@@ -254,6 +254,8 @@ public interface PropertySetter<T, R> {
    */
   @NonNull
   PropertySetter<T, R> accessible(boolean accessible);
+
+  //TODO 获取参数相关方法
 }
 
 /**

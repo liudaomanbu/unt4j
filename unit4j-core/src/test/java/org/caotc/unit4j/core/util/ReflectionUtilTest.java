@@ -17,19 +17,19 @@ class ReflectionUtilTest {
 @Data
 abstract class Super {
 
-  String a = "super";
+  protected String a = "super";
 
-  public String getA() {
-    return a;
-  }
+//  public String getA() {
+//    return a;
+//  }
 }
 
 @Data
 class Sub extends Super {
 
-  String a = "sub";
+//  String a = "sub";
 
-  @Override
+  //  @Override
   public String getA() {
     return a;
   }
