@@ -24,7 +24,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyGetter<T, R> extends AccessibleProperty<T, R> {
+public interface PropertyGetter<T, R> {
 
   /**
    * 工厂方法
@@ -131,7 +131,117 @@ public interface PropertyGetter<T, R> extends AccessibleProperty<T, R> {
   @NonNull Optional<R> get(@NonNull T object);
 
   /**
-   * 访问权限的set方法
+   * 属性名称
+   *
+   * @return 属性名称
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull String propertyName();
+
+  /**
+   * 拥有该属性的类
+   * @return 拥有该属性的类
+   *
+   * @author caotc
+   * @date 2019-06-27
+   * @since 1.0.0
+   */
+  @NonNull
+  TypeToken<T> ownerType();
+
+  /**
+   * 属性类型
+   *
+   * @return 属性类型
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  TypeToken<? extends R> propertyType();
+
+  /**
+   * 修改返回类型
+   *
+   * @param propertyType 新的返回类型
+   * @return 修改返回类型的属性获取器
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @NonNull
+  default <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
+    return propertyType(TypeToken.of(propertyType));
+  }
+
+  /**
+   * 修改返回类型
+   *
+   * @param propertyType 新的返回类型
+   * @return 修改返回类型的属性获取器
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @NonNull <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+
+  /**
+   * 获取注解对象
+   *
+   * @param annotationClass 注解类型
+   * @return 属性包装器的注解对象
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull <X extends Annotation> Optional<X> annotation(@NonNull Class<X> annotationClass);
+
+  /**
+   * 获取注解对象集合
+   *
+   * @param annotationClass 注解类型
+   * @return 注解对象集合
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  @NonNull <X extends Annotation> ImmutableList<X> annotations(@NonNull Class<X> annotationClass);
+
+  /**
+   * 获取注解对象集合
+   *
+   * @return 注解对象集合
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  @NonNull
+  ImmutableList<Annotation> annotations();
+
+  /**
+   * 注解对象集合
+   *
+   * @return 注解对象集合
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  ImmutableList<Annotation> declaredAnnotations();
+
+  /**
+   * 获取访问权限
+   *
+   * @return 获取访问权限
+   * @author caotc
+   * @date 2019-06-27
+   * @since 1.0.0
+   */
+  boolean accessible();
+
+  /**
+   * 设置访问权限
    *
    * @param accessible 是否可访问
    * @return {@code this}
@@ -139,8 +249,8 @@ public interface PropertyGetter<T, R> extends AccessibleProperty<T, R> {
    * @date 2019-05-28
    * @since 1.0.0
    */
-  @Override
-  @NonNull PropertyGetter<T, R> accessible(boolean accessible);
+  @NonNull
+  PropertyGetter<T, R> accessible(boolean accessible);
 }
 
 /**
@@ -180,8 +290,14 @@ class CompositePropertyGetter<T, R> implements PropertyGetter<T, R> {
   }
 
   @Override
-  public @NonNull TypeToken<? extends R> type() {
-    return propertyGetters.get(0).type();
+  public @NonNull TypeToken<? extends R> propertyType() {
+    return propertyGetters.get(0).propertyType();
+  }
+
+  @Override
+  public @NonNull <R1 extends R> PropertyGetter<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    return null;
   }
 
   @Override
@@ -207,8 +323,24 @@ class CompositePropertyGetter<T, R> implements PropertyGetter<T, R> {
   }
 
   @Override
-  public @NonNull String name() {
-    return propertyGetters.get(0).name();
+  public ImmutableList<Annotation> declaredAnnotations() {
+    return propertyGetters.stream().map(PropertyGetter::declaredAnnotations)
+        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
+  }
+
+  @Override
+  public boolean accessible() {
+    return propertyGetters.stream().allMatch(PropertyGetter::accessible);
+  }
+
+  @Override
+  public @NonNull String propertyName() {
+    return propertyGetters.get(0).propertyName();
+  }
+
+  @Override
+  public @NonNull TypeToken<T> ownerType() {
+    return propertyGetters.get(0).ownerType();
   }
 
   @Override
@@ -226,7 +358,7 @@ class CompositePropertyGetter<T, R> implements PropertyGetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class InvokablePropertyGetter<T, R> implements PropertyGetter<T, R> {
+class InvokablePropertyGetter<T, R> extends AccessibleProperty<T, R> implements PropertyGetter<T, R> {
 
   /**
    * get方法
@@ -237,8 +369,9 @@ class InvokablePropertyGetter<T, R> implements PropertyGetter<T, R> {
    */
   @NonNull ReflectionUtil.MethodNameStyle methodNameStyle;
 
-  InvokablePropertyGetter(@NonNull Invokable<T, R> getInvokable,
+  private InvokablePropertyGetter(@NonNull Invokable<T, R> getInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
+    super(getInvokable);
     Preconditions
         .checkArgument(methodNameStyle.isGetInvokable(getInvokable), "%s is not matches %s",
             getInvokable, methodNameStyle);
@@ -254,36 +387,30 @@ class InvokablePropertyGetter<T, R> implements PropertyGetter<T, R> {
   }
 
   @Override
-  public @NonNull TypeToken<? extends R> type() {
+  public @NonNull TypeToken<? extends R> propertyType() {
     return getInvokable.getReturnType();
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return Optional.ofNullable(getInvokable.getAnnotation(annotationClass));
+  public @NonNull <R1 extends R> InvokablePropertyGetter<T, R1> propertyType(
+      @NonNull Class<R1> propertyType) {
+    return (InvokablePropertyGetter<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return ImmutableList.copyOf(getInvokable.getAnnotationsByType(annotationClass));
+  public @NonNull <R1 extends R> InvokablePropertyGetter<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    return (InvokablePropertyGetter<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return ImmutableList.copyOf(getInvokable.getAnnotations());
-  }
-
-  @Override
-  public @NonNull String name() {
+  public @NonNull String propertyName() {
     return methodNameStyle.fieldNameFromGetInvokable(getInvokable);
   }
 
   @Override
-  public @NonNull PropertyGetter<T, R> accessible(boolean accessible) {
-    getInvokable.setAccessible(accessible);
-    return this;
+  public @NonNull InvokablePropertyGetter<T, R> accessible(boolean accessible) {
+    return (InvokablePropertyGetter<T, R>) super.accessible(accessible);
   }
 
 }
@@ -296,13 +423,18 @@ class InvokablePropertyGetter<T, R> implements PropertyGetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class FieldPropertyGetter<T, R> implements PropertyGetter<T, R> {
+class FieldPropertyGetter<T, R> extends AccessibleProperty<T, R> implements PropertyGetter<T, R> {
 
   /**
    * 属性
    */
   @NonNull
   Field field;
+
+//  private FieldPropertyGetter(@NonNull Field field){
+//    super(field);
+//    this.field=field;
+//  }
 
   @NonNull
   @SuppressWarnings("unchecked")
@@ -312,37 +444,31 @@ class FieldPropertyGetter<T, R> implements PropertyGetter<T, R> {
     return Optional.ofNullable((R) field.get(object));
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public @NonNull TypeToken<? extends R> type() {
+  @SuppressWarnings("unchecked")
+  public @NonNull TypeToken<? extends R> propertyType() {
     return TypeToken.of((Class<? extends R>) field.getType());
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return Optional.ofNullable(field.getAnnotation(annotationClass));
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return ImmutableList.copyOf(field.getAnnotationsByType(annotationClass));
-  }
-
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return ImmutableList.copyOf(field.getAnnotations());
-  }
-
-  @Override
-  public @NonNull String name() {
+  public @NonNull String propertyName() {
     return field.getName();
   }
 
   @Override
-  public @NonNull PropertyGetter<T, R> accessible(boolean accessible) {
-    field.setAccessible(accessible);
-    return this;
+  public @NonNull <R1 extends R> FieldPropertyGetter<T, R1> propertyType(
+      @NonNull Class<R1> propertyType) {
+    return (FieldPropertyGetter<T, R1>) super.propertyType(propertyType);
+  }
+
+  @Override
+  public @NonNull <R1 extends R> FieldPropertyGetter<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    return (FieldPropertyGetter<T, R1>) super.propertyType(propertyType);
+  }
+
+  @Override
+  public @NonNull FieldPropertyGetter<T, R> accessible(boolean accessible) {
+    return (FieldPropertyGetter<T, R>) super.accessible(accessible);
   }
 }

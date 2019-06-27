@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.util;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
@@ -33,14 +34,8 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   @NonNull
   Member member;
 
-  <M extends AccessibleObject & Member> AccessibleProperty(@NonNull M member) {
+  protected <M extends AccessibleObject & Member> AccessibleProperty(@NonNull M member) {
     this(member, member);
-  }
-
-  @SuppressWarnings("unchecked")
-  @NonNull
-  public TypeToken<T> ownerType() {
-    return (TypeToken<T>) TypeToken.of(getDeclaringClass());
   }
 
   @Override
@@ -163,14 +158,14 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   /**
    * Returns true if the field is volatile.
    */
-  final boolean isVolatile() {
+  public final boolean isVolatile() {
     return Modifier.isVolatile(getModifiers());
   }
 
   /**
    * Returns true if the field is transient.
    */
-  final boolean isTransient() {
+  public final boolean isTransient() {
     return Modifier.isTransient(getModifiers());
   }
 
@@ -186,6 +181,20 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   public abstract String propertyName();
 
   /**
+   * 拥有该属性的类
+   *
+   * @return 拥有该属性的类
+   * @author caotc
+   * @date 2019-06-27
+   * @since 1.0.0
+   */
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public TypeToken<T> ownerType() {
+    return (TypeToken<T>) TypeToken.of(getDeclaringClass());
+  }
+
+  /**
    * 属性类型
    *
    * @return 属性类型
@@ -197,11 +206,7 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   public abstract TypeToken<? extends R> propertyType();
 
   /**
-   * 修改返回类型 示例:
-   * <pre>{@code
-   * Method factoryMethod = Person.class.getMethod("create");
-   * Invokable<?, Person> factory = Invokable.of(getNameMethod).returning(Person.class);
-   * }</pre>
+   * 修改返回类型
    *
    * @param propertyType 新的返回类型
    * @return 修改返回类型的可使用属性
@@ -209,28 +214,34 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
    * @date 2019-06-25
    * @since 1.0.0
    */
-  public <R1 extends R> AccessibleProperty<T, R1> propertyType(Class<R1> propertyType) {
+  @NonNull
+  public <R1 extends R> AccessibleProperty<T, R1> propertyType(@NonNull Class<R1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
 
   /**
-   * Explicitly specifies the return type of this {@code Invokable}.
+   * 修改返回类型
+   *
+   * @param propertyType 新的返回类型
+   * @return 修改返回类型的可使用属性
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
    */
-  public <R1 extends R> AccessibleProperty<T, R1> propertyType(TypeToken<R1> propertyType) {
-    if (!propertyType.isSupertypeOf(propertyType())) {
-      throw new IllegalArgumentException(
-          "Invokable is known to return " + propertyType() + ", not " + propertyType);
-    }
-    @SuppressWarnings("unchecked") // guarded by previous check
-        AccessibleProperty<T, R1> specialized = (AccessibleProperty<T, R1>) this;
-    return specialized;
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public <R1 extends R> AccessibleProperty<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (AccessibleProperty<T, R1>) this;
   }
 
   /**
    * 获取该可使用属性的注解对象
    *
    * @param annotationClass 注解类型
-   * @return 属性包装器的注解对象
+   * @return 注解对象
    * @author caotc
    * @date 2019-05-27
    * @since 1.0.0
@@ -256,9 +267,21 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   }
 
   /**
-   * 获取该属性包装器的注解对象集合
+   * 注解对象集合
    *
-   * @return 属性包装器的注解对象集合
+   * @return 注解对象集合
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  public final ImmutableList<Annotation> declaredAnnotations() {
+    return ImmutableList.copyOf(getDeclaredAnnotations());
+  }
+
+  /**
+   * 注解对象集合
+   *
+   * @return 注解对象集合
    * @author caotc
    * @date 2019-05-28
    * @since 1.0.0
@@ -273,7 +296,7 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   }
 
   /**
-   * 访问权限的set方法
+   * 设置访问权限
    *
    * @param accessible 是否可访问
    * @return {@code this}
