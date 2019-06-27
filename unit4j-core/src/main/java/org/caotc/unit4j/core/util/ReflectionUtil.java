@@ -615,8 +615,9 @@ public class ReflectionUtil {
     //子类属性实现的属性获取器与所有get方法实现的属性获取器合并
     Stream<PropertyGetter<T, ?>> compositePropertyGetters = getInvokablePropertyGetters.asMap()
         .entrySet().stream()
-        .map(entry -> Stream.concat(entry.getValue().stream(),
-            Stream.of(fieldPropertyGetterMultimap.get(entry.getKey()).get(0))))
+        .map(entry -> Stream.concat(entry.getValue().stream()
+            , fieldPropertyGetterMultimap.get(entry.getKey()).stream().findAny().map(Stream::of)
+                .orElseGet(Stream::empty)))
         .map(propertyGetterStream -> propertyGetterStream.map(o -> (PropertyGetter<T, ?>) o))
         .map(PropertyGetter::create);
 
@@ -757,8 +758,9 @@ public class ReflectionUtil {
     //子类属性实现的属性获取器与所有get方法实现的属性获取器合并
     Stream<PropertySetter<T, ?>> compositePropertyGetters = invokablePropertySetterMultimap.asMap()
         .entrySet().stream()
-        .map(entry -> Stream.concat(entry.getValue().stream(),
-            Stream.of(fieldPropertySetterMultimap.get(entry.getKey()).get(0))))
+        .map(entry -> Stream.concat(entry.getValue().stream()
+            , fieldPropertySetterMultimap.get(entry.getKey()).stream().findAny().map(Stream::of)
+                .orElseGet(Stream::empty)))
         .map(propertySetterStream -> propertySetterStream.map(o -> (PropertySetter<T, ?>) o))
         .map(PropertySetter::create);
 
