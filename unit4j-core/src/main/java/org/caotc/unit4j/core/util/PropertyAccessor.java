@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.util;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
@@ -51,8 +52,23 @@ public class PropertyAccessor<T, R> implements PropertySetter<T, R>, PropertyGet
   }
 
   @Override
-  public @NonNull TypeToken<? extends R> type() {
-    return propertyGetter.type();
+  public @NonNull TypeToken<? extends R> propertyType() {
+    return propertyGetter.propertyType();
+  }
+
+  @Override
+  public @NonNull <R1 extends R> PropertyAccessor<T, R1> propertyType(
+      @NonNull Class<R1> propertyType) {
+    return propertyType(TypeToken.of(propertyType));
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public @NonNull <R1 extends R> PropertyAccessor<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "PropertyAccessor is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (PropertyAccessor<T, R1>) this;
   }
 
   @Override
@@ -77,8 +93,23 @@ public class PropertyAccessor<T, R> implements PropertySetter<T, R>, PropertyGet
   }
 
   @Override
-  public @NonNull String name() {
-    return propertyGetter.name();
+  public ImmutableList<Annotation> declaredAnnotations() {
+    return null;
+  }
+
+  @Override
+  public boolean accessible() {
+    return false;
+  }
+
+  @Override
+  public @NonNull String propertyName() {
+    return propertyGetter.propertyName();
+  }
+
+  @Override
+  public @NonNull TypeToken<T> ownerType() {
+    return propertyGetter.ownerType();
   }
 
   @Override

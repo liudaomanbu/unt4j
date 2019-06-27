@@ -294,10 +294,13 @@ class CompositePropertyGetter<T, R> implements PropertyGetter<T, R> {
     return propertyGetters.get(0).propertyType();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public @NonNull <R1 extends R> PropertyGetter<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
-    return null;
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "PropertyGetter is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (PropertyGetter<T, R1>) this;
   }
 
   @Override
@@ -369,7 +372,7 @@ class InvokablePropertyGetter<T, R> extends AccessibleProperty<T, R> implements 
    */
   @NonNull ReflectionUtil.MethodNameStyle methodNameStyle;
 
-  private InvokablePropertyGetter(@NonNull Invokable<T, R> getInvokable,
+  InvokablePropertyGetter(@NonNull Invokable<T, R> getInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     super(getInvokable);
     Preconditions
@@ -431,10 +434,10 @@ class FieldPropertyGetter<T, R> extends AccessibleProperty<T, R> implements Prop
   @NonNull
   Field field;
 
-//  private FieldPropertyGetter(@NonNull Field field){
-//    super(field);
-//    this.field=field;
-//  }
+  FieldPropertyGetter(@NonNull Field field) {
+    super(field);
+    this.field = field;
+  }
 
   @NonNull
   @SuppressWarnings("unchecked")

@@ -40,7 +40,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @Override
   public Object process(BeanContext context, Object object, String name, Object value) {
     AmountCodecConfig amountCodecConfig = ReflectionUtil
-        .propertyGetterFromClassWithoutFieldCheck(object.getClass(), name)
+        .propertyGetterFromClass(object.getClass(), name)
         .flatMap(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class))
         .map(amountSerialize -> unit4jProperties.createAmountCodecConfig(name, amountSerialize))
         .orElseGet(unit4jProperties::createAmountCodecConfig);
@@ -50,7 +50,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @Override
   public boolean apply(Object object, String name, Object value) {
     AmountCodecConfig amountCodecConfig = ReflectionUtil
-        .propertyGetterFromClassWithoutFieldCheck(object.getClass(), name)
+        .propertyGetterFromClass(object.getClass(), name)
         .flatMap(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class))
         .map(amountSerialize -> unit4jProperties.createAmountCodecConfig(name, amountSerialize))
         .orElseGet(unit4jProperties::createAmountCodecConfig);
@@ -61,15 +61,15 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @SuppressWarnings("unchecked")
   @Override
   public void writeBefore(Object object) {
-    ReflectionUtil.propertyGettersFromClassWithoutFieldCheck((Class<Object>) object.getClass())
+    ReflectionUtil.propertyGettersFromClass((Class<Object>) object.getClass())
         .stream()
         .filter(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class).isPresent()
-            || Amount.class.equals(fieldWrapper.type()))
+            || Amount.class.equals(fieldWrapper.propertyType().getRawType()))
         .forEach(fieldWrapper -> {
           fieldWrapper.get(object).map(Amount.class::cast).ifPresent(amount -> {
             AmountCodecConfig amountCodecConfig = fieldWrapper.annotation(AmountSerialize.class)
                 .map(amountSerialize -> unit4jProperties
-                    .createAmountCodecConfig(fieldWrapper.name(), amountSerialize))
+                    .createAmountCodecConfig(fieldWrapper.propertyName(), amountSerialize))
                 .orElseGet(unit4jProperties::createAmountCodecConfig);
             SerializeCommands serializeCommands = amountCodecConfig
                 .serializeCommandsFromAmount(amount);

@@ -37,7 +37,7 @@ public enum CodecStrategy {
           .apply((Class<? extends T>) value.getClass()).stream()
           .map(fieldWrapper -> SerializeCommand
               .create(Type.WRITE_FIELD,
-                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.name())),
+                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
                   fieldWrapper.get(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
       writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
           .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
@@ -85,7 +85,7 @@ public enum CodecStrategy {
           .apply((Class<? extends T>) value.getClass()).stream()
           .map(fieldWrapper -> SerializeCommand
               .create(Type.WRITE_FIELD,
-                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.name())),
+                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
                   fieldWrapper.get(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
       writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
           .forEach(writeFieldCommand -> builder.command(writeFieldCommand)

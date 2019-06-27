@@ -9,7 +9,7 @@ class ReflectionUtilTest {
 
   @Test
   void fieldWrappersFromClassWithFieldCheck() {
-    ReflectionUtil.propertyGettersFromClassWithFieldCheck(Sub.class).forEach(System.out::println);
+    ReflectionUtil.propertyGettersFromClass(Sub.class).forEach(System.out::println);
   }
 }
 

@@ -24,7 +24,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertySetter<T, R> extends AccessibleProperty<T, R> {
+public interface PropertySetter<T, R> {
 
   /**
    * 工厂方法
@@ -134,7 +134,117 @@ public interface PropertySetter<T, R> extends AccessibleProperty<T, R> {
   @NonNull PropertySetter<T, R> set(@NonNull T obj, @NonNull R value);
 
   /**
-   * 访问权限的set方法
+   * 属性名称
+   *
+   * @return 属性名称
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull String propertyName();
+
+  /**
+   * 拥有该属性的类
+   *
+   * @return 拥有该属性的类
+   * @author caotc
+   * @date 2019-06-27
+   * @since 1.0.0
+   */
+  @NonNull
+  TypeToken<T> ownerType();
+
+  /**
+   * 属性类型
+   *
+   * @return 属性类型
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  TypeToken<? extends R> propertyType();
+
+  /**
+   * 修改返回类型
+   *
+   * @param propertyType 新的返回类型
+   * @return 修改返回类型的属性设置器
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @NonNull
+  default <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
+    return propertyType(TypeToken.of(propertyType));
+  }
+
+  /**
+   * 修改返回类型
+   *
+   * @param propertyType 新的返回类型
+   * @return 修改返回类型的属性设置器
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @NonNull <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+
+  /**
+   * 获取注解对象
+   *
+   * @param annotationClass 注解类型
+   * @return 属性包装器的注解对象
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull <X extends Annotation> Optional<X> annotation(@NonNull Class<X> annotationClass);
+
+  /**
+   * 获取注解对象集合
+   *
+   * @param annotationClass 注解类型
+   * @return 注解对象集合
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  @NonNull <X extends Annotation> ImmutableList<X> annotations(@NonNull Class<X> annotationClass);
+
+  /**
+   * 获取注解对象集合
+   *
+   * @return 注解对象集合
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  @NonNull
+  ImmutableList<Annotation> annotations();
+
+  /**
+   * 注解对象集合
+   *
+   * @return 注解对象集合
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  ImmutableList<Annotation> declaredAnnotations();
+
+  /**
+   * 获取访问权限
+   *
+   * @return 获取访问权限
+   * @author caotc
+   * @date 2019-06-27
+   * @since 1.0.0
+   */
+  boolean accessible();
+
+  /**
+   * 设置访问权限
    *
    * @param accessible 是否可访问
    * @return {@code this}
@@ -142,8 +252,8 @@ public interface PropertySetter<T, R> extends AccessibleProperty<T, R> {
    * @date 2019-05-28
    * @since 1.0.0
    */
-  @Override
-  @NonNull PropertySetter<T, R> accessible(boolean accessible);
+  @NonNull
+  PropertySetter<T, R> accessible(boolean accessible);
 }
 
 /**
@@ -178,14 +288,22 @@ class CompositePropertySetter<T, R> implements PropertySetter<T, R> {
 
   @Override
   public @NonNull PropertySetter<T, R> set(@NonNull T obj, @NonNull R value) {
-    propertySetters.stream().findFirst()
-        .ifPresent(propertySetter -> propertySetter.set(obj, value));
+    propertySetters.get(0).set(obj, value);
     return this;
   }
 
   @Override
-  public @NonNull TypeToken<? extends R> type() {
-    return propertySetters.get(0).type();
+  public @NonNull TypeToken<? extends R> propertyType() {
+    return propertySetters.get(0).propertyType();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public @NonNull <R1 extends R> PropertySetter<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "PropertySetter is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (PropertySetter<T, R1>) this;
   }
 
   @Override
@@ -211,8 +329,24 @@ class CompositePropertySetter<T, R> implements PropertySetter<T, R> {
   }
 
   @Override
-  public @NonNull String name() {
-    return propertySetters.get(0).name();
+  public ImmutableList<Annotation> declaredAnnotations() {
+    return propertySetters.stream().map(PropertySetter::declaredAnnotations)
+        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
+  }
+
+  @Override
+  public boolean accessible() {
+    return propertySetters.stream().allMatch(PropertySetter::accessible);
+  }
+
+  @Override
+  public @NonNull String propertyName() {
+    return propertySetters.get(0).propertyName();
+  }
+
+  @Override
+  public @NonNull TypeToken<T> ownerType() {
+    return propertySetters.get(0).ownerType();
   }
 
   @Override
@@ -230,7 +364,8 @@ class CompositePropertySetter<T, R> implements PropertySetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class InvokablePropertySetter<T, R> implements PropertySetter<T, R> {
+class InvokablePropertySetter<T, R> extends AccessibleProperty<T, R> implements
+    PropertySetter<T, R> {
 
   /**
    * set方法
@@ -245,6 +380,7 @@ class InvokablePropertySetter<T, R> implements PropertySetter<T, R> {
 
   InvokablePropertySetter(@NonNull Invokable<T, ?> setInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
+    super(setInvokable);
     Preconditions
         .checkArgument(methodNameStyle.isSetInvokable(setInvokable), "%s is not matches %s",
             setInvokable, methodNameStyle);
@@ -261,38 +397,31 @@ class InvokablePropertySetter<T, R> implements PropertySetter<T, R> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public @NonNull TypeToken<? extends R> type() {
+  public @NonNull TypeToken<? extends R> propertyType() {
     return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return Optional.ofNullable(setInvokable.getAnnotation(annotationClass));
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return ImmutableList.copyOf(setInvokable.getAnnotationsByType(annotationClass));
-  }
-
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return ImmutableList.copyOf(setInvokable.getAnnotations());
-  }
-
-  @Override
-  public @NonNull String name() {
+  public @NonNull String propertyName() {
     return methodNameStyle.fieldNameFromGetInvokable(setInvokable);
   }
 
   @Override
-  public @NonNull PropertySetter<T, R> accessible(boolean accessible) {
-    setInvokable.setAccessible(accessible);
-    return this;
+  public @NonNull InvokablePropertySetter<T, R> accessible(boolean accessible) {
+    return (InvokablePropertySetter<T, R>) super.accessible(accessible);
   }
 
+  @Override
+  public @NonNull <R1 extends R> InvokablePropertySetter<T, R1> propertyType(
+      @NonNull Class<R1> propertyType) {
+    return (InvokablePropertySetter<T, R1>) super.propertyType(propertyType);
+  }
+
+  @Override
+  public @NonNull <R1 extends R> InvokablePropertySetter<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    return (InvokablePropertySetter<T, R1>) super.propertyType(propertyType);
+  }
 }
 
 /**
@@ -303,13 +432,18 @@ class InvokablePropertySetter<T, R> implements PropertySetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class FieldPropertySetter<T, R> implements PropertySetter<T, R> {
+class FieldPropertySetter<T, R> extends AccessibleProperty<T, R> implements PropertySetter<T, R> {
 
   /**
    * 属性
    */
   @NonNull
   Field field;
+
+  FieldPropertySetter(@NonNull Field field) {
+    super(field);
+    this.field = field;
+  }
 
   @Override
   @SneakyThrows
@@ -320,35 +454,29 @@ class FieldPropertySetter<T, R> implements PropertySetter<T, R> {
 
   @SuppressWarnings("unchecked")
   @Override
-  public @NonNull TypeToken<? extends R> type() {
+  public @NonNull TypeToken<? extends R> propertyType() {
     return TypeToken.of((Class<? extends R>) field.getType());
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return Optional.ofNullable(field.getAnnotation(annotationClass));
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return ImmutableList.copyOf(field.getAnnotationsByType(annotationClass));
-  }
-
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return ImmutableList.copyOf(field.getAnnotations());
-  }
-
-  @Override
-  public @NonNull String name() {
+  public @NonNull String propertyName() {
     return field.getName();
   }
 
   @Override
-  public @NonNull PropertySetter<T, R> accessible(boolean accessible) {
-    field.setAccessible(accessible);
-    return this;
+  public @NonNull FieldPropertySetter<T, R> accessible(boolean accessible) {
+    return (FieldPropertySetter<T, R>) super.accessible(accessible);
+  }
+
+  @Override
+  public @NonNull <R1 extends R> FieldPropertySetter<T, R1> propertyType(
+      @NonNull Class<R1> propertyType) {
+    return (FieldPropertySetter<T, R1>) super.propertyType(propertyType);
+  }
+
+  @Override
+  public @NonNull <R1 extends R> FieldPropertySetter<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    return (FieldPropertySetter<T, R1>) super.propertyType(propertyType);
   }
 }

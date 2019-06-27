@@ -155,9 +155,10 @@ public class AmountInterceptor implements Interceptor {
         .map(parameterMappings -> createSqlParams(parameterMappings, columns))
         .orElseGet(ImmutableList::of);
     sqlParams.stream().filter(sqlParam -> {
-      PropertyGetter<?, Object> propertyGetter = fieldWrapper(sqlParam.parameterMapping,
+      PropertyGetter<?, Object> propertyGetter = propertyGetter(sqlParam.parameterMapping,
           boundSql.getParameterObject(), mappedStatement);
-      return propertyGetter.annotation(AmountSerialize.class).isPresent() || propertyGetter.type()
+      return propertyGetter.annotation(AmountSerialize.class).isPresent() || propertyGetter
+          .propertyType().getRawType()
           .equals(Amount.class);
     }).forEach(sqlParam -> {
       ParameterMapping parameterMapping = sqlParam.parameterMapping;
@@ -166,7 +167,7 @@ public class AmountInterceptor implements Interceptor {
           .newMetaObject(boundSql.getParameterObject()).getValue(property);
       AmountCodecConfig amountCodecConfig = unit4jProperties
           .createAmountCodecConfig(sqlParam.column.getColumnName(),
-              fieldWrapper(sqlParam.parameterMapping, boundSql.getParameterObject(),
+              propertyGetter(sqlParam.parameterMapping, boundSql.getParameterObject(),
                   mappedStatement).annotation(AmountSerialize.class)
                   .orElse(null));
       SerializeCommands serializeCommands = amountCodecConfig
@@ -228,7 +229,7 @@ public class AmountInterceptor implements Interceptor {
 
   }
 
-  private PropertyGetter<?, Object> fieldWrapper(@NonNull ParameterMapping parameterMapping,
+  private PropertyGetter<?, Object> propertyGetter(@NonNull ParameterMapping parameterMapping,
       @NonNull Object parameterObject, @NonNull MappedStatement mappedStatement) {
     if (parameterMapping.getProperty().contains(StringConstant.DOT)) {
       ImmutableList<String> propertyNames = ImmutableList
@@ -239,12 +240,12 @@ public class AmountInterceptor implements Interceptor {
       Object directParameterObject = mappedStatement.getConfiguration()
           .newMetaObject(parameterObject).getValue(directPropertyName);
       return ReflectionUtil
-          .propertyGetterFromClassWithoutFieldCheck(directParameterObject.getClass(),
+          .propertyGetterFromClass(directParameterObject.getClass(),
               propertyNames.get(propertyNames.size() - 1)).orElseThrow(
               NeverHappenException::instance);
     } else {
       return ReflectionUtil
-          .propertyGetterFromClassWithoutFieldCheck(parameterObject.getClass(),
+          .propertyGetterFromClass(parameterObject.getClass(),
               parameterMapping.getProperty())
           .orElseThrow(NeverHappenException::instance);
     }
