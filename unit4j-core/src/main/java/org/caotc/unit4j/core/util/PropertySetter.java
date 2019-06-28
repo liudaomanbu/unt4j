@@ -144,17 +144,6 @@ public interface PropertySetter<T, R> {
   @NonNull String propertyName();
 
   /**
-   * 拥有该属性的类
-   *
-   * @return 拥有该属性的类
-   * @author caotc
-   * @date 2019-06-27
-   * @since 1.0.0
-   */
-  @NonNull
-  TypeToken<T> ownerType();
-
-  /**
    * 属性类型
    *
    * @return 属性类型
@@ -254,8 +243,6 @@ public interface PropertySetter<T, R> {
    */
   @NonNull
   PropertySetter<T, R> accessible(boolean accessible);
-
-  //TODO 获取参数相关方法
 }
 
 /**
@@ -344,11 +331,6 @@ class CompositePropertySetter<T, R> implements PropertySetter<T, R> {
   @Override
   public @NonNull String propertyName() {
     return propertySetters.get(0).propertyName();
-  }
-
-  @Override
-  public @NonNull TypeToken<T> ownerType() {
-    return propertySetters.get(0).ownerType();
   }
 
   @Override

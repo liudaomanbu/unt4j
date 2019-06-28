@@ -3,20 +3,17 @@ package org.caotc.unit4j.core.util;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Ordering;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.caotc.unit4j.core.constant.StringConstant;
-import org.caotc.unit4j.core.exception.NeverHappenException;
 //TODO 将所有方法优化到只有一次流操作
 
 /**
@@ -596,37 +593,23 @@ public class ReflectionUtil {
     Function<PropertyGetter<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
         .of(propertyGetter.propertyName(), propertyGetter.propertyType());
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyGetter<T, ?>> getInvokablePropertyGetters =
-        getMethodsFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
-            .flatMap(getMethod -> Arrays.stream(methodNameStyles)
-                .filter(methodNameStyle -> methodNameStyle.isGetMethod(getMethod))
-                .map(methodNameStyle -> (PropertyGetter<T, ?>) PropertyGetter
-                    .create(getMethod, methodNameStyle)))
+    Stream<PropertyGetter<T, ?>> getInvokablePropertyGetters = getMethodsFromClass(clazz,
+        fieldExistCheck, methodNameStyles).stream()
+        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
+            .filter(methodNameStyle -> methodNameStyle.isGetMethod(getMethod))
+            .map(methodNameStyle -> PropertyGetter.create(getMethod, methodNameStyle)));
+
+    Stream<PropertyGetter<T, ?>> fieldPropertyGetters = fieldsFromClass(
+        clazz).stream().map(PropertyGetter::create);
+
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyGetter<T, ?>> propertyGetterMultimap =
+        Stream.concat(fieldPropertyGetters, getInvokablePropertyGetters)
             .collect(ImmutableListMultimap
                 .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyGetter<T, ?>> fieldPropertyGetterMultimap = fieldsFromClass(
-        clazz).stream()
-        .sorted(fieldExtendClassComparator())
-        .map(PropertyGetter::create).map(propertyGetter -> (PropertyGetter<T, ?>) propertyGetter)
-        .collect(ImmutableListMultimap
-            .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
-
-    //子类属性实现的属性获取器与所有get方法实现的属性获取器合并
-    Stream<PropertyGetter<T, ?>> compositePropertyGetters = getInvokablePropertyGetters.asMap()
-        .entrySet().stream()
-        .map(entry -> Stream.concat(entry.getValue().stream()
-            , fieldPropertyGetterMultimap.get(entry.getKey()).stream().findAny().map(Stream::of)
-                .orElseGet(Stream::empty)))
-        .map(propertyGetterStream -> propertyGetterStream.map(o -> (PropertyGetter<T, ?>) o))
-        .map(PropertyGetter::create);
-
-    //其他父类的属性实现的属性获取器独立返回
-    Stream<PropertyGetter<T, ?>> fieldPropertyGetters = fieldPropertyGetterMultimap.asMap().values()
-        .stream().flatMap(fieldPropertyGetter -> fieldPropertyGetter.stream().skip(1));
-
-    return Stream.concat(compositePropertyGetters, fieldPropertyGetters)
-        .collect(ImmutableSet.toImmutableSet());
+    return propertyGetterMultimap.asMap().values().stream()
+        .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyGetter<T, ?>) o))
+        .map(PropertyGetter::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**
@@ -739,37 +722,23 @@ public class ReflectionUtil {
     Function<PropertySetter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertySetter -> ImmutableList
         .of(propertySetter.propertyName(), propertySetter.propertyType());
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertySetter<T, ?>> invokablePropertySetterMultimap =
-        setMethodsFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
-            .flatMap(setMethod -> Arrays.stream(methodNameStyles)
-                .filter(methodNameStyle -> methodNameStyle.isSetMethod(setMethod))
-                .map(methodNameStyle -> (PropertySetter<T, ?>) PropertySetter
-                    .create(setMethod, methodNameStyle)))
+    Stream<PropertySetter<T, ?>> setInvokablePropertySetters = getMethodsFromClass(clazz,
+        fieldExistCheck, methodNameStyles).stream()
+        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
+            .filter(methodNameStyle -> methodNameStyle.isSetMethod(getMethod))
+            .map(methodNameStyle -> PropertySetter.create(getMethod, methodNameStyle)));
+
+    Stream<PropertySetter<T, ?>> fieldPropertySetters = fieldsFromClass(
+        clazz).stream().map(PropertySetter::create);
+
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertySetter<T, ?>> propertySetterMultimap =
+        Stream.concat(fieldPropertySetters, setInvokablePropertySetters)
             .collect(ImmutableListMultimap
                 .toImmutableListMultimap(propertySetterToKeyFunction, Function.identity()));
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertySetter<T, ?>> fieldPropertySetterMultimap = fieldsFromClass(
-        clazz).stream()
-        .sorted(fieldExtendClassComparator())
-        .map(PropertySetter::create).map(propertySetter -> (PropertySetter<T, ?>) propertySetter)
-        .collect(ImmutableListMultimap
-            .toImmutableListMultimap(propertySetterToKeyFunction, Function.identity()));
-
-    //子类属性实现的属性获取器与所有get方法实现的属性获取器合并
-    Stream<PropertySetter<T, ?>> compositePropertyGetters = invokablePropertySetterMultimap.asMap()
-        .entrySet().stream()
-        .map(entry -> Stream.concat(entry.getValue().stream()
-            , fieldPropertySetterMultimap.get(entry.getKey()).stream().findAny().map(Stream::of)
-                .orElseGet(Stream::empty)))
-        .map(propertySetterStream -> propertySetterStream.map(o -> (PropertySetter<T, ?>) o))
-        .map(PropertySetter::create);
-
-    //其他父类的属性实现的属性获取器独立返回
-    Stream<PropertySetter<T, ?>> fieldPropertyGetters = fieldPropertySetterMultimap.asMap().values()
-        .stream().flatMap(propertySetters -> propertySetters.stream().skip(1));
-
-    return Stream.concat(compositePropertyGetters, fieldPropertyGetters)
-        .collect(ImmutableSet.toImmutableSet());
+    return propertySetterMultimap.asMap().values().stream()
+        .map(propertySetters -> propertySetters.stream().map(o -> (PropertySetter<T, ?>) o))
+        .map(PropertySetter::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**
@@ -929,35 +898,4 @@ public class ReflectionUtil {
     return Arrays.stream(methodNameStyles)
         .anyMatch(methodNameStyle -> methodNameStyle.isSetInvokable(invokable));
   }
-
-  /**
-   * 父子类的排序器,子类视为较小值,父类视为最大值 非父子类关系时报错
-   */
-  private static final Comparator<Class<?>> EXTEND_CLASS_COMPARATOR = (o1, o2) -> {
-    if (o1.equals(o2)) {
-      return 0;
-    }
-    if (o1.isAssignableFrom(o2)) {
-      return 1;
-    }
-    if (o2.isAssignableFrom(o1)) {
-      return -1;
-    }
-    throw NeverHappenException.instance();
-  };
-
-  /**
-   * 获取基于父子类的排序器的属性排序器
-   *
-   * @return 基于父子类的排序器的属性排序器
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @SuppressWarnings("ConstantConditions")
-  @NonNull
-  private static Comparator<Field> fieldExtendClassComparator() {
-    return Ordering.from(EXTEND_CLASS_COMPARATOR).onResultOf(Field::getDeclaringClass);
-  }
-
 }

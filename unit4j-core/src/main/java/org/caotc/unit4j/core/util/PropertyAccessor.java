@@ -108,11 +108,6 @@ public class PropertyAccessor<T, R> implements PropertySetter<T, R>, PropertyGet
   }
 
   @Override
-  public @NonNull TypeToken<T> ownerType() {
-    return propertyGetter.ownerType();
-  }
-
-  @Override
   public @NonNull PropertyAccessor<T, R> accessible(boolean accessible) {
     propertySetter.accessible(accessible);
     propertySetter.accessible(accessible);
