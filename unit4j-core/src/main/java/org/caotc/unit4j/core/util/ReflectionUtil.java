@@ -597,9 +597,8 @@ public class ReflectionUtil {
    * MethodNameStyle#JAVA_BEAN}
    * @since 1.0.0
    */
-  @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> ImmutableSet<PropertyGetter<T, ?>> propertyGettersFromClass(
+  public static <T> ImmutableSet<PropertyGetter<T, ?>> propertyGettersFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
 
@@ -729,7 +728,6 @@ public class ReflectionUtil {
    * MethodNameStyle#JAVA_BEAN}
    * @since 1.0.0
    */
-  @SuppressWarnings("unchecked")
   @NonNull
   public static <T> ImmutableSet<PropertySetter<T, ?>> propertySettersFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
@@ -816,19 +814,19 @@ public class ReflectionUtil {
         .findAny();
   }
 
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有属性存取器
-   *
-   * @param clazz 需要获取属性存取器的类
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @param methodNameStyles set/get方法格式集合
-   * @return 包括所有超类和接口的所有属性存取器
-   * @author caotc
-   * @date 2019-05-10
-   * @apiNote 如果只想要获取JavaBean规范的get/set方法, {@code methodNameStyles}参数使用{@link
-   * MethodNameStyle#JAVA_BEAN}
-   * @since 1.0.0
-   */
+//  /**
+//   * 从传入的类中获取包括所有超类和接口的所有属性存取器
+//   *
+//   * @param clazz 需要获取属性存取器的类
+//   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
+//   * @param methodNameStyles set/get方法格式集合
+//   * @return 包括所有超类和接口的所有属性存取器
+//   * @author caotc
+//   * @date 2019-05-10
+//   * @apiNote 如果只想要获取JavaBean规范的get/set方法, {@code methodNameStyles}参数使用{@link
+//   * MethodNameStyle#JAVA_BEAN}
+//   * @since 1.0.0
+//   */
 //  @NonNull
 //  public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
 //      @NonNull Class<T> clazz, boolean fieldExistCheck,
