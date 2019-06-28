@@ -120,7 +120,9 @@ public class ReflectionUtil {
         return setInvokable.getName();
       }
     };
-
+    private static final ImmutableSet<String> OBJECT_METHOD_NAMES = Arrays
+        .stream(Object.class.getDeclaredMethods())
+        .map(Method::getName).collect(ImmutableSet.toImmutableSet());
     /**
      * 检查传入方法是否是属于该命名风格的get方法
      *
@@ -144,7 +146,10 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
-      return !invokable.isStatic() && invokable.getParameters().isEmpty()
+      return !invokable.isStatic()
+          && !OBJECT_METHOD_NAMES.contains(invokable.getName())
+          && invokable.getParameters().isEmpty()
+          && !invokable.getReturnType().getRawType().equals(void.class)
           && getInvokableNameMatches(invokable);
     }
 
@@ -171,7 +176,11 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
-      return !invokable.isStatic() && invokable.getParameters().size() == 1
+      return !invokable.isStatic()
+          && !OBJECT_METHOD_NAMES.contains(invokable.getName())
+          && (invokable.getReturnType().getRawType().equals(void.class) || invokable.getReturnType()
+          .equals(invokable.getOwnerType()))
+          && invokable.getParameters().size() == 1
           && setInvokableNameMatches(invokable);
     }
 
@@ -608,6 +617,8 @@ public class ReflectionUtil {
                 .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
 
     return propertyGetterMultimap.asMap().values().stream()
+        .filter(propertyGetters -> !fieldExistCheck || propertyGetters.stream()
+            .anyMatch(FieldPropertyGetter.class::isInstance))
         .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyGetter<T, ?>) o))
         .map(PropertyGetter::create).collect(ImmutableSet.toImmutableSet());
   }
@@ -722,7 +733,7 @@ public class ReflectionUtil {
     Function<PropertySetter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertySetter -> ImmutableList
         .of(propertySetter.propertyName(), propertySetter.propertyType());
 
-    Stream<PropertySetter<T, ?>> setInvokablePropertySetters = getMethodsFromClass(clazz,
+    Stream<PropertySetter<T, ?>> setInvokablePropertySetters = setMethodsFromClass(clazz,
         fieldExistCheck, methodNameStyles).stream()
         .flatMap(getMethod -> Arrays.stream(methodNameStyles)
             .filter(methodNameStyle -> methodNameStyle.isSetMethod(getMethod))
@@ -737,6 +748,8 @@ public class ReflectionUtil {
                 .toImmutableListMultimap(propertySetterToKeyFunction, Function.identity()));
 
     return propertySetterMultimap.asMap().values().stream()
+        .filter(propertySetters -> !fieldExistCheck || propertySetters.stream()
+            .anyMatch(FieldPropertySetter.class::isInstance))
         .map(propertySetters -> propertySetters.stream().map(o -> (PropertySetter<T, ?>) o))
         .map(PropertySetter::create).collect(ImmutableSet.toImmutableSet());
   }

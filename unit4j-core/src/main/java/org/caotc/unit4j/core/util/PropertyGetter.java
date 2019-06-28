@@ -38,7 +38,10 @@ public interface PropertyGetter<T, R> {
   @NonNull
   static <T, R> PropertyGetter<T, R> create(
       @NonNull Iterable<PropertyGetter<T, R>> propertyGetters) {
-    return new CompositePropertyGetter<>(ImmutableList.copyOf(propertyGetters));
+    ImmutableList<PropertyGetter<T, R>> getters = ImmutableList.copyOf(propertyGetters);
+    //不能是空集合
+    Preconditions.checkArgument(!getters.isEmpty(), "propertyGetters can't be empty");
+    return getters.size() == 1 ? getters.get(0) : new CompositePropertyGetter<T, R>(getters);
   }
 
   /**
@@ -53,7 +56,10 @@ public interface PropertyGetter<T, R> {
   @NonNull
   static <T, R> PropertyGetter<T, R> create(
       @NonNull Iterator<PropertyGetter<T, R>> propertyGetters) {
-    return new CompositePropertyGetter<>(ImmutableList.copyOf(propertyGetters));
+    ImmutableList<PropertyGetter<T, R>> getters = ImmutableList.copyOf(propertyGetters);
+    //不能是空集合
+    Preconditions.checkArgument(!getters.isEmpty(), "propertyGetters can't be empty");
+    return getters.size() == 1 ? getters.get(0) : new CompositePropertyGetter<T, R>(getters);
   }
 
   /**
@@ -68,8 +74,11 @@ public interface PropertyGetter<T, R> {
   @NonNull
   static <T, R> PropertyGetter<T, R> create(
       @NonNull Stream<PropertyGetter<T, R>> propertyGetters) {
-    return new CompositePropertyGetter<T, R>(
-        propertyGetters.collect(ImmutableList.toImmutableList()));
+    ImmutableList<PropertyGetter<T, R>> getters = propertyGetters
+        .collect(ImmutableList.toImmutableList());
+    //不能是空集合
+    Preconditions.checkArgument(!getters.isEmpty(), "propertyGetters can't be empty");
+    return getters.size() == 1 ? getters.get(0) : new CompositePropertyGetter<T, R>(getters);
   }
 
   /**
@@ -257,8 +266,9 @@ class CompositePropertyGetter<T, R> implements PropertyGetter<T, R> {
 
   CompositePropertyGetter(
       @NonNull ImmutableList<PropertyGetter<T, R>> propertyGetters) {
-    //不能是空集合
-    Preconditions.checkArgument(!propertyGetters.isEmpty(), "propertyGetters can't empty");
+    //集合元素个数>=2
+    Preconditions
+        .checkArgument(propertyGetters.size() >= 2, "propertyGetters size must greater than 1");
     //不能重复组合
     Preconditions
         .checkArgument(

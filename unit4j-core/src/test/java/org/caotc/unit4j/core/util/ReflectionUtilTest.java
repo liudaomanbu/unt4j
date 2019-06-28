@@ -8,8 +8,13 @@ import org.junit.jupiter.api.Test;
 class ReflectionUtilTest {
 
   @Test
-  void fieldWrappersFromClassWithFieldCheck() {
-    ReflectionUtil.propertyGettersFromClass(Sub.class).forEach(System.out::println);
+  void propertyGettersFromClass() {
+    ReflectionUtil.propertyGettersFromClass(Sub.class, false).forEach(System.out::println);
+  }
+
+  @Test
+  void propertySettersFromClass() {
+    ReflectionUtil.propertySettersFromClass(Sub.class, false).forEach(System.out::println);
   }
 }
 
