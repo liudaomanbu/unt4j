@@ -120,9 +120,13 @@ public class ReflectionUtil {
         return setInvokable.getName();
       }
     };
-    private static final ImmutableSet<String> OBJECT_METHOD_NAMES = Arrays
+    private static final Function<Invokable<?, ?>, ImmutableList<?>> INVOKABLE_TO_SIGN = invokable -> ImmutableList
+        .of(invokable.getName(), invokable.getParameters());
+
+    private static final ImmutableSet<ImmutableList<?>> OBJECT_METHOD_SIGNS = Arrays
         .stream(Object.class.getDeclaredMethods())
-        .map(Method::getName).collect(ImmutableSet.toImmutableSet());
+        .map(Invokable::from)
+        .map(INVOKABLE_TO_SIGN::apply).collect(ImmutableSet.toImmutableSet());
     /**
      * 检查传入方法是否是属于该命名风格的get方法
      *
@@ -147,7 +151,7 @@ public class ReflectionUtil {
      */
     public boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
       return !invokable.isStatic()
-          && !OBJECT_METHOD_NAMES.contains(invokable.getName())
+          && !OBJECT_METHOD_SIGNS.contains(INVOKABLE_TO_SIGN.apply(invokable))
           && invokable.getParameters().isEmpty()
           && !invokable.getReturnType().getRawType().equals(void.class)
           && getInvokableNameMatches(invokable);
@@ -177,7 +181,7 @@ public class ReflectionUtil {
      */
     public boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
       return !invokable.isStatic()
-          && !OBJECT_METHOD_NAMES.contains(invokable.getName())
+          && !OBJECT_METHOD_SIGNS.contains(INVOKABLE_TO_SIGN.apply(invokable))
           && (invokable.getReturnType().getRawType().equals(void.class) || invokable.getReturnType()
           .equals(invokable.getOwnerType()))
           && invokable.getParameters().size() == 1
