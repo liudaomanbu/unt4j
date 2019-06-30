@@ -9,12 +9,12 @@ class ReflectionUtilTest {
 
   @Test
   void propertyGettersFromClass() {
-    ReflectionUtil.propertyGettersFromClass(Sub.class).forEach(System.out::println);
+    ReflectionUtil.propertyGettersFromClass(Sub.class, false).forEach(System.out::println);
   }
 
   @Test
   void propertySettersFromClass() {
-    ReflectionUtil.propertySettersFromClass(Sub.class).forEach(System.out::println);
+    ReflectionUtil.propertySettersFromClass(Sub.class, false).forEach(System.out::println);
   }
 }
 

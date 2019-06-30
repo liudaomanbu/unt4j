@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.util;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
@@ -169,6 +170,17 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   }
 
   /**
+   * 属性名称
+   *
+   * @return 属性名称
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  public abstract String propertyName();
+
+  /**
    * 拥有该属性的类
    *
    * @return 拥有该属性的类
@@ -180,6 +192,49 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   @NonNull
   public TypeToken<T> ownerType() {
     return (TypeToken<T>) TypeToken.of(getDeclaringClass());
+  }
+
+  /**
+   * 属性类型
+   *
+   * @return 属性类型
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  public abstract TypeToken<? extends R> propertyType();
+
+  /**
+   * 修改返回类型
+   *
+   * @param propertyType 新的返回类型
+   * @return 修改返回类型的可使用属性
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @NonNull
+  public <R1 extends R> AccessibleProperty<T, R1> propertyType(@NonNull Class<R1> propertyType) {
+    return propertyType(TypeToken.of(propertyType));
+  }
+
+  /**
+   * 修改返回类型
+   *
+   * @param propertyType 新的返回类型
+   * @return 修改返回类型的可使用属性
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public <R1 extends R> AccessibleProperty<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (AccessibleProperty<T, R1>) this;
   }
 
   /**
