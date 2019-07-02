@@ -2,6 +2,7 @@ package org.caotc.unit4j.core.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
@@ -814,35 +815,72 @@ public class ReflectionUtil {
         .findAny();
   }
 
-//  /**
-//   * 从传入的类中获取包括所有超类和接口的所有属性存取器
-//   *
-//   * @param clazz 需要获取属性存取器的类
-//   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-//   * @param methodNameStyles set/get方法格式集合
-//   * @return 包括所有超类和接口的所有属性存取器
-//   * @author caotc
-//   * @date 2019-05-10
-//   * @apiNote 如果只想要获取JavaBean规范的get/set方法, {@code methodNameStyles}参数使用{@link
-//   * MethodNameStyle#JAVA_BEAN}
-//   * @since 1.0.0
-//   */
-//  @NonNull
-//  public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
-//      @NonNull Class<T> clazz, boolean fieldExistCheck,
-//      @NonNull MethodNameStyle... methodNameStyles) {
-//    ImmutableMap<ImmutableList<?>, PropertyGetter<T, ?>> keyToPropertyGetters = propertyGettersFromClass(
-//        clazz,
-//        fieldExistCheck, methodNameStyles).stream()
-//        .collect(ImmutableMap.toImmutableMap(
-//            propertyGetter -> ImmutableList.of(propertyGetter.name(), propertyGetter.type()),
-//            Function.identity()));
-//    return propertySettersFromClass(clazz,
-//        fieldExistCheck, methodNameStyles).stream()
-//        .filter(propertySetter -> keyToPropertyGetters.containsKey(ImmutableList.of(propertySetter.name(),propertySetter.type())))
-//    .map(propertySetter -> PropertyAccessor.create(propertySetter,(PropertyGetter<T, ?>)keyToPropertyGetters.get(ImmutableList.of(propertySetter.name(),propertySetter.type()))))
-//    .collect(ImmutableSet.toImmutableSet());
-//  }
+  /**
+   * 从传入的类中获取包括所有超类和接口的所有属性存取器
+   *
+   * @param clazz 需要获取属性存取器的类
+   * @return 包括所有超类和接口的所有属性存取器
+   * @author caotc
+   * @date 2019-05-10
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T, R> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyAccessorsFromClass(clazz, true);
+  }
+
+  /**
+   * 从传入的类中获取包括所有超类和接口的所有属性存取器
+   *
+   * @param clazz 需要获取属性存取器的类
+   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
+   * @return 包括所有超类和接口的所有属性存取器
+   * @author caotc
+   * @date 2019-05-10
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T, R> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck) {
+    return propertyAccessorsFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
+  }
+
+  /**
+   * 从传入的类中获取包括所有超类和接口的所有属性存取器
+   *
+   * @param clazz 需要获取属性存取器的类
+   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
+   * @param methodNameStyles set/get方法格式集合
+   * @return 包括所有超类和接口的所有属性存取器
+   * @author caotc
+   * @date 2019-05-10
+   * @apiNote 如果只想要获取JavaBean规范的get/set方法, {@code methodNameStyles}参数使用{@link
+   * MethodNameStyle#JAVA_BEAN}
+   * @since 1.0.0
+   */
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    Function<PropertyGetter<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
+        .of(propertyGetter.propertyName(), propertyGetter.propertyType());
+    Function<PropertySetter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertySetter -> ImmutableList
+        .of(propertySetter.propertyName(), propertySetter.propertyType());
+
+    ImmutableMap<ImmutableList<?>, PropertyGetter<T, ?>> keyToPropertyGetters = propertyGettersFromClass(
+        clazz, fieldExistCheck, methodNameStyles).stream()
+        .collect(ImmutableMap.toImmutableMap(propertyGetterToKeyFunction, Function.identity()));
+    return propertySettersFromClass(clazz,
+        fieldExistCheck, methodNameStyles).stream()
+        .filter(propertySetter -> keyToPropertyGetters
+            .containsKey(propertySetterToKeyFunction.apply(propertySetter)))
+        .map(propertySetter -> PropertyAccessor.create((PropertySetter<T, R>) propertySetter
+            , (PropertyGetter<T, R>) keyToPropertyGetters
+                .get(propertySetterToKeyFunction.apply(propertySetter))))
+        .collect(ImmutableSet.toImmutableSet());
+  }
 
   /**
    * 检查传入方法是否是get方法
