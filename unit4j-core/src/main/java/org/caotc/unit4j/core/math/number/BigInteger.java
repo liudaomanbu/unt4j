@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.math.number;
 
+import com.google.common.annotations.Beta;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -16,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode
 @AllArgsConstructor(staticName = "valueOf")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Beta
 public class BigInteger extends AbstractNumber {
 
   public static final BigInteger ZERO = valueOf(java.math.BigInteger.ZERO);

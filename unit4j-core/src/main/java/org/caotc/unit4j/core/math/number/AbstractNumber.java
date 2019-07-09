@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.math.number;
 
+import com.google.common.annotations.Beta;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import lombok.Data;
@@ -14,6 +15,7 @@ import lombok.NonNull;
  * @since 1.0.0
  */
 @Data
+@Beta
 public abstract class AbstractNumber extends Number implements Comparable<AbstractNumber> {
 
   protected static final MathContext DEFAULT_MATH_CONTEXT = MathContext.DECIMAL128;

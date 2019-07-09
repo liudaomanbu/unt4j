@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.util;
 
+import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -25,6 +26,7 @@ import org.caotc.unit4j.core.constant.StringConstant;
  * @since 1.0.0
  */
 @UtilityClass
+@Beta
 public class ReflectionUtil {
 
   /**
