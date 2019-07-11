@@ -49,6 +49,11 @@ class Sub extends Super {
   String stringField = "sub";
   Number numberField = 88;
 
+  public void setNumberField(Number numberField) {
+    System.out.println("setNumberField Number");
+    this.numberField = numberField;
+  }
+
   public void setNumberField(int numberField) {
     System.out.println("setNumberField int");
     this.numberField = numberField;

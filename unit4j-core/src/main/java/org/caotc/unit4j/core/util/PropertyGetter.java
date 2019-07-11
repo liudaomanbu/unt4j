@@ -1,16 +1,13 @@
 package org.caotc.unit4j.core.util;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
@@ -24,62 +21,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyGetter<T, R> {
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyGetters 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertyGetter<T, R> create(
-      @NonNull Iterable<PropertyGetter<T, R>> propertyGetters) {
-    ImmutableList<PropertyGetter<T, R>> getters = ImmutableList.copyOf(propertyGetters);
-    //不能是空集合
-    Preconditions.checkArgument(!getters.isEmpty(), "propertyGetters can't be empty");
-    return getters.size() == 1 ? getters.get(0) : new CompositePropertyGetter<T, R>(getters);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyGetters 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertyGetter<T, R> create(
-      @NonNull Iterator<PropertyGetter<T, R>> propertyGetters) {
-    ImmutableList<PropertyGetter<T, R>> getters = ImmutableList.copyOf(propertyGetters);
-    //不能是空集合
-    Preconditions.checkArgument(!getters.isEmpty(), "propertyGetters can't be empty");
-    return getters.size() == 1 ? getters.get(0) : new CompositePropertyGetter<T, R>(getters);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyGetters 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertyGetter<T, R> create(
-      @NonNull Stream<PropertyGetter<T, R>> propertyGetters) {
-    ImmutableList<PropertyGetter<T, R>> getters = propertyGetters
-        .collect(ImmutableList.toImmutableList());
-    //不能是空集合
-    Preconditions.checkArgument(!getters.isEmpty(), "propertyGetters can't be empty");
-    return getters.size() == 1 ? getters.get(0) : new CompositePropertyGetter<T, R>(getters);
-  }
+public abstract class PropertyGetter<T, R> extends Element<T> {
 
   /**
    * 工厂方法
@@ -93,7 +35,7 @@ public interface PropertyGetter<T, R> {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  static <T, R> PropertyGetter<T, R> create(@NonNull Method getMethod,
+  public static <T, R> PropertyGetter<T, R> create(@NonNull Method getMethod,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     return create((Invokable<T, R>) Invokable.from(getMethod), methodNameStyle);
   }
@@ -109,7 +51,7 @@ public interface PropertyGetter<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyGetter<T, R> create(@NonNull Invokable<T, R> getInvokable,
+  public static <T, R> PropertyGetter<T, R> create(@NonNull Invokable<T, R> getInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     return new InvokablePropertyGetter<>(getInvokable, methodNameStyle);
   }
@@ -124,8 +66,13 @@ public interface PropertyGetter<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyGetter<T, R> create(@NonNull Field field) {
+  public static <T, R> PropertyGetter<T, R> create(@NonNull Field field) {
     return new FieldPropertyGetter<>(field);
+  }
+
+  <M extends AccessibleObject & Member> PropertyGetter(
+      @NonNull M member) {
+    super(member);
   }
 
   /**
@@ -137,7 +84,8 @@ public interface PropertyGetter<T, R> {
    * @date 2019-05-27
    * @since 1.0.0
    */
-  @NonNull Optional<R> get(@NonNull T object);
+  @NonNull
+  public abstract Optional<R> get(@NonNull T object);
 
   /**
    * 属性名称
@@ -147,7 +95,8 @@ public interface PropertyGetter<T, R> {
    * @date 2019-05-27
    * @since 1.0.0
    */
-  @NonNull String propertyName();
+  @NonNull
+  public abstract String propertyName();
 
   /**
    * 属性类型
@@ -158,7 +107,7 @@ public interface PropertyGetter<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  TypeToken<? extends R> propertyType();
+  public abstract TypeToken<? extends R> propertyType();
 
   /**
    * 修改返回类型
@@ -170,7 +119,7 @@ public interface PropertyGetter<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  default <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
+  public <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
 
@@ -183,168 +132,14 @@ public interface PropertyGetter<T, R> {
    * @date 2019-06-25
    * @since 1.0.0
    */
-  @NonNull <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
-
-  /**
-   * 获取注解对象
-   *
-   * @param annotationClass 注解类型
-   * @return 属性包装器的注解对象
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull <X extends Annotation> Optional<X> annotation(@NonNull Class<X> annotationClass);
-
-  /**
-   * 获取注解对象集合
-   *
-   * @param annotationClass 注解类型
-   * @return 注解对象集合
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @NonNull <X extends Annotation> ImmutableList<X> annotations(@NonNull Class<X> annotationClass);
-
-  /**
-   * 获取注解对象集合
-   *
-   * @return 注解对象集合
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @NonNull
-  ImmutableList<Annotation> annotations();
-
-  /**
-   * 注解对象集合
-   *
-   * @return 注解对象集合
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  ImmutableList<Annotation> declaredAnnotations();
-
-  /**
-   * 获取访问权限
-   *
-   * @return 获取访问权限
-   * @author caotc
-   * @date 2019-06-27
-   * @since 1.0.0
-   */
-  boolean accessible();
-
-  /**
-   * 设置访问权限
-   *
-   * @param accessible 是否可访问
-   * @return {@code this}
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @NonNull
-  PropertyGetter<T, R> accessible(boolean accessible);
-}
-
-/**
- * 组合属性获取器,由{@link FieldPropertyGetter}和{@link InvokablePropertyGetter}实现
- *
- * @author caotc
- * @date 2019-05-27
- * @since 1.0.0
- */
-@Value
-class CompositePropertyGetter<T, R> implements PropertyGetter<T, R> {
-
-  @NonNull
-  ImmutableList<PropertyGetter<T, R>> propertyGetters;
-
-  CompositePropertyGetter(
-      @NonNull ImmutableList<PropertyGetter<T, R>> propertyGetters) {
-    //集合元素个数>=2
-    Preconditions
-        .checkArgument(propertyGetters.size() >= 2, "propertyGetters size must greater than 1");
-    //不能重复组合
-    Preconditions
-        .checkArgument(
-            propertyGetters.stream().noneMatch(CompositePropertyGetter.class::isInstance),
-            "CompositePropertyGetter are not allowed in a CompositePropertyGetter");
-    //实际属性只能有一个
-    Preconditions.checkArgument(
-        propertyGetters.stream().filter(FieldPropertyGetter.class::isInstance).count() <= 1,
-        "Multiple FieldPropertyGetter are not allowed");
-    this.propertyGetters = propertyGetters.stream().distinct()
-        .collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public @NonNull Optional<R> get(@NonNull T object) {
-    return propertyGetters.stream().map(propertyGetter -> propertyGetter.get(object))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
-  }
-
-  @Override
-  public @NonNull TypeToken<? extends R> propertyType() {
-    return propertyGetters.get(0).propertyType();
-  }
-
   @SuppressWarnings("unchecked")
-  @Override
-  public @NonNull <R1 extends R> PropertyGetter<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
+  @NonNull
+  public <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertyGetter is known propertyType %s,not %s ", propertyType(), propertyType);
+        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
     return (PropertyGetter<T, R1>) this;
   }
 
-  @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return propertyGetters.stream()
-        .map(fieldWrapper -> fieldWrapper.annotation(annotationClass))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return propertyGetters.stream()
-        .map(propertyGetter -> propertyGetter.annotations(annotationClass))
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return propertyGetters.stream().map(PropertyGetter::annotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public ImmutableList<Annotation> declaredAnnotations() {
-    return propertyGetters.stream().map(PropertyGetter::declaredAnnotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public boolean accessible() {
-    return propertyGetters.stream().allMatch(PropertyGetter::accessible);
-  }
-
-  @Override
-  public @NonNull String propertyName() {
-    return propertyGetters.get(0).propertyName();
-  }
-
-  @Override
-  public @NonNull PropertyGetter<T, R> accessible(boolean accessible) {
-    propertyGetters.forEach(propertyGetter -> propertyGetter.accessible(accessible));
-    return this;
-  }
 }
 
 /**
@@ -355,7 +150,7 @@ class CompositePropertyGetter<T, R> implements PropertyGetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class InvokablePropertyGetter<T, R> extends AccessibleProperty<T, R> implements PropertyGetter<T, R> {
+class InvokablePropertyGetter<T, R> extends PropertyGetter<T, R> {
 
   /**
    * get方法
@@ -420,7 +215,7 @@ class InvokablePropertyGetter<T, R> extends AccessibleProperty<T, R> implements 
  * @since 1.0.0
  */
 @Value
-class FieldPropertyGetter<T, R> extends AccessibleProperty<T, R> implements PropertyGetter<T, R> {
+class FieldPropertyGetter<T, R> extends PropertyGetter<T, R> {
 
   /**
    * 属性

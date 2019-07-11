@@ -1,40 +1,40 @@
 package org.caotc.unit4j.core.util;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-
+import lombok.ToString;
 
 /**
- * 可使用属性,可由{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
+ * {@link Field},{@link Method},{@link Constructor}的父类
  *
  * @param <T> 拥有该属性的类
- * @param <R> 属性类型
  * @author caotc
  * @date 2019-06-20
  * @since 1.0.0
  */
-@Data
 @AllArgsConstructor
-public abstract class AccessibleProperty<T, R> extends AccessibleObject implements Member {
+@ToString
+@EqualsAndHashCode
+public abstract class Element<T> extends AccessibleObject implements Member {
 
   @NonNull
   AccessibleObject accessibleObject;
   @NonNull
   Member member;
 
-  protected <M extends AccessibleObject & Member> AccessibleProperty(@NonNull M member) {
+  <M extends AccessibleObject & Member> Element(@NonNull M member) {
     this(member, member);
   }
 
@@ -170,17 +170,6 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   }
 
   /**
-   * 属性名称
-   *
-   * @return 属性名称
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public abstract String propertyName();
-
-  /**
    * 拥有该属性的类
    *
    * @return 拥有该属性的类
@@ -191,54 +180,29 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
   @SuppressWarnings("unchecked")
   @NonNull
   public TypeToken<T> ownerType() {
-    return (TypeToken<T>) TypeToken.of(getDeclaringClass());
+    return TypeToken.of((Class<T>) getDeclaringClass());
   }
 
-  /**
-   * 属性类型
-   *
-   * @return 属性类型
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public abstract TypeToken<? extends R> propertyType();
+//  /**
+//   * 修改返回类型
+//   *
+//   * @param propertyType 新的返回类型
+//   * @return 修改返回类型的可使用属性
+//   * @author caotc
+//   * @date 2019-06-25
+//   * @since 1.0.0
+//   */
+//  @SuppressWarnings("unchecked")
+//  @NonNull
+//  public <R1 extends R> Element<T, R1> propertyType(
+//      @NonNull TypeToken<R1> propertyType) {
+//    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+//        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
+//    return (Element<T, R1>) this;
+//  }
 
   /**
-   * 修改返回类型
-   *
-   * @param propertyType 新的返回类型
-   * @return 修改返回类型的可使用属性
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @NonNull
-  public <R1 extends R> AccessibleProperty<T, R1> propertyType(@NonNull Class<R1> propertyType) {
-    return propertyType(TypeToken.of(propertyType));
-  }
-
-  /**
-   * 修改返回类型
-   *
-   * @param propertyType 新的返回类型
-   * @return 修改返回类型的可使用属性
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
-  @NonNull
-  public <R1 extends R> AccessibleProperty<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (AccessibleProperty<T, R1>) this;
-  }
-
-  /**
-   * 获取该可使用属性的注解对象
+   * 获取该元素的注解对象
    *
    * @param annotationClass 注解类型
    * @return 注解对象
@@ -274,6 +238,7 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
    * @date 2019-05-28
    * @since 1.0.0
    */
+  @NonNull
   public final ImmutableList<Annotation> declaredAnnotations() {
     return ImmutableList.copyOf(getDeclaredAnnotations());
   }
@@ -305,7 +270,7 @@ public abstract class AccessibleProperty<T, R> extends AccessibleObject implemen
    * @since 1.0.0
    */
   @NonNull
-  public AccessibleProperty<T, R> accessible(boolean accessible) {
+  public Element<T> accessible(boolean accessible) {
     setAccessible(accessible);
     return this;
   }

@@ -1,16 +1,12 @@
 package org.caotc.unit4j.core.util;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
@@ -24,62 +20,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertySetter<T, R> {
-
-  /**
-   * 工厂方法
-   *
-   * @param propertySetters 属性设置器集合
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertySetter<T, R> create(
-      @NonNull Iterable<PropertySetter<T, R>> propertySetters) {
-    ImmutableList<PropertySetter<T, R>> setters = ImmutableList.copyOf(propertySetters);
-    //不能是空集合
-    Preconditions.checkArgument(!setters.isEmpty(), "propertySetters can't be empty");
-    return setters.size() == 1 ? setters.get(0) : new CompositePropertySetter<T, R>(setters);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertySetters 属性设置器集合
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertySetter<T, R> create(
-      @NonNull Iterator<PropertySetter<T, R>> propertySetters) {
-    ImmutableList<PropertySetter<T, R>> setters = ImmutableList.copyOf(propertySetters);
-    //不能是空集合
-    Preconditions.checkArgument(!setters.isEmpty(), "propertySetters can't be empty");
-    return setters.size() == 1 ? setters.get(0) : new CompositePropertySetter<T, R>(setters);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertySetters 属性设置器集合
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertySetter<T, R> create(
-      @NonNull Stream<PropertySetter<T, R>> propertySetters) {
-    ImmutableList<PropertySetter<T, R>> setters = propertySetters
-        .collect(ImmutableList.toImmutableList());
-    //不能是空集合
-    Preconditions.checkArgument(!setters.isEmpty(), "propertySetters can't be empty");
-    return setters.size() == 1 ? setters.get(0) : new CompositePropertySetter<T, R>(setters);
-  }
+public abstract class PropertySetter<T, R> extends Element<T> {
 
   /**
    * 工厂方法
@@ -93,7 +34,7 @@ public interface PropertySetter<T, R> {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  static <T, R> PropertySetter<T, R> create(@NonNull Method setMethod,
+  public static <T, R> PropertySetter<T, R> create(@NonNull Method setMethod,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     return create((Invokable<T, ?>) Invokable.from(setMethod), methodNameStyle);
   }
@@ -110,7 +51,7 @@ public interface PropertySetter<T, R> {
    */
 
   @NonNull
-  static <T, R> PropertySetter<T, R> create(@NonNull Invokable<T, ?> setInvokable,
+  public static <T, R> PropertySetter<T, R> create(@NonNull Invokable<T, ?> setInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     return new InvokablePropertySetter<>(setInvokable, methodNameStyle);
   }
@@ -130,6 +71,11 @@ public interface PropertySetter<T, R> {
     return new FieldPropertySetter<>(field);
   }
 
+  <M extends AccessibleObject & Member> PropertySetter(
+      @NonNull M member) {
+    super(member);
+  }
+
   /**
    * 给传入对象的该属性设置传入的值
    *
@@ -140,7 +86,8 @@ public interface PropertySetter<T, R> {
    * @date 2019-05-28
    * @since 1.0.0
    */
-  @NonNull PropertySetter<T, R> set(@NonNull T obj, @NonNull R value);
+  @NonNull
+  public abstract PropertySetter<T, R> set(@NonNull T obj, @NonNull R value);
 
   /**
    * 属性名称
@@ -150,7 +97,8 @@ public interface PropertySetter<T, R> {
    * @date 2019-05-27
    * @since 1.0.0
    */
-  @NonNull String propertyName();
+  @NonNull
+  public abstract String propertyName();
 
   /**
    * 属性类型
@@ -161,7 +109,7 @@ public interface PropertySetter<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  TypeToken<? extends R> propertyType();
+  public abstract TypeToken<? extends R> propertyType();
 
   /**
    * 修改返回类型
@@ -173,7 +121,7 @@ public interface PropertySetter<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  default <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
+  public <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
 
@@ -186,167 +134,12 @@ public interface PropertySetter<T, R> {
    * @date 2019-06-25
    * @since 1.0.0
    */
-  @NonNull <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
-
-  /**
-   * 获取注解对象
-   *
-   * @param annotationClass 注解类型
-   * @return 属性包装器的注解对象
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull <X extends Annotation> Optional<X> annotation(@NonNull Class<X> annotationClass);
-
-  /**
-   * 获取注解对象集合
-   *
-   * @param annotationClass 注解类型
-   * @return 注解对象集合
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @NonNull <X extends Annotation> ImmutableList<X> annotations(@NonNull Class<X> annotationClass);
-
-  /**
-   * 获取注解对象集合
-   *
-   * @return 注解对象集合
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @NonNull
-  ImmutableList<Annotation> annotations();
-
-  /**
-   * 注解对象集合
-   *
-   * @return 注解对象集合
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  ImmutableList<Annotation> declaredAnnotations();
-
-  /**
-   * 获取访问权限
-   *
-   * @return 获取访问权限
-   * @author caotc
-   * @date 2019-06-27
-   * @since 1.0.0
-   */
-  boolean accessible();
-
-  /**
-   * 设置访问权限
-   *
-   * @param accessible 是否可访问
-   * @return {@code this}
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @NonNull
-  PropertySetter<T, R> accessible(boolean accessible);
-}
-
-/**
- * 组合属性设置器,由{@link FieldPropertySetter}和{@link InvokablePropertySetter}实现
- *
- * @author caotc
- * @date 2019-05-27
- * @since 1.0.0
- */
-@Value
-class CompositePropertySetter<T, R> implements PropertySetter<T, R> {
-
-  @NonNull
-  ImmutableList<PropertySetter<T, R>> propertySetters;
-
-  CompositePropertySetter(
-      @NonNull ImmutableList<PropertySetter<T, R>> propertySetters) {
-    //集合元素个数>=2
-    Preconditions
-        .checkArgument(propertySetters.size() >= 2, "propertySetters size must greater than 1");
-    //不能重复组合
-    Preconditions
-        .checkArgument(
-            propertySetters.stream().noneMatch(CompositePropertySetter.class::isInstance),
-            "CompositePropertySetter are not allowed in a CompositePropertySetter");
-    //实际属性只能有一个
-    Preconditions.checkArgument(
-        propertySetters.stream().filter(FieldPropertySetter.class::isInstance).count() <= 1,
-        "Multiple FieldPropertySetter are not allowed");
-    this.propertySetters = propertySetters.stream().distinct()
-        .collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public @NonNull PropertySetter<T, R> set(@NonNull T obj, @NonNull R value) {
-    propertySetters.get(0).set(obj, value);
-    return this;
-  }
-
-  @Override
-  public @NonNull TypeToken<? extends R> propertyType() {
-    return propertySetters.get(0).propertyType();
-  }
-
   @SuppressWarnings("unchecked")
-  @Override
-  public @NonNull <R1 extends R> PropertySetter<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
+  @NonNull
+  public <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertySetter is known propertyType %s,not %s ", propertyType(), propertyType);
+        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
     return (PropertySetter<T, R1>) this;
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return propertySetters.stream()
-        .map(propertySetter -> propertySetter.annotation(annotationClass))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return propertySetters.stream()
-        .map(propertySetter -> propertySetter.annotations(annotationClass))
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return propertySetters.stream().map(PropertySetter::annotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public ImmutableList<Annotation> declaredAnnotations() {
-    return propertySetters.stream().map(PropertySetter::declaredAnnotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  public boolean accessible() {
-    return propertySetters.stream().allMatch(PropertySetter::accessible);
-  }
-
-  @Override
-  public @NonNull String propertyName() {
-    return propertySetters.get(0).propertyName();
-  }
-
-  @Override
-  public @NonNull PropertySetter<T, R> accessible(boolean accessible) {
-    propertySetters.forEach(propertySetter -> propertySetter.accessible(accessible));
-    return this;
   }
 }
 
@@ -358,8 +151,7 @@ class CompositePropertySetter<T, R> implements PropertySetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class InvokablePropertySetter<T, R> extends AccessibleProperty<T, R> implements
-    PropertySetter<T, R> {
+class InvokablePropertySetter<T, R> extends PropertySetter<T, R> {
 
   /**
    * set方法
@@ -426,7 +218,7 @@ class InvokablePropertySetter<T, R> extends AccessibleProperty<T, R> implements
  * @since 1.0.0
  */
 @Value
-class FieldPropertySetter<T, R> extends AccessibleProperty<T, R> implements PropertySetter<T, R> {
+class FieldPropertySetter<T, R> extends PropertySetter<T, R> {
 
   /**
    * 属性
