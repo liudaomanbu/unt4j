@@ -21,7 +21,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public abstract class PropertyGetter<T, R> extends Element<T> {
+public abstract class PropertyReader<T, R> extends Element<T> {
 
   /**
    * 工厂方法
@@ -35,7 +35,7 @@ public abstract class PropertyGetter<T, R> extends Element<T> {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> PropertyGetter<T, R> create(@NonNull Method getMethod,
+  public static <T, R> PropertyReader<T, R> create(@NonNull Method getMethod,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     return create((Invokable<T, R>) Invokable.from(getMethod), methodNameStyle);
   }
@@ -51,9 +51,9 @@ public abstract class PropertyGetter<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> PropertyGetter<T, R> create(@NonNull Invokable<T, R> getInvokable,
+  public static <T, R> PropertyReader<T, R> create(@NonNull Invokable<T, R> getInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
-    return new InvokablePropertyGetter<>(getInvokable, methodNameStyle);
+    return new InvokablePropertyReader<>(getInvokable, methodNameStyle);
   }
 
   /**
@@ -66,11 +66,11 @@ public abstract class PropertyGetter<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> PropertyGetter<T, R> create(@NonNull Field field) {
-    return new FieldPropertyGetter<>(field);
+  public static <T, R> PropertyReader<T, R> create(@NonNull Field field) {
+    return new FieldPropertyReader<>(field);
   }
 
-  <M extends AccessibleObject & Member> PropertyGetter(
+  <M extends AccessibleObject & Member> PropertyReader(
       @NonNull M member) {
     super(member);
   }
@@ -119,7 +119,7 @@ public abstract class PropertyGetter<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
+  public <R1 extends R> PropertyReader<T, R1> propertyType(@NonNull Class<R1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
 
@@ -134,10 +134,10 @@ public abstract class PropertyGetter<T, R> extends Element<T> {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public <R1 extends R> PropertyGetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType) {
+  public <R1 extends R> PropertyReader<T, R1> propertyType(@NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
         , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (PropertyGetter<T, R1>) this;
+    return (PropertyReader<T, R1>) this;
   }
 
 }
@@ -150,7 +150,7 @@ public abstract class PropertyGetter<T, R> extends Element<T> {
  * @since 1.0.0
  */
 @Value
-class InvokablePropertyGetter<T, R> extends PropertyGetter<T, R> {
+class InvokablePropertyReader<T, R> extends PropertyReader<T, R> {
 
   /**
    * get方法
@@ -161,7 +161,7 @@ class InvokablePropertyGetter<T, R> extends PropertyGetter<T, R> {
    */
   @NonNull ReflectionUtil.MethodNameStyle methodNameStyle;
 
-  InvokablePropertyGetter(@NonNull Invokable<T, R> getInvokable,
+  InvokablePropertyReader(@NonNull Invokable<T, R> getInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     super(getInvokable);
     Preconditions
@@ -184,15 +184,15 @@ class InvokablePropertyGetter<T, R> extends PropertyGetter<T, R> {
   }
 
   @Override
-  public @NonNull <R1 extends R> InvokablePropertyGetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
-    return (InvokablePropertyGetter<T, R1>) super.propertyType(propertyType);
+    return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
-  public @NonNull <R1 extends R> InvokablePropertyGetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
-    return (InvokablePropertyGetter<T, R1>) super.propertyType(propertyType);
+    return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
@@ -201,8 +201,8 @@ class InvokablePropertyGetter<T, R> extends PropertyGetter<T, R> {
   }
 
   @Override
-  public @NonNull InvokablePropertyGetter<T, R> accessible(boolean accessible) {
-    return (InvokablePropertyGetter<T, R>) super.accessible(accessible);
+  public @NonNull InvokablePropertyReader<T, R> accessible(boolean accessible) {
+    return (InvokablePropertyReader<T, R>) super.accessible(accessible);
   }
 
 }
@@ -215,7 +215,7 @@ class InvokablePropertyGetter<T, R> extends PropertyGetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class FieldPropertyGetter<T, R> extends PropertyGetter<T, R> {
+class FieldPropertyReader<T, R> extends PropertyReader<T, R> {
 
   /**
    * 属性
@@ -223,7 +223,7 @@ class FieldPropertyGetter<T, R> extends PropertyGetter<T, R> {
   @NonNull
   Field field;
 
-  FieldPropertyGetter(@NonNull Field field) {
+  FieldPropertyReader(@NonNull Field field) {
     super(field);
     this.field = field;
   }
@@ -248,19 +248,19 @@ class FieldPropertyGetter<T, R> extends PropertyGetter<T, R> {
   }
 
   @Override
-  public @NonNull <R1 extends R> FieldPropertyGetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
-    return (FieldPropertyGetter<T, R1>) super.propertyType(propertyType);
+    return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
-  public @NonNull <R1 extends R> FieldPropertyGetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
-    return (FieldPropertyGetter<T, R1>) super.propertyType(propertyType);
+    return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
-  public @NonNull FieldPropertyGetter<T, R> accessible(boolean accessible) {
-    return (FieldPropertyGetter<T, R>) super.accessible(accessible);
+  public @NonNull FieldPropertyReader<T, R> accessible(boolean accessible) {
+    return (FieldPropertyReader<T, R>) super.accessible(accessible);
   }
 }

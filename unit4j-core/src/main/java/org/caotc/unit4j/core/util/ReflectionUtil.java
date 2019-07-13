@@ -3,7 +3,6 @@ package org.caotc.unit4j.core.util;
 import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
@@ -557,43 +556,43 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyGetter}
+   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
    *
    * @param clazz 需要获取get方法的类
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyGetter}
+   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<PropertyGetter<T, ?>> propertyGettersFromClass(
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> propertyGettersFromClass(
       @NonNull Class<T> clazz) {
     return propertyGettersFromClass(clazz, true);
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyGetter}
+   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
    *
    * @param clazz 需要获取get方法的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyGetter}
+   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<PropertyGetter<T, ?>> propertyGettersFromClass(
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> propertyGettersFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck) {
     return propertyGettersFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyGetter}
+   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
    *
    * @param clazz 需要获取get方法的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
    * @param methodNameStyles get方法格式集合
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyGetter}
+   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
    * @author caotc
    * @date 2019-05-10
    * @apiNote 如果只想要获取JavaBean规范的get方法, {@code methodNameStyles}参数使用{@link
@@ -601,75 +600,75 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<PropertyGetter<T, ?>> propertyGettersFromClass(
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> propertyGettersFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
 
-    Function<PropertyGetter<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
+    Function<PropertyReader<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
         .of(propertyGetter.propertyName(), propertyGetter.propertyType());
 
-    Stream<PropertyGetter<T, ?>> getInvokablePropertyGetters = getMethodsFromClass(clazz,
+    Stream<PropertyReader<T, ?>> getInvokablePropertyGetters = getMethodsFromClass(clazz,
         fieldExistCheck, methodNameStyles).stream()
         .flatMap(getMethod -> Arrays.stream(methodNameStyles)
             .filter(methodNameStyle -> methodNameStyle.isGetMethod(getMethod))
-            .map(methodNameStyle -> PropertyGetter.create(getMethod, methodNameStyle)));
+            .map(methodNameStyle -> PropertyReader.create(getMethod, methodNameStyle)));
 
-    Stream<PropertyGetter<T, ?>> fieldPropertyGetters = fieldsFromClass(
-        clazz).stream().map(PropertyGetter::create);
+    Stream<PropertyReader<T, ?>> fieldPropertyGetters = fieldsFromClass(
+        clazz).stream().map(PropertyReader::create);
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyGetter<T, ?>> propertyGetterMultimap =
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyReader<T, ?>> propertyGetterMultimap =
         Stream.concat(fieldPropertyGetters, getInvokablePropertyGetters)
             .collect(ImmutableListMultimap
                 .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
 
     return propertyGetterMultimap.asMap().values().stream()
         .filter(propertyGetters -> !fieldExistCheck || propertyGetters.stream()
-            .anyMatch(FieldPropertyGetter.class::isInstance))
-        .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyGetter<T, ?>) o))
-        .map(PropertyGetter::create).collect(ImmutableSet.toImmutableSet());
+            .anyMatch(FieldPropertyReader.class::isInstance))
+        .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
+        .map(ReadableProperty::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyGetter}
+   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
    *
    * @param clazz 需要获取get方法的类
    * @param fieldName 指定属性名称
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyGetter}
+   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<PropertyGetter<T, R>> propertyGetterFromClass(
+  public static <T, R> Optional<ReadableProperty<T, R>> propertyGetterFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
     return propertyGetterFromClass(clazz, fieldName, true);
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyGetter}
+   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
    *
    * @param clazz 需要获取get方法的类
    * @param fieldName 指定属性名称
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyGetter}
+   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<PropertyGetter<T, R>> propertyGetterFromClass(
+  public static <T, R> Optional<ReadableProperty<T, R>> propertyGetterFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
     return propertyGetterFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyGetter}
+   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
    *
    * @param clazz 需要获取get方法的类
    * @param fieldName 指定属性名称
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
    * @param methodNameStyles get方法格式集合
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyGetter}
+   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
    * @author caotc
    * @date 2019-05-10
    * @apiNote 如果只想要获取JavaBean规范的get方法, {@code methodNameStyles}参数使用{@link
@@ -678,53 +677,53 @@ public class ReflectionUtil {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> Optional<PropertyGetter<T, R>> propertyGetterFromClass(
+  public static <T, R> Optional<ReadableProperty<T, R>> propertyGetterFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     return propertyGettersFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
         .filter(propertyGetter -> propertyGetter.propertyName().equals(fieldName))
-        .map(propertyGetter -> (PropertyGetter<T, R>) propertyGetter)
+        .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
         .findAny();
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertySetter}
+   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
    *
    * @param clazz 需要获取set方法的类
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertySetter}
+   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<PropertySetter<T, ?>> propertySettersFromClass(
+  public static <T> ImmutableSet<WritableProperty<T, ?>> propertySettersFromClass(
       @NonNull Class<T> clazz) {
     return propertySettersFromClass(clazz, true);
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertySetter}
+   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
    *
    * @param clazz 需要获取set方法的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertySetter}
+   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<PropertySetter<T, ?>> propertySettersFromClass(
+  public static <T> ImmutableSet<WritableProperty<T, ?>> propertySettersFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck) {
     return propertySettersFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertySetter}
+   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
    *
    * @param clazz 需要获取set方法的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
    * @param methodNameStyles set方法格式集合
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertySetter}
+   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
    * @author caotc
    * @date 2019-05-10
    * @apiNote 如果只想要获取JavaBean规范的set方法, {@code methodNameStyles}参数使用{@link
@@ -732,74 +731,74 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<PropertySetter<T, ?>> propertySettersFromClass(
+  public static <T> ImmutableSet<WritableProperty<T, ?>> propertySettersFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
-    Function<PropertySetter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertySetter -> ImmutableList
-        .of(propertySetter.propertyName(), propertySetter.propertyType());
+    Function<PropertyWriter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertyWriter -> ImmutableList
+        .of(propertyWriter.propertyName(), propertyWriter.propertyType());
 
-    Stream<PropertySetter<T, ?>> setInvokablePropertySetters = setMethodsFromClass(clazz,
+    Stream<PropertyWriter<T, ?>> setInvokablePropertySetters = setMethodsFromClass(clazz,
         fieldExistCheck, methodNameStyles).stream()
         .flatMap(getMethod -> Arrays.stream(methodNameStyles)
             .filter(methodNameStyle -> methodNameStyle.isSetMethod(getMethod))
-            .map(methodNameStyle -> PropertySetter.create(getMethod, methodNameStyle)));
+            .map(methodNameStyle -> PropertyWriter.create(getMethod, methodNameStyle)));
 
-    Stream<PropertySetter<T, ?>> fieldPropertySetters = fieldsFromClass(
-        clazz).stream().map(PropertySetter::create);
+    Stream<PropertyWriter<T, ?>> fieldPropertySetters = fieldsFromClass(
+        clazz).stream().map(PropertyWriter::create);
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertySetter<T, ?>> propertySetterMultimap =
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyWriter<T, ?>> propertySetterMultimap =
         Stream.concat(fieldPropertySetters, setInvokablePropertySetters)
             .collect(ImmutableListMultimap
                 .toImmutableListMultimap(propertySetterToKeyFunction, Function.identity()));
 
     return propertySetterMultimap.asMap().values().stream()
         .filter(propertySetters -> !fieldExistCheck || propertySetters.stream()
-            .anyMatch(FieldPropertySetter.class::isInstance))
-        .map(propertySetters -> propertySetters.stream().map(o -> (PropertySetter<T, ?>) o))
-        .map(PropertySetter::create).collect(ImmutableSet.toImmutableSet());
+            .anyMatch(FieldPropertyWriter.class::isInstance))
+        .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
+        .map(WritableProperty::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertySetter}
+   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
    *
    * @param clazz 需要获取set方法的类
    * @param fieldName 指定属性名称
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertySetter}
+   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<PropertySetter<T, R>> propertySetterFromClass(
+  public static <T, R> Optional<WritableProperty<T, R>> propertySetterFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
     return propertySetterFromClass(clazz, fieldName, true);
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertySetter}
+   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
    *
    * @param clazz 需要获取set方法的类
    * @param fieldName 指定属性名称
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertySetter}
+   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<PropertySetter<T, R>> propertySetterFromClass(
+  public static <T, R> Optional<WritableProperty<T, R>> propertySetterFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
     return propertySetterFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertySetter}
+   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
    *
    * @param clazz 需要获取set方法的类
    * @param fieldName 指定属性名称
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
    * @param methodNameStyles set方法格式集合
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertySetter}
+   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
    * @author caotc
    * @date 2019-05-10
    * @apiNote 如果只想要获取JavaBean规范的set方法, {@code methodNameStyles}参数使用{@link
@@ -808,80 +807,13 @@ public class ReflectionUtil {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> Optional<PropertySetter<T, R>> propertySetterFromClass(
+  public static <T, R> Optional<WritableProperty<T, R>> propertySetterFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     return propertySettersFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
-        .filter(propertySetter -> propertySetter.propertyName().equals(fieldName))
-        .map(propertySetter -> (PropertySetter<T, R>) propertySetter)
+        .filter(propertyWriter -> propertyWriter.propertyName().equals(fieldName))
+        .map(propertyWriter -> (WritableProperty<T, R>) propertyWriter)
         .findAny();
-  }
-
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有属性存取器
-   *
-   * @param clazz 需要获取属性存取器的类
-   * @return 包括所有超类和接口的所有属性存取器
-   * @author caotc
-   * @date 2019-05-10
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
-      @NonNull Class<T> clazz) {
-    return propertyAccessorsFromClass(clazz, true);
-  }
-
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有属性存取器
-   *
-   * @param clazz 需要获取属性存取器的类
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有属性存取器
-   * @author caotc
-   * @date 2019-05-10
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck) {
-    return propertyAccessorsFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
-  }
-
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有属性存取器
-   *
-   * @param clazz 需要获取属性存取器的类
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @param methodNameStyles set/get方法格式集合
-   * @return 包括所有超类和接口的所有属性存取器
-   * @author caotc
-   * @date 2019-05-10
-   * @apiNote 如果只想要获取JavaBean规范的get/set方法, {@code methodNameStyles}参数使用{@link
-   * MethodNameStyle#JAVA_BEAN}
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
-  @NonNull
-  public static <T, R> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
-    Function<PropertyGetter<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
-        .of(propertyGetter.propertyName(), propertyGetter.propertyType());
-    Function<PropertySetter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertySetter -> ImmutableList
-        .of(propertySetter.propertyName(), propertySetter.propertyType());
-
-    ImmutableMap<ImmutableList<?>, PropertyGetter<T, ?>> keyToPropertyGetters = propertyGettersFromClass(
-        clazz, fieldExistCheck, methodNameStyles).stream()
-        .collect(ImmutableMap.toImmutableMap(propertyGetterToKeyFunction, Function.identity()));
-    return propertySettersFromClass(clazz,
-        fieldExistCheck, methodNameStyles).stream()
-        .filter(propertySetter -> keyToPropertyGetters
-            .containsKey(propertySetterToKeyFunction.apply(propertySetter)))
-        .map(propertySetter -> PropertyAccessor.create((PropertySetter<T, R>) propertySetter
-            , (PropertyGetter<T, R>) keyToPropertyGetters
-                .get(propertySetterToKeyFunction.apply(propertySetter))))
-        .collect(ImmutableSet.toImmutableSet());
   }
 
   /**

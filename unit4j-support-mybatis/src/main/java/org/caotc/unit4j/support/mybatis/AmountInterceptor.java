@@ -40,7 +40,7 @@ import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.exception.NeverHappenException;
 import org.caotc.unit4j.core.util.CaseFormat;
-import org.caotc.unit4j.core.util.PropertyGetter;
+import org.caotc.unit4j.core.util.ReadableProperty;
 import org.caotc.unit4j.core.util.ReflectionUtil;
 import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.AmountSerialize;
@@ -155,9 +155,9 @@ public class AmountInterceptor implements Interceptor {
         .map(parameterMappings -> createSqlParams(parameterMappings, columns))
         .orElseGet(ImmutableList::of);
     sqlParams.stream().filter(sqlParam -> {
-      PropertyGetter<?, Object> propertyGetter = propertyGetter(sqlParam.parameterMapping,
+      ReadableProperty<?, Object> propertyReader = readableProperty(sqlParam.parameterMapping,
           boundSql.getParameterObject(), mappedStatement);
-      return propertyGetter.annotation(AmountSerialize.class).isPresent() || propertyGetter
+      return propertyReader.annotation(AmountSerialize.class).isPresent() || propertyReader
           .propertyType().getRawType()
           .equals(Amount.class);
     }).forEach(sqlParam -> {
@@ -167,7 +167,7 @@ public class AmountInterceptor implements Interceptor {
           .newMetaObject(boundSql.getParameterObject()).getValue(property);
       AmountCodecConfig amountCodecConfig = unit4jProperties
           .createAmountCodecConfig(sqlParam.column.getColumnName(),
-              propertyGetter(sqlParam.parameterMapping, boundSql.getParameterObject(),
+              readableProperty(sqlParam.parameterMapping, boundSql.getParameterObject(),
                   mappedStatement).annotation(AmountSerialize.class)
                   .orElse(null));
       SerializeCommands serializeCommands = amountCodecConfig
@@ -229,7 +229,7 @@ public class AmountInterceptor implements Interceptor {
 
   }
 
-  private PropertyGetter<?, Object> propertyGetter(@NonNull ParameterMapping parameterMapping,
+  private ReadableProperty<?, Object> readableProperty(@NonNull ParameterMapping parameterMapping,
       @NonNull Object parameterObject, @NonNull MappedStatement mappedStatement) {
     if (parameterMapping.getProperty().contains(StringConstant.DOT)) {
       ImmutableList<String> propertyNames = ImmutableList

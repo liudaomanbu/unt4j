@@ -16,11 +16,11 @@ import lombok.Value;
  *
  * @author caotc
  * @date 2019-05-27
- * @see PropertySetter
+ * @see PropertyWriter
  * @since 1.0.0
  */
 @Value
-public class SettableProperty<T, R> {
+public class WritableProperty<T, R> {
 
   /**
    * 工厂方法
@@ -32,9 +32,9 @@ public class SettableProperty<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> SettableProperty<T, R> create(
-      @NonNull Iterable<PropertySetter<T, R>> propertySetters) {
-    return new SettableProperty<>(ImmutableList.copyOf(propertySetters));
+  public static <T, R> WritableProperty<T, R> create(
+      @NonNull Iterable<PropertyWriter<T, R>> propertySetters) {
+    return new WritableProperty<>(ImmutableList.copyOf(propertySetters));
   }
 
   /**
@@ -47,9 +47,9 @@ public class SettableProperty<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> SettableProperty<T, R> create(
-      @NonNull Iterator<PropertySetter<T, R>> propertySetters) {
-    return new SettableProperty<>(ImmutableList.copyOf(propertySetters));
+  public static <T, R> WritableProperty<T, R> create(
+      @NonNull Iterator<PropertyWriter<T, R>> propertySetters) {
+    return new WritableProperty<>(ImmutableList.copyOf(propertySetters));
   }
 
   /**
@@ -62,79 +62,79 @@ public class SettableProperty<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> SettableProperty<T, R> create(
-      @NonNull Stream<PropertySetter<T, R>> propertySetters) {
-    return new SettableProperty<>(propertySetters
+  public static <T, R> WritableProperty<T, R> create(
+      @NonNull Stream<PropertyWriter<T, R>> propertySetters) {
+    return new WritableProperty<>(propertySetters
         .collect(ImmutableList.toImmutableList()));
   }
 
   @NonNull
-  ImmutableList<PropertySetter<T, R>> propertySetters;
+  ImmutableList<PropertyWriter<T, R>> propertyWriters;
 
-  SettableProperty(
-      @NonNull ImmutableList<PropertySetter<T, R>> propertySetters) {
+  WritableProperty(
+      @NonNull ImmutableList<PropertyWriter<T, R>> propertyWriters) {
     //属性设置器集合非空
     Preconditions
-        .checkArgument(!propertySetters.isEmpty(), "propertySetters can't be empty");
+        .checkArgument(!propertyWriters.isEmpty(), "propertySetters can't be empty");
     //实际属性只能有一个
     Preconditions.checkArgument(
-        propertySetters.stream().filter(FieldPropertySetter.class::isInstance).count() <= 1,
+        propertyWriters.stream().filter(FieldPropertyWriter.class::isInstance).count() <= 1,
         "Multiple FieldPropertySetter are not allowed");
-    this.propertySetters = propertySetters.stream().distinct()
+    this.propertyWriters = propertyWriters.stream().distinct()
         .collect(ImmutableList.toImmutableList());
   }
 
-  public @NonNull SettableProperty<T, R> set(@NonNull T obj, @NonNull R value) {
-    propertySetters.get(0).set(obj, value);
+  public @NonNull WritableProperty<T, R> set(@NonNull T obj, @NonNull R value) {
+    propertyWriters.get(0).set(obj, value);
     return this;
   }
 
   public @NonNull TypeToken<? extends R> propertyType() {
-    return propertySetters.get(0).propertyType();
+    return propertyWriters.get(0).propertyType();
   }
 
   @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends R> SettableProperty<T, R1> propertyType(
+  public @NonNull <R1 extends R> WritableProperty<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
         , "PropertySetter is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (SettableProperty<T, R1>) this;
+    return (WritableProperty<T, R1>) this;
   }
 
   public @NonNull <X extends Annotation> Optional<X> annotation(
       @NonNull Class<X> annotationClass) {
-    return propertySetters.stream()
-        .map(propertySetter -> propertySetter.annotation(annotationClass))
+    return propertyWriters.stream()
+        .map(propertyWriter -> propertyWriter.annotation(annotationClass))
         .filter(Optional::isPresent).map(Optional::get).findFirst();
   }
 
   public @NonNull <X extends Annotation> ImmutableList<X> annotations(
       @NonNull Class<X> annotationClass) {
-    return propertySetters.stream()
-        .map(propertySetter -> propertySetter.annotations(annotationClass))
+    return propertyWriters.stream()
+        .map(propertyWriter -> propertyWriter.annotations(annotationClass))
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
   public @NonNull ImmutableList<Annotation> annotations() {
-    return propertySetters.stream().map(PropertySetter::annotations)
+    return propertyWriters.stream().map(PropertyWriter::annotations)
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
   public ImmutableList<Annotation> declaredAnnotations() {
-    return propertySetters.stream().map(PropertySetter::declaredAnnotations)
+    return propertyWriters.stream().map(PropertyWriter::declaredAnnotations)
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
   public boolean accessible() {
-    return propertySetters.stream().allMatch(PropertySetter::accessible);
+    return propertyWriters.stream().allMatch(PropertyWriter::accessible);
   }
 
   public @NonNull String propertyName() {
-    return propertySetters.get(0).propertyName();
+    return propertyWriters.get(0).propertyName();
   }
 
-  public @NonNull SettableProperty<T, R> accessible(boolean accessible) {
-    propertySetters.forEach(propertySetter -> propertySetter.accessible(accessible));
+  public @NonNull WritableProperty<T, R> accessible(boolean accessible) {
+    propertyWriters.forEach(propertyWriter -> propertyWriter.accessible(accessible));
     return this;
   }
 }

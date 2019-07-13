@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 import lombok.NonNull;
 import org.caotc.unit4j.core.util.CaseFormat;
-import org.caotc.unit4j.core.util.PropertyGetter;
+import org.caotc.unit4j.core.util.PropertyReader;
 import org.caotc.unit4j.support.SerializeCommand.Type;
 import org.caotc.unit4j.support.SerializeCommands.SerializeCommandsBuilder;
 
@@ -29,7 +29,7 @@ public enum CodecStrategy {
     @Override
     public <T> SerializeCommands createSerializeCommands(@NonNull T value,
         @NonNull Function<ImmutableList<String>, String> fieldNameConverter,
-        @NonNull Function<Class<? extends T>, ? extends Set<PropertyGetter<T, ?>>> fieldWrapperConverter,
+        @NonNull Function<Class<? extends T>, ? extends Set<PropertyReader<T, ?>>> fieldWrapperConverter,
         @NonNull CaseFormat fieldNameFormat) {
       SerializeCommandsBuilder builder = SerializeCommands.builder()
           .command(SerializeCommand.START_OBJECT);
@@ -56,16 +56,16 @@ public enum CodecStrategy {
     @Override
     public <T> SerializeCommands createSerializeCommands(@NonNull T value,
         @NonNull Function<ImmutableList<String>, String> fieldNameConverter,
-        @NonNull Function<Class<? extends T>, ? extends Set<PropertyGetter<T, ?>>> fieldWrapperConverter,
+        @NonNull Function<Class<? extends T>, ? extends Set<PropertyReader<T, ?>>> fieldWrapperConverter,
         @NonNull CaseFormat fieldNameFormat) {
-      Set<PropertyGetter<T, ?>> propertyGetters = fieldWrapperConverter
+      Set<PropertyReader<T, ?>> propertyReaders = fieldWrapperConverter
           .apply((Class<? extends T>) value.getClass());
-      Preconditions.checkArgument(propertyGetters.size() == 1,
+      Preconditions.checkArgument(propertyReaders.size() == 1,
           "value strategy serialize must have one fieldWrapper,but now fieldWrappers is %s",
-          propertyGetters);
+          propertyReaders);
       return SerializeCommands.builder()
           .command(SerializeCommand.create(Type.WRITE_VALUE, null,
-              Iterables.getOnlyElement(propertyGetters).get(value).orElse(null)))
+              Iterables.getOnlyElement(propertyReaders).get(value).orElse(null)))
           .build();
     }
   },
@@ -78,7 +78,7 @@ public enum CodecStrategy {
     @Override
     public <T> SerializeCommands createSerializeCommands(@NonNull T value,
         @NonNull Function<ImmutableList<String>, String> fieldNameConverter,
-        @NonNull Function<Class<? extends T>, ? extends Set<PropertyGetter<T, ?>>> fieldWrapperConverter,
+        @NonNull Function<Class<? extends T>, ? extends Set<PropertyReader<T, ?>>> fieldWrapperConverter,
         @NonNull CaseFormat fieldNameFormat) {
       SerializeCommandsBuilder builder = SerializeCommands.builder();
       ImmutableSet<SerializeCommand> writeFieldCommands = fieldWrapperConverter
@@ -111,7 +111,7 @@ public enum CodecStrategy {
   @NonNull
   public abstract <T> SerializeCommands createSerializeCommands(@NonNull T value,
       @NonNull Function<ImmutableList<String>, String> fieldNameConverter,
-      @NonNull Function<Class<? extends T>, ? extends Set<PropertyGetter<T, ?>>> fieldWrapperConverter
+      @NonNull Function<Class<? extends T>, ? extends Set<PropertyReader<T, ?>>> fieldWrapperConverter
       , @NonNull CaseFormat fieldNameFormat);
 
 }

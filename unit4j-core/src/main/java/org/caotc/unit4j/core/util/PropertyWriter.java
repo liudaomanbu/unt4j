@@ -20,7 +20,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public abstract class PropertySetter<T, R> extends Element<T> {
+public abstract class PropertyWriter<T, R> extends Element<T> {
 
   /**
    * 工厂方法
@@ -34,7 +34,7 @@ public abstract class PropertySetter<T, R> extends Element<T> {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> PropertySetter<T, R> create(@NonNull Method setMethod,
+  public static <T, R> PropertyWriter<T, R> create(@NonNull Method setMethod,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     return create((Invokable<T, ?>) Invokable.from(setMethod), methodNameStyle);
   }
@@ -51,9 +51,9 @@ public abstract class PropertySetter<T, R> extends Element<T> {
    */
 
   @NonNull
-  public static <T, R> PropertySetter<T, R> create(@NonNull Invokable<T, ?> setInvokable,
+  public static <T, R> PropertyWriter<T, R> create(@NonNull Invokable<T, ?> setInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
-    return new InvokablePropertySetter<>(setInvokable, methodNameStyle);
+    return new InvokablePropertyWriter<>(setInvokable, methodNameStyle);
   }
 
   /**
@@ -67,11 +67,11 @@ public abstract class PropertySetter<T, R> extends Element<T> {
    */
 
   @NonNull
-  static <T, R> PropertySetter<T, R> create(@NonNull Field field) {
-    return new FieldPropertySetter<>(field);
+  static <T, R> PropertyWriter<T, R> create(@NonNull Field field) {
+    return new FieldPropertyWriter<>(field);
   }
 
-  <M extends AccessibleObject & Member> PropertySetter(
+  <M extends AccessibleObject & Member> PropertyWriter(
       @NonNull M member) {
     super(member);
   }
@@ -87,7 +87,7 @@ public abstract class PropertySetter<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public abstract PropertySetter<T, R> set(@NonNull T obj, @NonNull R value);
+  public abstract PropertyWriter<T, R> set(@NonNull T obj, @NonNull R value);
 
   /**
    * 属性名称
@@ -121,7 +121,7 @@ public abstract class PropertySetter<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
+  public <R1 extends R> PropertyWriter<T, R1> propertyType(@NonNull Class<R1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
 
@@ -136,10 +136,10 @@ public abstract class PropertySetter<T, R> extends Element<T> {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public <R1 extends R> PropertySetter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType) {
+  public <R1 extends R> PropertyWriter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
         , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (PropertySetter<T, R1>) this;
+    return (PropertyWriter<T, R1>) this;
   }
 }
 
@@ -151,7 +151,7 @@ public abstract class PropertySetter<T, R> extends Element<T> {
  * @since 1.0.0
  */
 @Value
-class InvokablePropertySetter<T, R> extends PropertySetter<T, R> {
+class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   /**
    * set方法
@@ -164,7 +164,7 @@ class InvokablePropertySetter<T, R> extends PropertySetter<T, R> {
   @NonNull
   ReflectionUtil.MethodNameStyle methodNameStyle;
 
-  InvokablePropertySetter(@NonNull Invokable<T, ?> setInvokable,
+  InvokablePropertyWriter(@NonNull Invokable<T, ?> setInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
     super(setInvokable);
     Preconditions
@@ -176,7 +176,7 @@ class InvokablePropertySetter<T, R> extends PropertySetter<T, R> {
 
   @Override
   @SneakyThrows
-  public @NonNull PropertySetter<T, R> set(@NonNull T obj, @NonNull R value) {
+  public @NonNull PropertyWriter<T, R> set(@NonNull T obj, @NonNull R value) {
     setInvokable.invoke(obj, value);
     return this;
   }
@@ -193,20 +193,20 @@ class InvokablePropertySetter<T, R> extends PropertySetter<T, R> {
   }
 
   @Override
-  public @NonNull InvokablePropertySetter<T, R> accessible(boolean accessible) {
-    return (InvokablePropertySetter<T, R>) super.accessible(accessible);
+  public @NonNull InvokablePropertyWriter<T, R> accessible(boolean accessible) {
+    return (InvokablePropertyWriter<T, R>) super.accessible(accessible);
   }
 
   @Override
-  public @NonNull <R1 extends R> InvokablePropertySetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
-    return (InvokablePropertySetter<T, R1>) super.propertyType(propertyType);
+    return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
-  public @NonNull <R1 extends R> InvokablePropertySetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
-    return (InvokablePropertySetter<T, R1>) super.propertyType(propertyType);
+    return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
   }
 }
 
@@ -218,7 +218,7 @@ class InvokablePropertySetter<T, R> extends PropertySetter<T, R> {
  * @since 1.0.0
  */
 @Value
-class FieldPropertySetter<T, R> extends PropertySetter<T, R> {
+class FieldPropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   /**
    * 属性
@@ -226,14 +226,14 @@ class FieldPropertySetter<T, R> extends PropertySetter<T, R> {
   @NonNull
   Field field;
 
-  FieldPropertySetter(@NonNull Field field) {
+  FieldPropertyWriter(@NonNull Field field) {
     super(field);
     this.field = field;
   }
 
   @Override
   @SneakyThrows
-  public @NonNull PropertySetter<T, R> set(@NonNull T obj, @NonNull R value) {
+  public @NonNull PropertyWriter<T, R> set(@NonNull T obj, @NonNull R value) {
     field.set(obj, value);
     return this;
   }
@@ -250,19 +250,19 @@ class FieldPropertySetter<T, R> extends PropertySetter<T, R> {
   }
 
   @Override
-  public @NonNull FieldPropertySetter<T, R> accessible(boolean accessible) {
-    return (FieldPropertySetter<T, R>) super.accessible(accessible);
+  public @NonNull FieldPropertyWriter<T, R> accessible(boolean accessible) {
+    return (FieldPropertyWriter<T, R>) super.accessible(accessible);
   }
 
   @Override
-  public @NonNull <R1 extends R> FieldPropertySetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
-    return (FieldPropertySetter<T, R1>) super.propertyType(propertyType);
+    return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
   }
 
   @Override
-  public @NonNull <R1 extends R> FieldPropertySetter<T, R1> propertyType(
+  public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
-    return (FieldPropertySetter<T, R1>) super.propertyType(propertyType);
+    return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
   }
 }
