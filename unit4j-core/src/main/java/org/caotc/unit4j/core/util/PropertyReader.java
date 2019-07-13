@@ -43,6 +43,23 @@ public abstract class PropertyReader<T, R> extends Element<T> {
   /**
    * 工厂方法
    *
+   * @param getMethod get方法
+   * @param propertyName 属性名称
+   * @return 属性获取器
+   * @author caotc
+   * @date 2019-06-16
+   * @since 1.0.0
+   */
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> PropertyReader<T, R> create(@NonNull Method getMethod,
+      @NonNull String propertyName) {
+    return create((Invokable<T, R>) Invokable.from(getMethod), propertyName);
+  }
+
+  /**
+   * 工厂方法
+   *
    * @param getInvokable get方法封装的Invokable
    * @param methodNameStyle 方法名风格
    * @return 属性获取器

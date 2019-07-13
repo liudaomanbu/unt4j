@@ -42,6 +42,23 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
   /**
    * 工厂方法
    *
+   * @param setMethod set方法
+   * @param propertyName 属性名称
+   * @return 属性设置器
+   * @author caotc
+   * @date 2019-06-16
+   * @since 1.0.0
+   */
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> PropertyWriter<T, R> create(@NonNull Method setMethod,
+      @NonNull String propertyName) {
+    return create((Invokable<T, ?>) Invokable.from(setMethod), propertyName);
+  }
+
+  /**
+   * 工厂方法
+   *
    * @param setInvokable set方法
    * @param methodNameStyle 方法名称风格
    * @return 属性设置器
@@ -53,7 +70,25 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
   @NonNull
   public static <T, R> PropertyWriter<T, R> create(@NonNull Invokable<T, ?> setInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
-    return new InvokablePropertyWriter<>(setInvokable, methodNameStyle);
+    return new InvokablePropertyWriter<>(setInvokable,
+        methodNameStyle.fieldNameFromSetInvokable(setInvokable));
+  }
+
+  /**
+   * 工厂方法
+   *
+   * @param setInvokable set方法
+   * @param propertyName 属性名称
+   * @return 属性设置器
+   * @author caotc
+   * @date 2019-06-16
+   * @since 1.0.0
+   */
+
+  @NonNull
+  public static <T, R> PropertyWriter<T, R> create(@NonNull Invokable<T, ?> setInvokable,
+      @NonNull String propertyName) {
+    return new InvokablePropertyWriter<>(setInvokable, propertyName);
   }
 
   /**
@@ -162,16 +197,20 @@ class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
    * set方法名称风格
    */
   @NonNull
-  ReflectionUtil.MethodNameStyle methodNameStyle;
+  String propertyName;
 
-  InvokablePropertyWriter(@NonNull Invokable<T, ?> setInvokable,
-      @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
-    super(setInvokable);
+  InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
+      @NonNull String propertyName) {
+    super(invokable);
     Preconditions
-        .checkArgument(methodNameStyle.isSetInvokable(setInvokable), "%s is not matches %s",
-            setInvokable, methodNameStyle);
-    this.setInvokable = setInvokable;
-    this.methodNameStyle = methodNameStyle;
+        .checkArgument(!invokable.isStatic()
+                && (invokable.getReturnType().getRawType().equals(void.class) || invokable
+                .getReturnType()
+                .equals(invokable.getOwnerType()))
+                && invokable.getParameters().size() == 1, "%s is not a setInvokable",
+            invokable);
+    this.setInvokable = invokable;
+    this.propertyName = propertyName;
   }
 
   @Override
@@ -185,11 +224,6 @@ class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
   @Override
   public @NonNull TypeToken<? extends R> propertyType() {
     return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
-  }
-
-  @Override
-  public @NonNull String propertyName() {
-    return methodNameStyle.fieldNameFromGetInvokable(setInvokable);
   }
 
   @Override
