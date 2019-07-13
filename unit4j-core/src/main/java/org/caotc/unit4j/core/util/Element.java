@@ -170,6 +170,19 @@ public abstract class Element<T> extends AccessibleObject implements Member {
   }
 
   /**
+   * 名称
+   *
+   * @return 名称
+   * @author caotc
+   * @date 2019-07-13
+   * @since 1.0.0
+   */
+  @NonNull
+  public String name() {
+    return getName();
+  }
+
+  /**
    * 拥有该属性的类
    *
    * @return 拥有该属性的类
@@ -182,24 +195,6 @@ public abstract class Element<T> extends AccessibleObject implements Member {
   public TypeToken<T> ownerType() {
     return TypeToken.of((Class<T>) getDeclaringClass());
   }
-
-//  /**
-//   * 修改返回类型
-//   *
-//   * @param propertyType 新的返回类型
-//   * @return 修改返回类型的可使用属性
-//   * @author caotc
-//   * @date 2019-06-25
-//   * @since 1.0.0
-//   */
-//  @SuppressWarnings("unchecked")
-//  @NonNull
-//  public <R1 extends R> Element<T, R1> propertyType(
-//      @NonNull TypeToken<R1> propertyType) {
-//    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-//        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
-//    return (Element<T, R1>) this;
-//  }
 
   /**
    * 获取该元素的注解对象

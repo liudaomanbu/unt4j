@@ -84,8 +84,8 @@ public class WritableProperty<T, R> {
         .collect(ImmutableList.toImmutableList());
   }
 
-  public @NonNull WritableProperty<T, R> set(@NonNull T obj, @NonNull R value) {
-    propertyWriters.get(0).set(obj, value);
+  public @NonNull WritableProperty<T, R> write(@NonNull T obj, @NonNull R value) {
+    propertyWriters.get(0).write(obj, value);
     return this;
   }
 

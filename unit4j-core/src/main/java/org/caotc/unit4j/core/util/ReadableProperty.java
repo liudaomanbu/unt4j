@@ -83,8 +83,8 @@ public class ReadableProperty<T, R> {
         .collect(ImmutableList.toImmutableList());
   }
 
-  public @NonNull Optional<R> get(@NonNull T object) {
-    return propertyReaders.stream().map(propertyGetter -> propertyGetter.get(object))
+  public @NonNull Optional<R> read(@NonNull T object) {
+    return propertyReaders.stream().map(propertyGetter -> propertyGetter.read(object))
         .filter(Optional::isPresent).map(Optional::get).findFirst();
   }
 

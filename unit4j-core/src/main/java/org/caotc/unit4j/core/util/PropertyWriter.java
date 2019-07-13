@@ -67,7 +67,7 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
    */
 
   @NonNull
-  static <T, R> PropertyWriter<T, R> create(@NonNull Field field) {
+  public static <T, R> PropertyWriter<T, R> create(@NonNull Field field) {
     return new FieldPropertyWriter<>(field);
   }
 
@@ -87,7 +87,7 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public abstract PropertyWriter<T, R> set(@NonNull T obj, @NonNull R value);
+  public abstract PropertyWriter<T, R> write(@NonNull T obj, @NonNull R value);
 
   /**
    * 属性名称
@@ -176,7 +176,7 @@ class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   @Override
   @SneakyThrows
-  public @NonNull PropertyWriter<T, R> set(@NonNull T obj, @NonNull R value) {
+  public @NonNull PropertyWriter<T, R> write(@NonNull T obj, @NonNull R value) {
     setInvokable.invoke(obj, value);
     return this;
   }
@@ -233,7 +233,7 @@ class FieldPropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   @Override
   @SneakyThrows
-  public @NonNull PropertyWriter<T, R> set(@NonNull T obj, @NonNull R value) {
+  public @NonNull PropertyWriter<T, R> write(@NonNull T obj, @NonNull R value) {
     field.set(obj, value);
     return this;
   }

@@ -38,7 +38,7 @@ public enum CodecStrategy {
           .map(fieldWrapper -> SerializeCommand
               .create(Type.WRITE_FIELD,
                   fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
-                  fieldWrapper.get(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
+                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
       writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
           .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
               .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
@@ -65,7 +65,7 @@ public enum CodecStrategy {
           propertyReaders);
       return SerializeCommands.builder()
           .command(SerializeCommand.create(Type.WRITE_VALUE, null,
-              Iterables.getOnlyElement(propertyReaders).get(value).orElse(null)))
+              Iterables.getOnlyElement(propertyReaders).read(value).orElse(null)))
           .build();
     }
   },
@@ -86,7 +86,7 @@ public enum CodecStrategy {
           .map(fieldWrapper -> SerializeCommand
               .create(Type.WRITE_FIELD,
                   fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
-                  fieldWrapper.get(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
+                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
       writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
           .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
               .command(SerializeCommand.WRITE_FIELD_SEPARATOR));

@@ -66,7 +66,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
         .filter(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class).isPresent()
             || Amount.class.equals(fieldWrapper.propertyType().getRawType()))
         .forEach(fieldWrapper -> {
-          fieldWrapper.get(object).map(Amount.class::cast).ifPresent(amount -> {
+          fieldWrapper.read(object).map(Amount.class::cast).ifPresent(amount -> {
             AmountCodecConfig amountCodecConfig = fieldWrapper.annotation(AmountSerialize.class)
                 .map(amountSerialize -> unit4jProperties
                     .createAmountCodecConfig(fieldWrapper.propertyName(), amountSerialize))

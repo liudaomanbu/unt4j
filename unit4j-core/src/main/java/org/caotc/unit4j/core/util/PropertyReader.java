@@ -53,7 +53,24 @@ public abstract class PropertyReader<T, R> extends Element<T> {
   @NonNull
   public static <T, R> PropertyReader<T, R> create(@NonNull Invokable<T, R> getInvokable,
       @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
-    return new InvokablePropertyReader<>(getInvokable, methodNameStyle);
+    return new InvokablePropertyReader<>(getInvokable,
+        methodNameStyle.fieldNameFromGetInvokable(getInvokable));
+  }
+
+  /**
+   * 工厂方法
+   *
+   * @param getInvokable get方法封装的Invokable
+   * @param propertyName 属性名称
+   * @return 属性获取器
+   * @author caotc
+   * @date 2019-06-16
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T, R> PropertyReader<T, R> create(@NonNull Invokable<T, R> getInvokable,
+      @NonNull String propertyName) {
+    return new InvokablePropertyReader<>(getInvokable, propertyName);
   }
 
   /**
@@ -85,7 +102,7 @@ public abstract class PropertyReader<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public abstract Optional<R> get(@NonNull T object);
+  public abstract Optional<R> read(@NonNull T object);
 
   /**
    * 属性名称
@@ -157,24 +174,27 @@ class InvokablePropertyReader<T, R> extends PropertyReader<T, R> {
    */
   @NonNull Invokable<T, R> getInvokable;
   /**
-   * get方法名称风格
+   * 属性名称
    */
-  @NonNull ReflectionUtil.MethodNameStyle methodNameStyle;
+  @NonNull String propertyName;
 
-  InvokablePropertyReader(@NonNull Invokable<T, R> getInvokable,
-      @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
-    super(getInvokable);
+  InvokablePropertyReader(@NonNull Invokable<T, R> invokable,
+      @NonNull String propertyName) {
+    super(invokable);
     Preconditions
-        .checkArgument(methodNameStyle.isGetInvokable(getInvokable), "%s is not matches %s",
-            getInvokable, methodNameStyle);
-    this.getInvokable = getInvokable;
-    this.methodNameStyle = methodNameStyle;
+        .checkArgument(!invokable.isStatic()
+                && invokable.getParameters().isEmpty()
+                && !invokable.getReturnType().getRawType().equals(void.class)
+            , "%s is not a getInvokable",
+            invokable);
+    this.getInvokable = invokable;
+    this.propertyName = propertyName;
   }
 
   @NonNull
   @Override
   @SneakyThrows
-  public Optional<R> get(@NonNull T object) {
+  public Optional<R> read(@NonNull T object) {
     return Optional.ofNullable(getInvokable.invoke(object));
   }
 
@@ -193,11 +213,6 @@ class InvokablePropertyReader<T, R> extends PropertyReader<T, R> {
   public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
     return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
-  }
-
-  @Override
-  public @NonNull String propertyName() {
-    return methodNameStyle.fieldNameFromGetInvokable(getInvokable);
   }
 
   @Override
@@ -232,7 +247,7 @@ class FieldPropertyReader<T, R> extends PropertyReader<T, R> {
   @SuppressWarnings("unchecked")
   @Override
   @SneakyThrows
-  public Optional<R> get(@NonNull T object) {
+  public Optional<R> read(@NonNull T object) {
     return Optional.ofNullable((R) field.get(object));
   }
 
