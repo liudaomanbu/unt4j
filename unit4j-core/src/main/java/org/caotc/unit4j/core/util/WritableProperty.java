@@ -75,11 +75,12 @@ public class WritableProperty<T, R> {
       @NonNull ImmutableList<PropertyWriter<T, R>> propertyWriters) {
     //属性设置器集合非空
     Preconditions
-        .checkArgument(!propertyWriters.isEmpty(), "propertySetters can't be empty");
-    //实际属性只能有一个
+        .checkArgument(!propertyWriters.isEmpty(), "propertyWriters can't be empty");
+    //属性只能有一个
     Preconditions.checkArgument(
-        propertyWriters.stream().filter(FieldPropertyWriter.class::isInstance).count() <= 1,
-        "Multiple FieldPropertySetter are not allowed");
+        propertyWriters.stream().map(PropertyWriter::propertyName).distinct().count() == 1
+            && propertyWriters.stream().map(PropertyWriter::propertyType).distinct().count() == 1,
+        "propertyWriters is not a common property");
     this.propertyWriters = propertyWriters.stream().distinct()
         .collect(ImmutableList.toImmutableList());
   }
@@ -120,21 +121,13 @@ public class WritableProperty<T, R> {
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
+  @NonNull
   public ImmutableList<Annotation> declaredAnnotations() {
     return propertyWriters.stream().map(PropertyWriter::declaredAnnotations)
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
-  public boolean accessible() {
-    return propertyWriters.stream().allMatch(PropertyWriter::accessible);
-  }
-
   public @NonNull String propertyName() {
     return propertyWriters.get(0).propertyName();
-  }
-
-  public @NonNull WritableProperty<T, R> accessible(boolean accessible) {
-    propertyWriters.forEach(propertyWriter -> propertyWriter.accessible(accessible));
-    return this;
   }
 }

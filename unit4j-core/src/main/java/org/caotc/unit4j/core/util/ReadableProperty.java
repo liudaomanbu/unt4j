@@ -74,11 +74,12 @@ public class ReadableProperty<T, R> {
       @NonNull ImmutableList<PropertyReader<T, R>> propertyReaders) {
     //属性读取器集合不能为空
     Preconditions
-        .checkArgument(!propertyReaders.isEmpty(), "propertyGetters can't be empty");
-    //实际属性只能有一个
+        .checkArgument(!propertyReaders.isEmpty(), "propertyReaders can't be empty");
+    //属性只能有一个
     Preconditions.checkArgument(
-        propertyReaders.stream().filter(FieldPropertyReader.class::isInstance).count() <= 1,
-        "Multiple FieldPropertyGetter are not allowed");
+        propertyReaders.stream().map(PropertyReader::propertyName).distinct().count() == 1
+            && propertyReaders.stream().map(PropertyReader::propertyType).distinct().count() == 1,
+        "propertyReaders is not a common property");
     this.propertyReaders = propertyReaders.stream().distinct()
         .collect(ImmutableList.toImmutableList());
   }
@@ -124,16 +125,7 @@ public class ReadableProperty<T, R> {
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
-  public boolean accessible() {
-    return propertyReaders.stream().allMatch(PropertyReader::accessible);
-  }
-
   public @NonNull String propertyName() {
     return propertyReaders.get(0).propertyName();
-  }
-
-  public @NonNull ReadableProperty<T, R> accessible(boolean accessible) {
-    propertyReaders.forEach(propertyGetter -> propertyGetter.accessible(accessible));
-    return this;
   }
 }
