@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
@@ -21,6 +22,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
+@Data
 public abstract class PropertyReader<T, R> extends Element<T> {
 
   /**

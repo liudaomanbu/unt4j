@@ -11,10 +11,11 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Optional;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
+import lombok.Data;
 import lombok.NonNull;
-import lombok.ToString;
+import org.caotc.unit4j.core.exception.NeverHappenException;
 
 /**
  * {@link Field},{@link Method},{@link Constructor}的父类
@@ -24,9 +25,8 @@ import lombok.ToString;
  * @date 2019-06-20
  * @since 1.0.0
  */
+@Data
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode
 public abstract class Element<T> extends AccessibleObject implements Member {
 
   @NonNull
@@ -268,5 +268,30 @@ public abstract class Element<T> extends AccessibleObject implements Member {
   public final Element<T> accessible(boolean accessible) {
     setAccessible(accessible);
     return this;
+  }
+
+  /**
+   * 该元素的权限级别
+   *
+   * @return 权限级别
+   * @author caotc
+   * @date 2019-07-14
+   * @since 1.0.0
+   */
+  @NonNull
+  public final AccessLevel accessLevel() {
+    if (isPrivate()) {
+      return AccessLevel.PRIVATE;
+    }
+    if (isPackagePrivate()) {
+      return AccessLevel.PACKAGE;
+    }
+    if (isProtected()) {
+      return AccessLevel.PROTECTED;
+    }
+    if (isPublic()) {
+      return AccessLevel.PUBLIC;
+    }
+    throw NeverHappenException.instance();
   }
 }

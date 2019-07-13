@@ -2,12 +2,15 @@ package org.caotc.unit4j.core.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -23,6 +26,12 @@ import lombok.Value;
 public class WritableProperty<T, R> {
 
   /**
+   * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前
+   */
+  private static final Ordering<Element<?>> ORDERING = Ordering.natural()
+      .onResultOf(Element::accessLevel);
+
+  /**
    * 工厂方法
    *
    * @param propertySetters 属性设置器集合
@@ -34,7 +43,7 @@ public class WritableProperty<T, R> {
   @NonNull
   public static <T, R> WritableProperty<T, R> create(
       @NonNull Iterable<PropertyWriter<T, R>> propertySetters) {
-    return new WritableProperty<>(ImmutableList.copyOf(propertySetters));
+    return new WritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertySetters));
   }
 
   /**
@@ -49,7 +58,7 @@ public class WritableProperty<T, R> {
   @NonNull
   public static <T, R> WritableProperty<T, R> create(
       @NonNull Iterator<PropertyWriter<T, R>> propertySetters) {
-    return new WritableProperty<>(ImmutableList.copyOf(propertySetters));
+    return new WritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertySetters));
   }
 
   /**
@@ -65,14 +74,14 @@ public class WritableProperty<T, R> {
   public static <T, R> WritableProperty<T, R> create(
       @NonNull Stream<PropertyWriter<T, R>> propertySetters) {
     return new WritableProperty<>(propertySetters
-        .collect(ImmutableList.toImmutableList()));
+        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
   }
 
   @NonNull
-  ImmutableList<PropertyWriter<T, R>> propertyWriters;
+  ImmutableSortedSet<PropertyWriter<T, R>> propertyWriters;
 
   WritableProperty(
-      @NonNull ImmutableList<PropertyWriter<T, R>> propertyWriters) {
+      @NonNull ImmutableSortedSet<PropertyWriter<T, R>> propertyWriters) {
     //属性设置器集合非空
     Preconditions
         .checkArgument(!propertyWriters.isEmpty(), "propertyWriters can't be empty");
@@ -81,17 +90,16 @@ public class WritableProperty<T, R> {
         propertyWriters.stream().map(PropertyWriter::propertyName).distinct().count() == 1
             && propertyWriters.stream().map(PropertyWriter::propertyType).distinct().count() == 1,
         "propertyWriters is not a common property");
-    this.propertyWriters = propertyWriters.stream().distinct()
-        .collect(ImmutableList.toImmutableList());
+    this.propertyWriters = propertyWriters;
   }
 
   public @NonNull WritableProperty<T, R> write(@NonNull T obj, @NonNull R value) {
-    propertyWriters.get(0).write(obj, value);
+    propertyWriters.first().write(obj, value);
     return this;
   }
 
   public @NonNull TypeToken<? extends R> propertyType() {
-    return propertyWriters.get(0).propertyType();
+    return propertyWriters.first().propertyType();
   }
 
   @SuppressWarnings("unchecked")
@@ -128,6 +136,6 @@ public class WritableProperty<T, R> {
   }
 
   public @NonNull String propertyName() {
-    return propertyWriters.get(0).propertyName();
+    return propertyWriters.first().propertyName();
   }
 }

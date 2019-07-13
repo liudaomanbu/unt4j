@@ -7,6 +7,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
@@ -20,6 +21,7 @@ import lombok.Value;
  * @date 2019-05-27
  * @since 1.0.0
  */
+@Data
 public abstract class PropertyWriter<T, R> extends Element<T> {
 
   /**

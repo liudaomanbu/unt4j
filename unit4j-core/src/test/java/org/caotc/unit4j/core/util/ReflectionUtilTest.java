@@ -76,7 +76,7 @@ class Sub extends Super {
     return numberField;
   }
 
-  public Integer getReadNumberField() {
-    return numberField.intValue() + 22;
-  }
+//  public Integer getReadNumberField() {
+//    return numberField.intValue() + 22;
+//  }
 }

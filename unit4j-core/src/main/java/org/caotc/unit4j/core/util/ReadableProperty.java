@@ -2,12 +2,15 @@ package org.caotc.unit4j.core.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -22,6 +25,12 @@ import lombok.Value;
 public class ReadableProperty<T, R> {
 
   /**
+   * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前
+   */
+  private static final Ordering<Element<?>> ORDERING = Ordering.natural()
+      .onResultOf(Element::accessLevel);
+
+  /**
    * 工厂方法
    *
    * @param propertyGetters 属性获取器集合
@@ -33,7 +42,7 @@ public class ReadableProperty<T, R> {
   @NonNull
   public static <T, R> ReadableProperty<T, R> create(
       @NonNull Iterable<PropertyReader<T, R>> propertyGetters) {
-    return new ReadableProperty<T, R>(ImmutableList.copyOf(propertyGetters));
+    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyGetters));
   }
 
   /**
@@ -48,7 +57,7 @@ public class ReadableProperty<T, R> {
   @NonNull
   public static <T, R> ReadableProperty<T, R> create(
       @NonNull Iterator<PropertyReader<T, R>> propertyGetters) {
-    return new ReadableProperty<T, R>(ImmutableList.copyOf(propertyGetters));
+    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyGetters));
   }
 
   /**
@@ -63,15 +72,15 @@ public class ReadableProperty<T, R> {
   @NonNull
   public static <T, R> ReadableProperty<T, R> create(
       @NonNull Stream<PropertyReader<T, R>> propertyGetters) {
-    return new ReadableProperty<T, R>(propertyGetters
-        .collect(ImmutableList.toImmutableList()));
+    return new ReadableProperty<>(propertyGetters
+        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
   }
 
   @NonNull
-  ImmutableList<PropertyReader<T, R>> propertyReaders;
+  ImmutableSortedSet<PropertyReader<T, R>> propertyReaders;
 
   ReadableProperty(
-      @NonNull ImmutableList<PropertyReader<T, R>> propertyReaders) {
+      @NonNull ImmutableSortedSet<PropertyReader<T, R>> propertyReaders) {
     //属性读取器集合不能为空
     Preconditions
         .checkArgument(!propertyReaders.isEmpty(), "propertyReaders can't be empty");
@@ -80,8 +89,7 @@ public class ReadableProperty<T, R> {
         propertyReaders.stream().map(PropertyReader::propertyName).distinct().count() == 1
             && propertyReaders.stream().map(PropertyReader::propertyType).distinct().count() == 1,
         "propertyReaders is not a common property");
-    this.propertyReaders = propertyReaders.stream().distinct()
-        .collect(ImmutableList.toImmutableList());
+    this.propertyReaders = propertyReaders;
   }
 
   public @NonNull Optional<R> read(@NonNull T object) {
@@ -90,7 +98,7 @@ public class ReadableProperty<T, R> {
   }
 
   public @NonNull TypeToken<? extends R> propertyType() {
-    return propertyReaders.get(0).propertyType();
+    return propertyReaders.first().propertyType();
   }
 
   @SuppressWarnings("unchecked")
@@ -126,6 +134,6 @@ public class ReadableProperty<T, R> {
   }
 
   public @NonNull String propertyName() {
-    return propertyReaders.get(0).propertyName();
+    return propertyReaders.first().propertyName();
   }
 }
