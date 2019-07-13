@@ -119,7 +119,24 @@ public abstract class PropertyReader<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public abstract Optional<R> read(@NonNull T object);
+  public final Optional<R> read(@NonNull T object) {
+    if (!accessible()) {
+      accessible(true);
+    }
+    return readInternal(object);
+  }
+
+  /**
+   * 从传入的对象中获取该属性的值
+   *
+   * @param object 对象
+   * @return 对象中该属性的值
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  protected abstract Optional<R> readInternal(@NonNull T object);
 
   /**
    * 属性名称
@@ -211,7 +228,7 @@ class InvokablePropertyReader<T, R> extends PropertyReader<T, R> {
   @NonNull
   @Override
   @SneakyThrows
-  public Optional<R> read(@NonNull T object) {
+  public Optional<R> readInternal(@NonNull T object) {
     return Optional.ofNullable(getInvokable.invoke(object));
   }
 
@@ -230,11 +247,6 @@ class InvokablePropertyReader<T, R> extends PropertyReader<T, R> {
   public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
     return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
-  }
-
-  @Override
-  public @NonNull InvokablePropertyReader<T, R> accessible(boolean accessible) {
-    return (InvokablePropertyReader<T, R>) super.accessible(accessible);
   }
 
 }
@@ -264,7 +276,7 @@ class FieldPropertyReader<T, R> extends PropertyReader<T, R> {
   @SuppressWarnings("unchecked")
   @Override
   @SneakyThrows
-  public Optional<R> read(@NonNull T object) {
+  public Optional<R> readInternal(@NonNull T object) {
     return Optional.ofNullable((R) field.get(object));
   }
 
@@ -289,10 +301,5 @@ class FieldPropertyReader<T, R> extends PropertyReader<T, R> {
   public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
     return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
-  }
-
-  @Override
-  public @NonNull FieldPropertyReader<T, R> accessible(boolean accessible) {
-    return (FieldPropertyReader<T, R>) super.accessible(accessible);
   }
 }

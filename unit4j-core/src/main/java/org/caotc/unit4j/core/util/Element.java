@@ -265,7 +265,7 @@ public abstract class Element<T> extends AccessibleObject implements Member {
    * @since 1.0.0
    */
   @NonNull
-  public Element<T> accessible(boolean accessible) {
+  public final Element<T> accessible(boolean accessible) {
     setAccessible(accessible);
     return this;
   }

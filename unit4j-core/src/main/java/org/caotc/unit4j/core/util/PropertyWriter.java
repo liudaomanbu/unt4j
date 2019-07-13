@@ -114,7 +114,7 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
   /**
    * 给传入对象的该属性设置传入的值
    *
-   * @param obj 设置属性值的对象
+   * @param object 设置属性值的对象
    * @param value 设置的属性值
    * @return {@code this}
    * @author caotc
@@ -122,7 +122,25 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
    * @since 1.0.0
    */
   @NonNull
-  public abstract PropertyWriter<T, R> write(@NonNull T obj, @NonNull R value);
+  public final PropertyWriter<T, R> write(@NonNull T object, @NonNull R value) {
+    if (!accessible()) {
+      accessible(true);
+    }
+    return writeInternal(object, value);
+  }
+
+  /**
+   * 给传入对象的该属性设置传入的值
+   *
+   * @param object 设置属性值的对象
+   * @param value 设置的属性值
+   * @return {@code this}
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  @NonNull
+  protected abstract PropertyWriter<T, R> writeInternal(@NonNull T object, @NonNull R value);
 
   /**
    * 属性名称
@@ -215,7 +233,7 @@ class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   @Override
   @SneakyThrows
-  public @NonNull PropertyWriter<T, R> write(@NonNull T obj, @NonNull R value) {
+  public @NonNull PropertyWriter<T, R> writeInternal(@NonNull T obj, @NonNull R value) {
     setInvokable.invoke(obj, value);
     return this;
   }
@@ -224,11 +242,6 @@ class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
   @Override
   public @NonNull TypeToken<? extends R> propertyType() {
     return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
-  }
-
-  @Override
-  public @NonNull InvokablePropertyWriter<T, R> accessible(boolean accessible) {
-    return (InvokablePropertyWriter<T, R>) super.accessible(accessible);
   }
 
   @Override
@@ -267,7 +280,7 @@ class FieldPropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   @Override
   @SneakyThrows
-  public @NonNull PropertyWriter<T, R> write(@NonNull T obj, @NonNull R value) {
+  public @NonNull PropertyWriter<T, R> writeInternal(@NonNull T obj, @NonNull R value) {
     field.set(obj, value);
     return this;
   }
@@ -281,11 +294,6 @@ class FieldPropertyWriter<T, R> extends PropertyWriter<T, R> {
   @Override
   public @NonNull String propertyName() {
     return field.getName();
-  }
-
-  @Override
-  public @NonNull FieldPropertyWriter<T, R> accessible(boolean accessible) {
-    return (FieldPropertyWriter<T, R>) super.accessible(accessible);
   }
 
   @Override
