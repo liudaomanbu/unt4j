@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.util;
+package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * 属性设置器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -196,117 +197,117 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
         , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
     return (PropertyWriter<T, R1>) this;
   }
-}
-
-/**
- * set{@link Invokable}实现的属性设置器
- *
- * @author caotc
- * @date 2019-05-27
- * @since 1.0.0
- */
-@Value
-class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   /**
-   * set方法
+   * {@link Field}实现的属性设置器
+   *
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
    */
-  @NonNull
-  Invokable<T, ?> setInvokable;
-  /**
-   * set方法名称风格
-   */
-  @NonNull
-  String propertyName;
+  @Value
+  public static class FieldPropertyWriter<T, R> extends PropertyWriter<T, R> {
 
-  InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
-      @NonNull String propertyName) {
-    super(invokable);
-    Preconditions
-        .checkArgument(!invokable.isStatic()
-                && (invokable.getReturnType().getRawType().equals(void.class) || invokable
-                .getReturnType()
-                .equals(invokable.getOwnerType()))
-                && invokable.getParameters().size() == 1, "%s is not a setInvokable",
-            invokable);
-    this.setInvokable = invokable;
-    this.propertyName = propertyName;
+    /**
+     * 属性
+     */
+    @NonNull
+    Field field;
+
+    FieldPropertyWriter(@NonNull Field field) {
+      super(field);
+      this.field = field;
+    }
+
+    @Override
+    @SneakyThrows
+    public @NonNull PropertyWriter<T, R> writeInternal(@NonNull T obj, @NonNull R value) {
+      field.set(obj, value);
+      return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public @NonNull TypeToken<? extends R> propertyType() {
+      return TypeToken.of((Class<? extends R>) field.getType());
+    }
+
+    @Override
+    public @NonNull String propertyName() {
+      return field.getName();
+    }
+
+    @Override
+    public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
+        @NonNull Class<R1> propertyType) {
+      return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
+    }
+
+    @Override
+    public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
+        @NonNull TypeToken<R1> propertyType) {
+      return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
+    }
   }
-
-  @Override
-  @SneakyThrows
-  public @NonNull PropertyWriter<T, R> writeInternal(@NonNull T obj, @NonNull R value) {
-    setInvokable.invoke(obj, value);
-    return this;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public @NonNull TypeToken<? extends R> propertyType() {
-    return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
-  }
-
-  @Override
-  public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
-  }
-
-  @Override
-  public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
-  }
-}
-
-/**
- * {@link Field}实现的属性设置器
- *
- * @author caotc
- * @date 2019-05-27
- * @since 1.0.0
- */
-@Value
-class FieldPropertyWriter<T, R> extends PropertyWriter<T, R> {
 
   /**
-   * 属性
+   * set{@link Invokable}实现的属性设置器
+   *
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
    */
-  @NonNull
-  Field field;
+  @Value
+  public static class InvokablePropertyWriter<T, R> extends PropertyWriter<T, R> {
 
-  FieldPropertyWriter(@NonNull Field field) {
-    super(field);
-    this.field = field;
-  }
+    /**
+     * set方法
+     */
+    @NonNull
+    Invokable<T, ?> setInvokable;
+    /**
+     * set方法名称风格
+     */
+    @NonNull
+    String propertyName;
 
-  @Override
-  @SneakyThrows
-  public @NonNull PropertyWriter<T, R> writeInternal(@NonNull T obj, @NonNull R value) {
-    field.set(obj, value);
-    return this;
-  }
+    InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
+        @NonNull String propertyName) {
+      super(invokable);
+      Preconditions
+          .checkArgument(!invokable.isStatic()
+                  && (invokable.getReturnType().getRawType().equals(void.class) || invokable
+                  .getReturnType()
+                  .equals(invokable.getOwnerType()))
+                  && invokable.getParameters().size() == 1, "%s is not a setInvokable",
+              invokable);
+      this.setInvokable = invokable;
+      this.propertyName = propertyName;
+    }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public @NonNull TypeToken<? extends R> propertyType() {
-    return TypeToken.of((Class<? extends R>) field.getType());
-  }
+    @Override
+    @SneakyThrows
+    public @NonNull PropertyWriter<T, R> writeInternal(@NonNull T obj, @NonNull R value) {
+      setInvokable.invoke(obj, value);
+      return this;
+    }
 
-  @Override
-  public @NonNull String propertyName() {
-    return field.getName();
-  }
+    @SuppressWarnings("unchecked")
+    @Override
+    public @NonNull TypeToken<? extends R> propertyType() {
+      return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
+    }
 
-  @Override
-  public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
-  }
+    @Override
+    public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
+        @NonNull Class<R1> propertyType) {
+      return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
+    }
 
-  @Override
-  public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
+    @Override
+    public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
+        @NonNull TypeToken<R1> propertyType) {
+      return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
+    }
   }
 }

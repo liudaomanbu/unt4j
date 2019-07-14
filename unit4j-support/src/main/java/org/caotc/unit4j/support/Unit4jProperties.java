@@ -15,9 +15,9 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.unit.Alias;
 import org.caotc.unit4j.core.unit.Alias.Type;
-import org.caotc.unit4j.core.util.CaseFormat;
 
 /**
  * 属性,生成{@link AmountCodecConfig}对象使用 //TODO 可变性考虑

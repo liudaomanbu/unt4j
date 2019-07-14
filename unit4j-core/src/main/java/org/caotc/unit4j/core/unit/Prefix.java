@@ -10,11 +10,11 @@ import org.caotc.unit4j.core.AliasRegistrable;
 import org.caotc.unit4j.core.Aliased;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.WithId;
+import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigInteger;
-import org.caotc.unit4j.core.util.Util;
 
 /**
  * 词头 //TODO 考虑将词头类改为类似基本单位类型

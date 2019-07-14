@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.util;
+package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * 属性获取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -193,115 +194,113 @@ public abstract class PropertyReader<T, R> extends Element<T> {
     return (PropertyReader<T, R1>) this;
   }
 
-}
+  /**
+   * {@link Field}实现的属性获取器
+   *
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @Value
+  public static class FieldPropertyReader<T, R> extends PropertyReader<T, R> {
 
-/**
- * get{@link Invokable}实现的属性获取器
- *
- * @author caotc
- * @date 2019-05-27
- * @since 1.0.0
- */
-@Value
-class InvokablePropertyReader<T, R> extends PropertyReader<T, R> {
+    /**
+     * 属性
+     */
+    @NonNull
+    Field field;
+
+    FieldPropertyReader(@NonNull Field field) {
+      super(field);
+      this.field = field;
+    }
+
+    @NonNull
+    @SuppressWarnings("unchecked")
+    @Override
+    @SneakyThrows
+    public Optional<R> readInternal(@NonNull T object) {
+      return Optional.ofNullable((R) field.get(object));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public @NonNull TypeToken<? extends R> propertyType() {
+      return TypeToken.of((Class<? extends R>) field.getType());
+    }
+
+    @Override
+    public @NonNull String propertyName() {
+      return field.getName();
+    }
+
+    @Override
+    public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
+        @NonNull Class<R1> propertyType) {
+      return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
+    }
+
+    @Override
+    public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
+        @NonNull TypeToken<R1> propertyType) {
+      return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
+    }
+  }
 
   /**
-   * get方法
+   * get{@link Invokable}实现的属性获取器
+   *
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
    */
-  @NonNull Invokable<T, R> getInvokable;
-  /**
-   * 属性名称
-   */
-  @NonNull String propertyName;
+  @Value
+  public static class InvokablePropertyReader<T, R> extends PropertyReader<T, R> {
 
-  InvokablePropertyReader(@NonNull Invokable<T, R> invokable,
-      @NonNull String propertyName) {
-    super(invokable);
-    Preconditions
-        .checkArgument(!invokable.isStatic()
-                && invokable.getParameters().isEmpty()
-                && !invokable.getReturnType().getRawType().equals(void.class)
-            , "%s is not a getInvokable",
-            invokable);
-    this.getInvokable = invokable;
-    this.propertyName = propertyName;
-  }
+    /**
+     * get方法
+     */
+    @NonNull Invokable<T, R> getInvokable;
+    /**
+     * 属性名称
+     */
+    @NonNull String propertyName;
 
-  @NonNull
-  @Override
-  @SneakyThrows
-  public Optional<R> readInternal(@NonNull T object) {
-    return Optional.ofNullable(getInvokable.invoke(object));
-  }
+    InvokablePropertyReader(@NonNull Invokable<T, R> invokable,
+        @NonNull String propertyName) {
+      super(invokable);
+      Preconditions
+          .checkArgument(!invokable.isStatic()
+                  && invokable.getParameters().isEmpty()
+                  && !invokable.getReturnType().getRawType().equals(void.class)
+              , "%s is not a getInvokable",
+              invokable);
+      this.getInvokable = invokable;
+      this.propertyName = propertyName;
+    }
 
-  @Override
-  public @NonNull TypeToken<? extends R> propertyType() {
-    return getInvokable.getReturnType();
-  }
+    @NonNull
+    @Override
+    @SneakyThrows
+    public Optional<R> readInternal(@NonNull T object) {
+      return Optional.ofNullable(getInvokable.invoke(object));
+    }
 
-  @Override
-  public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
-  }
+    @Override
+    public @NonNull TypeToken<? extends R> propertyType() {
+      return getInvokable.getReturnType();
+    }
 
-  @Override
-  public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
-  }
+    @Override
+    public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
+        @NonNull Class<R1> propertyType) {
+      return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
+    }
 
-}
-
-/**
- * {@link Field}实现的属性获取器
- *
- * @author caotc
- * @date 2019-05-27
- * @since 1.0.0
- */
-@Value
-class FieldPropertyReader<T, R> extends PropertyReader<T, R> {
-
-  /**
-   * 属性
-   */
-  @NonNull
-  Field field;
-
-  FieldPropertyReader(@NonNull Field field) {
-    super(field);
-    this.field = field;
-  }
-
-  @NonNull
-  @SuppressWarnings("unchecked")
-  @Override
-  @SneakyThrows
-  public Optional<R> readInternal(@NonNull T object) {
-    return Optional.ofNullable((R) field.get(object));
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public @NonNull TypeToken<? extends R> propertyType() {
-    return TypeToken.of((Class<? extends R>) field.getType());
-  }
-
-  @Override
-  public @NonNull String propertyName() {
-    return field.getName();
-  }
-
-  @Override
-  public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
-  }
-
-  @Override
-  public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
+    @Override
+    public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
+        @NonNull TypeToken<R1> propertyType) {
+      return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
+    }
   }
 }

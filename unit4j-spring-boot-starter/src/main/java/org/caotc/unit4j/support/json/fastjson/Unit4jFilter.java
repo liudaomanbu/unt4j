@@ -11,7 +11,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Amount;
-import org.caotc.unit4j.core.util.ReflectionUtil;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.AmountSerialize;
 import org.caotc.unit4j.support.SerializeCommand;

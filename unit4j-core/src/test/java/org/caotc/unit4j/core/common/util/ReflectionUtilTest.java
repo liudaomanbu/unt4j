@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.util;
+package org.caotc.unit4j.core.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;

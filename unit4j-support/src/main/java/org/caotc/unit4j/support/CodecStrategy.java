@@ -7,8 +7,8 @@ import com.google.common.collect.Iterables;
 import java.util.Set;
 import java.util.function.Function;
 import lombok.NonNull;
-import org.caotc.unit4j.core.util.CaseFormat;
-import org.caotc.unit4j.core.util.PropertyReader;
+import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.core.common.reflect.PropertyReader;
 import org.caotc.unit4j.support.SerializeCommand.Type;
 import org.caotc.unit4j.support.SerializeCommands.SerializeCommandsBuilder;
 

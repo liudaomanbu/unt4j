@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.util;
+package org.caotc.unit4j.core.common.util;
 
 import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
@@ -14,6 +14,13 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.core.common.reflect.PropertyReader;
+import org.caotc.unit4j.core.common.reflect.PropertyReader.FieldPropertyReader;
+import org.caotc.unit4j.core.common.reflect.PropertyWriter;
+import org.caotc.unit4j.core.common.reflect.PropertyWriter.FieldPropertyWriter;
+import org.caotc.unit4j.core.common.reflect.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.WritableProperty;
 import org.caotc.unit4j.core.constant.StringConstant;
 //TODO 将所有方法优化到只有一次流操作
 
@@ -622,7 +629,7 @@ public class ReflectionUtil {
                 .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
 
     return propertyGetterMultimap.asMap().values().stream()
-        .filter(propertyGetters -> !fieldExistCheck || propertyGetters.stream()
+        .filter(propertyReaders -> !fieldExistCheck || propertyReaders.stream()
             .anyMatch(FieldPropertyReader.class::isInstance))
         .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
         .map(ReadableProperty::create).collect(ImmutableSet.toImmutableSet());
@@ -752,7 +759,7 @@ public class ReflectionUtil {
                 .toImmutableListMultimap(propertySetterToKeyFunction, Function.identity()));
 
     return propertySetterMultimap.asMap().values().stream()
-        .filter(propertySetters -> !fieldExistCheck || propertySetters.stream()
+        .filter(propertyWriters -> !fieldExistCheck || propertyWriters.stream()
             .anyMatch(FieldPropertyWriter.class::isInstance))
         .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
         .map(WritableProperty::create).collect(ImmutableSet.toImmutableSet());

@@ -15,8 +15,8 @@ import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.unit.type.CompositeUnitType;
-import org.caotc.unit4j.core.util.Util;
 
 /**
  * 组合标准单位

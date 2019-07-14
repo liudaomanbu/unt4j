@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.util;
+package org.caotc.unit4j.core.common.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;

@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.core.util.CaseFormat;
 
 /**
  * 数量序列化配置注解

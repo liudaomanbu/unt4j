@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.util;
+package org.caotc.unit4j.core.common.base;
 
 import com.google.common.base.Converter;
 import com.google.common.base.Splitter;
