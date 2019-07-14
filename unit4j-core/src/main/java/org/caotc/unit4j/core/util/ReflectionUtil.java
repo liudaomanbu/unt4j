@@ -565,9 +565,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<ReadableProperty<T, ?>> propertyGettersFromClass(
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
       @NonNull Class<T> clazz) {
-    return propertyGettersFromClass(clazz, true);
+    return readablePropertiesFromClass(clazz, true);
   }
 
   /**
@@ -581,9 +581,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<ReadableProperty<T, ?>> propertyGettersFromClass(
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck) {
-    return propertyGettersFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
+    return readablePropertiesFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
@@ -600,7 +600,7 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<ReadableProperty<T, ?>> propertyGettersFromClass(
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
 
@@ -639,9 +639,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<ReadableProperty<T, R>> propertyGetterFromClass(
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
-    return propertyGetterFromClass(clazz, fieldName, true);
+    return readablePropertyFromClass(clazz, fieldName, true);
   }
 
   /**
@@ -656,9 +656,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<ReadableProperty<T, R>> propertyGetterFromClass(
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
-    return propertyGetterFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
+    return readablePropertyFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
@@ -677,10 +677,10 @@ public class ReflectionUtil {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> Optional<ReadableProperty<T, R>> propertyGetterFromClass(
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return propertyGettersFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
+    return readablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
         .filter(propertyGetter -> propertyGetter.propertyName().equals(fieldName))
         .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
         .findAny();
@@ -696,9 +696,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<WritableProperty<T, ?>> propertySettersFromClass(
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
       @NonNull Class<T> clazz) {
-    return propertySettersFromClass(clazz, true);
+    return writablePropertiesFromClass(clazz, true);
   }
 
   /**
@@ -712,9 +712,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<WritableProperty<T, ?>> propertySettersFromClass(
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck) {
-    return propertySettersFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
+    return writablePropertiesFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
@@ -731,7 +731,7 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<WritableProperty<T, ?>> propertySettersFromClass(
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     Function<PropertyWriter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertyWriter -> ImmutableList
@@ -769,9 +769,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<WritableProperty<T, R>> propertySetterFromClass(
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
-    return propertySetterFromClass(clazz, fieldName, true);
+    return writablePropertyFromClass(clazz, fieldName, true);
   }
 
   /**
@@ -786,9 +786,9 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> Optional<WritableProperty<T, R>> propertySetterFromClass(
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
-    return propertySetterFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
+    return writablePropertyFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
   }
 
   /**
@@ -807,10 +807,10 @@ public class ReflectionUtil {
    */
   @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> Optional<WritableProperty<T, R>> propertySetterFromClass(
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return propertySettersFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
+    return writablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
         .filter(propertyWriter -> propertyWriter.propertyName().equals(fieldName))
         .map(propertyWriter -> (WritableProperty<T, R>) propertyWriter)
         .findAny();

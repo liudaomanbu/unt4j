@@ -34,7 +34,7 @@ public class WritableProperty<T, R> {
   /**
    * 工厂方法
    *
-   * @param propertySetters 属性设置器集合
+   * @param propertyWriters 属性设置器集合
    * @return 属性设置器
    * @author caotc
    * @date 2019-05-27
@@ -42,14 +42,14 @@ public class WritableProperty<T, R> {
    */
   @NonNull
   public static <T, R> WritableProperty<T, R> create(
-      @NonNull Iterable<PropertyWriter<T, R>> propertySetters) {
-    return new WritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertySetters));
+      @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
+    return new WritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
   }
 
   /**
    * 工厂方法
    *
-   * @param propertySetters 属性设置器集合
+   * @param propertyWriters 属性设置器集合
    * @return 属性设置器
    * @author caotc
    * @date 2019-05-27
@@ -57,14 +57,14 @@ public class WritableProperty<T, R> {
    */
   @NonNull
   public static <T, R> WritableProperty<T, R> create(
-      @NonNull Iterator<PropertyWriter<T, R>> propertySetters) {
-    return new WritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertySetters));
+      @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
+    return new WritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
   }
 
   /**
    * 工厂方法
    *
-   * @param propertySetters 属性设置器集合
+   * @param propertyWriterStream 属性设置器集合
    * @return 属性设置器
    * @author caotc
    * @date 2019-05-27
@@ -72,8 +72,8 @@ public class WritableProperty<T, R> {
    */
   @NonNull
   public static <T, R> WritableProperty<T, R> create(
-      @NonNull Stream<PropertyWriter<T, R>> propertySetters) {
-    return new WritableProperty<>(propertySetters
+      @NonNull Stream<PropertyWriter<T, R>> propertyWriterStream) {
+    return new WritableProperty<>(propertyWriterStream
         .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
   }
 

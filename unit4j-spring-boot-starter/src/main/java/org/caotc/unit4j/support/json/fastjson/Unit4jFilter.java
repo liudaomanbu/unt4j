@@ -40,7 +40,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @Override
   public Object process(BeanContext context, Object object, String name, Object value) {
     AmountCodecConfig amountCodecConfig = ReflectionUtil
-        .propertyGetterFromClass(object.getClass(), name)
+        .readablePropertyFromClass(object.getClass(), name)
         .flatMap(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class))
         .map(amountSerialize -> unit4jProperties.createAmountCodecConfig(name, amountSerialize))
         .orElseGet(unit4jProperties::createAmountCodecConfig);
@@ -50,7 +50,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @Override
   public boolean apply(Object object, String name, Object value) {
     AmountCodecConfig amountCodecConfig = ReflectionUtil
-        .propertyGetterFromClass(object.getClass(), name)
+        .readablePropertyFromClass(object.getClass(), name)
         .flatMap(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class))
         .map(amountSerialize -> unit4jProperties.createAmountCodecConfig(name, amountSerialize))
         .orElseGet(unit4jProperties::createAmountCodecConfig);
@@ -61,7 +61,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @SuppressWarnings("unchecked")
   @Override
   public void writeBefore(Object object) {
-    ReflectionUtil.propertyGettersFromClass((Class<Object>) object.getClass())
+    ReflectionUtil.readablePropertiesFromClass((Class<Object>) object.getClass())
         .stream()
         .filter(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class).isPresent()
             || Amount.class.equals(fieldWrapper.propertyType().getRawType()))

@@ -240,12 +240,12 @@ public class AmountInterceptor implements Interceptor {
       Object directParameterObject = mappedStatement.getConfiguration()
           .newMetaObject(parameterObject).getValue(directPropertyName);
       return ReflectionUtil
-          .propertyGetterFromClass(directParameterObject.getClass(),
+          .readablePropertyFromClass(directParameterObject.getClass(),
               propertyNames.get(propertyNames.size() - 1)).orElseThrow(
               NeverHappenException::instance);
     } else {
       return ReflectionUtil
-          .propertyGetterFromClass(parameterObject.getClass(),
+          .readablePropertyFromClass(parameterObject.getClass(),
               parameterMapping.getProperty())
           .orElseThrow(NeverHappenException::instance);
     }

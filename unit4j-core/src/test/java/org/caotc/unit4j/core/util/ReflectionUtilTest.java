@@ -13,12 +13,12 @@ class ReflectionUtilTest {
 
   @Test
   void propertyGettersFromClass() {
-    ReflectionUtil.propertyGettersFromClass(Sub.class, false).forEach(System.out::println);
+    ReflectionUtil.readablePropertiesFromClass(Sub.class, false).forEach(System.out::println);
   }
 
   @Test
   void propertySettersFromClass() {
-    ReflectionUtil.propertySettersFromClass(Sub.class, false).forEach(System.out::println);
+    ReflectionUtil.writablePropertiesFromClass(Sub.class, false).forEach(System.out::println);
   }
 
   @Test
@@ -33,12 +33,12 @@ class ReflectionUtilTest {
   }
 }
 
-
-@Data
 @FieldDefaults(makeFinal = false)
+@ToString
 abstract class Super {
 
   protected String stringField = "super";
+  protected int intField = 99;
 }
 
 @Data
@@ -79,4 +79,12 @@ class Sub extends Super {
 //  public Integer getReadNumberField() {
 //    return numberField.intValue() + 22;
 //  }
+
+  public int getIntField() {
+    return intField;
+  }
+
+  public void setIntField(int intField) {
+    this.intField = intField;
+  }
 }

@@ -33,7 +33,7 @@ public class ReadableProperty<T, R> {
   /**
    * 工厂方法
    *
-   * @param propertyGetters 属性获取器集合
+   * @param propertyReaders 属性获取器集合
    * @return 属性获取器
    * @author caotc
    * @date 2019-05-27
@@ -41,14 +41,14 @@ public class ReadableProperty<T, R> {
    */
   @NonNull
   public static <T, R> ReadableProperty<T, R> create(
-      @NonNull Iterable<PropertyReader<T, R>> propertyGetters) {
-    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyGetters));
+      @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
+    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
   }
 
   /**
    * 工厂方法
    *
-   * @param propertyGetters 属性获取器集合
+   * @param propertyReaders 属性获取器集合
    * @return 属性获取器
    * @author caotc
    * @date 2019-05-27
@@ -56,14 +56,14 @@ public class ReadableProperty<T, R> {
    */
   @NonNull
   public static <T, R> ReadableProperty<T, R> create(
-      @NonNull Iterator<PropertyReader<T, R>> propertyGetters) {
-    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyGetters));
+      @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
+    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
   }
 
   /**
    * 工厂方法
    *
-   * @param propertyGetters 属性获取器集合
+   * @param propertyReaders 属性获取器集合
    * @return 属性获取器
    * @author caotc
    * @date 2019-05-27
@@ -71,8 +71,8 @@ public class ReadableProperty<T, R> {
    */
   @NonNull
   public static <T, R> ReadableProperty<T, R> create(
-      @NonNull Stream<PropertyReader<T, R>> propertyGetters) {
-    return new ReadableProperty<>(propertyGetters
+      @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
+    return new ReadableProperty<>(propertyReaders
         .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
   }
 
