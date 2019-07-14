@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
-import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * 属性设置器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -38,7 +37,7 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
   @SuppressWarnings("unchecked")
   @NonNull
   public static <T, R> PropertyWriter<T, R> create(@NonNull Method setMethod,
-      @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
+      @NonNull MethodNameStyle methodNameStyle) {
     return create((Invokable<T, ?>) Invokable.from(setMethod), methodNameStyle);
   }
 
@@ -72,7 +71,7 @@ public abstract class PropertyWriter<T, R> extends Element<T> {
 
   @NonNull
   public static <T, R> PropertyWriter<T, R> create(@NonNull Invokable<T, ?> setInvokable,
-      @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
+      @NonNull MethodNameStyle methodNameStyle) {
     return new InvokablePropertyWriter<>(setInvokable,
         methodNameStyle.fieldNameFromSetInvokable(setInvokable));
   }

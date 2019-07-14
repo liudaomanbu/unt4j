@@ -12,7 +12,6 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
-import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * 属性获取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -39,7 +38,7 @@ public abstract class PropertyReader<T, R> extends Element<T> {
   @SuppressWarnings("unchecked")
   @NonNull
   public static <T, R> PropertyReader<T, R> create(@NonNull Method getMethod,
-      @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
+      @NonNull MethodNameStyle methodNameStyle) {
     return create((Invokable<T, R>) Invokable.from(getMethod), methodNameStyle);
   }
 
@@ -72,7 +71,7 @@ public abstract class PropertyReader<T, R> extends Element<T> {
    */
   @NonNull
   public static <T, R> PropertyReader<T, R> create(@NonNull Invokable<T, R> getInvokable,
-      @NonNull ReflectionUtil.MethodNameStyle methodNameStyle) {
+      @NonNull MethodNameStyle methodNameStyle) {
     return new InvokablePropertyReader<>(getInvokable,
         methodNameStyle.fieldNameFromGetInvokable(getInvokable));
   }
