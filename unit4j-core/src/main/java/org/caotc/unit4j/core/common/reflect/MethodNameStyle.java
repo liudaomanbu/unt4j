@@ -238,7 +238,7 @@ public enum MethodNameStyle {
    */
   @NonNull
   public String fieldNameFromSetMethod(@NonNull Method setMethod) {
-    return fieldNameFromGetInvokable(Invokable.from(setMethod));
+    return fieldNameFromSetInvokable(Invokable.from(setMethod));
   }
 
   /**
