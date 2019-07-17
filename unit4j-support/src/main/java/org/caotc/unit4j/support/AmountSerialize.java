@@ -11,8 +11,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
-import org.caotc.unit4j.core.constant.StringConstant;
-import org.caotc.unit4j.core.unit.Unit;
 
 /**
  * 数量序列化配置注解
@@ -45,12 +43,6 @@ public @interface AmountSerialize {
    * @return 数值序列化时使用的类
    */
   Class<?> valueType() default BigDecimal.class;
-
-  /**
-   * @return 目标单位主键
-   * @see Unit#id()
-   */
-  String targetUnitId() default StringConstant.EMPTY;
 
   /**
    * @return 配置对象主键
