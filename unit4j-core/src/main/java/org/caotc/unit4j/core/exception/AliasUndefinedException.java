@@ -2,10 +2,10 @@ package org.caotc.unit4j.core.exception;
 
 import lombok.NonNull;
 import lombok.Value;
+import org.caotc.unit4j.core.Alias;
+import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Aliased;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.unit.Alias;
-import org.caotc.unit4j.core.unit.Alias.Type;
 
 /**
  * 别名未定义异常 获取{@link #undefinedAliased}对象在{@link #configuration}中{@link

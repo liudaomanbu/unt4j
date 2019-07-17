@@ -3,7 +3,6 @@ package org.caotc.unit4j.core;
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import lombok.NonNull;
-import org.caotc.unit4j.core.unit.Alias;
 
 /**
  * 有别名的.实现该接口的类可以从{@link Configuration}中获取别名

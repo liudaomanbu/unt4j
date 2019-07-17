@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.Value;
+import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.AliasRegistrable;
 import org.caotc.unit4j.core.Aliased;
 import org.caotc.unit4j.core.Configuration;

@@ -2,7 +2,7 @@ package org.caotc.unit4j.core.constant;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.experimental.UtilityClass;
-import org.caotc.unit4j.core.unit.Alias;
+import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.unit.BasePrefixUnit;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;

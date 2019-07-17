@@ -27,7 +27,6 @@ import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.Fraction;
-import org.caotc.unit4j.core.unit.Alias;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
@@ -732,6 +731,7 @@ public final class Configuration implements WithId {
   }
 
   /**
+   * //TODO 冲突检测
    * 两个单位互相转换的配置添加
    *
    * @param source 源单位

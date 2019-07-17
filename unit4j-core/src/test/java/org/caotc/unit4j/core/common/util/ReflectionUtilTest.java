@@ -151,6 +151,8 @@ class ReflectionUtilTest {
     ImmutableSet<ReadableProperty<Sub, ?>> readableProperties = ReflectionUtil
         .readablePropertiesFromClass(Sub.class, false);
     log.debug("readableProperties:{}", readableProperties);
+    readableProperties.forEach(readableProperty -> System.out
+        .println(readableProperty.propertyName() + ":" + readableProperty.propertyType()));
     Assertions.assertEquals(7, readableProperties.size());
   }
 

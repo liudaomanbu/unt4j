@@ -12,9 +12,9 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
+import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.util.Util;
-import org.caotc.unit4j.core.unit.Alias;
 
 /**
  * 组合单位类型,由基本到位和其他组合单位类型组合而成
