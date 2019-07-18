@@ -5,8 +5,8 @@ import lombok.Value;
 import lombok.experimental.Accessors;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.math.number.BigDecimal;
-import org.caotc.unit4j.support.AmountSerialize;
 import org.caotc.unit4j.support.CodecStrategy;
+import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 @Value(staticConstructor = "create")
 @Accessors(fluent = false, chain = true)

@@ -13,10 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.AmountCodecConfig;
-import org.caotc.unit4j.support.AmountSerialize;
 import org.caotc.unit4j.support.SerializeCommand;
 import org.caotc.unit4j.support.SerializeCommands;
 import org.caotc.unit4j.support.Unit4jProperties;
+import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 /**
  * {@link Amount}在fastjson中的属性过滤器,为了实现不同类中的{@link Amount}属性通过注解实现不同策略序列化 ,在fastjson中需要通过Filter实现

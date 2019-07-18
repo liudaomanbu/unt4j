@@ -13,8 +13,8 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Amount;
-import org.caotc.unit4j.support.AmountSerialize;
 import org.caotc.unit4j.support.Unit4jProperties;
+import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 /**
  * {@link Amount}在jackson中的上下文序列化器. 为了实现不同类中的{@link Amount}属性通过注解实现不同策略序列化 ,在jackson中需要通过{@link

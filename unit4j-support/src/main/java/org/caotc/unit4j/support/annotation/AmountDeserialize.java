@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support;
+package org.caotc.unit4j.support.annotation;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.support.CodecStrategy;
 
 /**
  * 数量反序列化配置注解

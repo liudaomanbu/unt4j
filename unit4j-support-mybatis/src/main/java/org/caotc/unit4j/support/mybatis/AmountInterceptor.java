@@ -43,11 +43,11 @@ import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.exception.NeverHappenException;
 import org.caotc.unit4j.support.AmountCodecConfig;
-import org.caotc.unit4j.support.AmountSerialize;
 import org.caotc.unit4j.support.CodecStrategy;
 import org.caotc.unit4j.support.SerializeCommand;
 import org.caotc.unit4j.support.SerializeCommands;
 import org.caotc.unit4j.support.Unit4jProperties;
+import org.caotc.unit4j.support.annotation.AmountSerialize;
 import org.caotc.unit4j.support.mybatis.sql.AbstractExpressionVisitor;
 import org.caotc.unit4j.support.mybatis.sql.RecursionExpressionVisitor;
 

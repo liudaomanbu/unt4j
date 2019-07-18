@@ -18,6 +18,7 @@ import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 /**
  * 属性,生成{@link AmountCodecConfig}对象使用 //TODO 可变性考虑

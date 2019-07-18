@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support;
+package org.caotc.unit4j.support.annotation;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -9,24 +9,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 单位注解,标注在属性和get方法上
+ * 数据类型,标注在属性和get方法上
  *
  * @author caotc
- * @date 2019-07-17
+ * @date 2019-07-18
  * @since 1.0.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {METHOD, FIELD})
-public @interface Unit {
+public @interface DataType {
 
   /**
-   * 单位值,为id或者别名
+   * 数据类型
    */
   String value();
-
-  /**
-   * 别名类型,为空字符串时,{@link #value()}为id
-   */
-  String aliasType() default "";
 }

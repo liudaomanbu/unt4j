@@ -13,8 +13,8 @@ import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.constant.UnitConstant;
-import org.caotc.unit4j.support.AmountSerialize;
 import org.caotc.unit4j.support.CodecStrategy;
+import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 /**
  * 医生团队成员
