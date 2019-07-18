@@ -2,7 +2,7 @@ package org.caotc.unit4j.support.spring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.caotc.unit4j.support.json.jackson.Unit4jModule;
+import org.caotc.unit4j.support.jackson.Unit4jModule;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

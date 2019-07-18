@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.json;
+package org.caotc.unit4j.support.common.constant;
 
 import lombok.experimental.UtilityClass;
 import org.caotc.unit4j.core.constant.StringConstant;

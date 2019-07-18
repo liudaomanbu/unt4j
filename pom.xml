@@ -15,15 +15,22 @@
 
   <modules>
     <module>unit4j-core</module>
-    <module>unit4j-spring-boot-starter</module>
-    <module>unit4j-support-mybatis</module>
     <module>unit4j-support</module>
+    <module>unit4j-support-mybatis</module>
+    <module>unit4j-support-jackson</module>
+    <module>unit4j-spring-boot-starter</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     <unit4j.version>1.0.0${project.release.version}</unit4j.version>
+    <unit4j-support.version>1.0.0${project.release.version}
+    </unit4j-support.version>
+    <unit4j-support-mybatis.version>1.0.0${project.release.version}
+    </unit4j-support-mybatis.version>
+    <unit4j-support-jackson.version>1.0.0${project.release.version}
+    </unit4j-support-jackson.version>
     <unit4j-spring-boot-starter.version>1.0.0${project.release.version}
     </unit4j-spring-boot-starter.version>
 
@@ -60,12 +67,17 @@
       <dependency>
         <groupId>org.caotc</groupId>
         <artifactId>unit4j-support</artifactId>
-        <version>${unit4j.version}</version>
+        <version>${unit4j-support.version}</version>
       </dependency>
       <dependency>
         <groupId>org.caotc</groupId>
         <artifactId>unit4j-support-mybatis</artifactId>
-        <version>${unit4j.version}</version>
+        <version>${unit4j-support-mybatis.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.caotc</groupId>
+        <artifactId>unit4j-support-jackson</artifactId>
+        <version>${unit4j-support-jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>org.caotc</groupId>

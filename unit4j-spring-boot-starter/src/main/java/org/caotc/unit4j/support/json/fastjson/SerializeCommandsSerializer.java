@@ -10,7 +10,7 @@ import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.exception.NeverHappenException;
 import org.caotc.unit4j.support.SerializeCommand;
 import org.caotc.unit4j.support.SerializeCommands;
-import org.caotc.unit4j.support.json.JsonConstant;
+import org.caotc.unit4j.support.common.constant.JsonConstant;
 
 /**
  * {@link SerializeCommands}在fastjson中的序列化器. {@link Amount}通过转换为序列化指令对象,来实现同时存在多套序列化格式的需求

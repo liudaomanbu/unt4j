@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.json.jackson;
+package org.caotc.unit4j.support.jackson;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JsonSerializer;

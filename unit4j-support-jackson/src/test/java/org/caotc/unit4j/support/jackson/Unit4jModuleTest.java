@@ -1,11 +1,10 @@
-package org.caotc.unit4j.support.json.jackson;
+package org.caotc.unit4j.support.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.constant.UnitConstant;
 import org.caotc.unit4j.support.Unit4jProperties;
-import org.caotc.unit4j.support.json.AmountField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
