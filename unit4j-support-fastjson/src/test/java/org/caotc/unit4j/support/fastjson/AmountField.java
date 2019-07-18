@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.json;
+package org.caotc.unit4j.support.fastjson;
 
 import java.math.RoundingMode;
 import lombok.Value;

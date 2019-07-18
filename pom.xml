@@ -18,6 +18,7 @@
     <module>unit4j-support</module>
     <module>unit4j-support-mybatis</module>
     <module>unit4j-support-jackson</module>
+    <module>unit4j-support-fastjson</module>
     <module>unit4j-spring-boot-starter</module>
   </modules>
 
@@ -31,6 +32,8 @@
     </unit4j-support-mybatis.version>
     <unit4j-support-jackson.version>1.0.0${project.release.version}
     </unit4j-support-jackson.version>
+    <unit4j-support-fastjson.version>1.0.0${project.release.version}
+    </unit4j-support-fastjson.version>
     <unit4j-spring-boot-starter.version>1.0.0${project.release.version}
     </unit4j-spring-boot-starter.version>
 
@@ -78,6 +81,11 @@
         <groupId>org.caotc</groupId>
         <artifactId>unit4j-support-jackson</artifactId>
         <version>${unit4j-support-jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.caotc</groupId>
+        <artifactId>unit4j-support-fastjson</artifactId>
+        <version>${unit4j-support-fastjson.version}</version>
       </dependency>
       <dependency>
         <groupId>org.caotc</groupId>

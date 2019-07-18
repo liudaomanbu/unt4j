@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.json.fastjson;
+package org.caotc.unit4j.support.fastjson;
 
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;

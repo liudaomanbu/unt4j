@@ -2,7 +2,7 @@ package org.caotc.unit4j.support.spring;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import lombok.AllArgsConstructor;
-import org.caotc.unit4j.support.json.fastjson.Unit4jModule;
+import org.caotc.unit4j.support.fastjson.Unit4jModule;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
