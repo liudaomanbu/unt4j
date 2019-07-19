@@ -39,16 +39,15 @@
 
     <dependency>
       <groupId>org.caotc</groupId>
-      <artifactId>unit4j-support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.caotc</groupId>
       <artifactId>unit4j-support-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>org.caotc</groupId>
       <artifactId>unit4j-support-fastjson</artifactId>
-      <version>${unit4j-support-fastjson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.caotc</groupId>
+      <artifactId>unit4j-support-mybatis</artifactId>
     </dependency>
 
     <dependency>
@@ -62,6 +61,11 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

@@ -3,10 +3,7 @@ package org.caotc.unit4j.support.spring;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import lombok.AllArgsConstructor;
 import org.caotc.unit4j.support.fastjson.Unit4jModule;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 单位库在springboot中关于fastjson的自动配置
@@ -15,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
  * @date 2019-04-21
  * @since 1.0.0
  */
-@Configuration
-@ConditionalOnBean(FastJsonHttpMessageConverter.class)
-@EnableConfigurationProperties(Unit4jSpringProperties.class)
+//@Configuration
+//@ConditionalOnBean(FastJsonHttpMessageConverter.class)
+//@EnableConfigurationProperties(Unit4jSpringProperties.class)
 @AllArgsConstructor
 public class Unit4jFastJsonAutoConfigure {
 

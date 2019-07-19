@@ -1,9 +1,11 @@
 package org.caotc.unit4j.support;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -133,6 +135,9 @@ public class Unit4jProperties {
    */
   @NonNull
   AliasUndefinedStrategy unitAliasUndefinedStrategy = DEFAULT_UNIT_UNDEFINED_STRATEGY;
+
+  @NonNull
+  Map<String, String> unitConvertConfigs = Maps.newHashMap();
 
   /**
    * 获取单独的{@link Amount}对象的序列化反序列化配置

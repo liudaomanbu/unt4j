@@ -1,12 +1,8 @@
 package org.caotc.unit4j.support.spring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.caotc.unit4j.support.jackson.Unit4jModule;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 单位库在springboot中关于jackson的自动配置
@@ -15,9 +11,9 @@ import org.springframework.context.annotation.Configuration;
  * @date 2019-04-21
  * @since 1.0.0
  */
-@Configuration
-@ConditionalOnClass(ObjectMapper.class)
-@EnableConfigurationProperties(Unit4jSpringProperties.class)
+//@Configuration
+//@ConditionalOnClass(ObjectMapper.class)
+//@EnableConfigurationProperties(Unit4jSpringProperties.class)
 @AllArgsConstructor
 public class Unit4jJacksonAutoConfigure {
 
