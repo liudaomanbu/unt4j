@@ -17,6 +17,6 @@ class Unit4jSpringPropertiesTest {
 
   @Test
   void test() {
-    System.out.println();
+    System.out.println(unit4jSpringProperties.getDb().getUnitConvertConfigs());
   }
 }
