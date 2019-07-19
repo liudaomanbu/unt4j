@@ -136,8 +136,11 @@ public class Unit4jProperties {
   @NonNull
   AliasUndefinedStrategy unitAliasUndefinedStrategy = DEFAULT_UNIT_UNDEFINED_STRATEGY;
 
+  /**
+   * 单位转换关系额外注入//TODO
+   */
   @NonNull
-  Map<String, String> unitConvertConfigs = Maps.newHashMap();
+  Map<String, Map<String, String>> unitConvertConfigs = Maps.newHashMap();
 
   /**
    * 获取单独的{@link Amount}对象的序列化反序列化配置

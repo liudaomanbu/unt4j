@@ -9,23 +9,13 @@
 
 package org.caotc.unit4j.support.spring;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@Slf4j
 @SpringBootApplication(scanBasePackages = {"org.caotc.unit4j.support.spring"})
 public class Application {
 
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
-    log.error("end run");
   }
-
-//    @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
-//    @Service
-//    public static class TestService{
-//        @Resource
-//        TestCompoent testCompoent;
-//    }
 }
