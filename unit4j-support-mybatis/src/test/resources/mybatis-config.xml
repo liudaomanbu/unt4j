@@ -12,6 +12,9 @@
     <plugin interceptor="org.caotc.unit4j.support.mybatis.AmountInterceptor">
       <property name="someProperty" value="100"/>
     </plugin>
+    <plugin interceptor="org.caotc.unit4j.support.mybatis.ResultSetHandlerInterceptor">
+      <property name="someProperty" value="101"/>
+    </plugin>
   </plugins>
   <environments default="development">
     <environment id="development">
