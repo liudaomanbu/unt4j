@@ -35,7 +35,7 @@ public class TestMybatis {
   void queryTable() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       DoctorTeamMemberMapper dao = session.getMapper(DoctorTeamMemberMapper.class);
-      DoctorTeamMemberDO doctorTeamMemberDO = dao.findByPrimaryKey(9L);
+      DoctorTeamMemberDO doctorTeamMemberDO = dao.findByPrimaryKey(1L);
       log.info("doctorTeamMemberDO:{}", doctorTeamMemberDO);
     }
   }

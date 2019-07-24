@@ -134,10 +134,6 @@ public class AmountInterceptor implements Interceptor {
     final List<Column> columns;
 
     if (SqlCommandType.INSERT.equals(sqlCommandType)) {
-      return invocation.proceed();
-    }
-
-    if (SqlCommandType.INSERT.equals(sqlCommandType)) {
       Insert insert = (Insert) parse;
       columns = insert.getColumns();
     } else if (SqlCommandType.UPDATE.equals(sqlCommandType)) {
