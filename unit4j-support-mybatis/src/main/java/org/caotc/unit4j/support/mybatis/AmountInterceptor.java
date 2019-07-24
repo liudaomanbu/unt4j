@@ -134,6 +134,10 @@ public class AmountInterceptor implements Interceptor {
     final List<Column> columns;
 
     if (SqlCommandType.INSERT.equals(sqlCommandType)) {
+      return invocation.proceed();
+    }
+
+    if (SqlCommandType.INSERT.equals(sqlCommandType)) {
       Insert insert = (Insert) parse;
       columns = insert.getColumns();
     } else if (SqlCommandType.UPDATE.equals(sqlCommandType)) {
@@ -148,7 +152,7 @@ public class AmountInterceptor implements Interceptor {
         }
       }));
     } else {
-      throw NeverHappenException.instance();
+      return invocation.proceed();
     }
 
     ImmutableList<SqlParam> sqlParams = Optional.ofNullable(boundSql.getParameterMappings())

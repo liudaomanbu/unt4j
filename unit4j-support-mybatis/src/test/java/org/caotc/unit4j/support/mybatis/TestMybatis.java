@@ -33,41 +33,32 @@ public class TestMybatis {
 
   @Test
   void queryTable() {
-    SqlSession session = sqlSessionFactory.openSession();
-    try {
+    try (SqlSession session = sqlSessionFactory.openSession()) {
       DoctorTeamMemberMapper dao = session.getMapper(DoctorTeamMemberMapper.class);
       DoctorTeamMemberDO doctorTeamMemberDO = dao.findByPrimaryKey(9L);
       log.info("doctorTeamMemberDO:{}", doctorTeamMemberDO);
-    } finally {
-      session.close();
     }
   }
 
   @Test
   void insert() {
-    SqlSession session = sqlSessionFactory.openSession();
-    try {
+    try (SqlSession session = sqlSessionFactory.openSession()) {
       DoctorTeamMemberMapper dao = session.getMapper(DoctorTeamMemberMapper.class);
       int effectRows = dao.insert(
           new DoctorTeamMemberDO(0L, true, LocalDateTime.now(), LocalDateTime.now(), ""));
       session.commit();
       log.info("effectRows:{}", effectRows);
-    } finally {
-      session.close();
     }
   }
 
   @Test
   void update() {
-    SqlSession session = sqlSessionFactory.openSession();
-    try {
+    try (SqlSession session = sqlSessionFactory.openSession()) {
       DoctorTeamMemberMapper dao = session.getMapper(DoctorTeamMemberMapper.class);
       int effectRows = dao.updateByPrimaryKey(
           new DoctorTeamMemberDO(0L, true, LocalDateTime.now(), LocalDateTime.now(), ""));
       session.commit();
       log.info("effectRows:{}", effectRows);
-    } finally {
-      session.close();
     }
   }
 

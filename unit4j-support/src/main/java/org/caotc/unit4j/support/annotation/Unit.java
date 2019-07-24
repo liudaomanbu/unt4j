@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 单位注解,标注在属性和get方法上
+ * 单位注解,标注在属性和get方法上//TODO 似乎无用,待废弃
  *
  * @author caotc
  * @date 2019-07-17

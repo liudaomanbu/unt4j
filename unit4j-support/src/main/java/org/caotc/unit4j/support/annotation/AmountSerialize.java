@@ -52,9 +52,19 @@ public @interface AmountSerialize {
   String configId() default Configuration.DEFAULT_ID;
 
   /**
-   * 当前属性名称格式
+   * @return 当前属性名称格式
    */
   CaseFormat caseFormat() default CaseFormat.LOWER_CAMEL;
+
+  /**
+   * @return 目标单位id
+   */
+  String targetUnitId() default "";
+
+  /**
+   * @return 来源单位id
+   */
+  String sourceUnitId() default "";
 
   //TODO 目标属性名称的格式以外的内容
 }
