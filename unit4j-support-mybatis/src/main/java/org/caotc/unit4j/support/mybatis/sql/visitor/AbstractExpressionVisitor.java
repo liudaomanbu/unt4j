@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.mybatis.sql;
+package org.caotc.unit4j.support.mybatis.sql.visitor;
 
 import net.sf.jsqlparser.expression.AllComparisonExpression;
 import net.sf.jsqlparser.expression.AnalyticExpression;
@@ -74,7 +74,7 @@ import net.sf.jsqlparser.statement.select.SubSelect;
  * @date 2019-06-07
  * @since 1.0.0
  */
-public class AbstractExpressionVisitor implements ExpressionVisitor {
+public abstract class AbstractExpressionVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(BitwiseRightShift aThis) {

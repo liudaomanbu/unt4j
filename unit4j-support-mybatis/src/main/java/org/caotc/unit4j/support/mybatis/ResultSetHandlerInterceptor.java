@@ -1,6 +1,7 @@
 package org.caotc.unit4j.support.mybatis;
 
 import java.sql.Statement;
+import java.util.List;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
@@ -27,7 +28,8 @@ public class ResultSetHandlerInterceptor implements Interceptor {
   public Object intercept(Invocation invocation) throws Throwable {
     ResultSetHandler handler = (ResultSetHandler) invocation.getTarget();
     Statement statement = (Statement) invocation.getArgs()[0];
-    return invocation.proceed();
+    List<?> result = (List<?>) invocation.proceed();
+    return result;
   }
 
   @Override

@@ -13,7 +13,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.caotc.unit4j.support.mybatis.mapper.DoctorTeamMemberMapper;
 import org.caotc.unit4j.support.mybatis.model.DoctorTeamMemberDO;
-import org.caotc.unit4j.support.mybatis.sql.AbstractExpressionVisitor;
+import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
@@ -66,6 +66,7 @@ public class TestMybatis {
   @SneakyThrows
   void sqlParse() {
     Delete delete = (Delete) CCJSqlParserUtil.parse("delete from table1 where a=?");
-    delete.getWhere().accept(new AbstractExpressionVisitor());
+    delete.getWhere().accept(new AbstractExpressionVisitor() {
+    });
   }
 }
