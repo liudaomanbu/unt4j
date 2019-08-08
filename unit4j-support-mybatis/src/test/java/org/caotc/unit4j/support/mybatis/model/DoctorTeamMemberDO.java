@@ -10,7 +10,6 @@ package org.caotc.unit4j.support.mybatis.model;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.ToString;
-import lombok.Value;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.constant.UnitConstant;
 import org.caotc.unit4j.support.CodecStrategy;
@@ -51,12 +50,6 @@ public class DoctorTeamMemberDO {
   /**
    * 医生主键
    */
-  TestDO doctorId = new TestDO();
-}
-
-@Value
-class TestDO {
-
   @AmountSerialize(strategy = CodecStrategy.FLAT)
-  Amount value = Amount.create(123L, UnitConstant.SECOND);
+  Amount doctorId = Amount.create(123L, UnitConstant.SECOND);
 }
