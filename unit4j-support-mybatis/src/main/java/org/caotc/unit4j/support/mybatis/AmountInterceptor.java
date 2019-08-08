@@ -1,6 +1,7 @@
 package org.caotc.unit4j.support.mybatis;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.WritableProperty;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.exception.NeverHappenException;
@@ -156,33 +158,47 @@ public class AmountInterceptor implements Interceptor {
       }));
     } else if (SqlCommandType.SELECT.equals(sqlCommandType)) {
       List<ResultMap> resultMaps = mappedStatement.getResultMaps();
-      Select select = (Select) parse;
-      select.getSelectBody().accept(new AbstractSelectVisitor() {
-        @Override
-        public void visit(PlainSelect plainSelect) {
-          List<SelectItem> selectItems = plainSelect.getSelectItems();
-          selectItems.forEach(selectItem -> {
-            selectItem.accept(new AbstractSelectItemVisitor() {
-              @Override
-              public void visit(SelectExpressionItem selectExpressionItem) {
-                log.debug("SelectExpressionItem:{}", selectExpressionItem);
-                Expression expression = selectExpressionItem.getExpression();
-                expression.accept(new AbstractExpressionVisitor() {
-                  @Override
-                  public void visit(Column tableColumn) {
-                    if ("doctor_team_id".equals(tableColumn.getColumnName())) {
-                      tableColumn.setColumnName("doctor_team_id_new");
+      //多个resultMap时为存储过程,不处理
+      if (resultMaps.size() == 1) {
+        ResultMap resultMap = resultMaps.get(0);
+        Class<?> type = resultMap.getType();
+        ImmutableSet<? extends WritableProperty<?, ?>> writableProperties = ReflectionUtil
+            .writablePropertiesFromClass(type);
+        ImmutableSet<@NonNull AmountCodecConfig> amountCodecConfigs = writableProperties.stream()
+            .filter(writableProperty ->
+                Amount.class.equals(writableProperty.propertyType().getRawType())
+                    || writableProperty.annotation(AmountSerialize.class).isPresent())
+            .map(writableProperty -> unit4jProperties
+                .createAmountCodecConfig(writableProperty.propertyName(),
+                    writableProperty.annotation(AmountSerialize.class)
+                        .orElse(null))).collect(ImmutableSet.toImmutableSet());
+        Select select = (Select) parse;
+        select.getSelectBody().accept(new AbstractSelectVisitor() {
+          @Override
+          public void visit(PlainSelect plainSelect) {
+            List<SelectItem> selectItems = plainSelect.getSelectItems();
+            selectItems.forEach(selectItem -> {
+              selectItem.accept(new AbstractSelectItemVisitor() {
+                @Override
+                public void visit(SelectExpressionItem selectExpressionItem) {
+                  log.debug("SelectExpressionItem:{}", selectExpressionItem);
+                  Expression expression = selectExpressionItem.getExpression();
+                  expression.accept(new AbstractExpressionVisitor() {
+                    @Override
+                    public void visit(Column tableColumn) {
+                      if ("doctor_team_id".equals(tableColumn.getColumnName())) {
+                        tableColumn.setColumnName("doctor_team_id_new");
+                      }
                     }
-                  }
-                });
-              }
+                  });
+                }
+              });
             });
-          });
-          selectItems.add(new SelectExpressionItem(new Column("new_sytfhfshjsyj")));
-        }
-      });
+            selectItems.add(new SelectExpressionItem(new Column("new_sytfhfshjsyj")));
+          }
+        });
+      }
       return invocation.proceed();
-//      columns=null;
     } else {
       return invocation.proceed();
     }
@@ -219,27 +235,27 @@ public class AmountInterceptor implements Interceptor {
       @NonNull BoundSql boundSql, @NonNull SqlParam sqlParam,
       @NonNull MappedStatement mappedStatement) {
     for (SerializeCommand serializeCommand : serializeCommands) {
-      switch (serializeCommand.type()) {
+      switch (serializeCommand.getType()) {
         case REMOVE_ORIGINAL_FIELD:
           sqlParam.removeFieldName(statement, boundSql);
           break;
         case WRITE_VALUE:
-          if (serializeCommand.fieldValue() instanceof SerializeCommands) {
-            execute(statement, (SerializeCommands) serializeCommand.fieldValue(), boundSql,
+          if (serializeCommand.getFieldValue() instanceof SerializeCommands) {
+            execute(statement, (SerializeCommands) serializeCommand.getFieldValue(), boundSql,
                 sqlParam, mappedStatement);
           } else {
-            sqlParam.setValue(boundSql, mappedStatement, serializeCommand.fieldValue());
+            sqlParam.setValue(boundSql, mappedStatement, serializeCommand.getFieldValue());
           }
           break;
         case WRITE_FIELD:
-          sqlParam.addFieldName(statement, boundSql, serializeCommand.fieldName(),
-              serializeCommand.fieldValue(), mappedStatement);
-          if (serializeCommand.fieldValue() instanceof SerializeCommands) {
-            execute(statement, (SerializeCommands) serializeCommand.fieldValue(), boundSql,
+          sqlParam.addFieldName(statement, boundSql, serializeCommand.getFieldName(),
+              serializeCommand.getFieldValue(), mappedStatement);
+          if (serializeCommand.getFieldValue() instanceof SerializeCommands) {
+            execute(statement, (SerializeCommands) serializeCommand.getFieldValue(), boundSql,
                 sqlParam, mappedStatement);
           } else {
-            boundSql.setAdditionalParameter(serializeCommand.fieldName(),
-                serializeCommand.fieldValue());
+            boundSql.setAdditionalParameter(serializeCommand.getFieldName(),
+                serializeCommand.getFieldValue());
           }
           break;
         case WRITE_FIELD_SEPARATOR:
