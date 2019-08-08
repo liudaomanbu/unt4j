@@ -235,27 +235,27 @@ public class AmountInterceptor implements Interceptor {
       @NonNull BoundSql boundSql, @NonNull SqlParam sqlParam,
       @NonNull MappedStatement mappedStatement) {
     for (SerializeCommand serializeCommand : serializeCommands) {
-      switch (serializeCommand.getType()) {
+      switch (serializeCommand.type()) {
         case REMOVE_ORIGINAL_FIELD:
           sqlParam.removeFieldName(statement, boundSql);
           break;
         case WRITE_VALUE:
-          if (serializeCommand.getFieldValue() instanceof SerializeCommands) {
-            execute(statement, (SerializeCommands) serializeCommand.getFieldValue(), boundSql,
+          if (serializeCommand.fieldValue() instanceof SerializeCommands) {
+            execute(statement, (SerializeCommands) serializeCommand.fieldValue(), boundSql,
                 sqlParam, mappedStatement);
           } else {
-            sqlParam.setValue(boundSql, mappedStatement, serializeCommand.getFieldValue());
+            sqlParam.setValue(boundSql, mappedStatement, serializeCommand.fieldValue());
           }
           break;
         case WRITE_FIELD:
-          sqlParam.addFieldName(statement, boundSql, serializeCommand.getFieldName(),
-              serializeCommand.getFieldValue(), mappedStatement);
-          if (serializeCommand.getFieldValue() instanceof SerializeCommands) {
-            execute(statement, (SerializeCommands) serializeCommand.getFieldValue(), boundSql,
+          sqlParam.addFieldName(statement, boundSql, serializeCommand.fieldName(),
+              serializeCommand.fieldValue(), mappedStatement);
+          if (serializeCommand.fieldValue() instanceof SerializeCommands) {
+            execute(statement, (SerializeCommands) serializeCommand.fieldValue(), boundSql,
                 sqlParam, mappedStatement);
           } else {
-            boundSql.setAdditionalParameter(serializeCommand.getFieldName(),
-                serializeCommand.getFieldValue());
+            boundSql.setAdditionalParameter(serializeCommand.fieldName(),
+                serializeCommand.fieldValue());
           }
           break;
         case WRITE_FIELD_SEPARATOR:
