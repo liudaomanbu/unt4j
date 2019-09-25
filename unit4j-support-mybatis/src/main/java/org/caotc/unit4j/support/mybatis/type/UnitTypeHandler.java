@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.mybatis;
+package org.caotc.unit4j.support.mybatis.type;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

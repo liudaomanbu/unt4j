@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.mybatis;
+package org.caotc.unit4j.support.mybatis.interceptor;
 
 import java.sql.Statement;
 import java.util.List;

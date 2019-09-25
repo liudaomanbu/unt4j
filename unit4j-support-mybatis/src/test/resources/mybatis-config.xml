@@ -4,15 +4,15 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
   <typeHandlers>
-    <typeHandler handler="org.caotc.unit4j.support.mybatis.AmountTypeHandler"/>
-    <typeHandler handler="org.caotc.unit4j.support.mybatis.UnitTypeHandler"/>
-    <typeHandler handler="org.caotc.unit4j.support.mybatis.SerializeCommandsTypeHandler"/>
+    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.AmountTypeHandler"/>
+    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.UnitTypeHandler"/>
+    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.SerializeCommandsTypeHandler"/>
   </typeHandlers>
   <plugins>
-    <plugin interceptor="org.caotc.unit4j.support.mybatis.AmountInterceptor">
+    <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.AmountInterceptor">
       <property name="someProperty" value="100"/>
     </plugin>
-    <plugin interceptor="org.caotc.unit4j.support.mybatis.ResultSetHandlerInterceptor">
+    <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.ResultSetHandlerInterceptor">
       <property name="someProperty" value="101"/>
     </plugin>
   </plugins>

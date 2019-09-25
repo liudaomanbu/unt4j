@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.mybatis;
+package org.caotc.unit4j.support.mybatis.interceptor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
