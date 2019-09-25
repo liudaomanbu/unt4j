@@ -24,10 +24,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.update.Update;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -56,8 +53,7 @@ import org.caotc.unit4j.support.SerializeCommands;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
 import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
-import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractSelectItemVisitor;
-import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractSelectVisitor;
+import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
 import org.caotc.unit4j.support.mybatis.sql.visitor.RecursionExpressionVisitor;
 
 /**
@@ -140,6 +136,53 @@ public class AmountInterceptor implements Interceptor {
 
     Statement parse = CCJSqlParserUtil.parse(boundSql.getSql());
 
+    if (SqlCommandType.SELECT == sqlCommandType
+        || SqlCommandType.INSERT == sqlCommandType
+        || SqlCommandType.UPDATE == sqlCommandType) {
+      ImmutableSet<AmountCodecConfig> amountCodecConfigs = null;
+
+      if (SqlCommandType.SELECT == sqlCommandType) {
+        //多个resultMap时为存储过程,不处理
+        if (mappedStatement.getResultMaps().size() == 1) {
+          ResultMap resultMap = mappedStatement.getResultMaps().get(0);
+          Class<?> type = resultMap.getType();
+          ImmutableSet<? extends WritableProperty<?, ?>> writableProperties = ReflectionUtil
+              .writablePropertiesFromClass(type);
+          amountCodecConfigs = writableProperties.stream()
+              .filter(writableProperty ->
+                  Amount.class.equals(writableProperty.propertyType().getRawType())
+                      || writableProperty.annotation(AmountSerialize.class).isPresent())
+              .map(writableProperty -> unit4jProperties
+                  .createAmountCodecConfig(writableProperty.propertyName(),
+                      writableProperty.annotation(AmountSerialize.class)
+                          .orElse(null))).collect(ImmutableSet.toImmutableSet());
+
+          Select select = (Select) parse;
+
+          amountCodecConfigs.forEach(amountCodecConfig -> {
+            CodecStrategy strategy = amountCodecConfig.strategy();
+            switch (strategy) {
+              case VALUE:
+                break;
+              case FLAT:
+                select.getSelectBody().accept(new FlatSelectVisitor(amountCodecConfig));
+                break;
+              case OBJECT:
+                throw new IllegalArgumentException(
+                    "database strategy can't use " + CodecStrategy.OBJECT);
+              default:
+                throw new IllegalArgumentException();
+            }
+          });
+          SystemMetaObject.forObject(boundSql).setValue("sql", parse.toString());
+          log.debug("修改后sql:{}", boundSql.getSql());
+          return invocation.proceed();
+        }
+      }
+
+    }
+
+
     final List<Column> columns;
 
     if (SqlCommandType.INSERT.equals(sqlCommandType)) {
@@ -156,49 +199,6 @@ public class AmountInterceptor implements Interceptor {
           super.visit(equalsTo);
         }
       }));
-    } else if (SqlCommandType.SELECT.equals(sqlCommandType)) {
-      List<ResultMap> resultMaps = mappedStatement.getResultMaps();
-      //多个resultMap时为存储过程,不处理
-      if (resultMaps.size() == 1) {
-        ResultMap resultMap = resultMaps.get(0);
-        Class<?> type = resultMap.getType();
-        ImmutableSet<? extends WritableProperty<?, ?>> writableProperties = ReflectionUtil
-            .writablePropertiesFromClass(type);
-        ImmutableSet<@NonNull AmountCodecConfig> amountCodecConfigs = writableProperties.stream()
-            .filter(writableProperty ->
-                Amount.class.equals(writableProperty.propertyType().getRawType())
-                    || writableProperty.annotation(AmountSerialize.class).isPresent())
-            .map(writableProperty -> unit4jProperties
-                .createAmountCodecConfig(writableProperty.propertyName(),
-                    writableProperty.annotation(AmountSerialize.class)
-                        .orElse(null))).collect(ImmutableSet.toImmutableSet());
-        Select select = (Select) parse;
-        select.getSelectBody().accept(new AbstractSelectVisitor() {
-          @Override
-          public void visit(PlainSelect plainSelect) {
-            List<SelectItem> selectItems = plainSelect.getSelectItems();
-            selectItems.forEach(selectItem -> {
-              selectItem.accept(new AbstractSelectItemVisitor() {
-                @Override
-                public void visit(SelectExpressionItem selectExpressionItem) {
-                  log.debug("SelectExpressionItem:{}", selectExpressionItem);
-                  Expression expression = selectExpressionItem.getExpression();
-                  expression.accept(new AbstractExpressionVisitor() {
-                    @Override
-                    public void visit(Column tableColumn) {
-                      if ("doctor_team_id".equals(tableColumn.getColumnName())) {
-                        tableColumn.setColumnName("doctor_team_id_new");
-                      }
-                    }
-                  });
-                }
-              });
-            });
-            selectItems.add(new SelectExpressionItem(new Column("new_sytfhfshjsyj")));
-          }
-        });
-      }
-      return invocation.proceed();
     } else {
       return invocation.proceed();
     }

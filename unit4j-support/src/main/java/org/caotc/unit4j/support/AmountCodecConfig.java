@@ -21,6 +21,9 @@ import org.caotc.unit4j.core.unit.Unit;
 @Builder(toBuilder = true)
 public class AmountCodecConfig {
 
+  private static final String AMOUNT_VALUE_FIELD_NAME = "value";
+  private static final String AMOUNT_UNIT_FIELD_NAME = "unit";
+
   /**
    * 配置
    */
@@ -40,6 +43,11 @@ public class AmountCodecConfig {
    */
   @NonNull
   Function<ImmutableList<String>, String> fieldNameConverter;
+//  /**
+//   * 属性名称转换器
+//   */
+//  @NonNull
+//  Function<String, String> nameTransformer;
   /**
    * 数值的序列化和反序列化配置
    */
@@ -50,6 +58,21 @@ public class AmountCodecConfig {
    */
   @NonNull
   UnitCodecConfig unitCodecConfig;
+
+  @NonNull
+  public String outputName() {
+    return fieldNameConverter.apply(ImmutableList.of());
+  }
+
+  @NonNull
+  public String outputValueName() {
+    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME));
+  }
+
+  @NonNull
+  public String outputUnitName() {
+    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME));
+  }
 
   /**
    * 在序列化和反序列化之前执行的方法,转换到真正序列化和反序列化的{@link Amount}对象

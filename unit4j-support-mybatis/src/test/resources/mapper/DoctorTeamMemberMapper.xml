@@ -3,6 +3,13 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.caotc.unit4j.support.mybatis.mapper.DoctorTeamMemberMapper">
 
+  <resultMap id="DoctorTeamMemberMap"
+    type="org.caotc.unit4j.support.mybatis.model.DoctorTeamMemberDO">
+    <id property="id" column="id"/>
+    <result property="isDeleted" column="is_deleted"/>
+    <result property="doctorTeamId" column="doctor_team_id"/>
+  </resultMap>
+
   <sql id="baseColumnList">
         id,is_deleted,gmt_created,gmt_modified,doctor_team_id,doctor_id
     </sql>

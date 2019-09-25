@@ -11,6 +11,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.constant.UnitConstant;
 import org.caotc.unit4j.support.mybatis.mapper.DoctorTeamMemberMapper;
 import org.caotc.unit4j.support.mybatis.model.DoctorTeamMemberDO;
 import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 public class TestMybatis {
 
+  private static final Amount AMOUNT = Amount.create(123L, UnitConstant.SECOND);
   private static SqlSessionFactory sqlSessionFactory;
 
   static {
@@ -45,7 +48,8 @@ public class TestMybatis {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       DoctorTeamMemberMapper dao = session.getMapper(DoctorTeamMemberMapper.class);
       int effectRows = dao.insert(
-          new DoctorTeamMemberDO(0L, true, LocalDateTime.now(), LocalDateTime.now(), ""));
+          new DoctorTeamMemberDO(0L, true, LocalDateTime.now(), LocalDateTime.now(), "",
+              AMOUNT));
       session.commit();
       log.info("effectRows:{}", effectRows);
     }
@@ -56,7 +60,7 @@ public class TestMybatis {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       DoctorTeamMemberMapper dao = session.getMapper(DoctorTeamMemberMapper.class);
       int effectRows = dao.updateByPrimaryKey(
-          new DoctorTeamMemberDO(0L, true, LocalDateTime.now(), LocalDateTime.now(), ""));
+          new DoctorTeamMemberDO(0L, true, LocalDateTime.now(), LocalDateTime.now(), "", AMOUNT));
       session.commit();
       log.info("effectRows:{}", effectRows);
     }

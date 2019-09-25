@@ -1,9 +1,13 @@
 package org.caotc.unit4j.support.jackson;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.constant.UnitConstant;
@@ -29,4 +33,29 @@ class AmountValueSerializerTest {
   void serialize() throws Exception {
     log.info("value:{}", mapper.writeValueAsString(amount.value()));
   }
+
+  @Test
+  void test() throws Exception {
+    A a = new A();
+    a.getB().setName("sdhfgjtyjtuy");
+    log.info("toJson:{}", mapper.writeValueAsString(a));
+    log.info("parseJson:{}", mapper.readValue("{\"name\":\"shsfghsfgh\"}", A.class));
+  }
+}
+
+@Data
+@FieldDefaults(makeFinal = false)
+@Accessors(fluent = false)
+class A {
+
+  @JsonUnwrapped
+  B b = new B();
+}
+
+@Data
+@FieldDefaults(makeFinal = false)
+@Accessors(fluent = false)
+class B {
+
+  String name;
 }

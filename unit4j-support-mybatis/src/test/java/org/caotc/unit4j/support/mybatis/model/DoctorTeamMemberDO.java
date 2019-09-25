@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.ToString;
 import org.caotc.unit4j.core.Amount;
-import org.caotc.unit4j.core.constant.UnitConstant;
 import org.caotc.unit4j.support.CodecStrategy;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
 
@@ -51,5 +50,5 @@ public class DoctorTeamMemberDO {
    * 医生主键
    */
   @AmountSerialize(strategy = CodecStrategy.FLAT)
-  Amount doctorId = Amount.create(123L, UnitConstant.SECOND);
+  Amount doctorId;
 }

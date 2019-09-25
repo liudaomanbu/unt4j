@@ -60,7 +60,11 @@ public class Unit4jProperties {
    * 默认的名称拼接器
    */
   public static final Function<@NonNull ImmutableList<String>, @NonNull String> DEFAULT_NAME_JOINER = CaseFormat.LOWER_CAMEL::join;
-
+  /**
+   * 默认的名称转换器
+   */
+  public static final Function<@NonNull String, @NonNull String> DEFAULT_NAME_CONVERTER = DEFAULT_NAME_SPLITTER
+      .andThen(DEFAULT_NAME_JOINER);
   /**
    * 默认的属性名称拼接器
    */
@@ -153,6 +157,7 @@ public class Unit4jProperties {
   @NonNull
   public AmountCodecConfig createAmountCodecConfig() {
     return AmountCodecConfig.builder().configuration(getConfiguration()).strategy(getStrategy())
+//        .nameTransformer()
         .fieldNameConverter(getNameJoiner())
         .valueCodecConfig(new AmountValueCodecConfig(getValueType(), getMathContext()))
         .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
