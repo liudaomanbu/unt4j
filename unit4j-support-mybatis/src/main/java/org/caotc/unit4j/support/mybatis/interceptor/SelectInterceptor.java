@@ -76,8 +76,7 @@ public class SelectInterceptor implements Interceptor {
         Select select = (Select) parse;
 
         amountCodecConfigs.forEach(amountCodecConfig -> {
-          CodecStrategy strategy = amountCodecConfig.strategy();
-          switch (strategy) {
+          switch (amountCodecConfig.strategy()) {
             case VALUE:
               break;
             case FLAT:
@@ -90,7 +89,7 @@ public class SelectInterceptor implements Interceptor {
               throw new IllegalArgumentException();
           }
         });
-        SystemMetaObject.forObject(boundSql).setValue("sql", parse.toString());
+        SystemMetaObject.forObject(boundSql).setValue("sql", select.toString());
       }
     }
     return invocation.proceed();

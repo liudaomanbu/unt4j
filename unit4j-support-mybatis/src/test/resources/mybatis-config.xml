@@ -4,9 +4,10 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
   <typeHandlers>
-    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.AmountTypeHandler"/>
-    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.UnitTypeHandler"/>
-    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.SerializeCommandsTypeHandler"/>
+    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.handler.AmountTypeHandler"/>
+    <typeHandler handler="org.caotc.unit4j.support.mybatis.type.handler.UnitTypeHandler"/>
+    <typeHandler
+      handler="org.caotc.unit4j.support.mybatis.type.handler.SerializeCommandsTypeHandler"/>
   </typeHandlers>
   <plugins>
     <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.AmountInterceptor">

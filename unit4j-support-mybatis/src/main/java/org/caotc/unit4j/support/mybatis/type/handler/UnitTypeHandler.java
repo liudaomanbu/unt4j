@@ -1,4 +1,4 @@
-package org.caotc.unit4j.support.mybatis.type;
+package org.caotc.unit4j.support.mybatis.type.handler;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -10,7 +10,11 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
-import org.caotc.unit4j.support.SerializeCommands;
+import org.caotc.unit4j.core.unit.BasePrefixUnit;
+import org.caotc.unit4j.core.unit.BaseStandardUnit;
+import org.caotc.unit4j.core.unit.CompositePrefixUnit;
+import org.caotc.unit4j.core.unit.CompositeStandardUnit;
+import org.caotc.unit4j.core.unit.Unit;
 
 /**
  * 如果没有该TypeHandler,会导致mybatis解析{@link org.apache.ibatis.mapping.BoundSql}时直接报错,无法在{@link
@@ -23,12 +27,12 @@ import org.caotc.unit4j.support.SerializeCommands;
  * @since 1.0.0
  **/
 @Value
-@MappedTypes(value = {SerializeCommands.class})
-public class SerializeCommandsTypeHandler extends BaseTypeHandler<SerializeCommands> {
+@MappedTypes(value = {Unit.class, BaseStandardUnit.class, BasePrefixUnit.class,
+    CompositeStandardUnit.class, CompositePrefixUnit.class})
+public class UnitTypeHandler extends BaseTypeHandler<Unit> {
 
   @Override
-  public void setNonNullParameter(PreparedStatement ps, int i, SerializeCommands parameter,
-      JdbcType jdbcType)
+  public void setNonNullParameter(PreparedStatement ps, int i, Unit parameter, JdbcType jdbcType)
       throws SQLException {
     if (Objects.isNull(jdbcType)) {
       ps.setObject(i, parameter);
@@ -38,18 +42,17 @@ public class SerializeCommandsTypeHandler extends BaseTypeHandler<SerializeComma
   }
 
   @Override
-  public SerializeCommands getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Unit getNullableResult(ResultSet rs, String columnName) throws SQLException {
     return null;
   }
 
   @Override
-  public SerializeCommands getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+  public Unit getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
     return null;
   }
 
   @Override
-  public SerializeCommands getNullableResult(CallableStatement cs, int columnIndex)
-      throws SQLException {
+  public Unit getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
     return null;
   }
 }
