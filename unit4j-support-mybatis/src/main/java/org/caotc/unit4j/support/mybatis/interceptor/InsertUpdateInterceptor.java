@@ -10,19 +10,11 @@ import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.JdbcParameter;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsListVisitor;
-import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.update.Update;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -43,12 +35,11 @@ import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.exception.NeverHappenException;
 import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.CodecStrategy;
-import org.caotc.unit4j.support.SerializeCommand;
-import org.caotc.unit4j.support.SerializeCommands;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
-import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
-import org.caotc.unit4j.support.mybatis.sql.visitor.RecursionExpressionVisitor;
+import org.caotc.unit4j.support.mybatis.sql.visitor.AddParameterItemsListVisitor;
+import org.caotc.unit4j.support.mybatis.sql.visitor.RemoveParameterItemsListVisitor;
+import org.caotc.unit4j.support.mybatis.util.PluginUtil;
 
 /**
  * @author caotc
@@ -63,50 +54,6 @@ import org.caotc.unit4j.support.mybatis.sql.visitor.RecursionExpressionVisitor;
 public class InsertUpdateInterceptor implements Interceptor {
 
   private static final String STATEMENT_HANDLER_MAPPED_STATEMENT_FIELD_NAME = "delegate.mappedStatement";
-  private static final ItemsListVisitor ADD_PARAMETER_ITEMS_LIST_VISITOR = new ItemsListVisitor() {
-
-    @Override
-    public void visit(SubSelect subSelect) {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void visit(ExpressionList expressionList) {
-      expressionList.getExpressions().add(new JdbcParameter());
-    }
-
-    @Override
-    public void visit(NamedExpressionList namedExpressionList) {
-      log.debug("namedExpressionList:{}", namedExpressionList);
-    }
-
-    @Override
-    public void visit(MultiExpressionList multiExprList) {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-  };
-  private static final ItemsListVisitor REMOVE_PARAMETER_ITEMS_LIST_VISITOR = new ItemsListVisitor() {
-
-    @Override
-    public void visit(SubSelect subSelect) {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void visit(ExpressionList expressionList) {
-      expressionList.getExpressions().remove(0);
-    }
-
-    @Override
-    public void visit(NamedExpressionList namedExpressionList) {
-      log.debug("namedExpressionList:{}", namedExpressionList);
-    }
-
-    @Override
-    public void visit(MultiExpressionList multiExprList) {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-  };
 
   Unit4jProperties unit4jProperties = new Unit4jProperties()
       .setFieldNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
@@ -115,7 +62,7 @@ public class InsertUpdateInterceptor implements Interceptor {
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
-    StatementHandler handler = (StatementHandler) invocation.getTarget();
+    StatementHandler handler = (StatementHandler) PluginUtil.processTarget(invocation.getTarget());
     MappedStatement mappedStatement = (MappedStatement) SystemMetaObject.forObject(handler)
         .getValue(STATEMENT_HANDLER_MAPPED_STATEMENT_FIELD_NAME);
     SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
@@ -126,26 +73,11 @@ public class InsertUpdateInterceptor implements Interceptor {
     if (SqlCommandType.INSERT == sqlCommandType
         || SqlCommandType.UPDATE == sqlCommandType) {
 
-      List<Column> columns = null;
+      List<Column> columns = SqlCommandType.INSERT == sqlCommandType ? ((Insert) parse).getColumns()
+          : ((Update) parse).getColumns();
 
-      if (SqlCommandType.INSERT.equals(sqlCommandType)) {
-        Insert insert = (Insert) parse;
-        columns = insert.getColumns();
-      } else if (SqlCommandType.UPDATE.equals(sqlCommandType)) {
-        Update update = (Update) parse;
-        columns = update.getColumns();
-        Expression where = update.getWhere();
-        where.accept(RecursionExpressionVisitor.create(new AbstractExpressionVisitor() {
-          @Override
-          public void visit(EqualsTo equalsTo) {
-            super.visit(equalsTo);
-          }
-        }));
-      }
-
-      List<Column> finalColumns = columns;
       ImmutableList<SqlParam> sqlParams = Optional.ofNullable(boundSql.getParameterMappings())
-          .map(parameterMappings -> createSqlParams(parameterMappings, finalColumns))
+          .map(parameterMappings -> createSqlParams(parameterMappings, columns))
           .orElseGet(ImmutableList::of);
       sqlParams.stream().filter(sqlParam -> {
         ReadableProperty<?, Object> propertyReader = readableProperty(sqlParam.parameterMapping,
@@ -163,54 +95,30 @@ public class InsertUpdateInterceptor implements Interceptor {
                 readableProperty(sqlParam.parameterMapping, boundSql.getParameterObject(),
                     mappedStatement).annotation(AmountSerialize.class)
                     .orElse(null));
-        SerializeCommands serializeCommands = amountCodecConfig
-            .serializeCommandsFromAmount(amount);
-        execute(parse, serializeCommands, boundSql, sqlParam, mappedStatement);
+        switch (amountCodecConfig.strategy()) {
+          case VALUE:
+            break;
+          case FLAT:
+            sqlParam.removeFieldName(parse, boundSql);
+            sqlParam
+                .addFieldName(parse, boundSql, amountCodecConfig.outputValueName(), amount.value(),
+                    mappedStatement);
+            sqlParam
+                .addFieldName(parse, boundSql, amountCodecConfig.outputUnitName(), amount.unit(),
+                    mappedStatement);
+            break;
+          case OBJECT:
+            throw new IllegalArgumentException(
+                "database strategy can't use " + CodecStrategy.OBJECT);
+          default:
+            throw new IllegalArgumentException();
+        }
+
       });
       SystemMetaObject.forObject(boundSql).setValue("sql", parse.toString());
 
     }
     return invocation.proceed();
-  }
-
-  private void execute(@NonNull Statement statement, @NonNull SerializeCommands serializeCommands,
-      @NonNull BoundSql boundSql, @NonNull SqlParam sqlParam,
-      @NonNull MappedStatement mappedStatement) {
-    for (SerializeCommand serializeCommand : serializeCommands) {
-      switch (serializeCommand.type()) {
-        case REMOVE_ORIGINAL_FIELD:
-          sqlParam.removeFieldName(statement, boundSql);
-          break;
-        case WRITE_VALUE:
-          if (serializeCommand.fieldValue() instanceof SerializeCommands) {
-            execute(statement, (SerializeCommands) serializeCommand.fieldValue(), boundSql,
-                sqlParam, mappedStatement);
-          } else {
-            sqlParam.setValue(boundSql, mappedStatement, serializeCommand.fieldValue());
-          }
-          break;
-        case WRITE_FIELD:
-          sqlParam.addFieldName(statement, boundSql, serializeCommand.fieldName(),
-              serializeCommand.fieldValue(), mappedStatement);
-          if (serializeCommand.fieldValue() instanceof SerializeCommands) {
-            execute(statement, (SerializeCommands) serializeCommand.fieldValue(), boundSql,
-                sqlParam, mappedStatement);
-          } else {
-            boundSql.setAdditionalParameter(serializeCommand.fieldName(),
-                serializeCommand.fieldValue());
-          }
-          break;
-        case WRITE_FIELD_SEPARATOR:
-          break;
-        /**
-         * 只有 {@link CodecStrategy#OBJECT}才会产生以下指令,DB序列化暂时不支持此策略
-         */
-        case START_OBJECT:
-        case END_OBJECT:
-        default:
-          throw NeverHappenException.instance();
-      }
-    }
   }
 
   @Override
@@ -267,16 +175,12 @@ public class InsertUpdateInterceptor implements Interceptor {
       if (statement instanceof Insert) {
         Insert insert = (Insert) statement;
         insert.getColumns().remove(column);
-        insert.getItemsList().accept(REMOVE_PARAMETER_ITEMS_LIST_VISITOR);
+        insert.getItemsList().accept(new RemoveParameterItemsListVisitor());
       }
       if (statement instanceof Update) {
         Update update = (Update) statement;
         update.getColumns().remove(column);
         update.getExpressions().add(new JdbcParameter());
-      }
-      if (statement instanceof Delete) {
-        Delete delete = (Delete) statement;
-//        delete.getWhere().accept();
       }
     }
 
@@ -294,7 +198,7 @@ public class InsertUpdateInterceptor implements Interceptor {
       if (statement instanceof Insert) {
         Insert insert = (Insert) statement;
         insert.getColumns().add(new Column(fieldName));
-        insert.getItemsList().accept(ADD_PARAMETER_ITEMS_LIST_VISITOR);
+        insert.getItemsList().accept(new AddParameterItemsListVisitor());
       }
       if (statement instanceof Update) {
         Update update = (Update) statement;

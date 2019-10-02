@@ -28,6 +28,7 @@ import org.caotc.unit4j.support.CodecStrategy;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
 import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
+import org.caotc.unit4j.support.mybatis.util.PluginUtil;
 
 /**
  * @author caotc
@@ -50,7 +51,7 @@ public class SelectInterceptor implements Interceptor {
 
   @Override
   public Object intercept(Invocation invocation) throws Throwable {
-    StatementHandler handler = (StatementHandler) invocation.getTarget();
+    StatementHandler handler = (StatementHandler) PluginUtil.processTarget(invocation.getTarget());
     MappedStatement mappedStatement = (MappedStatement) SystemMetaObject.forObject(handler)
         .getValue(STATEMENT_HANDLER_MAPPED_STATEMENT_FIELD_NAME);
     SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
@@ -64,6 +65,7 @@ public class SelectInterceptor implements Interceptor {
         Class<?> type = resultMap.getType();
         ImmutableSet<? extends WritableProperty<?, ?>> writableProperties = ReflectionUtil
             .writablePropertiesFromClass(type);
+
         ImmutableSet<AmountCodecConfig> amountCodecConfigs = writableProperties.stream()
             .filter(writableProperty ->
                 Amount.class.equals(writableProperty.propertyType().getRawType())

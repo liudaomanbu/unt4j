@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.MethodNameStyle;
 import org.caotc.unit4j.core.common.reflect.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.PropertyReader.FieldPropertyReader;
@@ -32,6 +33,7 @@ import org.caotc.unit4j.core.common.reflect.WritableProperty;
  */
 @UtilityClass
 @Beta
+@Slf4j
 public class ReflectionUtil {
 
   /**

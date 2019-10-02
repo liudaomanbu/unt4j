@@ -10,11 +10,13 @@
       handler="org.caotc.unit4j.support.mybatis.type.handler.SerializeCommandsTypeHandler"/>
   </typeHandlers>
   <plugins>
-    <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.AmountInterceptor">
+    <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.InsertUpdateInterceptor">
       <property name="someProperty" value="100"/>
     </plugin>
     <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.ResultSetHandlerInterceptor">
       <property name="someProperty" value="101"/>
+    </plugin>
+    <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.SelectInterceptor">
     </plugin>
   </plugins>
   <environments default="development">
@@ -29,6 +31,6 @@
     </environment>
   </environments>
   <mappers>
-    <mapper resource="mapper/DoctorTeamMemberMapper.xml"/>
+    <mapper resource="mapper/TestAmountMapper.xml"/>
   </mappers>
 </configuration>

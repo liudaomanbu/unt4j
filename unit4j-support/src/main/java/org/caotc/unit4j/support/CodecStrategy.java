@@ -91,7 +91,6 @@ public enum CodecStrategy {
           .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
               .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
       writeFieldCommands.stream().skip(writeFieldCommands.size() - 1).forEach(builder::command);
-
       return builder.command(SerializeCommand.REMOVE_ORIGINAL_FIELD).build();
     }
 

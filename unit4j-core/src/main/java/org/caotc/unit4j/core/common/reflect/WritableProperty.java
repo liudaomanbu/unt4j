@@ -7,6 +7,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -26,10 +27,17 @@ import lombok.Value;
 public class WritableProperty<T, R> {
 
   /**
+   * 内存地址比较器,保证非同一个对象的compare结果不为0. {@link ImmutableSortedSet}集合使用比较器作为判断是否相等的依据
+   */
+  private static final Comparator<Element> ARBITRARY_COMPARATOR = (e1, e2) -> e1.equals(e2) ? 0
+      : Ordering.arbitrary().compare(e1, e2);
+  /**
    * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前
    */
-  private static final Ordering<Element<?>> ORDERING = Ordering.natural()
+  private static final Ordering<Element> ACCESS_LEVEL_ORDERING = Ordering.natural()
       .onResultOf(Element::accessLevel);
+  private static final Ordering<Element> ORDERING = ACCESS_LEVEL_ORDERING
+      .compound(ARBITRARY_COMPARATOR);
 
   /**
    * 工厂方法
@@ -43,6 +51,7 @@ public class WritableProperty<T, R> {
   @NonNull
   public static <T, R> WritableProperty<T, R> create(
       @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
+
     return new WritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
   }
 

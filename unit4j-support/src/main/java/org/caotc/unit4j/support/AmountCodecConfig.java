@@ -100,6 +100,7 @@ public class AmountCodecConfig {
    * @date 2019-05-29
    * @since 1.0.0
    */
+  //TODO 待删除
   @NonNull
   public <T> SerializeCommands serializeCommandsFromAmount(@NonNull Amount amount) {
 //    Function<Class<? extends T>, ? extends Set<FieldWrapper<T, ?>>> kvRemovalListener = type -> ReflectionUtil
