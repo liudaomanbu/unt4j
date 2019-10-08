@@ -6,8 +6,6 @@
   <typeHandlers>
     <typeHandler handler="org.caotc.unit4j.support.mybatis.type.handler.AmountTypeHandler"/>
     <typeHandler handler="org.caotc.unit4j.support.mybatis.type.handler.UnitTypeHandler"/>
-    <typeHandler
-      handler="org.caotc.unit4j.support.mybatis.type.handler.SerializeCommandsTypeHandler"/>
   </typeHandlers>
   <plugins>
     <plugin interceptor="org.caotc.unit4j.support.mybatis.interceptor.InsertUpdateInterceptor">
