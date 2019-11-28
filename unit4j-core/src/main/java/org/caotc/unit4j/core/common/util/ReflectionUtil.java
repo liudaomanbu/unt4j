@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core.common.util;
 
 import com.google.common.annotations.Beta;
@@ -15,13 +31,16 @@ import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldPropertyReader;
+import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldPropertyWriter;
 import org.caotc.unit4j.core.common.reflect.MethodNameStyle;
 import org.caotc.unit4j.core.common.reflect.PropertyReader;
-import org.caotc.unit4j.core.common.reflect.PropertyReader.FieldPropertyReader;
 import org.caotc.unit4j.core.common.reflect.PropertyWriter;
-import org.caotc.unit4j.core.common.reflect.PropertyWriter.FieldPropertyWriter;
 import org.caotc.unit4j.core.common.reflect.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.SimpleReadableProperty;
+import org.caotc.unit4j.core.common.reflect.SimpleWritableProperty;
 import org.caotc.unit4j.core.common.reflect.WritableProperty;
+import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 //TODO 将所有方法优化到只有一次流操作
 
 /**
@@ -314,11 +333,11 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
+   * 从传入的类中获取包括所有超类和接口的所有可读属性 {@link ReadableProperty}集合
    *
-   * @param clazz 需要获取get方法的类
+   * @param clazz 需要获取可读属性 {@link ReadableProperty}的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
+   * @return 所有可读属性 {@link ReadableProperty}集合
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
@@ -330,12 +349,12 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
+   * 从传入的类中获取包括所有超类和接口的所有可读属性{@link ReadableProperty}集合
    *
-   * @param clazz 需要获取get方法的类
+   * @param clazz 需要获取可读属性{@link ReadableProperty}的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
    * @param methodNameStyles get方法格式集合
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
+   * @return 所有可读属性 {@link ReadableProperty}集合
    * @author caotc
    * @date 2019-05-10
    * @apiNote 如果只想要获取JavaBean规范的get方法, {@code methodNameStyles}参数使用{@link
@@ -354,10 +373,10 @@ public class ReflectionUtil {
         fieldExistCheck, methodNameStyles).stream()
         .flatMap(getMethod -> Arrays.stream(methodNameStyles)
             .filter(methodNameStyle -> methodNameStyle.isGetMethod(getMethod))
-            .map(methodNameStyle -> PropertyReader.create(getMethod, methodNameStyle)));
+            .map(methodNameStyle -> PropertyReader.from(getMethod, methodNameStyle)));
 
     Stream<PropertyReader<T, ?>> fieldPropertyGetters = fieldsFromClass(
-        clazz).stream().map(PropertyReader::create);
+        clazz).stream().map(PropertyReader::from);
 
     ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyReader<T, ?>> propertyGetterMultimap =
         Stream.concat(fieldPropertyGetters, getInvokablePropertyGetters)
@@ -368,15 +387,35 @@ public class ReflectionUtil {
         .filter(propertyReaders -> !fieldExistCheck || propertyReaders.stream()
             .anyMatch(FieldPropertyReader.class::isInstance))
         .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
-        .map(ReadableProperty::create).collect(ImmutableSet.toImmutableSet());
+        .map(SimpleReadableProperty::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
+   * 获取指定{@link ReadableProperty}
    *
-   * @param clazz 需要获取get方法的类
-   * @param fieldName 指定属性名称
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
+   * @param clazz 需要获取可读属性{@link ReadableProperty}的类
+   * @param fieldName 属性名称
+   * @return {@link ReadableProperty}
+   * @throws ReadablePropertyNotFoundException readablePropertyNotFoundException
+   * @author caotc
+   * @date 2019-05-10
+   * @apiNote included super interfaces and superclasses
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName) {
+    return ReflectionUtil.<T, R>readablePropertyFromClass(clazz, fieldName)
+        .orElseThrow(() -> ReadablePropertyNotFoundException
+            .create(clazz, fieldName));
+  }
+
+  /**
+   * 获取指定{@link ReadableProperty}
+   *
+   * @param clazz 需要获取可读属性{@link ReadableProperty}的类
+   * @param fieldName 属性名称
+   * @return {@link ReadableProperty}的{@link Optional}
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
@@ -384,16 +423,16 @@ public class ReflectionUtil {
   @NonNull
   public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
-    return readablePropertyFromClass(clazz, fieldName, true);
+    return readablePropertyFromClass(clazz, fieldName, false);
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
+   * 从传入的类中获取包括所有超类和接口的所有可读属性{@link ReadableProperty}集合
    *
-   * @param clazz 需要获取get方法的类
+   * @param clazz 需要获取可读属性{@link ReadableProperty}集合的类
    * @param fieldName 指定属性名称
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
+   * @return 所有可读属性 {@link ReadableProperty}集合
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
@@ -405,13 +444,13 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
+   * 从传入的类中获取包括所有超类和接口的所有可读属性{@link ReadableProperty}集合
    *
-   * @param clazz 需要获取get方法的类
+   * @param clazz 需要获取可读属性{@link ReadableProperty}的类
    * @param fieldName 指定属性名称
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
    * @param methodNameStyles get方法格式集合
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
+   * @return 所有可读属性 {@link ReadableProperty}集合
    * @author caotc
    * @date 2019-05-10
    * @apiNote 如果只想要获取JavaBean规范的get方法, {@code methodNameStyles}参数使用{@link
@@ -430,10 +469,10 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
+   * 从传入的类中获取包括所有超类和接口的所有可写属性{@link WritableProperty}集合
    *
-   * @param clazz 需要获取set方法的类
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
+   * @param clazz 需要获取可写属性{@link WritableProperty}的类
+   * @return 所有可写属性 {@link WritableProperty}集合
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
@@ -445,11 +484,11 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
+   * 从传入的类中获取包括所有超类和接口的所有可写属性{@link WritableProperty}集合
    *
-   * @param clazz 需要获取set方法的类
+   * @param clazz 需要获取可写属性{@link WritableProperty}的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
+   * @return 所有可写属性 {@link WritableProperty}集合
    * @author caotc
    * @date 2019-05-10
    * @since 1.0.0
@@ -461,16 +500,15 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
+   * 从传入的类中获取包括所有超类和接口的所有可写属性{@link WritableProperty}集合
    *
-   * @param clazz 需要获取set方法的类
+   * @param clazz 需要获取可写属性{@link WritableProperty}的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @param methodNameStyles set方法格式集合
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
+   * @param methodNameStyles 属性写方法格式集合
+   * @return 所有可写属性 {@link WritableProperty}集合
    * @author caotc
    * @date 2019-05-10
-   * @apiNote 如果只想要获取JavaBean规范的set方法, {@code methodNameStyles}参数使用{@link
-   * MethodNameStyle#JAVA_BEAN}
+   * @apiNote 如果只想要获取JavaBean规范的set方法,{@code methodNameStyles}参数使用{@link MethodNameStyle#JAVA_BEAN}
    * @since 1.0.0
    */
   @NonNull
@@ -484,10 +522,10 @@ public class ReflectionUtil {
         fieldExistCheck, methodNameStyles).stream()
         .flatMap(getMethod -> Arrays.stream(methodNameStyles)
             .filter(methodNameStyle -> methodNameStyle.isSetMethod(getMethod))
-            .map(methodNameStyle -> PropertyWriter.create(getMethod, methodNameStyle)));
+            .map(methodNameStyle -> PropertyWriter.from(getMethod, methodNameStyle)));
 
     Stream<PropertyWriter<T, ?>> fieldPropertySetters = fieldsFromClass(
-        clazz).stream().map(PropertyWriter::create);
+        clazz).stream().map(PropertyWriter::from);
 
     ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyWriter<T, ?>> propertySetterMultimap =
         Stream.concat(fieldPropertySetters, setInvokablePropertySetters)
@@ -498,7 +536,7 @@ public class ReflectionUtil {
         .filter(propertyWriters -> !fieldExistCheck || propertyWriters.stream()
             .anyMatch(FieldPropertyWriter.class::isInstance))
         .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
-        .map(WritableProperty::create).collect(ImmutableSet.toImmutableSet());
+        .map(SimpleWritableProperty::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**

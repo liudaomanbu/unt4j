@@ -1,16 +1,32 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.support.mybatis.interceptor;
 
 import com.google.common.collect.ImmutableList;
 import java.sql.Connection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -37,8 +53,10 @@ import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.CodecStrategy;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
-import org.caotc.unit4j.support.mybatis.sql.visitor.AddParameterItemsListVisitor;
-import org.caotc.unit4j.support.mybatis.sql.visitor.RemoveParameterItemsListVisitor;
+import org.caotc.unit4j.support.annotation.WithUnit;
+import org.caotc.unit4j.support.annotation.WithUnit.ValueType;
+import org.caotc.unit4j.support.common.util.AmountUtil;
+import org.caotc.unit4j.support.mybatis.sql.visitor.ParameterMappingMatchColumnInsertUpdateVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
 
 /**
@@ -69,52 +87,89 @@ public class InsertUpdateInterceptor implements Interceptor {
     BoundSql boundSql = handler.getBoundSql();
 
     Statement parse = CCJSqlParserUtil.parse(boundSql.getSql());
-
+    log.info("sql:{}", parse);
     if (SqlCommandType.INSERT == sqlCommandType
         || SqlCommandType.UPDATE == sqlCommandType) {
 
       List<Column> columns = SqlCommandType.INSERT == sqlCommandType ? ((Insert) parse).getColumns()
           : ((Update) parse).getColumns();
+      log.info("ParameterMappings:{}", boundSql.getParameterMappings());
+      ParameterMappingMatchColumnInsertUpdateVisitor parameterMappingMatchColumnInsertUpdateVisitor = ParameterMappingMatchColumnInsertUpdateVisitor
+          .create(boundSql.getParameterMappings());
+      parse.accept(parameterMappingMatchColumnInsertUpdateVisitor);
+      parameterMappingMatchColumnInsertUpdateVisitor.columnToParameterMappings().entrySet().stream()
+          .map(entry -> SqlParam.create(entry.getValue(), entry.getKey(),
+              readableProperty(entry.getValue(), boundSql.getParameterObject(), mappedStatement)
+                  .orElseThrow(
+                      NeverHappenException::instance)))
+          .filter(sqlParam -> AmountUtil.isAmount(sqlParam.readableProperty))
+          .forEach(sqlParam -> {
+            //noinspection unchecked
+            AmountUtil
+                .readAmount((ReadableProperty<? super Object, ?>) sqlParam.readableProperty,
+                    boundSql.getParameterObject()).ifPresent(amount -> {
+              AmountCodecConfig amountCodecConfig = unit4jProperties
+                  .createAmountCodecConfig(sqlParam.column.getColumnName(),
+                      sqlParam.readableProperty.annotation(AmountSerialize.class).orElse(null));
 
-      ImmutableList<SqlParam> sqlParams = Optional.ofNullable(boundSql.getParameterMappings())
-          .map(parameterMappings -> createSqlParams(parameterMappings, columns))
-          .orElseGet(ImmutableList::of);
-      sqlParams.stream().filter(sqlParam -> {
-        ReadableProperty<?, Object> propertyReader = readableProperty(sqlParam.parameterMapping,
-            boundSql.getParameterObject(), mappedStatement);
-        return propertyReader.annotation(AmountSerialize.class).isPresent() || propertyReader
-            .propertyType().getRawType()
-            .equals(Amount.class);
-      }).forEach(sqlParam -> {
-        ParameterMapping parameterMapping = sqlParam.parameterMapping;
-        String property = parameterMapping.getProperty();
-        Amount amount = (Amount) mappedStatement.getConfiguration()
-            .newMetaObject(boundSql.getParameterObject()).getValue(property);
-        AmountCodecConfig amountCodecConfig = unit4jProperties
-            .createAmountCodecConfig(sqlParam.column.getColumnName(),
-                readableProperty(sqlParam.parameterMapping, boundSql.getParameterObject(),
-                    mappedStatement).annotation(AmountSerialize.class)
-                    .orElse(null));
-        switch (amountCodecConfig.strategy()) {
-          case VALUE:
-            break;
-          case FLAT:
-            sqlParam.removeFieldName(parse, boundSql);
-            sqlParam
-                .addFieldName(parse, boundSql, amountCodecConfig.outputValueName(), amount.value(),
-                    mappedStatement);
-            sqlParam
-                .addFieldName(parse, boundSql, amountCodecConfig.outputUnitName(), amount.unit(),
-                    mappedStatement);
-            break;
-          case OBJECT:
-            throw new IllegalArgumentException(
-                "database strategy can't use " + CodecStrategy.OBJECT);
-          default:
-            throw new IllegalArgumentException();
-        }
+              if (Objects.nonNull(amountCodecConfig.targetUnit()) && !amountCodecConfig
+                  .targetUnit().equals(amount.unit())) {
+                Amount amountWithTargetUnit = amount.convertTo(amountCodecConfig.targetUnit());
+                boundSql.setAdditionalParameter(sqlParam.parameterMapping.getProperty()
+                    , amountWithTargetUnit
+                        .value(amountCodecConfig.valueCodecConfig().valueType(),
+                            amountCodecConfig.valueCodecConfig().mathContext()));
+              }
 
-      });
+              switch (amountCodecConfig.strategy()) {
+                case VALUE:
+                  break;
+                case FLAT:
+                  sqlParam.column.setColumnName(amountCodecConfig.outputValueName());
+                  Optional<ParameterMapping> unitParameterMappingOptional = sqlParam.readableProperty
+                      .annotation(WithUnit.class)
+                      .filter(withUnit -> ValueType.PROPERTY_NAME == withUnit.valueType())
+                      .map(WithUnit::value)
+                      .map(unitPropertyName -> sqlParam.directPropertyName() + unitPropertyName)
+                      .flatMap(fullUnitPropertyName -> boundSql.getParameterMappings().stream()
+                          .filter(parameterMapping -> parameterMapping.getProperty()
+                              .equals(fullUnitPropertyName)).findAny());
+
+                  Column unitColumn = new Column(sqlParam.column.getTable(),
+                      amountCodecConfig.outputUnitName());
+                  if (!unitParameterMappingOptional.isPresent() && !columns.contains(unitColumn)) {
+                    columns.add(unitColumn);
+                  }
+
+                  if (Objects.nonNull(amountCodecConfig.targetUnit()) && !amountCodecConfig
+                      .targetUnit().equals(amount.unit())) {
+                    Amount amountWithTargetUnit = amount.convertTo(amountCodecConfig.targetUnit());
+
+                    ParameterMapping unitParameterMapping;
+                    if (unitParameterMappingOptional.isPresent()) {
+                      unitParameterMapping = unitParameterMappingOptional.get();
+                    } else {
+                      unitParameterMapping = new ParameterMapping.Builder(
+                          mappedStatement.getConfiguration(),
+                          //TODO 单位序列化配置
+                          sqlParam.directPropertyName() + unitColumn.getColumnName(), String.class)
+                          .build();
+                      boundSql.getParameterMappings().add(unitParameterMapping);
+                    }
+                    boundSql
+                        .setAdditionalParameter(unitParameterMapping.getProperty(),
+                            amountWithTargetUnit.unit().id());
+                  }
+
+                  break;
+                case OBJECT:
+                  throw new IllegalArgumentException(
+                      "database strategy can't use " + CodecStrategy.OBJECT);
+                default:
+                  throw new IllegalArgumentException();
+              }
+            });
+          });
       SystemMetaObject.forObject(boundSql).setValue("sql", parse.toString());
 
     }
@@ -131,8 +186,11 @@ public class InsertUpdateInterceptor implements Interceptor {
 
   }
 
-  private ReadableProperty<?, Object> readableProperty(@NonNull ParameterMapping parameterMapping,
+  private Optional<? extends ReadableProperty<?, ?>> readableProperty(
+      @NonNull ParameterMapping parameterMapping,
       @NonNull Object parameterObject, @NonNull MappedStatement mappedStatement) {
+    Class<?> clazz = parameterObject.getClass();
+    String fieldName = parameterMapping.getProperty();
     if (parameterMapping.getProperty().contains(StringConstant.DOT)) {
       ImmutableList<String> propertyNames = ImmutableList
           .copyOf(StringConstant.DOT_SPLITTER.split(parameterMapping.getProperty()));
@@ -141,25 +199,14 @@ public class InsertUpdateInterceptor implements Interceptor {
           .join(propertyNames.subList(0, propertyNames.size() - 1));
       Object directParameterObject = mappedStatement.getConfiguration()
           .newMetaObject(parameterObject).getValue(directPropertyName);
-      return ReflectionUtil
-          .readablePropertyFromClass(directParameterObject.getClass(),
-              propertyNames.get(propertyNames.size() - 1)).orElseThrow(
-              NeverHappenException::instance);
-    } else {
-      return ReflectionUtil
-          .readablePropertyFromClass(parameterObject.getClass(),
-              parameterMapping.getProperty())
-          .orElseThrow(NeverHappenException::instance);
+      if (Objects.isNull(directParameterObject)) {
+        return Optional.empty();
+      }
+      clazz = directParameterObject.getClass();
+      fieldName = propertyNames.get(propertyNames.size() - 1);
     }
-  }
-
-  private ImmutableList<SqlParam> createSqlParams(@NonNull List<ParameterMapping> parameterMappings,
-      @NonNull List<Column> columns) {
-    return IntStream.range(0, columns.size())
-        .mapToObj(index -> SqlParam
-            .create(parameterMappings.get(index),
-                columns.size() > index ? columns.get(index) : null, index))
-        .collect(ImmutableList.toImmutableList());
+    return ReflectionUtil
+        .readablePropertyFromClass(clazz, fieldName);
   }
 
   @Value(staticConstructor = "create")
@@ -167,48 +214,23 @@ public class InsertUpdateInterceptor implements Interceptor {
 
     @NonNull
     ParameterMapping parameterMapping;
+    @NonNull
     Column column;
-    int jdbcParameterIndex;
+    @NonNull
+    ReadableProperty<?, ?> readableProperty;
+    //复杂属性名的最后一层属性名之前的属性名
+    @Getter(lazy = true)
+    @NonNull
+    String directPropertyName = generateDirectPropertyName();
 
-    private void removeFieldName(@NonNull Statement statement, @NonNull BoundSql boundSql) {
-      boundSql.getParameterMappings().remove(parameterMapping);
-      if (statement instanceof Insert) {
-        Insert insert = (Insert) statement;
-        insert.getColumns().remove(column);
-        insert.getItemsList().accept(new RemoveParameterItemsListVisitor());
+    private String generateDirectPropertyName() {
+      if (parameterMapping().getProperty().contains(StringConstant.DOT)) {
+        ImmutableList<String> propertyNames = ImmutableList
+            .copyOf(StringConstant.DOT_SPLITTER.split(parameterMapping().getProperty()));
+        return StringConstant.DOT_JOINER
+            .join(propertyNames.subList(0, propertyNames.size() - 1));
       }
-      if (statement instanceof Update) {
-        Update update = (Update) statement;
-        update.getColumns().remove(column);
-        update.getExpressions().add(new JdbcParameter());
-      }
-    }
-
-    private void setValue(@NonNull BoundSql boundSql, @NonNull MappedStatement mappedStatement,
-        @NonNull Object value) {
-      boundSql.setAdditionalParameter(parameterMapping.getProperty(), value);
-      boundSql.getParameterMappings().set(jdbcParameterIndex,
-          new ParameterMapping.Builder(mappedStatement.getConfiguration(),
-              parameterMapping.getProperty(), value.getClass()).build());
-    }
-
-    private void addFieldName(@NonNull Statement statement, @NonNull BoundSql boundSql,
-        @NonNull String fieldName, @NonNull Object fieldValue,
-        @NonNull MappedStatement mappedStatement) {
-      if (statement instanceof Insert) {
-        Insert insert = (Insert) statement;
-        insert.getColumns().add(new Column(fieldName));
-        insert.getItemsList().accept(new AddParameterItemsListVisitor());
-      }
-      if (statement instanceof Update) {
-        Update update = (Update) statement;
-        update.getColumns().add(new Column(fieldName));
-        update.getExpressions().add(new JdbcParameter());
-      }
-      boundSql.getParameterMappings().add(
-          new ParameterMapping.Builder(mappedStatement.getConfiguration(),
-              fieldName, fieldValue.getClass())
-              .build());
+      return StringConstant.EMPTY;
     }
   }
 }

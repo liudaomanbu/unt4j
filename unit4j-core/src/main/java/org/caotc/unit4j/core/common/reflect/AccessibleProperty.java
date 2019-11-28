@@ -20,40 +20,24 @@ import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 
 /**
- * 可写属性
- *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> 拥有该属性的类
+ * @param <P> 属性类型
  * @author caotc
- * @date 2019-05-27
- * @see PropertyWriter
+ * @date 2019-11-22
+ * @see ReadableProperty
+ * @see WritableProperty
  * @since 1.0.0
  */
-public interface WritableProperty<T, R> extends Property<T, R> {
+public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
+    WritableProperty<O, P> {
 
-  /**
-   * 将参数值设置到参数对象的该属性上
-   *
-   * @param target 被设置属性值的对象
-   * @param value 被设置到属性的值
-   * @return this
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull WritableProperty<T, R> write(@NonNull T target, @NonNull R value);
-
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-11-22
-   * @see Property#propertyType
-   * @since 1.0.0
-   */
   @Override
-  @NonNull <R1 extends R> WritableProperty<T, R1> propertyType(
+  @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value);
+
+  @Override
+  @NonNull <P1 extends P> AccessibleProperty<O, P1> propertyType(@NonNull Class<P1> propertyType);
+
+  @Override
+  @NonNull <R1 extends P> AccessibleProperty<O, R1> propertyType(
       @NonNull TypeToken<R1> propertyType);
 }

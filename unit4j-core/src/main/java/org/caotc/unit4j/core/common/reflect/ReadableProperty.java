@@ -1,139 +1,106 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core.common.reflect;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Ordering;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
-import java.util.stream.Stream;
-import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.Value;
 
 /**
  * 可读取属性
  *
+ * @param <T> 拥有该属性的类
+ * @param <R> 属性类型
  * @author caotc
  * @date 2019-05-27
+ * @see PropertyReader
  * @since 1.0.0
  */
-@Value
-public class ReadableProperty<T, R> {
+public interface ReadableProperty<T, R> extends Property<T, R> {
 
   /**
-   * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前
-   */
-  private static final Ordering<Element<?>> ORDERING = Ordering.natural()
-      .onResultOf(Element::accessLevel);
-
-  /**
-   * 工厂方法
+   * 读取参数对象属性值
    *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
+   * @param target 读取属性的对象
+   * @return 参数对象的属性值的 {@link Optional}
    * @author caotc
-   * @date 2019-05-27
+   * @date 2019-11-22
    * @since 1.0.0
    */
-  @NonNull
-  public static <T, R> ReadableProperty<T, R> create(
-      @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
-    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
-  }
+  @NonNull Optional<R> read(@NonNull T target);
 
   /**
-   * 工厂方法
+   * 读取参数对象属性值
    *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
+   * @param target 读取属性的对象
+   * @return 参数对象的属性值
    * @author caotc
-   * @date 2019-05-27
+   * @date 2019-11-22
    * @since 1.0.0
    */
-  @NonNull
-  public static <T, R> ReadableProperty<T, R> create(
-      @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
-    return new ReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
-  }
+  @NonNull R readExact(@NonNull T target);
 
   /**
-   * 工厂方法
+   * compose two {@link ReadableProperty} to a {@link CompositeReadableProperty}
    *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
+   * @param readableProperty readableProperty
+   * @return {@link CompositeReadableProperty}
    * @author caotc
-   * @date 2019-05-27
+   * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull
-  public static <T, R> ReadableProperty<T, R> create(
-      @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
-    return new ReadableProperty<>(propertyReaders
-        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
-  }
+  @NonNull <S> CompositeReadableProperty<T, S, R> compose(ReadableProperty<R, S> readableProperty);
 
-  @NonNull
-  ImmutableSortedSet<PropertyReader<T, R>> propertyReaders;
+  /**
+   * compose {@link ReadableProperty} and {@link WritableProperty} to a {@link
+   * CompositeWritableProperty}
+   *
+   * @param writableProperty writableProperty
+   * @return {@link CompositeWritableProperty}
+   * @author caotc
+   * @date 2019-11-27
+   * @since 1.0.0
+   */
+  @NonNull <S> CompositeWritableProperty<T, S, R> compose(WritableProperty<R, S> writableProperty);
 
-  ReadableProperty(
-      @NonNull ImmutableSortedSet<PropertyReader<T, R>> propertyReaders) {
-    //属性读取器集合不能为空
-    Preconditions
-        .checkArgument(!propertyReaders.isEmpty(), "propertyReaders can't be empty");
-    //属性只能有一个
-    Preconditions.checkArgument(
-        propertyReaders.stream().map(PropertyReader::propertyName).distinct().count() == 1
-            && propertyReaders.stream().map(PropertyReader::propertyType).distinct().count() == 1,
-        "propertyReaders is not a common property");
-    this.propertyReaders = propertyReaders;
-  }
+  /**
+   * compose {@link ReadableProperty} and {@link AccessibleProperty} to a {@link
+   * CompositeAccessibleProperty}
+   *
+   * @param accessibleProperty accessibleProperty
+   * @return {@link CompositeAccessibleProperty}
+   * @author caotc
+   * @date 2019-11-27
+   * @since 1.0.0
+   */
+  @NonNull <S> CompositeAccessibleProperty<T, S, R> compose(
+      AccessibleProperty<R, S> accessibleProperty);
 
-  public @NonNull Optional<R> read(@NonNull T object) {
-    return propertyReaders.stream().map(propertyGetter -> propertyGetter.read(object))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
-  }
-
-  public @NonNull TypeToken<? extends R> propertyType() {
-    return propertyReaders.first().propertyType();
-  }
-
-  @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends R> ReadableProperty<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertyGetter is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (ReadableProperty<T, R1>) this;
-  }
-
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return propertyReaders.stream()
-        .map(fieldWrapper -> fieldWrapper.annotation(annotationClass))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
-  }
-
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return propertyReaders.stream()
-        .map(propertyGetter -> propertyGetter.annotations(annotationClass))
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return propertyReaders.stream().map(PropertyReader::annotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  public ImmutableList<Annotation> declaredAnnotations() {
-    return propertyReaders.stream().map(PropertyReader::declaredAnnotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  public @NonNull String propertyName() {
-    return propertyReaders.first().propertyName();
-  }
+  /**
+   * 设置属性类型
+   *
+   * @param propertyType 属性类型
+   * @return this
+   * @author caotc
+   * @date 2019-11-22
+   * @see Property#propertyType
+   * @since 1.0.0
+   */
+  @Override
+  @NonNull <R1 extends R> ReadableProperty<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType);
 }

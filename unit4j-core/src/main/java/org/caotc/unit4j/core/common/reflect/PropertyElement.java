@@ -17,31 +17,19 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.reflect.TypeToken;
+import lombok.AccessLevel;
 import lombok.NonNull;
 
 /**
- * 可写属性
+ * 属性元素
  *
  * @param <T> 拥有该属性的类
  * @param <R> 属性类型
  * @author caotc
  * @date 2019-05-27
- * @see PropertyWriter
  * @since 1.0.0
  */
-public interface WritableProperty<T, R> extends Property<T, R> {
-
-  /**
-   * 将参数值设置到参数对象的该属性上
-   *
-   * @param target 被设置属性值的对象
-   * @param value 被设置到属性的值
-   * @return this
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull WritableProperty<T, R> write(@NonNull T target, @NonNull R value);
+public interface PropertyElement<T, R> extends Property<T, R> {
 
   /**
    * 设置属性类型
@@ -49,11 +37,32 @@ public interface WritableProperty<T, R> extends Property<T, R> {
    * @param propertyType 属性类型
    * @return this
    * @author caotc
-   * @date 2019-11-22
-   * @see Property#propertyType
+   * @date 2019-06-25
    * @since 1.0.0
    */
   @Override
-  @NonNull <R1 extends R> WritableProperty<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType);
+  @NonNull <R1 extends R> PropertyElement<T, R1> propertyType(@NonNull Class<R1> propertyType);
+
+  /**
+   * 设置属性类型
+   *
+   * @param propertyType 属性类型
+   * @return this
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @Override
+  @NonNull <R1 extends R> PropertyElement<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+
+  /**
+   * 该元素的权限级别
+   *
+   * @return 权限级别
+   * @author caotc
+   * @date 2019-07-14
+   * @since 1.0.0
+   */
+  @NonNull
+  AccessLevel accessLevel();
 }

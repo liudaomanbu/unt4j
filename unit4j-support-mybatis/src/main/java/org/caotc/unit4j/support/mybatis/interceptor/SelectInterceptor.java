@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.support.mybatis.interceptor;
 
 import com.google.common.collect.ImmutableSet;
@@ -19,14 +35,13 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.WritableProperty;
-import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.CodecStrategy;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
+import org.caotc.unit4j.support.common.util.AmountUtil;
 import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
 
@@ -62,14 +77,25 @@ public class SelectInterceptor implements Interceptor {
         Statement parse = CCJSqlParserUtil.parse(boundSql.getSql());
 
         ResultMap resultMap = mappedStatement.getResultMaps().get(0);
+//        ResultMapping resultMapping = new Builder(mappedStatement.getConfiguration(),
+//            "amountFlat.unit").column("amount_flat_unit").javaType(Unit.class).build();
+//        List<ResultMapping> resultMappings= Lists.newArrayList(resultMap.getResultMappings());
+//        resultMappings.add(resultMapping);
+//        resultMap=new ResultMap.Builder(mappedStatement.getConfiguration(),resultMap.getId(),resultMap.getType(),resultMappings
+//            ,resultMap.getAutoMapping())
+//            .discriminator(resultMap.getDiscriminator()).build();
+//        SystemMetaObject.forObject(mappedStatement).setValue("resultMaps", Lists.newArrayList(resultMap));
         Class<?> type = resultMap.getType();
-        ImmutableSet<? extends WritableProperty<?, ?>> writableProperties = ReflectionUtil
-            .writablePropertiesFromClass(type);
+        log.error("getMappedProperties:{}", resultMap.getMappedProperties());
+        log.error("getMappedColumns:{}", resultMap.getMappedColumns());
+        log.error("getConstructorResultMappings:{}", resultMap.getConstructorResultMappings());
+        log.error("getIdResultMappings:{}", resultMap.getIdResultMappings());
+        log.error("getPropertyResultMappings:{}", resultMap.getPropertyResultMappings());
+        log.error("getResultMappings:{}", resultMap.getResultMappings());
+        ImmutableSet<? extends WritableProperty<?, ?>> writableProperties = AmountUtil
+            .amountWritablePropertiesFromClass(type);
 
         ImmutableSet<AmountCodecConfig> amountCodecConfigs = writableProperties.stream()
-            .filter(writableProperty ->
-                Amount.class.equals(writableProperty.propertyType().getRawType())
-                    || writableProperty.annotation(AmountSerialize.class).isPresent())
             .map(writableProperty -> unit4jProperties
                 .createAmountCodecConfig(writableProperty.propertyName(),
                     writableProperty.annotation(AmountSerialize.class)

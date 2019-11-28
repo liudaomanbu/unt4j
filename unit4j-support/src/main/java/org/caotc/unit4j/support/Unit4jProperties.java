@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.support;
 
 import com.google.common.collect.ImmutableList;
@@ -7,6 +23,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -20,6 +37,7 @@ import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.core.common.reflect.ReadableProperty;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 /**
@@ -115,7 +133,7 @@ public class Unit4jProperties {
    * 作为其他类属性的{@link Amount}对象的序列化反序列化策略
    */
   @NonNull
-  CodecStrategy fieldStrategy = DEFAULT_STRATEGY;
+  CodecStrategy propertyStrategy = DEFAULT_STRATEGY;
   /**
    * 单独的{@link Amount}对象的名称拼接器
    */
@@ -180,24 +198,59 @@ public class Unit4jProperties {
     if (Objects.isNull(fieldName)) {
       return createAmountCodecConfig();
     }
-    if (Objects.isNull(amountSerialize)) {
-      //TODO 封装
-      return AmountCodecConfig.builder().configuration(getConfiguration())
-          .strategy(getFieldStrategy())
-          .fieldNameConverter(
-              valueFieldNameWords -> getFieldNameJoiner()
-                  .apply(valueFieldNameWords, getFieldNameSplitter().apply(fieldName)))
-          .valueCodecConfig(new AmountValueCodecConfig(getValueType(), getMathContext()))
-          .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
-              getUnitAliasUndefinedStrategy())).build();
-    }
+    return createPropertyAmountCodecConfig(fieldName, amountSerialize);
+  }
+
+  /**
+   * 获取作为其他类属性的{@link Amount}对象的序列化反序列化配置
+   *
+   * @param amountReadableProperty 属性名称
+   * @return 序列化反序列化配置
+   * @author caotc
+   * @date 2019-11-06
+   * @since 1.0.0
+   */
+  @NonNull
+  public AmountCodecConfig createPropertyAmountCodecConfig(
+      @NonNull ReadableProperty<?, ?> amountReadableProperty) {
+    return createPropertyAmountCodecConfig(amountReadableProperty.propertyName(),
+        amountReadableProperty.annotation(AmountSerialize.class).orElse(null));
+  }
+
+  /**
+   * 获取作为其他类属性的{@link Amount}对象的序列化反序列化配置
+   *
+   * @param fieldName 属性名称
+   * @param amountSerialize 序列化注解
+   * @return 序列化反序列化配置
+   * @author caotc
+   * @date 2019-05-29
+   * @since 1.0.0
+   */
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public AmountCodecConfig createPropertyAmountCodecConfig(@NonNull String fieldName,
+      AmountSerialize amountSerialize) {
     return AmountCodecConfig.builder()
-        .configuration(Configuration.getById(amountSerialize.configId())
-            .orElseThrow(IllegalArgumentException::new)).strategy(amountSerialize.strategy())
+        .configuration(Optional.ofNullable(amountSerialize).map(AmountSerialize::configId)
+            .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
+        .strategy(Optional.ofNullable(amountSerialize).map(AmountSerialize::strategy)
+            .orElseGet(this::getPropertyStrategy))
+        .targetUnit(Optional.ofNullable(amountSerialize).map(AmountSerialize::targetUnitId)
+            .map(Configuration::getUnitByIdExact).orElse(null))
         .fieldNameConverter(valueFieldNameWords -> getFieldNameJoiner()
-            .apply(valueFieldNameWords, amountSerialize.caseFormat().split(fieldName)))
-        .valueCodecConfig(new AmountValueCodecConfig(amountSerialize.valueType(),
-            new MathContext(amountSerialize.precision(), amountSerialize.roundingMode())))
+            .apply(valueFieldNameWords,
+                Optional.ofNullable(amountSerialize).map(AmountSerialize::caseFormat)
+                    .map(
+                        caseFormat -> (Function<@NonNull String, @NonNull ImmutableList<String>>) caseFormat::split)
+                    .orElseGet(this::getFieldNameSplitter)
+                    .apply(fieldName)))
+        .valueCodecConfig(new AmountValueCodecConfig(
+            Optional.ofNullable(amountSerialize).map(AmountSerialize::valueType)
+                .orElseGet(() -> (Class) getValueType()),
+            Optional.ofNullable(amountSerialize)
+                .map(a -> new MathContext(a.precision(), a.roundingMode()))
+                .orElseGet(this::getMathContext)))
         .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
             getUnitAliasUndefinedStrategy())).build();
   }

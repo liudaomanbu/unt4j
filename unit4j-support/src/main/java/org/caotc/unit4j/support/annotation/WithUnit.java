@@ -23,7 +23,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.caotc.unit4j.core.constant.StringConstant;
 
 /**
  * 单位注解,标注在属性和get方法上
@@ -40,10 +39,21 @@ public @interface WithUnit {
   /**
    * 单位值,为id或者别名
    */
-  String value() default StringConstant.EMPTY;
+  String value();
 
   /**
    * 单位属性
    */
-  String property() default StringConstant.EMPTY;
+  ValueType valueType() default ValueType.ID;
+
+  enum ValueType {
+    /**
+     * id
+     */
+    ID,
+    /**
+     * propertyName
+     */
+    PROPERTY_NAME;
+  }
 }

@@ -16,32 +16,28 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
+import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Member;
 import lombok.NonNull;
 
 /**
- * 可写属性
+ * 属性元素抽象类
  *
  * @param <T> 拥有该属性的类
  * @param <R> 属性类型
  * @author caotc
  * @date 2019-05-27
- * @see PropertyWriter
  * @since 1.0.0
  */
-public interface WritableProperty<T, R> extends Property<T, R> {
+public abstract class AbstractPropertyElement<T, R> extends Element<T> implements
+    PropertyElement<T, R> {
 
-  /**
-   * 将参数值设置到参数对象的该属性上
-   *
-   * @param target 被设置属性值的对象
-   * @param value 被设置到属性的值
-   * @return this
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull WritableProperty<T, R> write(@NonNull T target, @NonNull R value);
+  protected <M extends AccessibleObject & Member> AbstractPropertyElement(
+      @NonNull M member) {
+    super(member);
+  }
 
   /**
    * 设置属性类型
@@ -49,11 +45,32 @@ public interface WritableProperty<T, R> extends Property<T, R> {
    * @param propertyType 属性类型
    * @return this
    * @author caotc
-   * @date 2019-11-22
-   * @see Property#propertyType
+   * @date 2019-06-25
    * @since 1.0.0
    */
   @Override
-  @NonNull <R1 extends R> WritableProperty<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType);
+  @NonNull
+  public <R1 extends R> AbstractPropertyElement<T, R1> propertyType(
+      @NonNull Class<R1> propertyType) {
+    return propertyType(TypeToken.of(propertyType));
+  }
+
+  /**
+   * 设置属性类型
+   *
+   * @param propertyType 属性类型
+   * @return this
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public <R1 extends R> AbstractPropertyElement<T, R1> propertyType(
+      @NonNull TypeToken<R1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "PropertyElement is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (AbstractPropertyElement<T, R1>) this;
+  }
 }

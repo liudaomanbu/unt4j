@@ -1,7 +1,24 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.support.mybatis;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -21,7 +38,9 @@ import org.junit.jupiter.api.Test;
 public class MybatisTest {
 
   private static final Amount AMOUNT = Amount.create(123L, UnitConstant.SECOND);
-  private static final TestAmount TEST_AMOUNT = new TestAmount(9L, AMOUNT, AMOUNT);
+  private static final TestAmount TEST_AMOUNT = new TestAmount().id(9L)
+      .withUnitValue(BigDecimal.TEN).withUnitProperty(BigDecimal.TEN)
+      .unit(UnitConstant.SECOND.id()).object("ssssssssssssssssss");
   private static SqlSessionFactory sqlSessionFactory;
 
   static {
@@ -35,10 +54,19 @@ public class MybatisTest {
   }
 
   @Test
-  void queryTable() {
+  void findByPrimaryKeyOnResultType() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      TestAmount testAmount = dao.findByPrimaryKey(1L);
+      TestAmount testAmount = dao.findByPrimaryKeyOnResultType(1L);
+      log.info("testAmount:{}", testAmount);
+    }
+  }
+
+  @Test
+  void findByPrimaryKeyOnResultMap() {
+    try (SqlSession session = sqlSessionFactory.openSession()) {
+      TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
+      TestAmount testAmount = dao.findByPrimaryKeyOnResultMap(1L);
       log.info("testAmount:{}", testAmount);
     }
   }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core;
 
 import com.google.common.base.Preconditions;
@@ -24,6 +40,8 @@ import org.caotc.unit4j.core.constant.UnitConstant;
 import org.caotc.unit4j.core.convert.AmountChooser;
 import org.caotc.unit4j.core.convert.TargetUnitChooser;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
+import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
+import org.caotc.unit4j.core.exception.UnitNotFoundException;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.Fraction;
@@ -76,6 +94,8 @@ public final class Configuration implements WithId {
    */
   private static final Map<String, Configuration> ID_TO_CONFIGURATIONS = Maps.newConcurrentMap();
 
+  private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
+
   /**
    * 默认实例
    */
@@ -98,7 +118,7 @@ public final class Configuration implements WithId {
    * 根据id获取配置对象
    *
    * @param id id
-   * @return 关于配置对象的Optional
+   * @return 配置对象
    * @author caotc
    * @date 2019-04-23
    * @since 1.0.0
@@ -106,6 +126,39 @@ public final class Configuration implements WithId {
   @NonNull
   public static Optional<Configuration> getById(@NonNull String id) {
     return Optional.ofNullable(ID_TO_CONFIGURATIONS.get(id));
+  }
+
+  /**
+   * 根据id获取{@link Configuration}
+   *
+   * @param id id
+   * @return 配置对象
+   * @throws ConfigurationNotFoundException 如果不存在该id的{@link Configuration}
+   * @author caotc
+   * @date 2019-11-01
+   * @since 1.0.0
+   */
+  @NonNull
+  public static Configuration getByIdExact(@NonNull String id) {
+    if (ID_TO_CONFIGURATIONS.containsKey(id)) {
+      return ID_TO_CONFIGURATIONS.get(id);
+    }
+    throw ConfigurationNotFoundException.create(id);
+  }
+
+
+  public static void register(@NonNull Unit unit) {
+    ID_TO_UNITS.putIfAbsent(unit.id(), unit);
+  }
+
+  @NonNull
+  public static Optional<Unit> getUnitById(@NonNull String id) {
+    return Optional.ofNullable(ID_TO_UNITS.get(id));
+  }
+
+  @NonNull
+  public static Unit getUnitByIdExact(@NonNull String id) {
+    return getUnitById(id).orElseThrow(() -> UnitNotFoundException.create(id));
   }
 
   private static void register(@NonNull Configuration configuration) {
@@ -731,8 +784,7 @@ public final class Configuration implements WithId {
   }
 
   /**
-   * //TODO 冲突检测
-   * 两个单位互相转换的配置添加
+   * //TODO 冲突检测 两个单位互相转换的配置添加
    *
    * @param source 源单位
    * @param target 目标单位
