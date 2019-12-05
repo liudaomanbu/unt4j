@@ -28,6 +28,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * 属性获取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -77,37 +78,21 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
   @NonNull
   protected abstract Optional<R> readInternal(@NonNull T object);
 
-
-  /**
-   * 修改返回类型
-   *
-   * @param propertyType 新的返回类型
-   * @return 修改返回类型的属性获取器
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
   @Override
   @NonNull
-  public <R1 extends R> AbstractPropertyReader<T, R1> propertyType(
+  public final <R1 extends R> PropertyReader<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
-    return (AbstractPropertyReader<T, R1>) super.propertyType(propertyType);
+    return propertyType(TypeToken.of(propertyType));
   }
 
-  /**
-   * 修改返回类型
-   *
-   * @param propertyType 新的返回类型
-   * @return 修改返回类型的属性获取器
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
+  @SuppressWarnings("unchecked")
   @Override
   @NonNull
-  public <R1 extends R> AbstractPropertyReader<T, R1> propertyType(
+  public final <R1 extends R> PropertyReader<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
-    return (AbstractPropertyReader<T, R1>) super.propertyType(propertyType);
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "PropertyReader is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (PropertyReader<T, R1>) this;
   }
 
   /**
@@ -149,18 +134,6 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     public @NonNull String propertyName() {
       return field.getName();
     }
-
-    @Override
-    public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
-        @NonNull Class<R1> propertyType) {
-      return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
-    }
-
-    @Override
-    public @NonNull <R1 extends R> FieldPropertyReader<T, R1> propertyType(
-        @NonNull TypeToken<R1> propertyType) {
-      return (FieldPropertyReader<T, R1>) super.propertyType(propertyType);
-    }
   }
 
   /**
@@ -186,10 +159,7 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
         @NonNull String propertyName) {
       super(invokable);
       Preconditions
-          .checkArgument(!invokable.isStatic()
-                  && invokable.getParameters().isEmpty()
-                  && !invokable.getReturnType().getRawType().equals(void.class)
-              , "%s is not a getInvokable",
+          .checkArgument(ReflectionUtil.isGetInvokable(invokable), "%s is not a getInvokable",
               invokable);
       this.getInvokable = invokable;
       this.propertyName = propertyName;
@@ -207,16 +177,5 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
       return getInvokable.getReturnType();
     }
 
-    @Override
-    public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
-        @NonNull Class<R1> propertyType) {
-      return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
-    }
-
-    @Override
-    public @NonNull <R1 extends R> InvokablePropertyReader<T, R1> propertyType(
-        @NonNull TypeToken<R1> propertyType) {
-      return (InvokablePropertyReader<T, R1>) super.propertyType(propertyType);
-    }
   }
 }

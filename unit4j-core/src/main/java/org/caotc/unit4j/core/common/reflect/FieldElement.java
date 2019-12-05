@@ -16,28 +16,20 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
-import com.google.common.reflect.TypeToken;
+import java.lang.reflect.Field;
 import lombok.NonNull;
 
 /**
- * @param <O> 拥有该属性的类
- * @param <P> 属性类型
  * @author caotc
- * @date 2019-11-22
- * @see ReadableProperty
- * @see WritableProperty
+ * @date 2019-11-29
  * @since 1.0.0
  */
-public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
-    WritableProperty<O, P> {
+public class FieldElement<T> extends Element {
 
-  @Override
-  @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value);
+  FieldElement(
+      @NonNull Field field) {
+    super(field);
+  }
 
-  @Override
-  @NonNull <P1 extends P> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType);
 
-  @Override
-  @NonNull <R1 extends P> AccessibleProperty<O, R1> type(
-      @NonNull TypeToken<R1> propertyType);
 }

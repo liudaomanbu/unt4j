@@ -41,7 +41,7 @@ public class ReadablePropertyValueNotFoundException extends IllegalStateExceptio
   Object target;
   @Getter(lazy = true)
   String message = String
-      .format("property %s for %s value not found", readableProperty.propertyName(), target);
+      .format("property %s for %s value not found", readableProperty.name(), target);
 
   @Override
   public String getMessage() {

@@ -116,10 +116,10 @@ public class SimpleWritableProperty<T, R> extends AbstractProperty<T, R> impleme
 
   @Override
   @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends R> SimpleWritableProperty<T, R1> propertyType(
+  public @NonNull <R1 extends R> SimpleWritableProperty<T, R1> type(
       @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertySetter is known propertyType %s,not %s ", propertyType(), propertyType);
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+        , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
     return (SimpleWritableProperty<T, R1>) this;
   }
 

@@ -42,52 +42,52 @@ public abstract class AbstractProperty<O, P> implements
     Property<O, P> {
 
   @NonNull
-  String propertyName;
+  String name;
   @NonNull
-  TypeToken<? extends P> propertyType;
+  TypeToken<? extends P> type;
 
   protected AbstractProperty(
-      @NonNull ImmutableSet<? extends PropertyElement<O, P>> properties) {
+      @NonNull ImmutableSet<? extends PropertyElement<O, P>> propertyElements) {
     //属性读取器集合不能为空
     Preconditions
-        .checkArgument(!properties.isEmpty(), "properties can't be empty");
+        .checkArgument(!propertyElements.isEmpty(), "propertyElements can't be empty");
     //属性只能有一个
-    ImmutableSet<@NonNull String> propertyNames = properties.stream()
-        .map(Property::propertyName).collect(ImmutableSet.toImmutableSet());
-    ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = properties.stream()
-        .map(Property::propertyType).collect(ImmutableSet.toImmutableSet());
+    ImmutableSet<@NonNull String> propertyNames = propertyElements.stream()
+        .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
+    ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = propertyElements.stream()
+        .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
     Preconditions.checkArgument(propertyNames.size() == 1 && propertyTypes.size() == 1,
-        "properties is not a common property");
-    this.propertyName = Iterables.getOnlyElement(propertyNames);
-    this.propertyType = Iterables.getOnlyElement(propertyTypes);
+        "propertyElements is not a common property");
+    this.name = Iterables.getOnlyElement(propertyNames);
+    this.type = Iterables.getOnlyElement(propertyTypes);
   }
 
   @NonNull
   @Override
-  public final String propertyName() {
-    return propertyName;
+  public final String name() {
+    return name;
   }
 
   @NonNull
   @Override
-  public final TypeToken<? extends P> propertyType() {
-    return propertyType;
+  public final TypeToken<? extends P> type() {
+    return type;
   }
 
   @Override
   @NonNull
-  public <P1 extends P> AbstractProperty<O, P1> propertyType(
-      @NonNull Class<P1> propertyType) {
-    return propertyType(TypeToken.of(propertyType));
+  public <P1 extends P> AbstractProperty<O, P1> type(
+      @NonNull Class<P1> newType) {
+    return type(TypeToken.of(newType));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   @NonNull
-  public <P1 extends P> AbstractProperty<O, P1> propertyType(
+  public <P1 extends P> AbstractProperty<O, P1> type(
       @NonNull TypeToken<P1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "Property is known propertyType %s,not %s ", propertyType(), propertyType);
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+        , "Property is known type %s,not %s ", type(), propertyType);
     return (AbstractProperty<O, P1>) this;
   }
 

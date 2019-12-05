@@ -64,8 +64,8 @@ public class CompositeWritableProperty<T, R, E> extends AbstractProperty<T, R> i
   private CompositeWritableProperty(
       @NonNull ReadableProperty<T, E> targetReadableProperty,
       @NonNull WritableProperty<E, R> delegate) {
-    super(targetReadableProperty.propertyName() + delegate.propertyName(),
-        delegate.propertyType());
+    super(targetReadableProperty.name() + delegate.name(),
+        delegate.type());
     this.targetReadableProperty = targetReadableProperty;
     this.delegate = delegate;
   }
@@ -79,10 +79,10 @@ public class CompositeWritableProperty<T, R, E> extends AbstractProperty<T, R> i
 
   @Override
   @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends R> CompositeWritableProperty<T, R1, E> propertyType(
+  public @NonNull <R1 extends R> CompositeWritableProperty<T, R1, E> type(
       @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertySetter is known propertyType %s,not %s ", propertyType(), propertyType);
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+        , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
     return (CompositeWritableProperty<T, R1, E>) this;
   }
 

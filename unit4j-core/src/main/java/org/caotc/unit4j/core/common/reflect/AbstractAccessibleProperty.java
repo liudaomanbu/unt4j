@@ -70,14 +70,14 @@ public abstract class AbstractAccessibleProperty<O, P> extends
   }
 
   @Override
-  public @NonNull <P1 extends P> AbstractAccessibleProperty<O, P1> propertyType(
-      @NonNull Class<P1> propertyType) {
-    return (AbstractAccessibleProperty<O, P1>) super.propertyType(propertyType);
+  public @NonNull <P1 extends P> AbstractAccessibleProperty<O, P1> type(
+      @NonNull Class<P1> newType) {
+    return (AbstractAccessibleProperty<O, P1>) super.type(newType);
   }
 
   @Override
-  public @NonNull <P1 extends P> AbstractAccessibleProperty<O, P1> propertyType(
+  public @NonNull <P1 extends P> AbstractAccessibleProperty<O, P1> type(
       @NonNull TypeToken<P1> propertyType) {
-    return (AbstractAccessibleProperty<O, P1>) super.propertyType(propertyType);
+    return (AbstractAccessibleProperty<O, P1>) super.type(propertyType);
   }
 }

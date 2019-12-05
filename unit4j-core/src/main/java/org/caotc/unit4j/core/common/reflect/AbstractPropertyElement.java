@@ -16,7 +16,6 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
-import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
@@ -31,46 +30,18 @@ import lombok.NonNull;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public abstract class AbstractPropertyElement<T, R> extends Element<T> implements
-    PropertyElement<T, R> {
+public abstract class AbstractPropertyElement<O, P> extends Element implements
+    PropertyElement<O, P> {
 
   protected <M extends AccessibleObject & Member> AbstractPropertyElement(
       @NonNull M member) {
     super(member);
   }
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  public <R1 extends R> AbstractPropertyElement<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return propertyType(TypeToken.of(propertyType));
-  }
-
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
   @SuppressWarnings("unchecked")
   @NonNull
-  public <R1 extends R> AbstractPropertyElement<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertyElement is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (AbstractPropertyElement<T, R1>) this;
+  @Override
+  public final TypeToken<O> ownerType() {
+    return (TypeToken<O>) super.ownerType();
   }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.support.fastjson;
 
 import com.alibaba.fastjson.parser.deserializer.ExtraProcessor;
@@ -64,12 +80,12 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
     ReflectionUtil.readablePropertiesFromClass((Class<Object>) object.getClass())
         .stream()
         .filter(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class).isPresent()
-            || Amount.class.equals(fieldWrapper.propertyType().getRawType()))
+            || Amount.class.equals(fieldWrapper.type().getRawType()))
         .forEach(fieldWrapper -> {
           fieldWrapper.read(object).map(Amount.class::cast).ifPresent(amount -> {
             AmountCodecConfig amountCodecConfig = fieldWrapper.annotation(AmountSerialize.class)
                 .map(amountSerialize -> unit4jProperties
-                    .createAmountCodecConfig(fieldWrapper.propertyName(), amountSerialize))
+                    .createAmountCodecConfig(fieldWrapper.name(), amountSerialize))
                 .orElseGet(unit4jProperties::createAmountCodecConfig);
             SerializeCommands serializeCommands = amountCodecConfig
                 .serializeCommandsFromAmount(amount);

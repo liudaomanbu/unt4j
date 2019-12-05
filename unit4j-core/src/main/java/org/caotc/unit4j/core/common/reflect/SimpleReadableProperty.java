@@ -112,9 +112,9 @@ public class SimpleReadableProperty<T, R> extends AbstractReadableProperty<T, R>
   }
 
   @Override
-  public @NonNull <R1 extends R> SimpleReadableProperty<T, R1> propertyType(
+  public @NonNull <R1 extends R> SimpleReadableProperty<T, R1> type(
       @NonNull TypeToken<R1> propertyType) {
-    return (SimpleReadableProperty<T, R1>) super.propertyType(propertyType);
+    return (SimpleReadableProperty<T, R1>) super.type(propertyType);
   }
 
   @Override

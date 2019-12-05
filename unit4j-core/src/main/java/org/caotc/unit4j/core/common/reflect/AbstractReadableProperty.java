@@ -71,14 +71,14 @@ public abstract class AbstractReadableProperty<O, P> extends
   }
 
   @Override
-  public @NonNull <R1 extends P> AbstractReadableProperty<O, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return (AbstractReadableProperty<O, R1>) super.propertyType(propertyType);
+  public @NonNull <R1 extends P> AbstractReadableProperty<O, R1> type(
+      @NonNull Class<R1> newType) {
+    return (AbstractReadableProperty<O, R1>) super.type(newType);
   }
 
   @Override
-  public @NonNull <R1 extends P> AbstractReadableProperty<O, R1> propertyType(
+  public @NonNull <R1 extends P> AbstractReadableProperty<O, R1> type(
       @NonNull TypeToken<R1> propertyType) {
-    return (AbstractReadableProperty<O, R1>) super.propertyType(propertyType);
+    return (AbstractReadableProperty<O, R1>) super.type(propertyType);
   }
 }

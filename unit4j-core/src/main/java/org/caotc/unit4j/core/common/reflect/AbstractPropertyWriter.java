@@ -27,6 +27,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * 属性设置器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -101,39 +102,21 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
   @NonNull
   public abstract TypeToken<? extends R> propertyType();
 
-  /**
-   * 修改返回类型
-   *
-   * @param propertyType 新的返回类型
-   * @return 修改返回类型的属性设置器
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
   @Override
   @NonNull
-  public <R1 extends R> AbstractPropertyWriter<T, R1> propertyType(
+  public final <R1 extends R> PropertyWriter<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
 
-  /**
-   * 修改返回类型
-   *
-   * @param propertyType 新的返回类型
-   * @return 修改返回类型的属性设置器
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
   @SuppressWarnings("unchecked")
+  @Override
   @NonNull
-  public <R1 extends R> AbstractPropertyWriter<T, R1> propertyType(
+  public final <R1 extends R> PropertyWriter<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "AccessibleProperty is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (AbstractPropertyWriter<T, R1>) this;
+        , "PropertyWriter is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (PropertyWriter<T, R1>) this;
   }
 
   /**
@@ -174,17 +157,6 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
       return field.getName();
     }
 
-    @Override
-    public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
-        @NonNull Class<R1> propertyType) {
-      return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
-    }
-
-    @Override
-    public @NonNull <R1 extends R> FieldPropertyWriter<T, R1> propertyType(
-        @NonNull TypeToken<R1> propertyType) {
-      return (FieldPropertyWriter<T, R1>) super.propertyType(propertyType);
-    }
   }
 
   /**
@@ -212,11 +184,7 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
         @NonNull String propertyName) {
       super(invokable);
       Preconditions
-          .checkArgument(!invokable.isStatic()
-                  && (invokable.getReturnType().getRawType().equals(void.class) || invokable
-                  .getReturnType()
-                  .equals(invokable.getOwnerType()))
-                  && invokable.getParameters().size() == 1, "%s is not a setInvokable",
+          .checkArgument(ReflectionUtil.isSetInvokable(invokable), "%s is not a setInvokable",
               invokable);
       this.setInvokable = invokable;
       this.propertyName = propertyName;
@@ -232,18 +200,6 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
       return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
-    }
-
-    @Override
-    public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
-        @NonNull Class<R1> propertyType) {
-      return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
-    }
-
-    @Override
-    public @NonNull <R1 extends R> InvokablePropertyWriter<T, R1> propertyType(
-        @NonNull TypeToken<R1> propertyType) {
-      return (InvokablePropertyWriter<T, R1>) super.propertyType(propertyType);
     }
   }
 }

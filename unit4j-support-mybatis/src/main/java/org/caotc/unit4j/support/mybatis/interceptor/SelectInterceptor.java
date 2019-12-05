@@ -97,7 +97,7 @@ public class SelectInterceptor implements Interceptor {
 
         ImmutableSet<AmountCodecConfig> amountCodecConfigs = writableProperties.stream()
             .map(writableProperty -> unit4jProperties
-                .createAmountCodecConfig(writableProperty.propertyName(),
+                .createAmountCodecConfig(writableProperty.name(),
                     writableProperty.annotation(AmountSerialize.class)
                         .orElse(null))).collect(ImmutableSet.toImmutableSet());
 

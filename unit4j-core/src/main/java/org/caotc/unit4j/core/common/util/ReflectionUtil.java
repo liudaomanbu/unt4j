@@ -34,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldPropertyReader;
 import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldPropertyWriter;
 import org.caotc.unit4j.core.common.reflect.MethodNameStyle;
+import org.caotc.unit4j.core.common.reflect.Property;
+import org.caotc.unit4j.core.common.reflect.PropertyAccessor;
 import org.caotc.unit4j.core.common.reflect.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.PropertyWriter;
 import org.caotc.unit4j.core.common.reflect.ReadableProperty;
@@ -155,6 +157,26 @@ public class ReflectionUtil {
           .collect(ImmutableSet.toImmutableSet());
       methodStream = methodStream.filter(getMethod -> getMethodKeys
           .contains(ImmutableList.of(getMethod.getName(), getMethod.getReturnType())));
+    }
+    return methodStream.collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public ImmutableSet<Method> accessorMethodsFromClass(@NonNull Class<?> clazz,
+      boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    Stream<Method> methodStream = methodsFromClass(clazz).stream()
+        .filter(method -> isGetMethod(method, methodNameStyles) || isSetMethod(method,
+            methodNameStyles));
+    if (fieldExistCheck) {
+      ImmutableSet<ImmutableList<?>> accessorMethodKeys = fieldsFromClass(clazz).stream()
+          .flatMap(field -> Arrays.stream(methodNameStyles)
+              .flatMap(methodNameStyle -> Stream.of(ImmutableList
+                  .of(methodNameStyle.getMethodNameFromField(field), field.getType()), ImmutableList
+                  .of(methodNameStyle.setMethodNameFromField(field), field.getType()))))
+          .collect(ImmutableSet.toImmutableSet());
+      methodStream = methodStream.filter(accessorMethod -> accessorMethodKeys
+          .contains(ImmutableList.of(accessorMethod.getName(), accessorMethod.getReturnType())));
     }
     return methodStream.collect(ImmutableSet.toImmutableSet());
   }
@@ -391,6 +413,47 @@ public class ReflectionUtil {
   }
 
   /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @param fieldExistCheck need check field exist
+   * @param methodNameStyles get set methods styles
+   * @return {@link ImmutableSet} of properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+
+    Function<PropertyReader<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
+        .of(propertyGetter.propertyName(), propertyGetter.propertyType());
+
+    Stream<PropertyReader<T, ?>> getInvokablePropertyGetters = accessorMethodsFromClass(clazz,
+        fieldExistCheck, methodNameStyles).stream()
+        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
+            .filter(methodNameStyle -> methodNameStyle.isGetMethod(getMethod))
+            .map(methodNameStyle -> PropertyReader.from(getMethod, methodNameStyle)));
+
+    Stream<PropertyAccessor<T, ?>> fieldPropertyAccessors = fieldsFromClass(
+        clazz).stream().map(PropertyAccessor::from);
+
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyReader<T, ?>> propertyGetterMultimap =
+        Stream.concat(fieldPropertyAccessors, getInvokablePropertyGetters)
+            .collect(ImmutableListMultimap
+                .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
+
+    return propertyGetterMultimap.asMap().values().stream()
+        .filter(propertyReaders -> !fieldExistCheck || propertyReaders.stream()
+            .anyMatch(FieldPropertyReader.class::isInstance))
+        .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
+        .map(SimpleReadableProperty::create).collect(ImmutableSet.toImmutableSet());
+  }
+
+  /**
    * 获取指定{@link ReadableProperty}
    *
    * @param clazz 需要获取可读属性{@link ReadableProperty}的类
@@ -463,7 +526,7 @@ public class ReflectionUtil {
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     return readablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
-        .filter(propertyGetter -> propertyGetter.propertyName().equals(fieldName))
+        .filter(propertyGetter -> propertyGetter.name().equals(fieldName))
         .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
         .findAny();
   }
@@ -592,7 +655,7 @@ public class ReflectionUtil {
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     return writablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
-        .filter(propertyWriter -> propertyWriter.propertyName().equals(fieldName))
+        .filter(propertyWriter -> propertyWriter.name().equals(fieldName))
         .map(propertyWriter -> (WritableProperty<T, R>) propertyWriter)
         .findAny();
   }
@@ -612,6 +675,15 @@ public class ReflectionUtil {
   public static boolean isGetMethod(@NonNull Method method,
       @NonNull MethodNameStyle... methodNameStyles) {
     return isGetInvokable(Invokable.from(method), methodNameStyles);
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-04
+   * @since 1.0.0
+   */
+  public static boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
+    return isGetInvokable(invokable, MethodNameStyle.values());
   }
 
   /**
@@ -647,6 +719,10 @@ public class ReflectionUtil {
   public static boolean isSetMethod(@NonNull Method method,
       @NonNull MethodNameStyle... methodNameStyles) {
     return isSetInvokable(Invokable.from(method), methodNameStyles);
+  }
+
+  public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
+    return isSetInvokable(invokable, MethodNameStyle.values());
   }
 
   /**

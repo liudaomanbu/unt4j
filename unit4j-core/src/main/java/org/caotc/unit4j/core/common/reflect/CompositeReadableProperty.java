@@ -62,8 +62,8 @@ public class CompositeReadableProperty<T, R, E> extends AbstractReadableProperty
   private CompositeReadableProperty(
       @NonNull ReadableProperty<T, E> targetReadableProperty,
       @NonNull ReadableProperty<E, R> delegate) {
-    super(targetReadableProperty.propertyName() + delegate.propertyName(),
-        delegate.propertyType());
+    super(targetReadableProperty.name() + delegate.name(),
+        delegate.type());
     this.targetReadableProperty = targetReadableProperty;
     this.delegate = delegate;
   }
@@ -74,9 +74,9 @@ public class CompositeReadableProperty<T, R, E> extends AbstractReadableProperty
   }
 
   @Override
-  public @NonNull <R1 extends R> CompositeReadableProperty<T, R1, E> propertyType(
+  public @NonNull <R1 extends R> CompositeReadableProperty<T, R1, E> type(
       @NonNull TypeToken<R1> propertyType) {
-    return (CompositeReadableProperty<T, R1, E>) super.propertyType(propertyType);
+    return (CompositeReadableProperty<T, R1, E>) super.type(propertyType);
   }
 
   @Override

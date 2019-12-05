@@ -97,10 +97,10 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
    * @return this
    * @author caotc
    * @date 2019-11-22
-   * @see Property#propertyType
+   * @see Property#type
    * @since 1.0.0
    */
   @Override
-  @NonNull <R1 extends R> ReadableProperty<T, R1> propertyType(
+  @NonNull <R1 extends R> ReadableProperty<T, R1> type(
       @NonNull TypeToken<R1> propertyType);
 }

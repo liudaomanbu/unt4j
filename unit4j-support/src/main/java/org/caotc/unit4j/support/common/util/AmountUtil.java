@@ -90,13 +90,13 @@ public class AmountUtil {
       @NonNull MethodNameStyle... methodNameStyles) {
     return ReflectionUtil.writablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles)
         .stream().filter(writableProperty ->
-            Amount.class.equals(writableProperty.propertyType().getRawType())
+            Amount.class.equals(writableProperty.type().getRawType())
                 || writableProperty.annotation(WithUnit.class).isPresent())
         .collect(ImmutableSet.toImmutableSet());
   }
 
   public static boolean isAmount(@NonNull ReadableProperty<?, ?> readableProperty) {
-    return readableProperty.propertyType().getRawType().equals(Amount.class)
+    return readableProperty.type().getRawType().equals(Amount.class)
         || readableProperty.annotation(WithUnit.class).isPresent();
   }
 
@@ -157,7 +157,7 @@ public class AmountUtil {
   @NonNull
   public static <T> Optional<? extends ReadableProperty<T, ?>> unitReadableProperty(
       @NonNull ReadableProperty<T, ?> amountReadableProperty, @NonNull T object) {
-    if (amountReadableProperty.propertyType().getRawType().equals(Amount.class)) {
+    if (amountReadableProperty.type().getRawType().equals(Amount.class)) {
       return Optional.empty();
     }
     WithUnit withUnit = amountReadableProperty.annotation(WithUnit.class).orElseThrow(

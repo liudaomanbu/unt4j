@@ -28,6 +28,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * @author caotc
@@ -176,18 +177,21 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
    */
   protected abstract void writeInternal(@NonNull T object, @NonNull R value);
 
-  @NonNull
   @Override
+  @NonNull
   public final <R1 extends R> PropertyAccessor<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
-    return (PropertyAccessor<T, R1>) super.propertyType(propertyType);
+    return propertyType(TypeToken.of(propertyType));
   }
 
-  @NonNull
+  @SuppressWarnings("unchecked")
   @Override
+  @NonNull
   public final <R1 extends R> PropertyAccessor<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
-    return (PropertyAccessor<T, R1>) super.propertyType(propertyType);
+    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+        , "PropertyAccessor is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (PropertyAccessor<T, R1>) this;
   }
 
 
@@ -270,17 +274,10 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
         @NonNull String propertyName) {
       super(getInvokable);
       Preconditions
-          .checkArgument(!getInvokable.isStatic()
-                  && getInvokable.getParameters().isEmpty()
-                  && !getInvokable.getReturnType().getRawType().equals(void.class)
-              , "%s is not a getInvokable",
+          .checkArgument(ReflectionUtil.isGetInvokable(getInvokable), "%s is not a getInvokable",
               getInvokable);
       Preconditions
-          .checkArgument(!setInvokable.isStatic()
-                  && (setInvokable.getReturnType().getRawType().equals(void.class) || setInvokable
-                  .getReturnType()
-                  .equals(setInvokable.getOwnerType()))
-                  && setInvokable.getParameters().size() == 1, "%s is not a setInvokable",
+          .checkArgument(ReflectionUtil.isSetInvokable(setInvokable), "%s is not a setInvokable",
               setInvokable);
       this.getInvokable = getInvokable;
       this.setInvokable = setInvokable;

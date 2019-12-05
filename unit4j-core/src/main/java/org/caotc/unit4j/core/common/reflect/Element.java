@@ -28,25 +28,24 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Optional;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.caotc.unit4j.core.exception.NeverHappenException;
 
 /**
- *
- *
- * @param <T> 拥有该属性的类
  * @author caotc
  * @date 2019-06-20
- * @since 1.0.0
  * @see Field
  * @see Method
  * @see Constructor
+ * @since 1.0.0
  */
-@Data
-@AllArgsConstructor
-public abstract class Element<T> extends AccessibleObject implements Member {
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public class Element extends AccessibleObject implements Member {
 
   @NonNull
   AccessibleObject accessibleObject;
@@ -85,11 +84,6 @@ public abstract class Element<T> extends AccessibleObject implements Member {
   @Override
   public final boolean isAccessible() {
     return accessibleObject.isAccessible();
-  }
-
-  @Override
-  public Class<?> getDeclaringClass() {
-    return member.getDeclaringClass();
   }
 
   @Override
@@ -197,8 +191,13 @@ public abstract class Element<T> extends AccessibleObject implements Member {
    * @since 1.0.0
    */
   @NonNull
-  public String name() {
+  public final String name() {
     return getName();
+  }
+
+  @Override
+  public final Class<?> getDeclaringClass() {
+    return member.getDeclaringClass();
   }
 
   /**
@@ -209,10 +208,9 @@ public abstract class Element<T> extends AccessibleObject implements Member {
    * @date 2019-06-27
    * @since 1.0.0
    */
-  @SuppressWarnings("unchecked")
   @NonNull
-  public TypeToken<T> ownerType() {
-    return TypeToken.of((Class<T>) getDeclaringClass());
+  public TypeToken<?> ownerType() {
+    return TypeToken.of(getDeclaringClass());
   }
 
   /**
@@ -284,7 +282,7 @@ public abstract class Element<T> extends AccessibleObject implements Member {
    * @since 1.0.0
    */
   @NonNull
-  public final Element<T> accessible(boolean accessible) {
+  public final Element accessible(boolean accessible) {
     setAccessible(accessible);
     return this;
   }
@@ -312,5 +310,20 @@ public abstract class Element<T> extends AccessibleObject implements Member {
       return AccessLevel.PUBLIC;
     }
     throw NeverHappenException.instance();
+  }
+
+  @Override
+  public final <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass) {
+    return super.getAnnotationsByType(annotationClass);
+  }
+
+  @Override
+  public final <T extends Annotation> T getDeclaredAnnotation(Class<T> annotationClass) {
+    return super.getDeclaredAnnotation(annotationClass);
+  }
+
+  @Override
+  public final <T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass) {
+    return super.getDeclaredAnnotationsByType(annotationClass);
   }
 }

@@ -44,7 +44,7 @@ public interface Property<O, P> {
    * @since 1.0.0
    */
   @NonNull
-  String propertyName();
+  String name();
 
   /**
    * 获取属性类型
@@ -55,7 +55,7 @@ public interface Property<O, P> {
    * @since 1.0.0
    */
   @NonNull
-  TypeToken<? extends P> propertyType();
+  TypeToken<? extends P> type();
 
   /**
    * 设置属性类型
@@ -66,7 +66,7 @@ public interface Property<O, P> {
    * @date 2019-06-25
    * @since 1.0.0
    */
-  @NonNull <P1 extends P> Property<O, P1> propertyType(@NonNull Class<P1> propertyType);
+  @NonNull <P1 extends P> Property<O, P1> type(@NonNull Class<P1> propertyType);
 
   /**
    * 设置属性类型
@@ -77,7 +77,7 @@ public interface Property<O, P> {
    * @date 2019-11-22
    * @since 1.0.0
    */
-  @NonNull <P1 extends P> Property<O, P1> propertyType(
+  @NonNull <P1 extends P> Property<O, P1> type(
       @NonNull TypeToken<P1> propertyType);
 
   /**

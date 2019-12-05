@@ -213,7 +213,7 @@ public class Unit4jProperties {
   @NonNull
   public AmountCodecConfig createPropertyAmountCodecConfig(
       @NonNull ReadableProperty<?, ?> amountReadableProperty) {
-    return createPropertyAmountCodecConfig(amountReadableProperty.propertyName(),
+    return createPropertyAmountCodecConfig(amountReadableProperty.name(),
         amountReadableProperty.annotation(AmountSerialize.class).orElse(null));
   }
 

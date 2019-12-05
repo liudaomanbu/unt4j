@@ -46,8 +46,8 @@ public class CompositeAccessibleProperty<T, R, E> extends
   protected CompositeAccessibleProperty(
       @NonNull ReadableProperty<T, E> targetReadableProperty,
       @NonNull AccessibleProperty<E, R> delegate) {
-    super(targetReadableProperty.propertyName() + delegate.propertyName(),
-        delegate.propertyType());
+    super(targetReadableProperty.name() + delegate.name(),
+        delegate.type());
     this.targetReadableProperty = targetReadableProperty;
     this.delegate = delegate;
   }
@@ -65,9 +65,9 @@ public class CompositeAccessibleProperty<T, R, E> extends
   }
 
   @Override
-  public @NonNull <R1 extends R> CompositeAccessibleProperty<T, R1, E> propertyType(
+  public @NonNull <R1 extends R> CompositeAccessibleProperty<T, R1, E> type(
       @NonNull TypeToken<R1> propertyType) {
-    return (CompositeAccessibleProperty<T, R1, E>) super.propertyType(propertyType);
+    return (CompositeAccessibleProperty<T, R1, E>) super.type(propertyType);
   }
 
   @Override

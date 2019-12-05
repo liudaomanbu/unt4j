@@ -43,14 +43,14 @@ public abstract class AbstractWritableProperty<T, R> extends AbstractProperty<T,
   }
 
   @Override
-  public @NonNull <R1 extends R> AbstractWritableProperty<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return (AbstractWritableProperty<T, R1>) super.propertyType(propertyType);
+  public @NonNull <R1 extends R> AbstractWritableProperty<T, R1> type(
+      @NonNull Class<R1> newType) {
+    return (AbstractWritableProperty<T, R1>) super.type(newType);
   }
 
   @Override
-  public @NonNull <R1 extends R> AbstractWritableProperty<T, R1> propertyType(
+  public @NonNull <R1 extends R> AbstractWritableProperty<T, R1> type(
       @NonNull TypeToken<R1> propertyType) {
-    return (AbstractWritableProperty<T, R1>) super.propertyType(propertyType);
+    return (AbstractWritableProperty<T, R1>) super.type(propertyType);
   }
 }
