@@ -24,8 +24,8 @@ import lombok.NonNull;
 /**
  * 属性元素抽象类
  *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> 拥有该属性的类
+ * @param <P> 属性类型
  * @author caotc
  * @date 2019-05-27
  * @since 1.0.0

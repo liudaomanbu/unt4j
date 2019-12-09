@@ -21,7 +21,7 @@ import com.google.common.reflect.TypeToken;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldPropertyWriter;
+import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldElementPropertyWriter;
 import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.InvokablePropertyWriter;
 
 /**
@@ -112,9 +112,15 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
    * @date 2019-06-16
    * @since 1.0.0
    */
+  @SuppressWarnings("unchecked")
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Field field) {
-    return new FieldPropertyWriter<>(field);
+    return from(FieldElement.from(field));
+  }
+
+  @NonNull
+  static <T, R> PropertyWriter<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
+    return new FieldElementPropertyWriter<>(fieldElement);
   }
 
   /**

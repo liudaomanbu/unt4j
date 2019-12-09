@@ -195,8 +195,9 @@ public class Element extends AccessibleObject implements Member {
     return getName();
   }
 
+  @NonNull
   @Override
-  public final Class<?> getDeclaringClass() {
+  public Class<?> getDeclaringClass() {
     return member.getDeclaringClass();
   }
 

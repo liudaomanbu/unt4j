@@ -35,6 +35,8 @@ import org.caotc.unit4j.support.annotation.WithUnit.ValueType;
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 public class TestAmount {
 
+  public static int static_int = 1;
+
   Long id;
 
   @AmountSerialize(targetUnitId = "SECOND")

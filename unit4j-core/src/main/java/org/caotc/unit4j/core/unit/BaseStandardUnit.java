@@ -59,7 +59,7 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
       @NonNull BaseUnitType type) {
     this.id = id;
     this.type = type;
-    Configuration.register(this);
+//    Configuration.register(this);
   }
 
   @NonNull

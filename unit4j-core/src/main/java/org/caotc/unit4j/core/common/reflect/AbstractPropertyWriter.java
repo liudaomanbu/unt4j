@@ -127,34 +127,34 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
    * @since 1.0.0
    */
   @Value
-  public static class FieldPropertyWriter<T, R> extends AbstractPropertyWriter<T, R> {
+  public static class FieldElementPropertyWriter<T, R> extends AbstractPropertyWriter<T, R> {
 
     /**
      * 属性
      */
     @NonNull
-    Field field;
+    FieldElement<T, R> fieldElement;
 
-    FieldPropertyWriter(@NonNull Field field) {
-      super(field);
-      this.field = field;
+    FieldElementPropertyWriter(@NonNull FieldElement<T, R> fieldElement) {
+      super(fieldElement);
+      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(fieldElement),
+          "%s is not a PropertyWriter");
+      this.fieldElement = fieldElement;
     }
 
     @Override
-    @SneakyThrows
     public void writeInternal(@NonNull T obj, @NonNull R value) {
-      field.set(obj, value);
+      fieldElement.set(obj, value);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
-      return TypeToken.of((Class<? extends R>) field.getType());
+      return fieldElement.type();
     }
 
     @Override
     public @NonNull String propertyName() {
-      return field.getName();
+      return fieldElement.getName();
     }
 
   }
@@ -184,7 +184,7 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
         @NonNull String propertyName) {
       super(invokable);
       Preconditions
-          .checkArgument(ReflectionUtil.isSetInvokable(invokable), "%s is not a setInvokable",
+          .checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a setInvokable",
               invokable);
       this.setInvokable = invokable;
       this.propertyName = propertyName;

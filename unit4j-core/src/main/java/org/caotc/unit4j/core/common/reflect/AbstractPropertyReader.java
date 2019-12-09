@@ -159,7 +159,7 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
         @NonNull String propertyName) {
       super(invokable);
       Preconditions
-          .checkArgument(ReflectionUtil.isGetInvokable(invokable), "%s is not a getInvokable",
+          .checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a getInvokable",
               invokable);
       this.getInvokable = invokable;
       this.propertyName = propertyName;

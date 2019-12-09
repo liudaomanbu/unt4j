@@ -125,9 +125,23 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
    * @date 2019-06-16
    * @since 1.0.0
    */
+  @SuppressWarnings("unchecked")
   @NonNull
   public static <T, R> PropertyAccessor<T, R> from(@NonNull Field field) {
-    return new FieldPropertyAccessor<>(field);
+    return from(FieldElement.from(field));
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-08
+   * @implNote
+   * @implSpec
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T, R> PropertyAccessor<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
+    return new FieldElementPropertyAccessor<>(fieldElement);
   }
 
   protected <M extends AccessibleObject & Member> PropertyAccessor(
@@ -203,42 +217,40 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
    * @since 1.0.0
    */
   @Value
-  public static class FieldPropertyAccessor<T, R> extends PropertyAccessor<T, R> {
+  public static class FieldElementPropertyAccessor<T, R> extends PropertyAccessor<T, R> {
 
     /**
      * 属性
      */
     @NonNull
-    Field field;
+    FieldElement<T, R> fieldElement;
 
-    FieldPropertyAccessor(@NonNull Field field) {
-      super(field);
-      this.field = field;
+    FieldElementPropertyAccessor(@NonNull FieldElement<T, R> fieldElement) {
+      super(fieldElement);
+      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(fieldElement),
+          "%s is not a PropertyWriter");
+      this.fieldElement = fieldElement;
     }
 
     @NonNull
-    @SuppressWarnings("unchecked")
     @Override
-    @SneakyThrows
     public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable((R) field.get(object));
+      return Optional.ofNullable(fieldElement.get(object));
     }
 
     @Override
-    @SneakyThrows
     protected void writeInternal(@NonNull T object, @NonNull R value) {
-      field.set(object, value);
+      fieldElement.set(object, value);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public @NonNull TypeToken<? extends R> propertyType() {
-      return TypeToken.of((Class<? extends R>) field.getType());
+      return fieldElement.type();
     }
 
     @Override
     public @NonNull String propertyName() {
-      return field.getName();
+      return fieldElement.getName();
     }
 
   }
@@ -274,10 +286,10 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
         @NonNull String propertyName) {
       super(getInvokable);
       Preconditions
-          .checkArgument(ReflectionUtil.isGetInvokable(getInvokable), "%s is not a getInvokable",
+          .checkArgument(ReflectionUtil.isPropertyReader(getInvokable), "%s is not a getInvokable",
               getInvokable);
       Preconditions
-          .checkArgument(ReflectionUtil.isSetInvokable(setInvokable), "%s is not a setInvokable",
+          .checkArgument(ReflectionUtil.isPropertyWriter(setInvokable), "%s is not a setInvokable",
               setInvokable);
       this.getInvokable = getInvokable;
       this.setInvokable = setInvokable;

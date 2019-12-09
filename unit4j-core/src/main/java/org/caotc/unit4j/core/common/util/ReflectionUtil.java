@@ -32,10 +32,12 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldPropertyReader;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldPropertyWriter;
+import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldElementPropertyWriter;
+import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.reflect.MethodNameStyle;
 import org.caotc.unit4j.core.common.reflect.Property;
 import org.caotc.unit4j.core.common.reflect.PropertyAccessor;
+import org.caotc.unit4j.core.common.reflect.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.PropertyWriter;
 import org.caotc.unit4j.core.common.reflect.ReadableProperty;
@@ -56,6 +58,9 @@ import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 @Beta
 @Slf4j
 public class ReflectionUtil {
+
+  private static final Function<PropertyElement<?, ?>, ImmutableList<?>> KEY_FUNCTION = propertyElement -> ImmutableList
+      .of(propertyElement.propertyName(), propertyElement.propertyType());
 
   /**
    * 从传入的类中获取包括所有超类和接口的所有属性
@@ -148,7 +153,7 @@ public class ReflectionUtil {
   public ImmutableSet<Method> getMethodsFromClass(@NonNull Class<?> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     Stream<Method> methodStream = methodsFromClass(clazz).stream()
-        .filter(method -> isGetMethod(method, methodNameStyles));
+        .filter(method -> isPropertyReader(method, methodNameStyles));
     if (fieldExistCheck) {
       ImmutableSet<ImmutableList<?>> getMethodKeys = fieldsFromClass(clazz).stream()
           .flatMap(field -> Arrays.stream(methodNameStyles)
@@ -166,7 +171,7 @@ public class ReflectionUtil {
       boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     Stream<Method> methodStream = methodsFromClass(clazz).stream()
-        .filter(method -> isGetMethod(method, methodNameStyles) || isSetMethod(method,
+        .filter(method -> isPropertyReader(method, methodNameStyles) || isPropertyWriter(method,
             methodNameStyles));
     if (fieldExistCheck) {
       ImmutableSet<ImmutableList<?>> accessorMethodKeys = fieldsFromClass(clazz).stream()
@@ -224,7 +229,7 @@ public class ReflectionUtil {
   public ImmutableSet<Method> setMethodsFromClass(@NonNull Class<?> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     Stream<Method> methodStream = methodsFromClass(clazz).stream()
-        .filter(method -> isSetMethod(method, methodNameStyles));
+        .filter(method -> isPropertyWriter(method, methodNameStyles));
     if (fieldExistCheck) {
       ImmutableSet<ImmutableList<?>> setMethodKeys = fieldsFromClass(clazz).stream()
           .flatMap(field -> Arrays.stream(methodNameStyles)
@@ -597,7 +602,7 @@ public class ReflectionUtil {
 
     return propertySetterMultimap.asMap().values().stream()
         .filter(propertyWriters -> !fieldExistCheck || propertyWriters.stream()
-            .anyMatch(FieldPropertyWriter.class::isInstance))
+            .anyMatch(FieldElementPropertyWriter.class::isInstance))
         .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
         .map(SimpleWritableProperty::create).collect(ImmutableSet.toImmutableSet());
   }
@@ -660,6 +665,32 @@ public class ReflectionUtil {
         .findAny();
   }
 
+  @NonNull
+  public static <T> ImmutableSet<WritableProperty<T, ?>> propertyElementsFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+
+    Stream<PropertyWriter<T, ?>> setInvokablePropertySetters = setMethodsFromClass(clazz,
+        fieldExistCheck, methodNameStyles).stream()
+        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
+            .filter(methodNameStyle -> methodNameStyle.isSetMethod(getMethod))
+            .map(methodNameStyle -> PropertyWriter.from(getMethod, methodNameStyle)));
+
+    Stream<PropertyWriter<T, ?>> fieldPropertySetters = fieldsFromClass(
+        clazz).stream().map(PropertyWriter::from);
+
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyWriter<T, ?>> propertySetterMultimap =
+        Stream.concat(fieldPropertySetters, setInvokablePropertySetters)
+            .collect(ImmutableListMultimap
+                .toImmutableListMultimap(KEY_FUNCTION, Function.identity()));
+
+    return propertySetterMultimap.asMap().values().stream()
+        .filter(propertyWriters -> !fieldExistCheck || propertyWriters.stream()
+            .anyMatch(FieldElementPropertyWriter.class::isInstance))
+        .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
+        .map(SimpleWritableProperty::create).collect(ImmutableSet.toImmutableSet());
+  }
+
   /**
    * 检查传入方法是否是get方法
    *
@@ -672,18 +703,18 @@ public class ReflectionUtil {
    * 所以如果只想要判断是否是JavaBean规范的get方法请使用 {@link MethodNameStyle#JAVA_BEAN#isGetMethod(Method)}
    * @since 1.0.0
    */
-  public static boolean isGetMethod(@NonNull Method method,
+  public static boolean isPropertyReader(@NonNull Method method,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return isGetInvokable(Invokable.from(method), methodNameStyles);
+    return isPropertyReader(Invokable.from(method), methodNameStyles);
   }
 
   /**
    * @author caotc
-   * @date 2019-12-04
+   * @date 2019-12-08
    * @since 1.0.0
    */
-  public static boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
-    return isGetInvokable(invokable, MethodNameStyle.values());
+  public static boolean isPropertyReader(@NonNull Invokable<?, ?> invokable) {
+    return isPropertyReader(invokable, MethodNameStyle.values());
   }
 
   /**
@@ -695,13 +726,46 @@ public class ReflectionUtil {
    * @author caotc
    * @date 2019-05-23
    * @apiNote 这里所指的get方法并不是专指JavaBean规范的get方法, 而是所有获取属性的方法, 符合任意{@link MethodNameStyle}检查即视为get方法.
-   * 所以如果只想要判断是否是JavaBean规范的get方法请使用 {@link MethodNameStyle#JAVA_BEAN#isGetInvokable(Invokable)}
+   * 所以如果只想要判断是否是JavaBean规范的get方法请使用 {@link MethodNameStyle#JAVA_BEAN#isPropertyReader(Invokable)}
    * @since 1.0.0
    */
-  public static boolean isGetInvokable(@NonNull Invokable<?, ?> invokable,
+  public static boolean isPropertyReader(@NonNull Invokable<?, ?> invokable,
       @NonNull MethodNameStyle... methodNameStyles) {
     return Arrays.stream(methodNameStyles)
         .anyMatch(methodNameStyle -> methodNameStyle.isGetInvokable(invokable));
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-08
+   * @implNote
+   * @implSpec
+   * @apiNote 非static的final属性只有在值为固定值时会因为编译器优化导致get方法无法读取到修改后的值
+   * @since 1.0.0
+   */
+  public static boolean isPropertyWriter(@NonNull Field field) {
+    return isPropertyWriter(FieldElement.from(field));
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-08
+   * @implNote
+   * @implSpec
+   * @apiNote 非static的final属性只有在值为固定值时会因为编译器优化导致get方法无法读取到修改后的值
+   * @since 1.0.0
+   */
+  public static boolean isPropertyWriter(@NonNull FieldElement<?, ?> fieldElement) {
+    return !fieldElement.isFinal() || !fieldElement.isStatic();
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-05
+   * @since 1.0.0
+   */
+  public static boolean isPropertyWriter(@NonNull Method method) {
+    return isPropertyWriter(method, MethodNameStyle.values());
   }
 
   /**
@@ -713,16 +777,21 @@ public class ReflectionUtil {
    * @author caotc
    * @date 2019-05-23
    * @apiNote 这里所指的set方法并不是专指JavaBean规范的set方法, 而是所有获取属性的方法, 符合任意{@link MethodNameStyle}检查即视为set方法.
-   * 所以如果只想要判断是否是JavaBean规范的set方法请使用 {@link MethodNameStyle#JAVA_BEAN#isSetMethod(Method)}
+   * 所以如果只想要判断是否是JavaBean规范的set方法请使用 {@link MethodNameStyle#JAVA_BEAN#isPropertyWriter(Method)}
    * @since 1.0.0
    */
-  public static boolean isSetMethod(@NonNull Method method,
+  public static boolean isPropertyWriter(@NonNull Method method,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return isSetInvokable(Invokable.from(method), methodNameStyles);
+    return isPropertyWriter(Invokable.from(method), methodNameStyles);
   }
 
-  public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
-    return isSetInvokable(invokable, MethodNameStyle.values());
+  /**
+   * @author caotc
+   * @date 2019-12-05
+   * @since 1.0.0
+   */
+  public static boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable) {
+    return isPropertyWriter(invokable, MethodNameStyle.values());
   }
 
   /**
@@ -734,12 +803,48 @@ public class ReflectionUtil {
    * @author caotc
    * @date 2019-05-23
    * @apiNote 这里所指的set方法并不是专指JavaBean规范的set方法, 而是所有获取属性的方法, 符合任意{@link MethodNameStyle}检查即视为set方法.
-   * 所以如果只想要判断是否是JavaBean规范的set方法请使用 {@link MethodNameStyle#JAVA_BEAN#isSetInvokable(Invokable)}
+   * 所以如果只想要判断是否是JavaBean规范的set方法请使用 {@link MethodNameStyle#JAVA_BEAN#isPropertyWriter(Invokable)}
    * @since 1.0.0
    */
-  public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable,
+  public static boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable,
       @NonNull MethodNameStyle... methodNameStyles) {
     return Arrays.stream(methodNameStyles)
         .anyMatch(methodNameStyle -> methodNameStyle.isSetInvokable(invokable));
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-08
+   * @since 1.0.0
+   */
+  public static boolean isGetMethod(@NonNull Method method) {
+    return isGetInvokable(Invokable.from(method));
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-08
+   * @since 1.0.0
+   */
+  public static boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
+    return isPropertyReader(invokable, MethodNameStyle.JAVA_BEAN);
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-08
+   * @since 1.0.0
+   */
+  public static boolean isSetMethod(@NonNull Method method) {
+    return isSetInvokable(Invokable.from(method));
+  }
+
+  /**
+   * @author caotc
+   * @date 2019-12-08
+   * @since 1.0.0
+   */
+  public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
+    return isPropertyWriter(invokable, MethodNameStyle.JAVA_BEAN);
   }
 }

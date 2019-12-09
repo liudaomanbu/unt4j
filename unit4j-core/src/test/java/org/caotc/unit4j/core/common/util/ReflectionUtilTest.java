@@ -259,7 +259,7 @@ class ReflectionUtilTest {
   @SneakyThrows
   void isGetMethod() {
     boolean isGetMethod = ReflectionUtil
-        .isGetMethod(Sub.class.getDeclaredMethod("stringField"), MethodNameStyle.FLUENT);
+        .isPropertyReader(Sub.class.getDeclaredMethod("stringField"), MethodNameStyle.FLUENT);
     Assertions.assertTrue(isGetMethod);
   }
 
@@ -267,7 +267,7 @@ class ReflectionUtilTest {
   @SneakyThrows
   void isGetInvokable() {
     boolean isGetInvokable = ReflectionUtil
-        .isGetInvokable(Invokable.from(Sub.class.getDeclaredMethod("stringField")),
+        .isPropertyReader(Invokable.from(Sub.class.getDeclaredMethod("stringField")),
             MethodNameStyle.FLUENT);
     Assertions.assertTrue(isGetInvokable);
   }
@@ -276,7 +276,7 @@ class ReflectionUtilTest {
   @SneakyThrows
   void isSetMethod() {
     boolean isSetMethod = ReflectionUtil
-        .isSetMethod(Sub.class.getDeclaredMethod("stringField", String.class),
+        .isPropertyWriter(Sub.class.getDeclaredMethod("stringField", String.class),
             MethodNameStyle.FLUENT);
     Assertions.assertTrue(isSetMethod);
   }
@@ -285,7 +285,7 @@ class ReflectionUtilTest {
   @SneakyThrows
   void isSetInvokable() {
     boolean isSetInvokable = ReflectionUtil
-        .isSetInvokable(Invokable.from(Sub.class.getDeclaredMethod("stringField", String.class)),
+        .isPropertyWriter(Invokable.from(Sub.class.getDeclaredMethod("stringField", String.class)),
             MethodNameStyle.FLUENT);
     Assertions.assertTrue(isSetInvokable);
   }

@@ -1,12 +1,24 @@
+/*
+ * Copyright (C) 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core.common.reflect;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.function.Function;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.constant.StringConstant;
@@ -105,13 +117,6 @@ public enum MethodNameStyle {
       return setInvokable.getName();
     }
   };
-  private static final Function<Invokable<?, ?>, ImmutableList<?>> INVOKABLE_TO_SIGN = invokable -> ImmutableList
-      .of(invokable.getName(), invokable.getParameters());
-
-  private static final ImmutableSet<ImmutableList<?>> OBJECT_METHOD_SIGNS = Arrays
-      .stream(Object.class.getDeclaredMethods())
-      .map(Invokable::from)
-      .map(INVOKABLE_TO_SIGN::apply).collect(ImmutableSet.toImmutableSet());
 
   /**
    * 检查传入方法是否是属于该命名风格的get方法
@@ -136,8 +141,7 @@ public enum MethodNameStyle {
    * @since 1.0.0
    */
   public boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
-    return !invokable.isStatic()
-        && !OBJECT_METHOD_SIGNS.contains(INVOKABLE_TO_SIGN.apply(invokable))
+    return !invokable.isNative()
         && invokable.getParameters().isEmpty()
         && !invokable.getReturnType().getRawType().equals(void.class)
         && getInvokableNameMatches(invokable);
@@ -166,8 +170,7 @@ public enum MethodNameStyle {
    * @since 1.0.0
    */
   public boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
-    return !invokable.isStatic()
-        && !OBJECT_METHOD_SIGNS.contains(INVOKABLE_TO_SIGN.apply(invokable))
+    return !invokable.isNative()
         && (invokable.getReturnType().getRawType().equals(void.class) || invokable.getReturnType()
         .equals(invokable.getOwnerType()))
         && invokable.getParameters().size() == 1
