@@ -39,7 +39,7 @@ public class FieldElement<O, P> extends Element {
    * @since 1.0.0
    */
   @NonNull
-  public static FieldElement from(@NonNull Field field) {
+  public static <O, P> FieldElement<O, P> from(@NonNull Field field) {
     return new FieldElement<>(field);
   }
 

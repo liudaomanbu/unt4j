@@ -19,6 +19,8 @@ package org.caotc.unit4j.core.common.reflect;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Member;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -32,7 +34,7 @@ import lombok.NonNull;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyElement<O, P> {
+public interface PropertyElement<O, P> extends AnnotatedElement, Member {
 
   /**
    * 获取属性名称
@@ -88,6 +90,67 @@ public interface PropertyElement<O, P> {
    * @since 1.0.0
    */
   @NonNull <R1 extends P> PropertyElement<O, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+
+
+  /**
+   * @author caotc
+   * @date 2019-12-09
+   * @implNote
+   * @implSpec
+   * @apiNote
+   * @since 1.0.0
+   */
+  boolean isStatic();
+
+  /**
+   * @author caotc
+   * @date 2019-12-09
+   * @implNote
+   * @implSpec
+   * @apiNote
+   * @since 1.0.0
+   */
+  boolean isFinal();
+
+  /**
+   * @author caotc
+   * @date 2019-12-09
+   * @implNote
+   * @implSpec
+   * @apiNote
+   * @since 1.0.0
+   */
+  boolean isAbstract();
+
+  /**
+   * @author caotc
+   * @date 2019-12-09
+   * @implNote
+   * @implSpec
+   * @apiNote
+   * @since 1.0.0
+   */
+  boolean isSynchronized();
+
+  /**
+   * @author caotc
+   * @date 2019-12-09
+   * @implNote
+   * @implSpec
+   * @apiNote
+   * @since 1.0.0
+   */
+  boolean isVolatile();
+
+  /**
+   * @author caotc
+   * @date 2019-12-09
+   * @implNote
+   * @implSpec
+   * @apiNote
+   * @since 1.0.0
+   */
+  boolean isTransient();
 
   /**
    * 该元素的权限级别
@@ -145,4 +208,6 @@ public interface PropertyElement<O, P> {
    */
   @NonNull
   ImmutableList<Annotation> declaredAnnotations();
+
+
 }

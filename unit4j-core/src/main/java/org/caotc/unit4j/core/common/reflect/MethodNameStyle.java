@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.constant.StringConstant;
 
 /**
@@ -141,7 +142,7 @@ public enum MethodNameStyle {
    * @since 1.0.0
    */
   public boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
-    return !invokable.isNative()
+    return !ReflectionUtil.isOverride(invokable, Object.class)
         && invokable.getParameters().isEmpty()
         && !invokable.getReturnType().getRawType().equals(void.class)
         && getInvokableNameMatches(invokable);
@@ -170,7 +171,7 @@ public enum MethodNameStyle {
    * @since 1.0.0
    */
   public boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
-    return !invokable.isNative()
+    return !ReflectionUtil.isOverride(invokable, Object.class)
         && (invokable.getReturnType().getRawType().equals(void.class) || invokable.getReturnType()
         .equals(invokable.getOwnerType()))
         && invokable.getParameters().size() == 1
