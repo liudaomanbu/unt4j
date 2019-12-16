@@ -17,6 +17,8 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.reflect.TypeToken;
+import java.util.Iterator;
+import java.util.stream.Stream;
 import lombok.NonNull;
 
 /**
@@ -30,6 +32,52 @@ import lombok.NonNull;
  * @since 1.0.0
  */
 public interface WritableProperty<T, R> extends Property<T, R> {
+
+  /**
+   * 工厂方法
+   *
+   * @param propertyWriters 属性设置器集合
+   * @return 属性设置器
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  static <T, R> SimpleWritableProperty<T, R> create(
+      @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
+
+    return new SimpleWritableProperty<>(propertyWriters);
+  }
+
+  /**
+   * 工厂方法
+   *
+   * @param propertyWriters 属性设置器集合
+   * @return 属性设置器
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  static <T, R> SimpleWritableProperty<T, R> create(
+      @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
+    return new SimpleWritableProperty<>(propertyWriters);
+  }
+
+  /**
+   * 工厂方法
+   *
+   * @param propertyWriters 属性设置器集合
+   * @return 属性设置器
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  static <T, R> SimpleWritableProperty<T, R> create(
+      @NonNull Stream<PropertyWriter<T, R>> propertyWriters) {
+    return new SimpleWritableProperty<>(propertyWriters);
+  }
 
   /**
    * 将参数值设置到参数对象的该属性上

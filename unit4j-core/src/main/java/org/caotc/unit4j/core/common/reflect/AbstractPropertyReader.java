@@ -95,6 +95,16 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     return (PropertyReader<T, R1>) this;
   }
 
+  @Override
+  public final boolean isReader() {
+    return true;
+  }
+
+  @Override
+  public final boolean isWriter() {
+    return false;
+  }
+
   /**
    * {@link Field}实现的属性获取器
    *
@@ -103,36 +113,38 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
    * @since 1.0.0
    */
   @Value
-  public static class FieldPropertyReader<T, R> extends AbstractPropertyReader<T, R> {
+  public static class FieldElementPropertyReader<T, R> extends AbstractPropertyReader<T, R> {
 
     /**
      * 属性
      */
     @NonNull
-    Field field;
+    FieldElement<T, R> fieldElement;
 
-    FieldPropertyReader(@NonNull Field field) {
-      super(field);
-      this.field = field;
+    FieldElementPropertyReader(@NonNull FieldElement<T, R> fieldElement) {
+      super(fieldElement);
+      this.fieldElement = fieldElement;
     }
 
     @NonNull
-    @SuppressWarnings("unchecked")
     @Override
-    @SneakyThrows
     public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable((R) field.get(object));
+      return Optional.ofNullable(fieldElement.get(object));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public @NonNull TypeToken<? extends R> propertyType() {
-      return TypeToken.of((Class<? extends R>) field.getType());
+      return fieldElement.type();
+    }
+
+    @Override
+    public boolean basedOnField() {
+      return true;
     }
 
     @Override
     public @NonNull String propertyName() {
-      return field.getName();
+      return fieldElement.getName();
     }
   }
 
@@ -175,6 +187,11 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
       return getInvokable.getReturnType();
+    }
+
+    @Override
+    public boolean basedOnField() {
+      return false;
     }
 
   }

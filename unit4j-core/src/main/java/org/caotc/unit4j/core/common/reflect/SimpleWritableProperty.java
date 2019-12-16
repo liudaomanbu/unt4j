@@ -52,57 +52,26 @@ public class SimpleWritableProperty<T, R> extends AbstractProperty<T, R> impleme
       .<PropertyElement<?, ?>>onResultOf(PropertyElement::accessLevel)
       .compound(Ordering.arbitrary());
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyWriters 属性设置器集合
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> SimpleWritableProperty<T, R> create(
-      @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
-
-    return new SimpleWritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyWriters 属性设置器集合
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> SimpleWritableProperty<T, R> create(
-      @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
-    return new SimpleWritableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyWriterStream 属性设置器集合
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> SimpleWritableProperty<T, R> create(
-      @NonNull Stream<PropertyWriter<T, R>> propertyWriterStream) {
-    return new SimpleWritableProperty<>(propertyWriterStream
-        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
-  }
-
   @NonNull
   ImmutableSortedSet<PropertyWriter<T, R>> propertyWriters;
 
-  private SimpleWritableProperty(
+  protected SimpleWritableProperty(
+      @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
+    this(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+  }
+
+  protected SimpleWritableProperty(
+      @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
+    this(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+  }
+
+  protected SimpleWritableProperty(
+      @NonNull Stream<PropertyWriter<T, R>> propertyWriters) {
+    this(propertyWriters
+        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
+  }
+
+  protected SimpleWritableProperty(
       @NonNull ImmutableSortedSet<PropertyWriter<T, R>> propertyWriters) {
     super(propertyWriters);
     this.propertyWriters = propertyWriters;

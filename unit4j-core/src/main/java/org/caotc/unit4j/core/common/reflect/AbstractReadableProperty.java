@@ -34,9 +34,9 @@ public abstract class AbstractReadableProperty<O, P> extends
     AbstractProperty<O, P> implements
     ReadableProperty<O, P> {
 
-  protected AbstractReadableProperty(@NonNull String propertyName,
-      @NonNull TypeToken<? extends P> propertyType) {
-    super(propertyName, propertyType);
+  protected <T> AbstractReadableProperty(@NonNull ReadableProperty<O, T> targetReadableProperty,
+      @NonNull ReadableProperty<T, P> delegate) {
+    super(targetReadableProperty, delegate);
   }
 
   protected AbstractReadableProperty(

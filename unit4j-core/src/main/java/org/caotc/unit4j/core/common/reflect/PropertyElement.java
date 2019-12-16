@@ -16,14 +16,18 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
  * 属性元素
@@ -35,6 +39,41 @@ import lombok.NonNull;
  * @since 1.0.0
  */
 public interface PropertyElement<O, P> extends AnnotatedElement, Member {
+
+  @NonNull
+  static <T, R> PropertyElement<T, R> from(@NonNull Field field) {
+    return from(FieldElement.from(field));
+  }
+
+  @NonNull
+  static <T, R> PropertyElement<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
+    return ReflectionUtil.isPropertyWriter(fieldElement) ? PropertyAccessor.from(fieldElement)
+        : PropertyReader.from(fieldElement);
+  }
+
+  @NonNull
+  static <T, R> PropertyElement<T, R> from(@NonNull Invokable<T, R> invokable,
+      @NonNull MethodNameStyle methodNameStyle) {
+    if (ReflectionUtil.isPropertyReader(invokable)) {
+      PropertyReader.from(invokable, methodNameStyle);
+    }
+    if (ReflectionUtil.isPropertyWriter(invokable)) {
+      PropertyReader.from(invokable, methodNameStyle);
+    }
+    throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
+  }
+
+  @NonNull
+  static <T, R> PropertyElement<T, R> from(@NonNull Invokable<T, R> invokable,
+      @NonNull String propertyName) {
+    if (ReflectionUtil.isPropertyReader(invokable)) {
+      PropertyReader.from(invokable, propertyName);
+    }
+    if (ReflectionUtil.isPropertyWriter(invokable)) {
+      PropertyReader.from(invokable, propertyName);
+    }
+    throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
+  }
 
   /**
    * 获取属性名称
@@ -91,6 +130,30 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
    */
   @NonNull <R1 extends P> PropertyElement<O, R1> propertyType(@NonNull TypeToken<R1> propertyType);
 
+  boolean isReader();
+
+  boolean isWriter();
+
+  default boolean isAccessor() {
+    return isReader() && isWriter();
+  }
+
+  default PropertyReader<O, P> toReader() {
+    Preconditions.checkArgument(isReader(), "it is not a PropertyReader");
+    return (PropertyReader<O, P>) this;
+  }
+
+  default PropertyWriter<O, P> toWriter() {
+    Preconditions.checkArgument(isWriter(), "it is not a PropertyWriter");
+    return (PropertyWriter<O, P>) this;
+  }
+
+  default PropertyAccessor<O, P> toAccessor() {
+    Preconditions.checkArgument(isAccessor(), "it is not a PropertyAccessor");
+    return (PropertyAccessor<O, P>) this;
+  }
+
+  boolean basedOnField();
 
   /**
    * @author caotc

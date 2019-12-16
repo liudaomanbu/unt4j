@@ -17,7 +17,9 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.reflect.TypeToken;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.NonNull;
 
 /**
@@ -31,6 +33,51 @@ import lombok.NonNull;
  * @since 1.0.0
  */
 public interface ReadableProperty<T, R> extends Property<T, R> {
+
+  /**
+   * 工厂方法
+   *
+   * @param propertyReaders 属性获取器集合
+   * @return 属性获取器
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  static <T, R> SimpleReadableProperty<T, R> create(
+      @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
+    return new SimpleReadableProperty<>(propertyReaders);
+  }
+
+  /**
+   * 工厂方法
+   *
+   * @param propertyReaders 属性获取器集合
+   * @return 属性获取器
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  static <T, R> SimpleReadableProperty<T, R> create(
+      @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
+    return new SimpleReadableProperty<>(propertyReaders);
+  }
+
+  /**
+   * 工厂方法
+   *
+   * @param propertyReaders 属性获取器集合
+   * @return 属性获取器
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @NonNull
+  static <T, R> SimpleReadableProperty<T, R> create(
+      @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
+    return new SimpleReadableProperty<>(propertyReaders);
+  }
 
   /**
    * 读取参数对象属性值

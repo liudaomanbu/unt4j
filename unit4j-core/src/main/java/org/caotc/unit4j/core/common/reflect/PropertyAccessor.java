@@ -17,16 +17,13 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.base.Preconditions;
-import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.Optional;
 import lombok.Data;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.Value;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
@@ -38,83 +35,6 @@ import org.caotc.unit4j.core.common.util.ReflectionUtil;
 @Data
 public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, R> implements
     PropertyReader<T, R>, PropertyWriter<T, R> {
-
-  /**
-   * 工厂方法
-   *
-   * @param getMethod get方法
-   * @param setMethod set方法
-   * @param methodNameStyle 方法名风格
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
-  @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull Method getMethod,
-      @NonNull Method setMethod,
-      @NonNull MethodNameStyle methodNameStyle) {
-    return from((Invokable<T, R>) Invokable.from(getMethod),
-        (Invokable<T, ?>) Invokable.from(setMethod), methodNameStyle);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param getMethod get方法
-   * @param setMethod set方法
-   * @param propertyName 属性名称
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
-  @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull Method getMethod,
-      @NonNull Method setMethod,
-      @NonNull String propertyName) {
-    return from((Invokable<T, R>) Invokable.from(getMethod),
-        (Invokable<T, ?>) Invokable.from(setMethod), propertyName);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param getInvokable get方法封装的Invokable
-   * @param setInvokable set方法封装的Invokable
-   * @param methodNameStyle 方法名风格
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull Invokable<T, R> getInvokable,
-      @NonNull Invokable<T, ?> setInvokable,
-      @NonNull MethodNameStyle methodNameStyle) {
-    return new InvokablePropertyAccessor<>(getInvokable, setInvokable,
-        methodNameStyle.fieldNameFromGetInvokable(getInvokable));
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param getInvokable get方法封装的Invokable
-   * @param setInvokable set方法封装的Invokable
-   * @param propertyName 属性名称
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull Invokable<T, R> getInvokable,
-      @NonNull Invokable<T, ?> setInvokable,
-      @NonNull String propertyName) {
-    return new InvokablePropertyAccessor<>(getInvokable, setInvokable, propertyName);
-  }
 
   /**
    * 工厂方法
@@ -249,69 +169,14 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
     }
 
     @Override
+    public boolean basedOnField() {
+      return true;
+    }
+
+    @Override
     public @NonNull String propertyName() {
       return fieldElement.getName();
     }
 
-  }
-
-  /**
-   * get{@link Invokable}实现的属性获取器
-   *
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Value
-  public static class InvokablePropertyAccessor<T, R> extends PropertyAccessor<T, R> {
-
-    /**
-     * get方法
-     */
-    @NonNull Invokable<T, R> getInvokable;
-
-    /**
-     * set方法
-     */
-    @NonNull
-    Invokable<T, ?> setInvokable;
-
-    /**
-     * 属性名称
-     */
-    @NonNull String propertyName;
-
-    InvokablePropertyAccessor(@NonNull Invokable<T, R> getInvokable,
-        @NonNull Invokable<T, ?> setInvokable,
-        @NonNull String propertyName) {
-      super(getInvokable);
-      Preconditions
-          .checkArgument(ReflectionUtil.isPropertyReader(getInvokable), "%s is not a getInvokable",
-              getInvokable);
-      Preconditions
-          .checkArgument(ReflectionUtil.isPropertyWriter(setInvokable), "%s is not a setInvokable",
-              setInvokable);
-      this.getInvokable = getInvokable;
-      this.setInvokable = setInvokable;
-      this.propertyName = propertyName;
-    }
-
-    @NonNull
-    @Override
-    @SneakyThrows
-    public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable(getInvokable.invoke(object));
-    }
-
-    @SneakyThrows
-    @Override
-    protected void writeInternal(@NonNull T object, @NonNull R value) {
-      setInvokable.invoke(object, value);
-    }
-
-    @Override
-    public @NonNull TypeToken<? extends R> propertyType() {
-      return getInvokable.getReturnType();
-    }
   }
 }

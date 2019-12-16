@@ -33,9 +33,9 @@ import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 public abstract class AbstractAccessibleProperty<O, P> extends
     AbstractProperty<O, P> implements AccessibleProperty<O, P> {
 
-  protected AbstractAccessibleProperty(@NonNull String propertyName,
-      @NonNull TypeToken<? extends P> propertyType) {
-    super(propertyName, propertyType);
+  protected <T> AbstractAccessibleProperty(@NonNull ReadableProperty<O, T> targetReadableProperty,
+      @NonNull AccessibleProperty<T, P> delegate) {
+    super(targetReadableProperty, delegate);
   }
 
   protected AbstractAccessibleProperty(

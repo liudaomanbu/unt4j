@@ -161,4 +161,8 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
   @Override
   @NonNull <R1 extends R> PropertyWriter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
 
+  @Override
+  default boolean isWriter() {
+    return true;
+  }
 }

@@ -45,6 +45,7 @@ public abstract class AbstractProperty<O, P> implements
   String name;
   @NonNull
   TypeToken<? extends P> type;
+  boolean fieldExist;
 
   protected AbstractProperty(
       @NonNull ImmutableSet<? extends PropertyElement<O, P>> propertyElements) {
@@ -60,6 +61,14 @@ public abstract class AbstractProperty<O, P> implements
         "propertyElements is not a common property");
     this.name = Iterables.getOnlyElement(propertyNames);
     this.type = Iterables.getOnlyElement(propertyTypes);
+    this.fieldExist = propertyElements.stream().anyMatch(PropertyElement::basedOnField);
+  }
+
+  protected <T> AbstractProperty(@NonNull ReadableProperty<O, T> targetReadableProperty,
+      @NonNull Property<T, P> delegate) {
+    this.name = targetReadableProperty.name() + delegate.name();
+    this.type = delegate.type();
+    this.fieldExist = delegate.fieldExist();
   }
 
   @NonNull
@@ -72,6 +81,11 @@ public abstract class AbstractProperty<O, P> implements
   @Override
   public final TypeToken<? extends P> type() {
     return type;
+  }
+
+  @Override
+  public final boolean fieldExist() {
+    return fieldExist;
   }
 
   @Override

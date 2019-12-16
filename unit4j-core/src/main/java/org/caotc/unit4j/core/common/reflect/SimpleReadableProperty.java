@@ -50,54 +50,24 @@ public class SimpleReadableProperty<T, R> extends AbstractReadableProperty<T, R>
       .<PropertyElement<?, ?>>onResultOf(PropertyElement::accessLevel)
       .compound(Ordering.arbitrary());
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> SimpleReadableProperty<T, R> create(
-      @NonNull Iterable<? extends PropertyReader<T, R>> propertyReaders) {
-    return new SimpleReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> SimpleReadableProperty<T, R> create(
-      @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
-    return new SimpleReadableProperty<>(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> SimpleReadableProperty<T, R> create(
-      @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
-    return new SimpleReadableProperty<>(propertyReaders
-        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
-  }
-
   @NonNull
   ImmutableSortedSet<PropertyReader<T, R>> propertyReaders;
+
+  protected SimpleReadableProperty(
+      @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
+    this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
+  }
+
+  protected SimpleReadableProperty(
+      @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
+    this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
+  }
+
+  protected SimpleReadableProperty(
+      @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
+    this(propertyReaders
+        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
+  }
 
   private SimpleReadableProperty(
       @NonNull ImmutableSortedSet<PropertyReader<T, R>> propertyReaders) {

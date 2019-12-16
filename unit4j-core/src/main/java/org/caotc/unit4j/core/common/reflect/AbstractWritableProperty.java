@@ -32,9 +32,9 @@ import lombok.ToString;
 public abstract class AbstractWritableProperty<T, R> extends AbstractProperty<T, R> implements
     WritableProperty<T, R> {
 
-  protected AbstractWritableProperty(@NonNull String propertyName,
-      @NonNull TypeToken<? extends R> propertyType) {
-    super(propertyName, propertyType);
+  protected <E> AbstractWritableProperty(@NonNull ReadableProperty<T, E> targetReadableProperty,
+      @NonNull WritableProperty<E, R> delegate) {
+    super(targetReadableProperty, delegate);
   }
 
   protected AbstractWritableProperty(

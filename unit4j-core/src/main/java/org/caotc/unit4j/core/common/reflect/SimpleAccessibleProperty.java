@@ -17,10 +17,15 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -32,51 +37,79 @@ import lombok.Value;
 @Value
 public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O, P> {
 
-  @NonNull
-  ImmutableSortedSet<PropertyAccessor<O, P>> propertyAccessors;
+  /**
+   * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前+内存地址比较器
+   */
+  private static final Ordering<PropertyElement<?, ?>> ORDERING = Ordering.natural()
+      .<PropertyElement<?, ?>>onResultOf(PropertyElement::accessLevel)
+      .compound(Ordering.arbitrary());
 
-  private SimpleAccessibleProperty(
-      @NonNull ImmutableSortedSet<PropertyAccessor<O, P>> propertyAccessors) {
-    super(propertyAccessors);
-    this.propertyAccessors = propertyAccessors;
+  @NonNull
+  ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
+  @NonNull
+  ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters;
+
+  protected SimpleAccessibleProperty(
+      @NonNull Iterable<PropertyElement<O, P>> propertyReaders) {
+    this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
+  }
+
+  protected SimpleAccessibleProperty(
+      @NonNull Iterator<PropertyElement<O, P>> propertyReaders) {
+    this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
+  }
+
+  protected SimpleAccessibleProperty(
+      @NonNull Stream<PropertyElement<O, P>> propertyReaders) {
+    this(propertyReaders
+        .collect(ImmutableSet.toImmutableSet()));
+  }
+
+  protected SimpleAccessibleProperty(
+      @NonNull ImmutableSet<PropertyElement<O, P>> propertyElements) {
+    super(propertyElements);
+    this.propertyReaders = propertyElements.stream().filter(PropertyElement::isReader)
+        .map(PropertyElement::toReader).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
+    this.propertyWriters = propertyElements.stream().filter(PropertyElement::isWriter)
+        .map(PropertyElement::toWriter).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
   }
 
   @Override
   public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-    propertyAccessors.first().write(target, value);
+    propertyWriters.first().write(target, value);
     return this;
   }
 
   @Override
   public @NonNull Optional<P> read(@NonNull O target) {
-    return propertyAccessors.stream().map(propertyGetter -> propertyGetter.read(target))
+    return propertyReaders.stream().map(propertyGetter -> propertyGetter.read(target))
         .filter(Optional::isPresent).map(Optional::get).findFirst();
   }
 
   @Override
   public @NonNull <X extends Annotation> Optional<X> annotation(@NonNull Class<X> annotationClass) {
-    return propertyAccessors.stream()
+    return propertyReaders.stream()
         .map(fieldWrapper -> fieldWrapper.annotation(annotationClass))
         .filter(Optional::isPresent).map(Optional::get).findFirst();
   }
 
   @Override
   public @NonNull ImmutableList<Annotation> annotations() {
-    return propertyAccessors.stream().map(PropertyReader::annotations)
+    return propertyReaders.stream().map(PropertyReader::annotations)
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
   @Override
   public @NonNull <X extends Annotation> ImmutableList<X> annotations(
       @NonNull Class<X> annotationClass) {
-    return propertyAccessors.stream()
+    return propertyReaders.stream()
         .map(propertyGetter -> propertyGetter.annotations(annotationClass))
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
   @Override
   public @NonNull ImmutableList<Annotation> declaredAnnotations() {
-    return propertyAccessors.stream().map(PropertyReader::declaredAnnotations)
+    return propertyReaders.stream().map(PropertyReader::declaredAnnotations)
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 }

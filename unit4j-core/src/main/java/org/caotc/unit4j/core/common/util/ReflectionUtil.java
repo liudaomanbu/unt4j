@@ -35,7 +35,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldPropertyReader;
+import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldElementPropertyReader;
 import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldElementPropertyWriter;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.reflect.MethodNameStyle;
@@ -45,8 +45,6 @@ import org.caotc.unit4j.core.common.reflect.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.PropertyWriter;
 import org.caotc.unit4j.core.common.reflect.ReadableProperty;
-import org.caotc.unit4j.core.common.reflect.SimpleReadableProperty;
-import org.caotc.unit4j.core.common.reflect.SimpleWritableProperty;
 import org.caotc.unit4j.core.common.reflect.WritableProperty;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 //TODO 将所有方法优化到只有一次流操作
@@ -654,15 +652,15 @@ public class ReflectionUtil {
 
     return propertyGetterMultimap.asMap().values().stream()
         .filter(propertyReaders -> !fieldExistCheck || propertyReaders.stream()
-            .anyMatch(FieldPropertyReader.class::isInstance))
+            .anyMatch(FieldElementPropertyReader.class::isInstance))
         .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
-        .map(SimpleReadableProperty::create).collect(ImmutableSet.toImmutableSet());
+        .map(ReadableProperty::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**
    * get all properties from class
    *
-   * @param clazz target class
+   * @param typeToken target class
    * @param fieldExistCheck need check field exist
    * @param methodNameStyles get set methods styles
    * @return {@link ImmutableSet} of properties
@@ -673,31 +671,19 @@ public class ReflectionUtil {
    */
   @NonNull
   public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
 
-    Function<PropertyReader<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
-        .of(propertyGetter.propertyName(), propertyGetter.propertyType());
-
-    Stream<PropertyReader<T, ?>> getInvokablePropertyGetters = accessorMethodsFromClass(clazz,
-        fieldExistCheck, methodNameStyles).stream()
-        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
-            .filter(methodNameStyle -> methodNameStyle.isGetMethod(getMethod))
-            .map(methodNameStyle -> PropertyReader.from(getMethod, methodNameStyle)));
-
-    Stream<PropertyAccessor<T, ?>> fieldPropertyAccessors = fieldsFromClass(
-        clazz).stream().map(PropertyAccessor::from);
-
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyReader<T, ?>> propertyGetterMultimap =
-        Stream.concat(fieldPropertyAccessors, getInvokablePropertyGetters)
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyElement<T, ?>> propertyGetterMultimap =
+        propertyElementStreamFromClass(typeToken, methodNameStyles)
             .collect(ImmutableListMultimap
-                .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
+                .toImmutableListMultimap(KEY_FUNCTION, Function.identity()));
 
     return propertyGetterMultimap.asMap().values().stream()
-        .filter(propertyReaders -> !fieldExistCheck || propertyReaders.stream()
-            .anyMatch(FieldPropertyReader.class::isInstance))
         .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
-        .map(SimpleReadableProperty::create).collect(ImmutableSet.toImmutableSet());
+        .map(ReadableProperty::create)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
   }
 
   /**
@@ -846,7 +832,7 @@ public class ReflectionUtil {
         .filter(propertyWriters -> !fieldExistCheck || propertyWriters.stream()
             .anyMatch(FieldElementPropertyWriter.class::isInstance))
         .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
-        .map(SimpleWritableProperty::create).collect(ImmutableSet.toImmutableSet());
+        .map(WritableProperty::create).collect(ImmutableSet.toImmutableSet());
   }
 
   /**
@@ -908,29 +894,318 @@ public class ReflectionUtil {
   }
 
   @NonNull
-  public static <T> ImmutableSet<WritableProperty<T, ?>> propertyElementsFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
+  public static ImmutableSet<PropertyElement<?, ?>> propertyElementsFromClass(
+      @NonNull Type type) {
+    return propertyElementsFromClass(type, MethodNameStyle.values());
+  }
 
-    Stream<PropertyWriter<T, ?>> setInvokablePropertySetters = setMethodsFromClass(clazz,
-        fieldExistCheck, methodNameStyles).stream()
-        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
-            .filter(methodNameStyle -> methodNameStyle.isSetMethod(getMethod))
-            .map(methodNameStyle -> PropertyWriter.from(getMethod, methodNameStyle)));
+  @NonNull
+  public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyElementsFromClass(clazz, MethodNameStyle.values());
+  }
 
-    Stream<PropertyWriter<T, ?>> fieldPropertySetters = fieldsFromClass(
-        clazz).stream().map(PropertyWriter::from);
+  @NonNull
+  public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyElementsFromClass(typeToken, MethodNameStyle.values());
+  }
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyWriter<T, ?>> propertySetterMultimap =
-        Stream.concat(fieldPropertySetters, setInvokablePropertySetters)
-            .collect(ImmutableListMultimap
-                .toImmutableListMultimap(KEY_FUNCTION, Function.identity()));
+  @NonNull
+  public static ImmutableSet<PropertyElement<?, ?>> propertyElementsFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(type, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
 
-    return propertySetterMultimap.asMap().values().stream()
-        .filter(propertyWriters -> !fieldExistCheck || propertyWriters.stream()
-            .anyMatch(FieldElementPropertyWriter.class::isInstance))
-        .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
-        .map(SimpleWritableProperty::create).collect(ImmutableSet.toImmutableSet());
+  @NonNull
+  public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(clazz, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(typeToken, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static Stream<PropertyElement<?, ?>> propertyElementStreamFromClass(
+      @NonNull Type type) {
+    return propertyElementStreamFromClass(type, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyElementStreamFromClass(clazz, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyElementStreamFromClass(typeToken, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static Stream<PropertyElement<?, ?>> propertyElementStreamFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(TypeToken.of(type), methodNameStyles)
+        .map(propertyElement -> (PropertyElement<?, ?>) propertyElement);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+
+    Stream<PropertyElement<T, ?>> propertyElementStream = methodInvokableStreamFromClass(typeToken)
+        .flatMap(invokable -> Arrays.stream(methodNameStyles)
+            .filter(methodNameStyle -> methodNameStyle.isSetInvokable(invokable) || methodNameStyle
+                .isGetInvokable(invokable))
+            .map(methodNameStyle -> PropertyElement.from(invokable, methodNameStyle)));
+
+    return Stream
+        .concat(fieldStreamFromClass(typeToken).map(PropertyElement::from), propertyElementStream);
+  }
+
+  @NonNull
+  public static ImmutableSet<PropertyReader<?, ?>> propertyReadersFromClass(
+      @NonNull Type type) {
+    return propertyReadersFromClass(type, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyReadersFromClass(clazz, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyReadersFromClass(typeToken, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static ImmutableSet<PropertyReader<?, ?>> propertyReadersFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyReaderStreamFromClass(type, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyReaderStreamFromClass(clazz, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyReaderStreamFromClass(typeToken, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static Stream<PropertyReader<?, ?>> propertyReaderStreamFromClass(
+      @NonNull Type type) {
+    return propertyReaderStreamFromClass(type, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyReaderStreamFromClass(clazz, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyReaderStreamFromClass(typeToken, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static Stream<PropertyReader<?, ?>> propertyReaderStreamFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyReaderStreamFromClass(TypeToken.of(type), methodNameStyles)
+        .map(propertyReader -> (PropertyReader<?, ?>) propertyReader);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyReaderStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(typeToken, methodNameStyles)
+        .filter(PropertyElement::isReader).map(PropertyElement::toReader);
+  }
+
+  @NonNull
+  public static ImmutableSet<PropertyWriter<?, ?>> propertyWritersFromClass(
+      @NonNull Type type) {
+    return propertyWritersFromClass(type, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyWritersFromClass(clazz, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyWritersFromClass(typeToken, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static ImmutableSet<PropertyWriter<?, ?>> propertyWritersFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyWriterStreamFromClass(type, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyWriterStreamFromClass(clazz, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyWriterStreamFromClass(typeToken, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static Stream<PropertyWriter<?, ?>> propertyWriterStreamFromClass(
+      @NonNull Type type) {
+    return propertyWriterStreamFromClass(type, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyWriterStreamFromClass(clazz, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyWriterStreamFromClass(typeToken, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static Stream<PropertyWriter<?, ?>> propertyWriterStreamFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyWriterStreamFromClass(TypeToken.of(type), methodNameStyles)
+        .map(propertyWriter -> (PropertyWriter<?, ?>) propertyWriter);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyWriterStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(typeToken, methodNameStyles)
+        .filter(PropertyElement::isWriter).map(PropertyElement::toWriter);
+  }
+
+  @NonNull
+  public static ImmutableSet<PropertyAccessor<?, ?>> propertyAccessorsFromClass(
+      @NonNull Type type) {
+    return propertyAccessorsFromClass(type, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyAccessorsFromClass(clazz, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyAccessorsFromClass(typeToken, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static ImmutableSet<PropertyAccessor<?, ?>> propertyAccessorsFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyAccessorStreamFromClass(type, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyAccessorStreamFromClass(clazz, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyAccessorStreamFromClass(typeToken, methodNameStyles)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static Stream<PropertyAccessor<?, ?>> propertyAccessorStreamFromClass(
+      @NonNull Type type) {
+    return propertyAccessorStreamFromClass(type, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyAccessorStreamFromClass(clazz, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyAccessorStreamFromClass(typeToken, MethodNameStyle.values());
+  }
+
+  @NonNull
+  public static Stream<PropertyAccessor<?, ?>> propertyAccessorStreamFromClass(
+      @NonNull Type type, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyAccessorStreamFromClass(TypeToken.of(type), methodNameStyles)
+        .map(propertyAccessor -> (PropertyAccessor<?, ?>) propertyAccessor);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+      @NonNull Class<T> clazz, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyAccessorStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  @NonNull
+  public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyElementStreamFromClass(typeToken, methodNameStyles)
+        .filter(PropertyElement::isAccessor).map(PropertyElement::toAccessor);
   }
 
   /**

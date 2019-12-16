@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldPropertyReader;
+import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldElementPropertyReader;
 import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.InvokablePropertyReader;
 
 /**
@@ -114,7 +114,12 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    */
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Field field) {
-    return new FieldPropertyReader<>(field);
+    return from(FieldElement.from(field));
+  }
+
+  @NonNull
+  static <T, R> PropertyReader<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
+    return new FieldElementPropertyReader<>(fieldElement);
   }
 
   /**
@@ -152,4 +157,10 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    */
   @Override
   @NonNull <R1 extends R> PropertyReader<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+
+  @Override
+  default boolean isReader() {
+    return true;
+  }
+
 }

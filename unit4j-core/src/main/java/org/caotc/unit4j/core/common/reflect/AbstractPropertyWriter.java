@@ -119,6 +119,16 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
     return (PropertyWriter<T, R1>) this;
   }
 
+  @Override
+  public final boolean isReader() {
+    return false;
+  }
+
+  @Override
+  public final boolean isWriter() {
+    return true;
+  }
+
   /**
    * {@link Field}实现的属性设置器
    *
@@ -150,6 +160,11 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
       return fieldElement.type();
+    }
+
+    @Override
+    public boolean basedOnField() {
+      return true;
     }
 
     @Override
@@ -200,6 +215,11 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
       return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
+    }
+
+    @Override
+    public boolean basedOnField() {
+      return false;
     }
   }
 }

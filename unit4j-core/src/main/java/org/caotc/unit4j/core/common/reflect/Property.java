@@ -80,6 +80,8 @@ public interface Property<O, P> {
   @NonNull <P1 extends P> Property<O, P1> type(
       @NonNull TypeToken<P1> propertyType);
 
+  boolean fieldExist();
+
   /**
    * 获取注解
    *
