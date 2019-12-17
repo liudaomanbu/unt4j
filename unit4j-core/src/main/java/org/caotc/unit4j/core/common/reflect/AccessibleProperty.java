@@ -17,6 +17,8 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.reflect.TypeToken;
+import java.util.Iterator;
+import java.util.stream.Stream;
 import lombok.NonNull;
 
 /**
@@ -30,6 +32,24 @@ import lombok.NonNull;
  */
 public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
     WritableProperty<O, P> {
+
+  @NonNull
+  static <T, R> SimpleAccessibleProperty<T, R> create(
+      @NonNull Iterable<PropertyElement<T, R>> propertyReaders) {
+    return new SimpleAccessibleProperty<>(propertyReaders);
+  }
+
+  @NonNull
+  static <T, R> SimpleAccessibleProperty<T, R> create(
+      @NonNull Iterator<PropertyElement<T, R>> propertyReaders) {
+    return new SimpleAccessibleProperty<>(propertyReaders);
+  }
+
+  @NonNull
+  static <T, R> SimpleAccessibleProperty<T, R> create(
+      @NonNull Stream<PropertyElement<T, R>> propertyReaders) {
+    return new SimpleAccessibleProperty<>(propertyReaders);
+  }
 
   @Override
   @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value);

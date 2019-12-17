@@ -16,6 +16,7 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -51,12 +52,12 @@ public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O
 
   protected SimpleAccessibleProperty(
       @NonNull Iterable<PropertyElement<O, P>> propertyReaders) {
-    this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
+    this(ImmutableSet.copyOf(propertyReaders));
   }
 
   protected SimpleAccessibleProperty(
       @NonNull Iterator<PropertyElement<O, P>> propertyReaders) {
-    this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders));
+    this(ImmutableSet.copyOf(propertyReaders));
   }
 
   protected SimpleAccessibleProperty(
@@ -72,6 +73,10 @@ public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O
         .map(PropertyElement::toReader).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
     this.propertyWriters = propertyElements.stream().filter(PropertyElement::isWriter)
         .map(PropertyElement::toWriter).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
+    Preconditions
+        .checkArgument(!propertyReaders.isEmpty(), "propertyElements do not have PropertyReader");
+    Preconditions
+        .checkArgument(!propertyWriters.isEmpty(), "propertyElements do not have PropertyWriter");
   }
 
   @Override
