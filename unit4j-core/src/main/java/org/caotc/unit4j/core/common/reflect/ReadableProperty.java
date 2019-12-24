@@ -79,6 +79,12 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
     return new SimpleReadableProperty<>(propertyReaders);
   }
 
+  @Override
+  default boolean readable() {
+    return true;
+  }
+
+
   /**
    * 读取参数对象属性值
    *

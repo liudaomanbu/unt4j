@@ -43,6 +43,21 @@ public abstract class AbstractWritableProperty<T, R> extends AbstractProperty<T,
   }
 
   @Override
+  public final boolean readable() {
+    return false;
+  }
+
+  @Override
+  public final boolean writable() {
+    return true;
+  }
+
+  @Override
+  public final boolean accessible() {
+    return false;
+  }
+
+  @Override
   public @NonNull <R1 extends R> AbstractWritableProperty<T, R1> type(
       @NonNull Class<R1> newType) {
     return (AbstractWritableProperty<T, R1>) super.type(newType);

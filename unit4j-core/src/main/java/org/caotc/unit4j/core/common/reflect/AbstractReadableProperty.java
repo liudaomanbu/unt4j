@@ -44,6 +44,21 @@ public abstract class AbstractReadableProperty<O, P> extends
     super(properties);
   }
 
+  @Override
+  public final boolean readable() {
+    return true;
+  }
+
+  @Override
+  public final boolean writable() {
+    return false;
+  }
+
+  @Override
+  public final boolean accessible() {
+    return false;
+  }
+
   @NonNull
   @Override
   public final P readExact(@NonNull O target) {

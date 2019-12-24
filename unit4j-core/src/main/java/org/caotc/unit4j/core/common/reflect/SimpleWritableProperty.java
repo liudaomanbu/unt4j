@@ -42,7 +42,7 @@ import lombok.Value;
  * @since 1.0.0
  */
 @Value
-public class SimpleWritableProperty<T, R> extends AbstractProperty<T, R> implements
+public class SimpleWritableProperty<T, R> extends AbstractWritableProperty<T, R> implements
     WritableProperty<T, R> {
 
   /**

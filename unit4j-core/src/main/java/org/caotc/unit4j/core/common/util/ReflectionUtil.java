@@ -661,29 +661,146 @@ public class ReflectionUtil {
    * get all properties from class
    *
    * @param typeToken target class
-   * @param fieldExistCheck need check field exist
    * @param methodNameStyles get set methods styles
-   * @return {@link ImmutableSet} of properties
+   * @return {@link Stream} of all properties
    * @author caotc
    * @date 2019-11-28
    * @apiNote
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
-      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck,
+  public static Stream<Property<?, ?>> propertyStreamFromClass(
+      @NonNull Type typeToken,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(TypeToken.of(typeToken), methodNameStyles)
+        .map(property -> (Property<?, ?>) property);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+      @NonNull Class<T> clazz,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken,
       @NonNull MethodNameStyle... methodNameStyles) {
 
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyElement<T, ?>> propertyGetterMultimap =
+    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyElement<T, ?>> signatureToPropertyElements =
         propertyElementStreamFromClass(typeToken, methodNameStyles)
             .collect(ImmutableListMultimap
                 .toImmutableListMultimap(KEY_FUNCTION, Function.identity()));
 
-    return propertyGetterMultimap.asMap().values().stream()
-        .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
-        .map(ReadableProperty::create)
+    return signatureToPropertyElements.asMap().values().stream()
+        .map(propertyElements -> propertyElements.stream().map(o -> (PropertyElement<T, ?>) o))
+        .map(Property::create);
+  }
+
+  @NonNull
+  public static ImmutableSet<Property<?, ?>> propertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(type, methodNameStyles)
         .filter(property -> !fieldExistCheck || property.fieldExist())
         .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(clazz, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(typeToken, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static Stream<ReadableProperty<?, ?>> readablePropertyStreamFromClass(
+      @NonNull Type typeToken,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyStreamFromClass(TypeToken.of(typeToken), methodNameStyles)
+        .map(property -> (ReadableProperty<?, ?>) property);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+      @NonNull Class<T> clazz,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(typeToken, methodNameStyles).filter(Property::readable)
+        .map(Property::toReadable);
   }
 
   /**

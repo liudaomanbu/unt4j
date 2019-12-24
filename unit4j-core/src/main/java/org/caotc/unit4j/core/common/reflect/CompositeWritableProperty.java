@@ -36,7 +36,7 @@ import lombok.Value;
  * @since 1.0.0
  */
 @Value
-public class CompositeWritableProperty<T, R, E> extends AbstractProperty<T, R> implements
+public class CompositeWritableProperty<T, R, E> extends AbstractWritableProperty<T, R> implements
     WritableProperty<T, R> {
 
   /**

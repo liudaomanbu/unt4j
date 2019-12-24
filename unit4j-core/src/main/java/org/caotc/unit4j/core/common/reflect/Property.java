@@ -16,6 +16,7 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
@@ -38,7 +39,6 @@ import lombok.NonNull;
  * @since 1.0.0
  */
 public interface Property<O, P> {
-
 
   @NonNull
   static <T, R> Property<T, R> create(
@@ -108,6 +108,29 @@ public interface Property<O, P> {
       @NonNull TypeToken<P1> propertyType);
 
   boolean fieldExist();
+
+  boolean readable();
+
+  boolean writable();
+
+  default boolean accessible() {
+    return readable() && writable();
+  }
+
+  default ReadableProperty<O, P> toReadable() {
+    Preconditions.checkArgument(readable(), "it is not a ReadableProperty");
+    return (ReadableProperty<O, P>) this;
+  }
+
+  default WritableProperty<O, P> toWritable() {
+    Preconditions.checkArgument(writable(), "it is not a WritableProperty");
+    return (WritableProperty<O, P>) this;
+  }
+
+  default AccessibleProperty<O, P> toAccessible() {
+    Preconditions.checkArgument(accessible(), "it is not a AccessibleProperty");
+    return (AccessibleProperty<O, P>) this;
+  }
 
   /**
    * 获取注解
