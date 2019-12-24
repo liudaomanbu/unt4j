@@ -16,6 +16,7 @@
 
 package org.caotc.unit4j.core.exception;
 
+import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,7 +38,7 @@ public abstract class PropertyNotFoundException extends IllegalArgumentException
    * 类
    */
   @NonNull
-  Class<?> clazz;
+  TypeToken<?> typeToken;
   /**
    * 属性名称
    */
@@ -46,9 +47,10 @@ public abstract class PropertyNotFoundException extends IllegalArgumentException
   @Getter(lazy = true)
   String message = message();
 
-  protected PropertyNotFoundException(@NonNull Class<?> clazz, @NonNull String propertyName) {
+  protected PropertyNotFoundException(@NonNull TypeToken<?> typeToken,
+      @NonNull String propertyName) {
     this.propertyName = propertyName;
-    this.clazz = clazz;
+    this.typeToken = typeToken;
   }
 
   /**

@@ -16,6 +16,8 @@
 
 package org.caotc.unit4j.core.exception;
 
+import com.google.common.reflect.TypeToken;
+import java.lang.reflect.Type;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -33,28 +35,41 @@ import org.caotc.unit4j.core.common.reflect.ReadableProperty;
 @EqualsAndHashCode
 public class ReadablePropertyNotFoundException extends PropertyNotFoundException {
 
+  @NonNull
+  public static ReadablePropertyNotFoundException create(@NonNull Type type,
+      @NonNull String propertyName) {
+    return new ReadablePropertyNotFoundException(TypeToken.of(type), propertyName);
+  }
+
+  @NonNull
+  public static ReadablePropertyNotFoundException create(@NonNull Class<?> clazz,
+      @NonNull String propertyName) {
+    return new ReadablePropertyNotFoundException(TypeToken.of(clazz), propertyName);
+  }
+
   /**
    * 工厂方法
    *
    * @param propertyName 属性名称
-   * @param clazz 类
+   * @param typeToken 类
    * @return {@link ReadablePropertyNotFoundException}
    * @author caotc
    * @date 2019-05-25
    * @since 1.0.0
    */
   @NonNull
-  public static ReadablePropertyNotFoundException create(@NonNull Class<?> clazz,
+  public static ReadablePropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
       @NonNull String propertyName) {
-    return new ReadablePropertyNotFoundException(clazz, propertyName);
+    return new ReadablePropertyNotFoundException(typeToken, propertyName);
   }
 
-  private ReadablePropertyNotFoundException(@NonNull Class<?> clazz, @NonNull String propertyName) {
-    super(clazz, propertyName);
+  private ReadablePropertyNotFoundException(@NonNull TypeToken<?> typeToken,
+      @NonNull String propertyName) {
+    super(typeToken, propertyName);
   }
 
   @Override
   public String getMessage() {
-    return String.format("%s not found the ReadableProperty named %s", clazz(), propertyName());
+    return String.format("%s not found the ReadableProperty named %s", typeToken(), propertyName());
   }
 }

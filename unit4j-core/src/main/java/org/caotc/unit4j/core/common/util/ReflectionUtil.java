@@ -1260,6 +1260,39 @@ public class ReflectionUtil {
         .collect(ImmutableSet.toImmutableSet());
   }
 
+  @NonNull
+  public static <R> ReadableProperty<?, R> readablePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName) {
+    return readablePropertyFromClassExact(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <R> ReadableProperty<?, R> readablePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck) {
+    return readablePropertyFromClassExact(type, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <R> ReadableProperty<?, R> readablePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyFromClassExact(TypeToken.of(type), fieldName);
+  }
+
+  @NonNull
+  public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName) {
+    return readablePropertyFromClassExact(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
+    return readablePropertyFromClassExact(clazz, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
   /**
    * 获取指定{@link ReadableProperty}
    *
@@ -1274,10 +1307,51 @@ public class ReflectionUtil {
    */
   @NonNull
   public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
-      @NonNull Class<T> clazz, @NonNull String fieldName) {
-    return ReflectionUtil.<T, R>readablePropertyFromClass(clazz, fieldName)
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyFromClassExact(TypeToken.of(clazz), fieldName, fieldExistCheck,
+        methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName) {
+    return readablePropertyFromClassExact(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck) {
+    return readablePropertyFromClassExact(typeToken, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return ReflectionUtil.<T, R>readablePropertyFromClass(typeToken, fieldName, fieldExistCheck,
+        methodNameStyles)
         .orElseThrow(() -> ReadablePropertyNotFoundException
-            .create(clazz, fieldName));
+            .create(typeToken, fieldName));
+  }
+
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName) {
+    return readablePropertyFromClass(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck) {
+    return readablePropertyFromClass(type, fieldName, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyFromClass((TypeToken<T>) TypeToken.of(type), fieldName, fieldExistCheck,
+        methodNameStyles);
   }
 
   /**
@@ -1293,7 +1367,7 @@ public class ReflectionUtil {
   @NonNull
   public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
-    return readablePropertyFromClass(clazz, fieldName, false);
+    return readablePropertyFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
   }
 
   /**
@@ -1327,12 +1401,33 @@ public class ReflectionUtil {
    * MethodNameStyle#JAVA_BEAN}
    * @since 1.0.0
    */
-  @SuppressWarnings("unchecked")
   @NonNull
   public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return readablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
+    return readablePropertyFromClass(TypeToken.of(clazz), fieldName, fieldExistCheck,
+        methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName) {
+    return readablePropertyFromClass(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck) {
+    return readablePropertyFromClass(typeToken, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertiesFromClass(typeToken, fieldExistCheck, methodNameStyles).stream()
         .filter(propertyGetter -> propertyGetter.name().equals(fieldName))
         .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
         .findAny();
