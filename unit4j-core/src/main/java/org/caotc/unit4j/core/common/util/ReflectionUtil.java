@@ -35,8 +35,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldElementPropertyReader;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyWriter.FieldElementPropertyWriter;
+import org.caotc.unit4j.core.common.reflect.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.reflect.MethodNameStyle;
 import org.caotc.unit4j.core.common.reflect.Property;
@@ -61,6 +60,8 @@ import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 @Slf4j
 public class ReflectionUtil {
 
+  public static final boolean DEFAULT_FIELD_EXIST_CHECK = true;
+  private static final MethodNameStyle[] DEFAULT_METHOD_NAME_STYLES = MethodNameStyle.values();
   private static final Function<PropertyElement<?, ?>, ImmutableList<?>> KEY_FUNCTION = propertyElement -> ImmutableList
       .of(propertyElement.propertyName(), propertyElement.propertyType(),
           propertyElement.isStatic());
@@ -360,7 +361,7 @@ public class ReflectionUtil {
    */
   @NonNull
   public ImmutableSet<Method> getMethodsFromClass(@NonNull Class<?> clazz) {
-    return getMethodsFromClass(clazz, true);
+    return getMethodsFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
   }
 
   /**
@@ -375,7 +376,7 @@ public class ReflectionUtil {
   @NonNull
   public ImmutableSet<Method> getMethodsFromClass(@NonNull Class<?> clazz,
       boolean fieldExistCheck) {
-    return getMethodsFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
+    return getMethodsFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -436,7 +437,7 @@ public class ReflectionUtil {
    */
   @NonNull
   public ImmutableSet<Method> setMethodsFromClass(@NonNull Class<?> clazz) {
-    return setMethodsFromClass(clazz, true);
+    return setMethodsFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
   }
 
   /**
@@ -451,7 +452,7 @@ public class ReflectionUtil {
   @NonNull
   public ImmutableSet<Method> setMethodsFromClass(@NonNull Class<?> clazz,
       boolean fieldExistCheck) {
-    return setMethodsFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
+    return setMethodsFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -494,7 +495,7 @@ public class ReflectionUtil {
   @NonNull
   public Optional<Method> getMethodFromClass(@NonNull Class<?> clazz,
       @NonNull String fieldName) {
-    return getMethodFromClass(clazz, fieldName, true);
+    return getMethodFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
   }
 
   /**
@@ -545,7 +546,7 @@ public class ReflectionUtil {
   @NonNull
   public Optional<Method> setMethodFromClass(@NonNull Class<?> clazz,
       @NonNull String fieldName) {
-    return setMethodFromClass(clazz, fieldName, true);
+    return setMethodFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
   }
 
   /**
@@ -585,82 +586,25 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有get方法与属性的包装{@link PropertyReader}
+   * get all properties from class
    *
-   * @param clazz 需要获取get方法的类
-   * @return 包括所有超类和接口的所有get方法与属性的包装 {@link PropertyReader}
+   * @param type target class
+   * @return {@link Stream} of all properties
    * @author caotc
-   * @date 2019-05-10
+   * @date 2019-11-28
+   * @apiNote
    * @since 1.0.0
    */
   @NonNull
-  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
-      @NonNull Class<T> clazz) {
-    return readablePropertiesFromClass(clazz, true);
-  }
-
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有可读属性 {@link ReadableProperty}集合
-   *
-   * @param clazz 需要获取可读属性 {@link ReadableProperty}的类
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 所有可读属性 {@link ReadableProperty}集合
-   * @author caotc
-   * @date 2019-05-10
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck) {
-    return readablePropertiesFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
-  }
-
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有可读属性{@link ReadableProperty}集合
-   *
-   * @param clazz 需要获取可读属性{@link ReadableProperty}的类
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @param methodNameStyles get方法格式集合
-   * @return 所有可读属性 {@link ReadableProperty}集合
-   * @author caotc
-   * @date 2019-05-10
-   * @apiNote 如果只想要获取JavaBean规范的get方法, {@code methodNameStyles}参数使用{@link
-   * MethodNameStyle#JAVA_BEAN}
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
-
-    Function<PropertyReader<T, ?>, ImmutableList<?>> propertyGetterToKeyFunction = propertyGetter -> ImmutableList
-        .of(propertyGetter.propertyName(), propertyGetter.propertyType());
-
-    Stream<PropertyReader<T, ?>> getInvokablePropertyGetters = getMethodsFromClass(clazz,
-        fieldExistCheck, methodNameStyles).stream()
-        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
-            .filter(methodNameStyle -> methodNameStyle.isGetMethod(getMethod))
-            .map(methodNameStyle -> PropertyReader.from(getMethod, methodNameStyle)));
-
-    Stream<PropertyReader<T, ?>> fieldPropertyGetters = fieldsFromClass(
-        clazz).stream().map(PropertyReader::from);
-
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyReader<T, ?>> propertyGetterMultimap =
-        Stream.concat(fieldPropertyGetters, getInvokablePropertyGetters)
-            .collect(ImmutableListMultimap
-                .toImmutableListMultimap(propertyGetterToKeyFunction, Function.identity()));
-
-    return propertyGetterMultimap.asMap().values().stream()
-        .filter(propertyReaders -> !fieldExistCheck || propertyReaders.stream()
-            .anyMatch(FieldElementPropertyReader.class::isInstance))
-        .map(propertyGetters -> propertyGetters.stream().map(o -> (PropertyReader<T, ?>) o))
-        .map(ReadableProperty::create).collect(ImmutableSet.toImmutableSet());
+  public static Stream<Property<?, ?>> propertyStreamFromClass(
+      @NonNull Type type) {
+    return propertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
    * get all properties from class
    *
-   * @param typeToken target class
+   * @param type target class
    * @param methodNameStyles get set methods styles
    * @return {@link Stream} of all properties
    * @author caotc
@@ -670,10 +614,26 @@ public class ReflectionUtil {
    */
   @NonNull
   public static Stream<Property<?, ?>> propertyStreamFromClass(
-      @NonNull Type typeToken,
+      @NonNull Type type,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return propertyStreamFromClass(TypeToken.of(typeToken), methodNameStyles)
+    return propertyStreamFromClass(TypeToken.of(type), methodNameStyles)
         .map(property -> (Property<?, ?>) property);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return propertyStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -692,6 +652,22 @@ public class ReflectionUtil {
       @NonNull Class<T> clazz,
       @NonNull MethodNameStyle... methodNameStyles) {
     return propertyStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertyStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -722,6 +698,18 @@ public class ReflectionUtil {
 
   @NonNull
   public static ImmutableSet<Property<?, ?>> propertiesFromClass(
+      @NonNull Type type) {
+    return propertiesFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static ImmutableSet<Property<?, ?>> propertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck) {
+    return propertiesFromClass(type, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static ImmutableSet<Property<?, ?>> propertiesFromClass(
       @NonNull Type type, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     return propertyStreamFromClass(type, methodNameStyles)
@@ -731,11 +719,35 @@ public class ReflectionUtil {
 
   @NonNull
   public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+      @NonNull Class<T> clazz) {
+    return propertiesFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck) {
+    return propertiesFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
     return propertyStreamFromClass(clazz, methodNameStyles)
         .filter(property -> !fieldExistCheck || property.fieldExist())
         .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return propertiesFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck) {
+    return propertiesFromClass(typeToken, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -750,7 +762,23 @@ public class ReflectionUtil {
   /**
    * get all properties from class
    *
-   * @param typeToken target class
+   * @param type target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static Stream<ReadableProperty<?, ?>> readablePropertyStreamFromClass(
+      @NonNull Type type) {
+    return readablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param type target class
    * @param methodNameStyles get set methods styles
    * @return {@link Stream} of all properties
    * @author caotc
@@ -760,10 +788,26 @@ public class ReflectionUtil {
    */
   @NonNull
   public static Stream<ReadableProperty<?, ?>> readablePropertyStreamFromClass(
-      @NonNull Type typeToken,
+      @NonNull Type type,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return readablePropertyStreamFromClass(TypeToken.of(typeToken), methodNameStyles)
+    return readablePropertyStreamFromClass(TypeToken.of(type), methodNameStyles)
         .map(property -> (ReadableProperty<?, ?>) property);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return readablePropertyStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -788,6 +832,22 @@ public class ReflectionUtil {
    * get all properties from class
    *
    * @param typeToken target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return readablePropertyStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
    * @param methodNameStyles get set methods styles
    * @return {@link Stream} of all properties
    * @author caotc
@@ -801,6 +861,403 @@ public class ReflectionUtil {
       @NonNull MethodNameStyle... methodNameStyles) {
     return propertyStreamFromClass(typeToken, methodNameStyles).filter(Property::readable)
         .map(Property::toReadable);
+  }
+
+  @NonNull
+  public static ImmutableSet<ReadableProperty<?, ?>> readablePropertiesFromClass(
+      @NonNull Type type) {
+    return readablePropertiesFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static ImmutableSet<ReadableProperty<?, ?>> readablePropertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck) {
+    return readablePropertiesFromClass(type, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static ImmutableSet<ReadableProperty<?, ?>> readablePropertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyStreamFromClass(type, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+      @NonNull Class<T> clazz) {
+    return readablePropertiesFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck) {
+    return readablePropertiesFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyStreamFromClass(clazz, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return readablePropertiesFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck) {
+    return readablePropertiesFromClass(typeToken, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return readablePropertyStreamFromClass(typeToken, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param type target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static Stream<WritableProperty<?, ?>> writablePropertyStreamFromClass(
+      @NonNull Type type) {
+    return writablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param type target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static Stream<WritableProperty<?, ?>> writablePropertyStreamFromClass(
+      @NonNull Type type,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyStreamFromClass(TypeToken.of(type), methodNameStyles)
+        .map(property -> (WritableProperty<?, ?>) property);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return writablePropertyStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+      @NonNull Class<T> clazz,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return writablePropertyStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(typeToken, methodNameStyles).filter(Property::writable)
+        .map(Property::toWritable);
+  }
+
+  @NonNull
+  public static ImmutableSet<WritableProperty<?, ?>> writablePropertiesFromClass(
+      @NonNull Type type) {
+    return writablePropertiesFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static ImmutableSet<WritableProperty<?, ?>> writablePropertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck) {
+    return writablePropertiesFromClass(type, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static ImmutableSet<WritableProperty<?, ?>> writablePropertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyStreamFromClass(type, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+      @NonNull Class<T> clazz) {
+    return writablePropertiesFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck) {
+    return writablePropertiesFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyStreamFromClass(clazz, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return writablePropertiesFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck) {
+    return writablePropertiesFromClass(typeToken, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyStreamFromClass(typeToken, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param type target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static Stream<AccessibleProperty<?, ?>> accessiblePropertyStreamFromClass(
+      @NonNull Type type) {
+    return accessiblePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param type target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static Stream<AccessibleProperty<?, ?>> accessiblePropertyStreamFromClass(
+      @NonNull Type type,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyStreamFromClass(TypeToken.of(type), methodNameStyles)
+        .map(property -> (AccessibleProperty<?, ?>) property);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+      @NonNull Class<T> clazz) {
+    return accessiblePropertyStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param clazz target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+      @NonNull Class<T> clazz,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyStreamFromClass(TypeToken.of(clazz), methodNameStyles);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return accessiblePropertyStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param typeToken target class
+   * @param methodNameStyles get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+      @NonNull TypeToken<T> typeToken,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return propertyStreamFromClass(typeToken, methodNameStyles).filter(Property::accessible)
+        .map(Property::toAccessible);
+  }
+
+  @NonNull
+  public static ImmutableSet<AccessibleProperty<?, ?>> accessiblePropertiesFromClass(
+      @NonNull Type type) {
+    return accessiblePropertiesFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static ImmutableSet<AccessibleProperty<?, ?>> accessiblePropertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck) {
+    return accessiblePropertiesFromClass(type, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static ImmutableSet<AccessibleProperty<?, ?>> accessiblePropertiesFromClass(
+      @NonNull Type type, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyStreamFromClass(type, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+      @NonNull Class<T> clazz) {
+    return accessiblePropertiesFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck) {
+    return accessiblePropertiesFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+      @NonNull Class<T> clazz, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyStreamFromClass(clazz, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken) {
+    return accessiblePropertiesFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck) {
+    return accessiblePropertiesFromClass(typeToken, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+      @NonNull TypeToken<T> typeToken, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyStreamFromClass(typeToken, methodNameStyles)
+        .filter(property -> !fieldExistCheck || property.fieldExist())
+        .collect(ImmutableSet.toImmutableSet());
   }
 
   /**
@@ -853,7 +1310,7 @@ public class ReflectionUtil {
   @NonNull
   public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
-    return readablePropertyFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
+    return readablePropertyFromClass(clazz, fieldName, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -882,77 +1339,6 @@ public class ReflectionUtil {
   }
 
   /**
-   * 从传入的类中获取包括所有超类和接口的所有可写属性{@link WritableProperty}集合
-   *
-   * @param clazz 需要获取可写属性{@link WritableProperty}的类
-   * @return 所有可写属性 {@link WritableProperty}集合
-   * @author caotc
-   * @date 2019-05-10
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
-      @NonNull Class<T> clazz) {
-    return writablePropertiesFromClass(clazz, true);
-  }
-
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有可写属性{@link WritableProperty}集合
-   *
-   * @param clazz 需要获取可写属性{@link WritableProperty}的类
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 所有可写属性 {@link WritableProperty}集合
-   * @author caotc
-   * @date 2019-05-10
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck) {
-    return writablePropertiesFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
-  }
-
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有可写属性{@link WritableProperty}集合
-   *
-   * @param clazz 需要获取可写属性{@link WritableProperty}的类
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @param methodNameStyles 属性写方法格式集合
-   * @return 所有可写属性 {@link WritableProperty}集合
-   * @author caotc
-   * @date 2019-05-10
-   * @apiNote 如果只想要获取JavaBean规范的set方法,{@code methodNameStyles}参数使用{@link MethodNameStyle#JAVA_BEAN}
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
-      @NonNull Class<T> clazz, boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
-    Function<PropertyWriter<T, ?>, ImmutableList<?>> propertySetterToKeyFunction = propertyWriter -> ImmutableList
-        .of(propertyWriter.propertyName(), propertyWriter.propertyType());
-
-    Stream<PropertyWriter<T, ?>> setInvokablePropertySetters = setMethodsFromClass(clazz,
-        fieldExistCheck, methodNameStyles).stream()
-        .flatMap(getMethod -> Arrays.stream(methodNameStyles)
-            .filter(methodNameStyle -> methodNameStyle.isSetMethod(getMethod))
-            .map(methodNameStyle -> PropertyWriter.from(getMethod, methodNameStyle)));
-
-    Stream<PropertyWriter<T, ?>> fieldPropertySetters = fieldsFromClass(
-        clazz).stream().map(PropertyWriter::from);
-
-    ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyWriter<T, ?>> propertySetterMultimap =
-        Stream.concat(fieldPropertySetters, setInvokablePropertySetters)
-            .collect(ImmutableListMultimap
-                .toImmutableListMultimap(propertySetterToKeyFunction, Function.identity()));
-
-    return propertySetterMultimap.asMap().values().stream()
-        .filter(propertyWriters -> !fieldExistCheck || propertyWriters.stream()
-            .anyMatch(FieldElementPropertyWriter.class::isInstance))
-        .map(propertySetters -> propertySetters.stream().map(o -> (PropertyWriter<T, ?>) o))
-        .map(WritableProperty::create).collect(ImmutableSet.toImmutableSet());
-  }
-
-  /**
    * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
    *
    * @param clazz 需要获取set方法的类
@@ -965,7 +1351,7 @@ public class ReflectionUtil {
   @NonNull
   public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
-    return writablePropertyFromClass(clazz, fieldName, true);
+    return writablePropertyFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
   }
 
   /**
@@ -982,7 +1368,7 @@ public class ReflectionUtil {
   @NonNull
   public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
-    return writablePropertyFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.values());
+    return writablePropertyFromClass(clazz, fieldName, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -1013,19 +1399,19 @@ public class ReflectionUtil {
   @NonNull
   public static ImmutableSet<PropertyElement<?, ?>> propertyElementsFromClass(
       @NonNull Type type) {
-    return propertyElementsFromClass(type, MethodNameStyle.values());
+    return propertyElementsFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
       @NonNull Class<T> clazz) {
-    return propertyElementsFromClass(clazz, MethodNameStyle.values());
+    return propertyElementsFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyElementsFromClass(typeToken, MethodNameStyle.values());
+    return propertyElementsFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1052,19 +1438,19 @@ public class ReflectionUtil {
   @NonNull
   public static Stream<PropertyElement<?, ?>> propertyElementStreamFromClass(
       @NonNull Type type) {
-    return propertyElementStreamFromClass(type, MethodNameStyle.values());
+    return propertyElementStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
       @NonNull Class<T> clazz) {
-    return propertyElementStreamFromClass(clazz, MethodNameStyle.values());
+    return propertyElementStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyElementStreamFromClass(typeToken, MethodNameStyle.values());
+    return propertyElementStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1097,19 +1483,19 @@ public class ReflectionUtil {
   @NonNull
   public static ImmutableSet<PropertyReader<?, ?>> propertyReadersFromClass(
       @NonNull Type type) {
-    return propertyReadersFromClass(type, MethodNameStyle.values());
+    return propertyReadersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
       @NonNull Class<T> clazz) {
-    return propertyReadersFromClass(clazz, MethodNameStyle.values());
+    return propertyReadersFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyReadersFromClass(typeToken, MethodNameStyle.values());
+    return propertyReadersFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1136,19 +1522,19 @@ public class ReflectionUtil {
   @NonNull
   public static Stream<PropertyReader<?, ?>> propertyReaderStreamFromClass(
       @NonNull Type type) {
-    return propertyReaderStreamFromClass(type, MethodNameStyle.values());
+    return propertyReaderStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
       @NonNull Class<T> clazz) {
-    return propertyReaderStreamFromClass(clazz, MethodNameStyle.values());
+    return propertyReaderStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyReaderStreamFromClass(typeToken, MethodNameStyle.values());
+    return propertyReaderStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1174,19 +1560,19 @@ public class ReflectionUtil {
   @NonNull
   public static ImmutableSet<PropertyWriter<?, ?>> propertyWritersFromClass(
       @NonNull Type type) {
-    return propertyWritersFromClass(type, MethodNameStyle.values());
+    return propertyWritersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
       @NonNull Class<T> clazz) {
-    return propertyWritersFromClass(clazz, MethodNameStyle.values());
+    return propertyWritersFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyWritersFromClass(typeToken, MethodNameStyle.values());
+    return propertyWritersFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1213,19 +1599,19 @@ public class ReflectionUtil {
   @NonNull
   public static Stream<PropertyWriter<?, ?>> propertyWriterStreamFromClass(
       @NonNull Type type) {
-    return propertyWriterStreamFromClass(type, MethodNameStyle.values());
+    return propertyWriterStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
       @NonNull Class<T> clazz) {
-    return propertyWriterStreamFromClass(clazz, MethodNameStyle.values());
+    return propertyWriterStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyWriterStreamFromClass(typeToken, MethodNameStyle.values());
+    return propertyWriterStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1251,19 +1637,19 @@ public class ReflectionUtil {
   @NonNull
   public static ImmutableSet<PropertyAccessor<?, ?>> propertyAccessorsFromClass(
       @NonNull Type type) {
-    return propertyAccessorsFromClass(type, MethodNameStyle.values());
+    return propertyAccessorsFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
       @NonNull Class<T> clazz) {
-    return propertyAccessorsFromClass(clazz, MethodNameStyle.values());
+    return propertyAccessorsFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyAccessorsFromClass(typeToken, MethodNameStyle.values());
+    return propertyAccessorsFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1290,19 +1676,19 @@ public class ReflectionUtil {
   @NonNull
   public static Stream<PropertyAccessor<?, ?>> propertyAccessorStreamFromClass(
       @NonNull Type type) {
-    return propertyAccessorStreamFromClass(type, MethodNameStyle.values());
+    return propertyAccessorStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
       @NonNull Class<T> clazz) {
-    return propertyAccessorStreamFromClass(clazz, MethodNameStyle.values());
+    return propertyAccessorStreamFromClass(clazz, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
   public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
       @NonNull TypeToken<T> typeToken) {
-    return propertyAccessorStreamFromClass(typeToken, MethodNameStyle.values());
+    return propertyAccessorStreamFromClass(typeToken, DEFAULT_METHOD_NAME_STYLES);
   }
 
   @NonNull
@@ -1348,7 +1734,7 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   public static boolean isPropertyReader(@NonNull Invokable<?, ?> invokable) {
-    return isPropertyReader(invokable, MethodNameStyle.values());
+    return isPropertyReader(invokable, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -1399,7 +1785,7 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   public static boolean isPropertyWriter(@NonNull Method method) {
-    return isPropertyWriter(method, MethodNameStyle.values());
+    return isPropertyWriter(method, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
@@ -1425,7 +1811,7 @@ public class ReflectionUtil {
    * @since 1.0.0
    */
   public static boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable) {
-    return isPropertyWriter(invokable, MethodNameStyle.values());
+    return isPropertyWriter(invokable, DEFAULT_METHOD_NAME_STYLES);
   }
 
   /**
