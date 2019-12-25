@@ -72,12 +72,10 @@ class ReflectionUtilTest {
 
   @Test
   void getMethodsFromClass2() {
-    ImmutableSet<Method> javaBeanGetMethods = ReflectionUtil.getMethodsFromClass(Sub.class, false,
-        MethodNameStyle.JAVA_BEAN);
+    ImmutableSet<Method> javaBeanGetMethods = ReflectionUtil.getMethodsFromClass(Sub.class, false);
     log.debug("javaBeanGetMethods:{}", javaBeanGetMethods);
     Assertions.assertEquals(4, javaBeanGetMethods.size());
-    ImmutableSet<Method> fluentGetMethods = ReflectionUtil.getMethodsFromClass(Sub.class, true,
-        MethodNameStyle.FLUENT);
+    ImmutableSet<Method> fluentGetMethods = ReflectionUtil.getMethodsFromClass(Sub.class, true);
     log.debug("fluentGetMethods:{}", fluentGetMethods);
     Assertions.assertEquals(2, fluentGetMethods.size());
   }
@@ -99,11 +97,11 @@ class ReflectionUtilTest {
   @Test
   void setMethodsFromClass2() {
     ImmutableSet<Method> javaBeanSetMethods = ReflectionUtil
-        .setMethodsFromClass(Sub.class, false, MethodNameStyle.JAVA_BEAN);
+        .setMethodsFromClass(Sub.class, false);
     log.debug("javaBeanSetMethods:{}", javaBeanSetMethods);
     Assertions.assertEquals(5, javaBeanSetMethods.size());
     ImmutableSet<Method> fluentBeanSetMethods = ReflectionUtil
-        .setMethodsFromClass(Sub.class, false, MethodNameStyle.FLUENT);
+        .setMethodsFromClass(Sub.class, false);
     log.debug("fluentBeanSetMethods:{}", fluentBeanSetMethods);
     Assertions.assertEquals(7, fluentBeanSetMethods.size());
   }
@@ -128,7 +126,7 @@ class ReflectionUtilTest {
   @Test
   void getMethodFromClass2() {
     Optional<Method> numberField = ReflectionUtil
-        .getMethodFromClass(Sub.class, "numberField", false, MethodNameStyle.FLUENT);
+        .getMethodFromClass(Sub.class, "numberField", false);
     Assertions.assertTrue(numberField.isPresent());
   }
 
@@ -150,7 +148,7 @@ class ReflectionUtilTest {
   @Test
   void setMethodFromClass2() {
     Optional<Method> numberField = ReflectionUtil
-        .setMethodFromClass(Sub.class, "numberField", false, MethodNameStyle.FLUENT);
+        .setMethodFromClass(Sub.class, "numberField", false);
     Assertions.assertTrue(numberField.isPresent());
   }
 

@@ -45,7 +45,10 @@ import org.caotc.unit4j.core.common.reflect.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.PropertyWriter;
 import org.caotc.unit4j.core.common.reflect.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.WritableProperty;
+import org.caotc.unit4j.core.exception.AccessiblePropertyNotFoundException;
+import org.caotc.unit4j.core.exception.MethodNotFoundException;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
+import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
 //TODO 将所有方法优化到只有一次流操作
 
 /**
@@ -351,80 +354,89 @@ public class ReflectionUtil {
         methodInvokableStreamFromClass(typeToken));
   }
 
-  /**
-   * 根据指定的get方法名称格式从传入的类中获取包括所有超类和接口的所有get方法
-   *
-   * @param clazz 需要获取get方法的类
-   * @return 所有超类和接口的所有get方法
-   * @author caotc
-   * @date 2019-05-22
-   */
+  @NonNull
+  public ImmutableSet<Method> getMethodsFromClass(@NonNull Type type) {
+    return getMethodsFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public ImmutableSet<Method> getMethodsFromClass(@NonNull Type type, boolean fieldExistCheck) {
+    return getMethodStreamFromClass(type, fieldExistCheck).collect(ImmutableSet.toImmutableSet());
+  }
+
   @NonNull
   public ImmutableSet<Method> getMethodsFromClass(@NonNull Class<?> clazz) {
     return getMethodsFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
   }
 
-  /**
-   * 根据指定的get方法名称格式从传入的类中获取包括所有超类和接口的所有get方法
-   *
-   * @param clazz 需要获取get方法的类
-   * @param fieldExistCheck 是否检查有对应{@link Field}存在
-   * @return 所有超类和接口的所有get方法
-   * @author caotc
-   * @date 2019-05-22
-   */
   @NonNull
   public ImmutableSet<Method> getMethodsFromClass(@NonNull Class<?> clazz,
       boolean fieldExistCheck) {
-    return getMethodsFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+    return getMethodStreamFromClass(clazz, fieldExistCheck).collect(ImmutableSet.toImmutableSet());
   }
 
-  /**
-   * 根据指定的get方法名称格式从传入的类中获取包括所有超类和接口的所有get方法
-   *
-   * @param clazz 需要获取get方法的类
-   * @param fieldExistCheck 是否检查有对应{@link Field}存在
-   * @param methodNameStyles 指定的get方法名称格式集合 {@link MethodNameStyle}
-   * @return 所有超类和接口的所有get方法
-   * @author caotc
-   * @date 2019-05-22
-   * @apiNote 如果只想获得JavaBean规范的get方法, {@code methodNameStyles}请传入{@link MethodNameStyle#JAVA_BEAN}
-   */
   @NonNull
-  public ImmutableSet<Method> getMethodsFromClass(@NonNull Class<?> clazz, boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
-    Stream<Method> methodStream = methodsFromClass(clazz).stream()
-        .filter(method -> isPropertyReader(method, methodNameStyles));
+  public ImmutableSet<Method> getMethodsFromClass(@NonNull TypeToken<?> typeToken) {
+    return getMethodsFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public ImmutableSet<Method> getMethodsFromClass(@NonNull TypeToken<?> typeToken,
+      boolean fieldExistCheck) {
+    return getMethodStreamFromClass(typeToken, fieldExistCheck)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public Stream<Method> getMethodStreamFromClass(@NonNull Type type) {
+    return getMethodStreamFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Stream<Method> getMethodStreamFromClass(@NonNull Type type, boolean fieldExistCheck) {
+    return getMethodStreamFromClass(TypeToken.of(type), fieldExistCheck);
+  }
+
+  @NonNull
+  public Stream<Method> getMethodStreamFromClass(@NonNull Class<?> clazz) {
+    return getMethodStreamFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Stream<Method> getMethodStreamFromClass(@NonNull Class<?> clazz, boolean fieldExistCheck) {
+    return getMethodStreamFromClass(TypeToken.of(clazz), fieldExistCheck);
+  }
+
+  @NonNull
+  public Stream<Method> getMethodStreamFromClass(@NonNull TypeToken<?> typeToken) {
+    return getMethodStreamFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Stream<Method> getMethodStreamFromClass(@NonNull TypeToken<?> typeToken,
+      boolean fieldExistCheck) {
+    Stream<Method> methodStream = methodStreamFromClass(typeToken)
+        .filter(method -> isPropertyReader(method, MethodNameStyle.JAVA_BEAN));
     if (fieldExistCheck) {
-      ImmutableSet<ImmutableList<?>> getMethodKeys = fieldsFromClass(clazz).stream()
-          .flatMap(field -> Arrays.stream(methodNameStyles)
-              .map(methodNameStyle -> ImmutableList
-                  .of(methodNameStyle.getMethodNameFromField(field), field.getType())))
+      ImmutableSet<ImmutableList<?>> getMethodKeys = fieldsFromClass(typeToken).stream()
+          .map(field -> ImmutableList
+              .of(MethodNameStyle.JAVA_BEAN.getMethodNameFromField(field), field.getType()))
           .collect(ImmutableSet.toImmutableSet());
       methodStream = methodStream.filter(getMethod -> getMethodKeys
           .contains(ImmutableList.of(getMethod.getName(), getMethod.getReturnType())));
     }
-    return methodStream.collect(ImmutableSet.toImmutableSet());
+    return methodStream;
   }
 
   @NonNull
-  public ImmutableSet<Method> accessorMethodsFromClass(@NonNull Class<?> clazz,
-      boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
-    Stream<Method> methodStream = methodsFromClass(clazz).stream()
-        .filter(method -> isPropertyReader(method, methodNameStyles) || isPropertyWriter(method,
-            methodNameStyles));
-    if (fieldExistCheck) {
-      ImmutableSet<ImmutableList<?>> accessorMethodKeys = fieldsFromClass(clazz).stream()
-          .flatMap(field -> Arrays.stream(methodNameStyles)
-              .flatMap(methodNameStyle -> Stream.of(ImmutableList
-                  .of(methodNameStyle.getMethodNameFromField(field), field.getType()), ImmutableList
-                  .of(methodNameStyle.setMethodNameFromField(field), field.getType()))))
-          .collect(ImmutableSet.toImmutableSet());
-      methodStream = methodStream.filter(accessorMethod -> accessorMethodKeys
-          .contains(ImmutableList.of(accessorMethod.getName(), accessorMethod.getReturnType())));
-    }
-    return methodStream.collect(ImmutableSet.toImmutableSet());
+  public ImmutableSet<Method> setMethodsFromClass(@NonNull Type type) {
+    return setMethodsFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public ImmutableSet<Method> setMethodsFromClass(@NonNull Type type,
+      boolean fieldExistCheck) {
+    return setMethodsFromClass(TypeToken.of(type), fieldExistCheck);
   }
 
   /**
@@ -452,103 +464,148 @@ public class ReflectionUtil {
   @NonNull
   public ImmutableSet<Method> setMethodsFromClass(@NonNull Class<?> clazz,
       boolean fieldExistCheck) {
-    return setMethodsFromClass(clazz, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+    return setMethodsFromClass(TypeToken.of(clazz), fieldExistCheck);
   }
 
-  /**
-   * 根据指定的set方法名称格式从传入的类中获取包括所有超类和接口的所有set方法
-   *
-   * @param clazz 需要获取set方法的类
-   * @param fieldExistCheck 是否检查有对应{@link Field}存在
-   * @param methodNameStyles 指定的set方法名称格式集合 {@link MethodNameStyle}
-   * @return 所有超类和接口的所有set方法
-   * @author caotc
-   * @date 2019-05-22
-   * @apiNote 如果只想获得JavaBean规范的set方法, {@code methodNameStyles}请传入{@link MethodNameStyle#JAVA_BEAN}
-   */
   @NonNull
-  public ImmutableSet<Method> setMethodsFromClass(@NonNull Class<?> clazz, boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
-    Stream<Method> methodStream = methodsFromClass(clazz).stream()
-        .filter(method -> isPropertyWriter(method, methodNameStyles));
-    if (fieldExistCheck) {
-      ImmutableSet<ImmutableList<?>> setMethodKeys = fieldsFromClass(clazz).stream()
-          .flatMap(field -> Arrays.stream(methodNameStyles)
-              .map(methodNameStyle -> ImmutableList
-                  .of(methodNameStyle.setMethodNameFromField(field), field.getType())))
-          .collect(ImmutableSet.toImmutableSet());
-      methodStream = methodStream.filter(setMethod -> setMethodKeys
-          .contains(ImmutableList.of(setMethod.getName(), setMethod.getParameterTypes()[0])));
-    }
-    return methodStream.collect(ImmutableSet.toImmutableSet());
+  public ImmutableSet<Method> setMethodsFromClass(@NonNull TypeToken<?> typeToken) {
+    return setMethodsFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
   }
 
-  /**
-   * 根据指定的get方法名称格式从传入的类中获取包括所有超类和接口的所有get方法中指定属性名称的get方法
-   *
-   * @param clazz 需要获取get方法的类
-   * @param fieldName 指定属性名称
-   * @return 包括所有超类和接口的所有get方法中指定属性名称的get方法
-   * @author caotc
-   * @date 2019-05-22
-   */
+  @NonNull
+  public ImmutableSet<Method> setMethodsFromClass(@NonNull TypeToken<?> typeToken,
+      boolean fieldExistCheck) {
+    return setMethodStreamFromClass(typeToken, fieldExistCheck)
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @NonNull
+  public Stream<Method> setMethodStreamFromClass(@NonNull Type type) {
+    return setMethodStreamFromClass(type, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Stream<Method> setMethodStreamFromClass(@NonNull Type type, boolean fieldExistCheck) {
+    return setMethodStreamFromClass(TypeToken.of(type), fieldExistCheck);
+  }
+
+  @NonNull
+  public Stream<Method> setMethodStreamFromClass(@NonNull Class<?> clazz) {
+    return setMethodStreamFromClass(clazz, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Stream<Method> setMethodStreamFromClass(@NonNull Class<?> clazz, boolean fieldExistCheck) {
+    return setMethodStreamFromClass(TypeToken.of(clazz), fieldExistCheck);
+  }
+
+  @NonNull
+  public Stream<Method> setMethodStreamFromClass(@NonNull TypeToken<?> typeToken) {
+    return setMethodStreamFromClass(typeToken, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Stream<Method> setMethodStreamFromClass(@NonNull TypeToken<?> typeToken,
+      boolean fieldExistCheck) {
+    Stream<Method> methodStream = methodStreamFromClass(typeToken)
+        .filter(method -> isPropertyWriter(method, MethodNameStyle.JAVA_BEAN));
+    if (fieldExistCheck) {
+      ImmutableSet<ImmutableList<?>> setMethodKeys = fieldsFromClass(typeToken).stream()
+          .map(field -> ImmutableList
+              .of(MethodNameStyle.JAVA_BEAN.setMethodNameFromField(field), field.getType()))
+          .collect(ImmutableSet.toImmutableSet());
+      methodStream = methodStream.filter(getMethod -> setMethodKeys
+          .contains(ImmutableList.of(getMethod.getName(), getMethod.getReturnType())));
+    }
+    return methodStream;
+  }
+
+  @NonNull
+  public Method getMethodFromClassExact(@NonNull Type type,
+      @NonNull String fieldName) {
+    return getMethodFromClassExact(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Method getMethodFromClassExact(@NonNull Type type,
+      @NonNull String fieldName, boolean fieldExistCheck) {
+    return getMethodFromClassExact(TypeToken.of(type), fieldName, fieldExistCheck);
+  }
+
+  @NonNull
+  public Method getMethodFromClassExact(@NonNull Class<?> clazz,
+      @NonNull String fieldName) {
+    return getMethodFromClassExact(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Method getMethodFromClassExact(@NonNull Class<?> clazz,
+      @NonNull String fieldName, boolean fieldExistCheck) {
+    return getMethodFromClassExact(TypeToken.of(clazz), fieldName, fieldExistCheck);
+  }
+
+  @NonNull
+  public Method getMethodFromClassExact(@NonNull TypeToken<?> typeToken,
+      @NonNull String fieldName) {
+    return getMethodFromClassExact(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Method getMethodFromClassExact(@NonNull TypeToken<?> typeToken,
+      @NonNull String fieldName, boolean fieldExistCheck) {
+    return getMethodStreamFromClass(typeToken, fieldExistCheck)
+        .filter(getMethod -> fieldName
+            .equals(MethodNameStyle.JAVA_BEAN.fieldNameFromGetMethod(getMethod)))
+        .findAny().orElseThrow(
+            () -> MethodNotFoundException.create(typeToken, fieldName, ImmutableList.of()));
+  }
+
+  @NonNull
+  public Optional<Method> getMethodFromClass(@NonNull Type type,
+      @NonNull String fieldName) {
+    return getMethodFromClass(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Optional<Method> getMethodFromClass(@NonNull Type type,
+      @NonNull String fieldName, boolean fieldExistCheck) {
+    return getMethodFromClass(TypeToken.of(type), fieldName, fieldExistCheck);
+  }
+
   @NonNull
   public Optional<Method> getMethodFromClass(@NonNull Class<?> clazz,
       @NonNull String fieldName) {
     return getMethodFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
   }
 
-  /**
-   * 根据指定的get方法名称格式从传入的类中获取包括所有超类和接口的所有get方法中指定属性名称的get方法
-   *
-   * @param clazz 需要获取get方法的类
-   * @param fieldName 指定属性名称
-   * @param fieldExistCheck 是否检查有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有get方法中指定属性名称的get方法
-   * @author caotc
-   * @date 2019-05-22
-   */
   @NonNull
   public Optional<Method> getMethodFromClass(@NonNull Class<?> clazz,
       @NonNull String fieldName, boolean fieldExistCheck) {
-    return getMethodFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.JAVA_BEAN);
+    return getMethodFromClass(TypeToken.of(clazz), fieldName, fieldExistCheck);
   }
 
-  /**
-   * 根据指定的get方法名称格式从传入的类中获取包括所有超类和接口的所有get方法中指定属性名称的get方法
-   *
-   * @param clazz 需要获取get方法的类
-   * @param methodNameStyle 指定的get方法名称格式 {@link MethodNameStyle}
-   * @param fieldName 指定属性名称
-   * @param fieldExistCheck 是否检查有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有get方法中指定属性名称的get方法
-   * @author caotc
-   * @date 2019-05-22
-   */
   @NonNull
-  public Optional<Method> getMethodFromClass(@NonNull Class<?> clazz,
-      @NonNull String fieldName, boolean fieldExistCheck,
-      @NonNull MethodNameStyle methodNameStyle) {
-    return getMethodsFromClass(clazz, fieldExistCheck, methodNameStyle).stream()
-        .filter(getMethod -> fieldName.equals(methodNameStyle.fieldNameFromGetMethod(getMethod)))
+  public Optional<Method> getMethodFromClass(@NonNull TypeToken<?> typeToken,
+      @NonNull String fieldName) {
+    return getMethodFromClass(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public Optional<Method> getMethodFromClass(@NonNull TypeToken<?> typeToken,
+      @NonNull String fieldName, boolean fieldExistCheck) {
+    return getMethodStreamFromClass(typeToken, fieldExistCheck)
+        .filter(getMethod -> fieldName
+            .equals(MethodNameStyle.JAVA_BEAN.fieldNameFromGetMethod(getMethod)))
         .findAny();
   }
 
-  /**
-   * 根据指定的set方法名称格式从传入的类中获取包括所有超类和接口的所有set方法中指定属性名称的set方法
-   *
-   * @param clazz 需要获取set方法的类
-   * @param fieldName 指定属性名称
-   * @return 包括所有超类和接口的所有set方法中指定属性名称的set方法
-   * @author caotc
-   * @date 2019-05-22
-   */
   @NonNull
   public Optional<Method> setMethodFromClass(@NonNull Class<?> clazz,
       @NonNull String fieldName) {
     return setMethodFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
   }
 
+
   /**
    * 根据指定的set方法名称格式从传入的类中获取包括所有超类和接口的所有set方法中指定属性名称的set方法
    *
@@ -562,26 +619,9 @@ public class ReflectionUtil {
   @NonNull
   public Optional<Method> setMethodFromClass(@NonNull Class<?> clazz,
       @NonNull String fieldName, boolean fieldExistCheck) {
-    return setMethodFromClass(clazz, fieldName, fieldExistCheck, MethodNameStyle.JAVA_BEAN);
-  }
-
-  /**
-   * 根据指定的set方法名称格式从传入的类中获取包括所有超类和接口的所有set方法中指定属性名称的set方法
-   *
-   * @param clazz 需要获取set方法的类
-   * @param methodNameStyle 指定的set方法名称格式 {@link MethodNameStyle}
-   * @param fieldName 指定属性名称
-   * @param fieldExistCheck 是否检查有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有set方法中指定属性名称的set方法
-   * @author caotc
-   * @date 2019-05-22
-   */
-  @NonNull
-  public Optional<Method> setMethodFromClass(@NonNull Class<?> clazz,
-      @NonNull String fieldName, boolean fieldExistCheck,
-      @NonNull MethodNameStyle methodNameStyle) {
-    return setMethodsFromClass(clazz, fieldExistCheck, methodNameStyle).stream()
-        .filter(setMethod -> fieldName.equals(methodNameStyle.fieldNameFromSetMethod(setMethod)))
+    return setMethodsFromClass(clazz, fieldExistCheck).stream()
+        .filter(setMethod -> fieldName
+            .equals(MethodNameStyle.JAVA_BEAN.fieldNameFromSetMethod(setMethod)))
         .findAny();
   }
 
@@ -1433,61 +1473,267 @@ public class ReflectionUtil {
         .findAny();
   }
 
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
-   *
-   * @param clazz 需要获取set方法的类
-   * @param fieldName 指定属性名称
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
-   * @author caotc
-   * @date 2019-05-10
-   * @since 1.0.0
-   */
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName) {
+    return writablePropertyFromClassExact(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck) {
+    return writablePropertyFromClassExact(type, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyFromClassExact((TypeToken<T>) TypeToken.of(type), fieldName,
+        fieldExistCheck, methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName) {
+    return writablePropertyFromClassExact(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
+    return writablePropertyFromClassExact(clazz, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyFromClassExact(TypeToken.of(clazz), fieldName, fieldExistCheck,
+        methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName) {
+    return writablePropertyFromClassExact(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck) {
+    return writablePropertyFromClassExact(typeToken, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return ReflectionUtil.<T, R>writablePropertyFromClass(typeToken, fieldName, fieldExistCheck,
+        methodNameStyles)
+        .orElseThrow(() -> WritablePropertyNotFoundException
+            .create(typeToken, fieldName));
+  }
+
+  @NonNull
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName) {
+    return writablePropertyFromClass(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck) {
+    return writablePropertyFromClass(type, fieldName, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertyFromClass((TypeToken<T>) TypeToken.of(type), fieldName, fieldExistCheck,
+        methodNameStyles);
+  }
+
   @NonNull
   public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName) {
     return writablePropertyFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
   }
 
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
-   *
-   * @param clazz 需要获取set方法的类
-   * @param fieldName 指定属性名称
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
-   * @author caotc
-   * @date 2019-05-10
-   * @since 1.0.0
-   */
   @NonNull
   public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
     return writablePropertyFromClass(clazz, fieldName, fieldExistCheck, DEFAULT_METHOD_NAME_STYLES);
   }
 
-  /**
-   * 从传入的类中获取包括所有超类和接口的所有set方法与属性的包装{@link PropertyWriter}
-   *
-   * @param clazz 需要获取set方法的类
-   * @param fieldName 指定属性名称
-   * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @param methodNameStyles set方法格式集合
-   * @return 包括所有超类和接口的所有set方法与属性的包装 {@link PropertyWriter}
-   * @author caotc
-   * @date 2019-05-10
-   * @apiNote 如果只想要获取JavaBean规范的set方法, {@code methodNameStyles}参数使用{@link
-   * MethodNameStyle#JAVA_BEAN}
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
   @NonNull
   public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
       @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
       @NonNull MethodNameStyle... methodNameStyles) {
-    return writablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles).stream()
+    return writablePropertyFromClass(TypeToken.of(clazz), fieldName, fieldExistCheck,
+        methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName) {
+    return writablePropertyFromClass(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck) {
+    return writablePropertyFromClass(typeToken, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return writablePropertiesFromClass(typeToken, fieldExistCheck, methodNameStyles).stream()
         .filter(propertyWriter -> propertyWriter.name().equals(fieldName))
         .map(propertyWriter -> (WritableProperty<T, R>) propertyWriter)
+        .findAny();
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName) {
+    return accessiblePropertyFromClassExact(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck) {
+    return accessiblePropertyFromClassExact(type, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyFromClassExact((TypeToken<T>) TypeToken.of(type), fieldName,
+        fieldExistCheck, methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName) {
+    return accessiblePropertyFromClassExact(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
+    return accessiblePropertyFromClassExact(clazz, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyFromClassExact(TypeToken.of(clazz), fieldName, fieldExistCheck,
+        methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName) {
+    return accessiblePropertyFromClassExact(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck) {
+    return accessiblePropertyFromClassExact(typeToken, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return ReflectionUtil.<T, R>accessiblePropertyFromClass(typeToken, fieldName, fieldExistCheck,
+        methodNameStyles)
+        .orElseThrow(() -> AccessiblePropertyNotFoundException
+            .create(typeToken, fieldName));
+  }
+
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName) {
+    return accessiblePropertyFromClass(type, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck) {
+    return accessiblePropertyFromClass(type, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull Type type, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyFromClass((TypeToken<T>) TypeToken.of(type), fieldName,
+        fieldExistCheck, methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull Class<T> clazz, @NonNull String fieldName) {
+    return accessiblePropertyFromClass(clazz, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck) {
+    return accessiblePropertyFromClass(clazz, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull Class<T> clazz, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertyFromClass(TypeToken.of(clazz), fieldName, fieldExistCheck,
+        methodNameStyles);
+  }
+
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName) {
+    return accessiblePropertyFromClass(typeToken, fieldName, DEFAULT_FIELD_EXIST_CHECK);
+  }
+
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck) {
+    return accessiblePropertyFromClass(typeToken, fieldName, fieldExistCheck,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+      @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck,
+      @NonNull MethodNameStyle... methodNameStyles) {
+    return accessiblePropertiesFromClass(typeToken, fieldExistCheck, methodNameStyles).stream()
+        .filter(propertyWriter -> propertyWriter.name().equals(fieldName))
+        .map(propertyWriter -> (AccessibleProperty<T, R>) propertyWriter)
         .findAny();
   }
 
