@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.WritableProperty;
+import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 
 /**
  * {@link WritableProperty}不存在异常

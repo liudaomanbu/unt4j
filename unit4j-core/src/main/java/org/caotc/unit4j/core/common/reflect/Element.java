@@ -52,7 +52,7 @@ public class Element extends AccessibleObject implements Member {
   @NonNull
   Member member;
 
-  <M extends AccessibleObject & Member> Element(@NonNull M member) {
+  protected <M extends AccessibleObject & Member> Element(@NonNull M member) {
     this(member, member);
   }
 

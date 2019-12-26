@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.reflect;
+package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.Invokable;
 import java.lang.reflect.Field;
@@ -31,7 +31,7 @@ import org.caotc.unit4j.core.constant.StringConstant;
  * @date 2019-05-29
  * @since 1.0.0
  */
-public enum MethodNameStyle {
+public enum PropertyAccessorMethodFormat {
   /**
    * 默认的javaBean规范风格
    */

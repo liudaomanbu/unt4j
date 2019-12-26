@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.reflect;
+package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.reflect.TypeToken;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 
 /**
  * 可读取属性

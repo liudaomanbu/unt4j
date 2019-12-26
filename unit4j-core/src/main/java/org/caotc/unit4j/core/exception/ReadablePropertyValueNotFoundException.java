@@ -20,7 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.caotc.unit4j.core.common.reflect.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 
 /**
  * {@link ReadableProperty}不存在异常

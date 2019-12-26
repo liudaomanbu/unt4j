@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.reflect;
+package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.Element;
 
 /**
  * 属性元素抽象类

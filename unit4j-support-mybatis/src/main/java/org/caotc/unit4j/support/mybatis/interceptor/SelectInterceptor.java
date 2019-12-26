@@ -36,7 +36,7 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.core.common.base.CaseFormat;
-import org.caotc.unit4j.core.common.reflect.WritableProperty;
+import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.CodecStrategy;
 import org.caotc.unit4j.support.Unit4jProperties;

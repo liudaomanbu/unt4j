@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.reflect;
+package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
@@ -22,8 +22,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.FieldElementPropertyReader;
-import org.caotc.unit4j.core.common.reflect.AbstractPropertyReader.InvokablePropertyReader;
+import org.caotc.unit4j.core.common.reflect.FieldElement;
+import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyReader.FieldElementPropertyReader;
+import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyReader.InvokablePropertyReader;
 
 /**
  * 属性读取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -40,7 +41,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * 工厂方法
    *
    * @param getMethod get方法
-   * @param methodNameStyle 方法名风格
+   * @param propertyAccessorMethodFormat 方法名风格
    * @return 属性获取器
    * @author caotc
    * @date 2019-06-16
@@ -49,8 +50,8 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
   @SuppressWarnings("unchecked")
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Method getMethod,
-      @NonNull MethodNameStyle methodNameStyle) {
-    return from((Invokable<T, R>) Invokable.from(getMethod), methodNameStyle);
+      @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
+    return from((Invokable<T, R>) Invokable.from(getMethod), propertyAccessorMethodFormat);
   }
 
   /**
@@ -74,7 +75,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * 工厂方法
    *
    * @param getInvokable get方法封装的Invokable
-   * @param methodNameStyle 方法名风格
+   * @param propertyAccessorMethodFormat 方法名风格
    * @return 属性获取器
    * @author caotc
    * @date 2019-06-16
@@ -82,9 +83,9 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    */
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Invokable<T, R> getInvokable,
-      @NonNull MethodNameStyle methodNameStyle) {
+      @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
     return new InvokablePropertyReader<>(getInvokable,
-        methodNameStyle.fieldNameFromGetInvokable(getInvokable));
+        propertyAccessorMethodFormat.fieldNameFromGetInvokable(getInvokable));
   }
 
   /**

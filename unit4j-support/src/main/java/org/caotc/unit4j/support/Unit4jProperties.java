@@ -37,7 +37,7 @@ import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
-import org.caotc.unit4j.core.common.reflect.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 /**

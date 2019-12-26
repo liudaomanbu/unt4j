@@ -45,7 +45,7 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.base.CaseFormat;
-import org.caotc.unit4j.core.common.reflect.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.exception.NeverHappenException;

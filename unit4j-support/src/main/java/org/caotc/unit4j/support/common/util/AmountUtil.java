@@ -25,9 +25,9 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.common.reflect.MethodNameStyle;
-import org.caotc.unit4j.core.common.reflect.ReadableProperty;
-import org.caotc.unit4j.core.common.reflect.WritableProperty;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.annotation.WithUnit;
@@ -70,7 +70,8 @@ public class AmountUtil {
   @NonNull
   public static <T> ImmutableSet<WritableProperty<T, ?>> amountWritablePropertiesFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck) {
-    return amountWritablePropertiesFromClass(clazz, fieldExistCheck, MethodNameStyle.values());
+    return amountWritablePropertiesFromClass(clazz, fieldExistCheck,
+        PropertyAccessorMethodFormat.values());
   }
 
   /**
@@ -78,7 +79,7 @@ public class AmountUtil {
    *
    * @param clazz 需要获取可写{@link org.caotc.unit4j.core.Amount}属性的类
    * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-   * @param methodNameStyles 属性写方法格式集合
+   * @param propertyAccessorMethodFormats 属性写方法格式集合
    * @return 可写{@link org.caotc.unit4j.core.Amount}属性{@link WritableProperty}集合
    * @author caotc
    * @date 2019-10-26
@@ -87,8 +88,9 @@ public class AmountUtil {
   @NonNull
   public static <T> ImmutableSet<WritableProperty<T, ?>> amountWritablePropertiesFromClass(
       @NonNull Class<T> clazz, boolean fieldExistCheck,
-      @NonNull MethodNameStyle... methodNameStyles) {
-    return ReflectionUtil.writablePropertiesFromClass(clazz, fieldExistCheck, methodNameStyles)
+      @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+    return ReflectionUtil.writablePropertiesFromClass(clazz, fieldExistCheck,
+        propertyAccessorMethodFormats)
         .stream().filter(writableProperty ->
             Amount.class.equals(writableProperty.type().getRawType())
                 || writableProperty.annotation(WithUnit.class).isPresent())

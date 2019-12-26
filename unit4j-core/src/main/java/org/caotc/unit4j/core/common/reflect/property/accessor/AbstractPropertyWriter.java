@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.reflect;
+package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
@@ -23,15 +23,15 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Optional;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
+import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
- * 属性获取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
+ * 属性设置器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
  *
  * @param <T> 拥有该属性的类
  * @param <R> 属性类型
@@ -40,47 +40,72 @@ import org.caotc.unit4j.core.common.util.ReflectionUtil;
  * @since 1.0.0
  */
 @Data
-public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyElement<T, R> implements
-    PropertyReader<T, R> {
+public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyElement<T, R> implements
+    PropertyWriter<T, R> {
 
-  <M extends AccessibleObject & Member> AbstractPropertyReader(
+  <M extends AccessibleObject & Member> AbstractPropertyWriter(
       @NonNull M member) {
     super(member);
   }
 
   /**
-   * 从传入的对象中获取该属性的值
+   * 给传入对象的该属性设置传入的值
    *
-   * @param object 对象
-   * @return 对象中该属性的值
+   * @param object 设置属性值的对象
+   * @param value 设置的属性值
+   * @return {@code this}
    * @author caotc
-   * @date 2019-05-27
+   * @date 2019-05-28
    * @since 1.0.0
    */
   @Override
   @NonNull
-  public final Optional<R> read(@NonNull T object) {
+  public final AbstractPropertyWriter<T, R> write(@NonNull T object, @NonNull R value) {
     if (!accessible()) {
       accessible(true);
     }
-    return readInternal(object);
+    writeInternal(object, value);
+    return this;
   }
 
   /**
-   * 从传入的对象中获取该属性的值
+   * 给传入对象的该属性设置传入的值
    *
-   * @param object 对象
-   * @return 对象中该属性的值
+   * @param object 设置属性值的对象
+   * @param value 设置的属性值
+   * @author caotc
+   * @date 2019-05-28
+   * @since 1.0.0
+   */
+  protected abstract void writeInternal(@NonNull T object, @NonNull R value);
+
+  /**
+   * 属性名称
+   *
+   * @return 属性名称
    * @author caotc
    * @date 2019-05-27
    * @since 1.0.0
    */
+  @Override
   @NonNull
-  protected abstract Optional<R> readInternal(@NonNull T object);
+  public abstract String propertyName();
+
+  /**
+   * 属性类型
+   *
+   * @return 属性类型
+   * @author caotc
+   * @date 2019-05-27
+   * @since 1.0.0
+   */
+  @Override
+  @NonNull
+  public abstract TypeToken<? extends R> propertyType();
 
   @Override
   @NonNull
-  public final <R1 extends R> PropertyReader<T, R1> propertyType(
+  public final <R1 extends R> PropertyWriter<T, R1> propertyType(
       @NonNull Class<R1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
@@ -88,32 +113,32 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
   @SuppressWarnings("unchecked")
   @Override
   @NonNull
-  public final <R1 extends R> PropertyReader<T, R1> propertyType(
+  public final <R1 extends R> PropertyWriter<T, R1> propertyType(
       @NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertyReader is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (PropertyReader<T, R1>) this;
+        , "PropertyWriter is known propertyType %s,not %s ", propertyType(), propertyType);
+    return (PropertyWriter<T, R1>) this;
   }
 
   @Override
   public final boolean isReader() {
-    return true;
+    return false;
   }
 
   @Override
   public final boolean isWriter() {
-    return false;
+    return true;
   }
 
   /**
-   * {@link Field}实现的属性获取器
+   * {@link Field}实现的属性设置器
    *
    * @author caotc
    * @date 2019-05-27
    * @since 1.0.0
    */
   @Value
-  public static class FieldElementPropertyReader<T, R> extends AbstractPropertyReader<T, R> {
+  public static class FieldElementPropertyWriter<T, R> extends AbstractPropertyWriter<T, R> {
 
     /**
      * 属性
@@ -121,15 +146,16 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     @NonNull
     FieldElement<T, R> fieldElement;
 
-    FieldElementPropertyReader(@NonNull FieldElement<T, R> fieldElement) {
+    FieldElementPropertyWriter(@NonNull FieldElement<T, R> fieldElement) {
       super(fieldElement);
+      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(fieldElement),
+          "%s is not a PropertyWriter");
       this.fieldElement = fieldElement;
     }
 
-    @NonNull
     @Override
-    public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable(fieldElement.get(object));
+    public void writeInternal(@NonNull T obj, @NonNull R value) {
+      fieldElement.set(obj, value);
     }
 
     @Override
@@ -146,53 +172,55 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     public @NonNull String propertyName() {
       return fieldElement.getName();
     }
+
   }
 
   /**
-   * get{@link Invokable}实现的属性获取器
+   * set{@link Invokable}实现的属性设置器
    *
    * @author caotc
    * @date 2019-05-27
    * @since 1.0.0
    */
   @Value
-  public static class InvokablePropertyReader<T, R> extends AbstractPropertyReader<T, R> {
+  public static class InvokablePropertyWriter<T, R> extends AbstractPropertyWriter<T, R> {
 
     /**
-     * get方法
+     * set方法
      */
-    @NonNull Invokable<T, R> getInvokable;
+    @NonNull
+    Invokable<T, ?> setInvokable;
     /**
-     * 属性名称
+     * set方法名称风格
      */
-    @NonNull String propertyName;
+    @NonNull
+    String propertyName;
 
-    InvokablePropertyReader(@NonNull Invokable<T, R> invokable,
+    InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
         @NonNull String propertyName) {
       super(invokable);
       Preconditions
-          .checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a getInvokable",
+          .checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a setInvokable",
               invokable);
-      this.getInvokable = invokable;
+      this.setInvokable = invokable;
       this.propertyName = propertyName;
     }
 
-    @NonNull
     @Override
     @SneakyThrows
-    public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable(getInvokable.invoke(object));
+    public void writeInternal(@NonNull T obj, @NonNull R value) {
+      setInvokable.invoke(obj, value);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
-      return getInvokable.getReturnType();
+      return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
     }
 
     @Override
     public boolean basedOnField() {
       return false;
     }
-
   }
 }

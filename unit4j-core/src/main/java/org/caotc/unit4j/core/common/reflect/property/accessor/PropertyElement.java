@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.reflect;
+package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -27,6 +27,7 @@ import java.lang.reflect.Member;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
@@ -53,12 +54,12 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
 
   @NonNull
   static <T, R> PropertyElement<T, R> from(@NonNull Invokable<T, R> invokable,
-      @NonNull MethodNameStyle methodNameStyle) {
+      @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
     if (ReflectionUtil.isPropertyReader(invokable)) {
-      PropertyReader.from(invokable, methodNameStyle);
+      PropertyReader.from(invokable, propertyAccessorMethodFormat);
     }
     if (ReflectionUtil.isPropertyWriter(invokable)) {
-      PropertyReader.from(invokable, methodNameStyle);
+      PropertyReader.from(invokable, propertyAccessorMethodFormat);
     }
     throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
   }

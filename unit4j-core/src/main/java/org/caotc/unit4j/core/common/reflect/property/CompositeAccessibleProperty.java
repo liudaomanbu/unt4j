@@ -14,75 +14,60 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.reflect;
+package org.caotc.unit4j.core.common.reflect.property;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.Value;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 
 /**
- * 可写属性
+ * 可读取属性
  *
  * @param <T> 拥有该属性的类
  * @param <R> 属性类型
  * @author caotc
  * @date 2019-05-27
- * @see WritableProperty
- * @see PropertyWriter
+ * @see PropertyReader
  * @since 1.0.0
  */
 @Value
-public class CompositeWritableProperty<T, R, E> extends AbstractWritableProperty<T, R> implements
-    WritableProperty<T, R> {
-
-  /**
-   * static constructor
-   *
-   * @param targetReadableProperty targetReadableProperty
-   * @param delegate delegate
-   * @return {@link CompositeWritableProperty}
-   * @author caotc
-   * @date 2019-11-27
-   * @since 1.0.0
-   */
-  @NonNull
-  protected static <T, R, E> CompositeWritableProperty<T, R, E> create(
-      @NonNull ReadableProperty<T, E> targetReadableProperty,
-      @NonNull WritableProperty<E, R> delegate) {
-    return new CompositeWritableProperty<T, R, E>(targetReadableProperty, delegate);
-  }
+public class CompositeAccessibleProperty<T, R, E> extends
+    AbstractAccessibleProperty<T, R> implements
+    AccessibleProperty<T, R> {
 
   @NonNull
   ReadableProperty<T, E> targetReadableProperty;
   @NonNull
-  WritableProperty<E, R> delegate;
+  AccessibleProperty<E, R> delegate;
 
-  private CompositeWritableProperty(
+  protected CompositeAccessibleProperty(
       @NonNull ReadableProperty<T, E> targetReadableProperty,
-      @NonNull WritableProperty<E, R> delegate) {
+      @NonNull AccessibleProperty<E, R> delegate) {
     super(targetReadableProperty, delegate);
     this.targetReadableProperty = targetReadableProperty;
     this.delegate = delegate;
   }
 
   @Override
-  public @NonNull CompositeWritableProperty<T, R, E> write(@NonNull T target, @NonNull R value) {
+  public @NonNull Optional<R> read(@NonNull T target) {
+    return targetReadableProperty.read(target).flatMap(delegate::read);
+  }
+
+  @Override
+  public @NonNull AccessibleProperty<T, R> write(@NonNull T target, @NonNull R value) {
     targetReadableProperty.read(target)
         .ifPresent(actualTarget -> delegate.write(actualTarget, value));
     return this;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends R> CompositeWritableProperty<T, R1, E> type(
+  public @NonNull <R1 extends R> CompositeAccessibleProperty<T, R1, E> type(
       @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-        , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
-    return (CompositeWritableProperty<T, R1, E>) this;
+    return (CompositeAccessibleProperty<T, R1, E>) super.type(propertyType);
   }
 
   @Override
@@ -102,8 +87,8 @@ public class CompositeWritableProperty<T, R, E> extends AbstractWritableProperty
     return delegate.annotations();
   }
 
-  @Override
   @NonNull
+  @Override
   public ImmutableList<Annotation> declaredAnnotations() {
     return delegate.declaredAnnotations();
   }

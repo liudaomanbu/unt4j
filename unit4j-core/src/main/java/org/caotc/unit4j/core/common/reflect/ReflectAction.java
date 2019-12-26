@@ -14,21 +14,30 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.support.exception;
+package org.caotc.unit4j.core.common.reflect;
 
+import com.google.common.reflect.TypeToken;
+import java.util.function.Predicate;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 
 /**
  * @author caotc
- * @date 2019-11-22
+ * @date 2019-12-26
  * @since 1.0.0
  */
-@Value(staticConstructor = "create")
-public class NotAmountPropertyException extends IllegalArgumentException {
+@Value
+@Builder
+public class ReflectAction<T, R> {
 
   @NonNull
-  ReadableProperty<?, ?> property;
+  TypeToken<T> target;
+
+  @NonNull
+  R reflectTypeClass;
+
+  @NonNull
+  Predicate<?> filter;
 
 }
