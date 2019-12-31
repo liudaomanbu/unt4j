@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,13 +45,16 @@ public abstract class PropertyNotFoundException extends IllegalArgumentException
   @NonNull
   String propertyName;
   @Getter(lazy = true)
-  String message = message();
+  String message = messageInternal();
 
   protected PropertyNotFoundException(@NonNull TypeToken<?> typeToken,
       @NonNull String propertyName) {
     this.propertyName = propertyName;
     this.typeToken = typeToken;
   }
+
+  @NonNull
+  protected abstract String messageInternal();
 
   /**
    * Returns the detail message string of this throwable.
@@ -60,6 +63,8 @@ public abstract class PropertyNotFoundException extends IllegalArgumentException
    * null}).
    */
   @Override
-  public abstract String getMessage();
+  public final String getMessage() {
+    return message();
+  }
 
 }
