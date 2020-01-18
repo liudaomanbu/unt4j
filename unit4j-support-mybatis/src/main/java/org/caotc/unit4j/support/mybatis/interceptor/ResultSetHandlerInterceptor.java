@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.caotc.unit4j.support.common.util.AmountUtil;
 
 /**
  * 结果集拦截器
@@ -61,8 +62,14 @@ public class ResultSetHandlerInterceptor implements Interceptor {
     Object result = invocation.proceed();
     log.error("resultSet:{}", statement.getResultSet());
     if (result instanceof Collection) {
-      Collection<?> collection = (Collection<?>) result;
+      Collection<?> results = (Collection<?>) result;
 
+      results.forEach(o -> {
+        AmountUtil.accessibleAmountPropertyStreamFromClass(o.getClass())
+            .forEach(accessibleAmountProperty -> {
+//              AmountUtil.readAmount(accessibleAmountProperty,o);
+            });
+      });
     }
     return result;
   }

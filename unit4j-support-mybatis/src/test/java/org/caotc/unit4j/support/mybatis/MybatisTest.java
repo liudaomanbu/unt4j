@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public class MybatisTest {
   void findByPrimaryKeyOnResultType() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      TestAmount testAmount = dao.findByPrimaryKeyOnResultType(1L);
+      TestAmount testAmount = dao.findByPrimaryKeyOnResultType(2L);
       log.info("testAmount:{}", testAmount);
     }
   }

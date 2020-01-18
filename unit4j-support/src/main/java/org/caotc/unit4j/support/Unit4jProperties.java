@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,14 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.caotc.unit4j.api.annotation.AmountSerialize;
+import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
-import org.caotc.unit4j.support.annotation.AmountSerialize;
 
 /**
  * 属性,生成{@link AmountCodecConfig}对象使用 //TODO 可变性考虑

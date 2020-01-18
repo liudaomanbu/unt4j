@@ -97,15 +97,10 @@ public class ReflectAction<T, R> {
   @NonNull
   public Optional<R> only() {
     return stream().findAny();
-
   }
 
   @NonNull
   public R onlyExact() {
     return only().orElseThrow(IllegalAccessError::new);
-  }
-
-  public static void main(String[] args) {
-//    from(null).method().field();
   }
 }

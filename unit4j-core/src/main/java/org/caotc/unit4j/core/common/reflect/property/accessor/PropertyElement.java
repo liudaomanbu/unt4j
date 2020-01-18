@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,10 +56,10 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
   static <T, R> PropertyElement<T, R> from(@NonNull Invokable<T, R> invokable,
       @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
     if (ReflectionUtil.isPropertyReader(invokable)) {
-      PropertyReader.from(invokable, propertyAccessorMethodFormat);
+      return PropertyReader.from(invokable, propertyAccessorMethodFormat);
     }
     if (ReflectionUtil.isPropertyWriter(invokable)) {
-      PropertyReader.from(invokable, propertyAccessorMethodFormat);
+      return PropertyWriter.from(invokable, propertyAccessorMethodFormat);
     }
     throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
   }

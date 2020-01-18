@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,25 @@
 package org.caotc.unit4j.support.common.util;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.TypeToken;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import org.caotc.unit4j.api.annotation.WithUnit;
+import org.caotc.unit4j.api.annotation.WithUnit.ValueType;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
+import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.support.annotation.WithUnit;
-import org.caotc.unit4j.support.annotation.WithUnit.ValueType;
 import org.caotc.unit4j.support.exception.NotAmountPropertyException;
 
 /**
@@ -41,6 +45,8 @@ import org.caotc.unit4j.support.exception.NotAmountPropertyException;
  */
 @UtilityClass
 public class AmountUtil {
+
+  private static final TypeToken<Amount> AMOUNT_TYPE_TOKEN = TypeToken.of(Amount.class);
 
   /**
    * 从传入的类中获取包括所有超类和接口的可写{@link org.caotc.unit4j.core.Amount}属性{@link WritableProperty}集合
@@ -91,14 +97,24 @@ public class AmountUtil {
       @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
     return ReflectionUtil.writablePropertiesFromClass(clazz, fieldExistCheck,
         propertyAccessorMethodFormats)
-        .stream().filter(writableProperty ->
-            Amount.class.equals(writableProperty.type().getRawType())
-                || writableProperty.annotation(WithUnit.class).isPresent())
+        .stream().filter(AmountUtil::isAmount)
         .collect(ImmutableSet.toImmutableSet());
   }
 
-  public static boolean isAmount(@NonNull ReadableProperty<?, ?> readableProperty) {
-    return readableProperty.type().getRawType().equals(Amount.class)
+  @NonNull
+  public static <T> Stream<WritableProperty<T, ?>> writableAmountPropertyStreamFromClass(
+      @NonNull Class<T> type) {
+    return ReflectionUtil.writablePropertyStreamFromClass(type).filter(AmountUtil::isAmount);
+  }
+
+  @NonNull
+  public static <T> Stream<AccessibleProperty<T, ?>> accessibleAmountPropertyStreamFromClass(
+      @NonNull Class<T> type) {
+    return ReflectionUtil.accessiblePropertyStreamFromClass(type).filter(AmountUtil::isAmount);
+  }
+
+  public static boolean isAmount(@NonNull Property<?, ?> readableProperty) {
+    return readableProperty.type().equals(AMOUNT_TYPE_TOKEN)
         || readableProperty.annotation(WithUnit.class).isPresent();
   }
 

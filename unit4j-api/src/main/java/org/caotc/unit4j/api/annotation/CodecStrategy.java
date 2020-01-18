@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.support;
+package org.caotc.unit4j.api.annotation;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.util.Set;
 import java.util.function.Function;
 import lombok.NonNull;
+import org.caotc.unit4j.api.annotation.SerializeCommand.Type;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.support.SerializeCommand.Type;
-import org.caotc.unit4j.support.SerializeCommands.SerializeCommandsBuilder;
 
 /**
  * 序列化、反序列化时的策略
@@ -47,20 +45,21 @@ public enum CodecStrategy {
         @NonNull Function<ImmutableList<String>, String> fieldNameConverter,
         @NonNull Function<Class<? extends T>, ? extends Set<PropertyReader<T, ?>>> fieldWrapperConverter,
         @NonNull CaseFormat fieldNameFormat) {
-      SerializeCommandsBuilder builder = SerializeCommands.builder()
-          .command(SerializeCommand.START_OBJECT);
-      ImmutableSet<SerializeCommand> writeFieldCommands = fieldWrapperConverter
-          .apply((Class<? extends T>) value.getClass()).stream()
-          .map(fieldWrapper -> SerializeCommand
-              .create(Type.WRITE_FIELD,
-                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
-                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
-      writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
-          .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
-              .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
-      writeFieldCommands.stream().skip(writeFieldCommands.size() - 1).forEach(builder::command);
-
-      return builder.command(SerializeCommand.END_OBJECT).build();
+//      SerializeCommandsBuilder builder = SerializeCommands.builder()
+//          .command(SerializeCommand.START_OBJECT);
+//      ImmutableSet<SerializeCommand> writeFieldCommands = fieldWrapperConverter
+//          .apply((Class<? extends T>) value.getClass()).stream()
+//          .map(fieldWrapper -> SerializeCommand
+//              .create(Type.WRITE_FIELD,
+//                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
+//                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
+//      writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
+//          .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
+//              .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
+//      writeFieldCommands.stream().skip(writeFieldCommands.size() - 1).forEach(builder::command);
+//
+//      return builder.command(SerializeCommand.END_OBJECT).build();
+      return null;
     }
   },
   /**
@@ -96,18 +95,19 @@ public enum CodecStrategy {
         @NonNull Function<ImmutableList<String>, String> fieldNameConverter,
         @NonNull Function<Class<? extends T>, ? extends Set<PropertyReader<T, ?>>> fieldWrapperConverter,
         @NonNull CaseFormat fieldNameFormat) {
-      SerializeCommandsBuilder builder = SerializeCommands.builder();
-      ImmutableSet<SerializeCommand> writeFieldCommands = fieldWrapperConverter
-          .apply((Class<? extends T>) value.getClass()).stream()
-          .map(fieldWrapper -> SerializeCommand
-              .create(Type.WRITE_FIELD,
-                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
-                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
-      writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
-          .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
-              .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
-      writeFieldCommands.stream().skip(writeFieldCommands.size() - 1).forEach(builder::command);
-      return builder.command(SerializeCommand.REMOVE_ORIGINAL_FIELD).build();
+//      SerializeCommandsBuilder builder = SerializeCommands.builder();
+//      ImmutableSet<SerializeCommand> writeFieldCommands = fieldWrapperConverter
+//          .apply((Class<? extends T>) value.getClass()).stream()
+//          .map(fieldWrapper -> SerializeCommand
+//              .create(Type.WRITE_FIELD,
+//                  fieldNameConverter.apply(fieldNameFormat.split(fieldWrapper.propertyName())),
+//                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
+//      writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
+//          .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
+//              .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
+//      writeFieldCommands.stream().skip(writeFieldCommands.size() - 1).forEach(builder::command);
+//      return builder.command(SerializeCommand.REMOVE_ORIGINAL_FIELD).build();
+      return null;
     }
 
   };

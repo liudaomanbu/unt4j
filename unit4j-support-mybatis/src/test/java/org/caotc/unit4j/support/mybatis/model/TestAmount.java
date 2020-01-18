@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.caotc.unit4j.support.annotation.AmountSerialize;
-import org.caotc.unit4j.support.annotation.WithUnit;
-import org.caotc.unit4j.support.annotation.WithUnit.ValueType;
+import org.caotc.unit4j.api.annotation.AmountDeserialize;
+import org.caotc.unit4j.api.annotation.AmountSerialize;
+import org.caotc.unit4j.api.annotation.WithUnit;
+import org.caotc.unit4j.api.annotation.WithUnit.ValueType;
+
 
 /**
  * `
@@ -35,11 +37,10 @@ import org.caotc.unit4j.support.annotation.WithUnit.ValueType;
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 public class TestAmount {
 
-  public static int static_int = 1;
-
   Long id;
 
   @AmountSerialize(targetUnitId = "SECOND")
+  @AmountDeserialize(sourceUnitId = "SECOND")
   @WithUnit("MINUTE")
   BigDecimal withUnitValue;
 

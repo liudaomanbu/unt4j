@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -564,6 +564,8 @@ public final class Configuration implements WithId {
   public Configuration register(@NonNull BaseStandardUnit source,
       @NonNull BaseStandardUnit target,
       @NonNull UnitConvertConfig unitConvertConfig) {
+    register(source);
+    register(target);
     addUnitConvertConfig(source, target, unitConvertConfig);
     return this;
   }
