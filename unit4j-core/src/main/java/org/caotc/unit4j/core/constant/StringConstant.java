@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import lombok.experimental.UtilityClass;
  * @since 1.0.0
  **/
 @UtilityClass
-public class StringConstant {
+public final class StringConstant {
 
   /**
    * 空字符串

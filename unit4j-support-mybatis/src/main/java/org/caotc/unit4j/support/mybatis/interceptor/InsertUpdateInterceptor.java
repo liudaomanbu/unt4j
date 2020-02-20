@@ -17,12 +17,6 @@
 package org.caotc.unit4j.support.mybatis.interceptor;
 
 import com.google.common.collect.ImmutableList;
-import java.sql.Connection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -37,11 +31,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
@@ -59,14 +49,21 @@ import org.caotc.unit4j.support.common.util.AmountUtil;
 import org.caotc.unit4j.support.mybatis.sql.visitor.ParameterMappingMatchColumnInsertUpdateVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
 
+import java.sql.Connection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.stream.Stream;
+
 /**
  * @author caotc
  * @date 2019-05-31
  * @since 1.0.0
  */
 @Intercepts({
-    @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class,
-        Integer.class})
+        @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class,
+                Integer.class})
 })
 @Slf4j
 public class InsertUpdateInterceptor implements Interceptor {
@@ -97,12 +94,12 @@ public class InsertUpdateInterceptor implements Interceptor {
       ParameterMappingMatchColumnInsertUpdateVisitor parameterMappingMatchColumnInsertUpdateVisitor = ParameterMappingMatchColumnInsertUpdateVisitor
           .create(boundSql.getParameterMappings());
       parse.accept(parameterMappingMatchColumnInsertUpdateVisitor);
-      parameterMappingMatchColumnInsertUpdateVisitor.columnToParameterMappings().entrySet().stream()
-          .map(entry -> SqlParam.create(entry.getValue(), entry.getKey(),
-              readableProperty(entry.getValue(), boundSql.getParameterObject(), mappedStatement)
-                  .orElseThrow(
-                      NeverHappenException::instance)))
-          .filter(sqlParam -> AmountUtil.isAmount(sqlParam.readableProperty))
+        parameterMappingMatchColumnInsertUpdateVisitor.columnToParameterMappings().entrySet().stream()
+                .map(entry -> SqlParam.create(entry.getValue(), entry.getKey(),
+                        readableProperty(entry.getValue(), boundSql.getParameterObject(), mappedStatement)
+                                .orElseThrow(
+                                        NeverHappenException::instance)))
+                .filter(sqlParam -> AmountUtil.isAmountProperty(sqlParam.readableProperty))
           .forEach(sqlParam -> {
             //noinspection unchecked
             AmountUtil

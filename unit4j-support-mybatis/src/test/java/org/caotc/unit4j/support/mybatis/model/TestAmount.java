@@ -16,7 +16,6 @@
 
 package org.caotc.unit4j.support.mybatis.model;
 
-import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +23,8 @@ import org.caotc.unit4j.api.annotation.AmountDeserialize;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.WithUnit;
 import org.caotc.unit4j.api.annotation.WithUnit.ValueType;
+
+import java.math.BigDecimal;
 
 
 /**
@@ -44,6 +45,7 @@ public class TestAmount {
   @WithUnit("MINUTE")
   BigDecimal withUnitValue;
 
+  @AmountDeserialize(sourceUnitId = "SECOND", targetUnitId = "MINUTE")
   @WithUnit(value = "unit", valueType = ValueType.PROPERTY_NAME)
   BigDecimal withUnitProperty;
 

@@ -16,8 +16,9 @@
 
 package org.caotc.unit4j.api.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
+import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.core.constant.StringConstant;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -25,8 +26,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.common.base.CaseFormat;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 
 /**
  * 数量序列化配置注解
@@ -74,12 +76,12 @@ public @interface AmountSerialize {
   /**
    * @return 目标单位id
    */
-  String targetUnitId() default "";
+  String targetUnitId() default StringConstant.EMPTY;
 
   /**
    * @return 来源单位id
    */
-  String sourceUnitId() default "";
+  String sourceUnitId() default StringConstant.EMPTY;
 
   //TODO 目标属性名称的格式以外的内容
 }

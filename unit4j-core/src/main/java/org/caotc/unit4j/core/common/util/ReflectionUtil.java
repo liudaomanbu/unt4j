@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,6 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -40,15 +32,20 @@ import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.caotc.unit4j.core.common.reflect.property.accessor.*;
 import org.caotc.unit4j.core.exception.AccessiblePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 //TODO 将所有方法优化到只有一次流操作
 
 /**
@@ -1305,10 +1302,45 @@ public class ReflectionUtil {
   @SuppressWarnings("unchecked")
   @NonNull
   public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
-      @NonNull Type type,
-      @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+          @NonNull Type type,
+          @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
     return accessiblePropertyStreamFromClass((TypeToken<T>) TypeToken.of(type),
-        propertyAccessorMethodFormats);
+            propertyAccessorMethodFormats);
+  }
+
+  /**
+   * get all properties from object
+   *
+   * @param object target object
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @NonNull
+  public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+          @NonNull T object) {
+    return accessiblePropertyStreamFromClass(object, DEFAULT_METHOD_NAME_STYLES);
+  }
+
+  /**
+   * get all properties from class
+   *
+   * @param object                        target class
+   * @param propertyAccessorMethodFormats get set methods styles
+   * @return {@link Stream} of all properties
+   * @author caotc
+   * @date 2019-11-28
+   * @apiNote
+   * @since 1.0.0
+   */
+  @SuppressWarnings("unchecked")
+  @NonNull
+  public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+          @NonNull T object,
+          @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+    return accessiblePropertyStreamFromClass((Class<T>) object.getClass(), propertyAccessorMethodFormats);
   }
 
   /**
