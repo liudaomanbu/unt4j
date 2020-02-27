@@ -17,9 +17,6 @@
 package org.caotc.unit4j.support.mybatis.interceptor;
 
 import com.google.common.collect.ImmutableSet;
-import java.sql.Connection;
-import java.util.Properties;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -29,11 +26,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
@@ -44,6 +37,10 @@ import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.common.util.AmountUtil;
 import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
+
+import java.sql.Connection;
+import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  * @author caotc
@@ -86,20 +83,20 @@ public class SelectInterceptor implements Interceptor {
 //            .discriminator(resultMap.getDiscriminator()).build();
 //        SystemMetaObject.forObject(mappedStatement).setValue("resultMaps", Lists.newArrayList(resultMap));
         Class<?> type = resultMap.getType();
-        log.error("getMappedProperties:{}", resultMap.getMappedProperties());
-        log.error("getMappedColumns:{}", resultMap.getMappedColumns());
-        log.error("getConstructorResultMappings:{}", resultMap.getConstructorResultMappings());
-        log.error("getIdResultMappings:{}", resultMap.getIdResultMappings());
-        log.error("getPropertyResultMappings:{}", resultMap.getPropertyResultMappings());
-        log.error("getResultMappings:{}", resultMap.getResultMappings());
+        log.debug("getMappedProperties:{}", resultMap.getMappedProperties());
+        log.debug("getMappedColumns:{}", resultMap.getMappedColumns());
+        log.debug("getConstructorResultMappings:{}", resultMap.getConstructorResultMappings());
+        log.debug("getIdResultMappings:{}", resultMap.getIdResultMappings());
+        log.debug("getPropertyResultMappings:{}", resultMap.getPropertyResultMappings());
+        log.debug("getResultMappings:{}", resultMap.getResultMappings());
         ImmutableSet<? extends WritableProperty<?, ?>> writableProperties = AmountUtil
-            .amountWritablePropertiesFromClass(type);
+                .amountWritablePropertiesFromClass(type);
 
         ImmutableSet<AmountCodecConfig> amountCodecConfigs = writableProperties.stream()
-            .map(writableProperty -> unit4jProperties
-                .createAmountCodecConfig(writableProperty.name(),
-                    writableProperty.annotation(AmountSerialize.class)
-                        .orElse(null))).collect(ImmutableSet.toImmutableSet());
+                .map(writableProperty -> unit4jProperties
+                        .createAmountCodecConfig(writableProperty.name(),
+                                writableProperty.annotation(AmountSerialize.class)
+                                        .orElse(null))).collect(ImmutableSet.toImmutableSet());
 
         Select select = (Select) parse;
 

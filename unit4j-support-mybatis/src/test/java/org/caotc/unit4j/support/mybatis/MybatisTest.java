@@ -29,6 +29,7 @@ import org.caotc.unit4j.core.constant.UnitConstant;
 import org.caotc.unit4j.support.mybatis.mapper.TestAmountMapper;
 import org.caotc.unit4j.support.mybatis.model.TestAmount;
 import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,9 +40,9 @@ import java.math.BigDecimal;
 public class MybatisTest {
 
   private static final Amount AMOUNT = Amount.create(123L, UnitConstant.SECOND);
-  private static final TestAmount TEST_AMOUNT = new TestAmount().id(9L)
-      .withUnitValue(BigDecimal.TEN).withUnitProperty(BigDecimal.TEN)
-      .unit(UnitConstant.SECOND.id()).object("ssssssssssssssssss");
+  private static final TestAmount TEST_AMOUNT = new TestAmount()
+          .withUnitValue(BigDecimal.TEN).withUnitProperty(BigDecimal.ONE)
+          .unit(UnitConstant.HOUR.id()).object("ssssssssssssssssss");
   private static SqlSessionFactory sqlSessionFactory;
 
   static {
@@ -58,8 +59,11 @@ public class MybatisTest {
   void findByPrimaryKeyOnResultType() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      TestAmount testAmount = dao.findByPrimaryKeyOnResultType(2L);
-      log.info("testAmount:{}", testAmount);
+      TestAmount result = dao.findByPrimaryKeyOnResultType(1L);
+      log.debug("result:{}", result);
+      Assertions.assertEquals(BigDecimal.TEN, result.withUnitValue());
+      Assertions.assertEquals(BigDecimal.ONE, result.withUnitProperty());
+      Assertions.assertEquals(UnitConstant.MINUTE.id(), result.unit());
     }
   }
 
@@ -67,8 +71,11 @@ public class MybatisTest {
   void findByPrimaryKeyOnResultMap() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      TestAmount testAmount = dao.findByPrimaryKeyOnResultMap(2L);
-      log.info("testAmount:{}", testAmount);
+      TestAmount result = dao.findByPrimaryKeyOnResultMap(1L);
+      log.debug("result:{}", result);
+      Assertions.assertEquals(BigDecimal.TEN, result.withUnitValue());
+      Assertions.assertEquals(BigDecimal.ONE, result.withUnitProperty());
+      Assertions.assertEquals(UnitConstant.MINUTE.id(), result.unit());
     }
   }
 
@@ -76,9 +83,23 @@ public class MybatisTest {
   void insert() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      int effectRows = dao.insert(TEST_AMOUNT);
+      Amount amount = Amount.create(BigDecimal.ONE, UnitConstant.HOUR);
+      TestAmount param = new TestAmount()
+              .withUnitValue(BigDecimal.TEN).withUnitProperty(amount.bigDecimalValue())
+              .unit(amount.unit().id());
+      log.debug("param:{}", param);
+      int effectRows = dao.insertSelective(param);
+      log.debug("effectRows:{}", effectRows);
+      Assertions.assertEquals(1, effectRows);
+
+      TestAmount result = dao.findByPrimaryKeyOnResultType(param.id());
+      log.debug("result:{}", result);
+      Assertions.assertNotNull(result);
+
+      Assertions.assertEquals(param.withUnitValue(), result.withUnitValue());
+      Assertions.assertEquals(amount.convertTo(UnitConstant.MINUTE).unit().id(), result.unit());
+      Assertions.assertEquals(amount.convertTo(UnitConstant.MINUTE).bigDecimalValue(), result.withUnitProperty());
       session.commit();
-      log.info("effectRows:{}", effectRows);
     }
   }
 
@@ -86,7 +107,7 @@ public class MybatisTest {
   void update() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      int effectRows = dao.updateByPrimaryKey(TEST_AMOUNT);
+      int effectRows = dao.updateByPrimaryKeySelective(TEST_AMOUNT);
       session.commit();
       log.info("effectRows:{}", effectRows);
     }

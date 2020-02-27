@@ -40,50 +40,23 @@
         id,with_unit_value,with_unit_property,unit
     </sql>
 
-  <insert id="insert" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
-    parameterType="org.caotc.unit4j.support.mybatis.model.TestAmount">
-    insert into test_amount(
-    <trim suffixOverrides=",">
-      with_unit_value,
-      gmt_created,
-      with_unit_property,
-      unit,
-    </trim>
-    )
-    values (
-    <trim suffixOverrides=",">
-      #{withUnitValue},
-      now(),
-      #{withUnitProperty},
-      #{unit}
-    </trim>
-    )
-  </insert>
-
   <insert id="insertSelective" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
     parameterType="org.caotc.unit4j.support.mybatis.model.TestAmount">
     insert into test_amount(
     <trim suffixOverrides=",">
-      <if test="amountValue!= null">amount_value,</if>
-      <if test="doctorId!= null">amount_flat,</if>
+      <if test="withUnitValue!= null">with_unit_value,</if>
+      <if test="withUnitProperty!= null">with_unit_property,</if>
+      <if test="unit!= null">unit,</if>
     </trim>
     )
     values (
     <trim suffixOverrides=",">
-      <if test="amountValue!= null">#{amountValue},</if>
-      <if test="doctorId!= null">#{doctorId},</if>
+      <if test="withUnitValue!= null">#{withUnitValue},</if>
+      <if test="withUnitProperty!= null">#{withUnitProperty},</if>
+      <if test="unit!= null">#{unit},</if>
     </trim>
     )
   </insert>
-
-  <update id="updateByPrimaryKey">
-    update test_amount
-    <set>
-      amount_value = #{amountValue},
-      amount_flat = #{amountFlat},
-    </set>
-    where id = #{ id } and amount_flat = #{amountFlat}
-  </update>
 
   <update id="updateByPrimaryKeySelective">
     update test_amount

@@ -46,7 +46,7 @@ public class ResultSetHandlerInterceptor implements Interceptor {
     TypeHandlerRegistry typeHandlerRegistry = (TypeHandlerRegistry) SystemMetaObject
         .forObject(handler)
         .getValue("typeHandlerRegistry");
-    log.error("TypeHandlerRegistry:{}", typeHandlerRegistry);
+    log.debug("TypeHandlerRegistry:{}", typeHandlerRegistry);
     Statement statement = (Statement) invocation.getArgs()[0];
 //    MappedStatement mappedStatement = (MappedStatement) SystemMetaObject.forObject(handler)
 //        .getValue("mappedStatement");
@@ -57,7 +57,7 @@ public class ResultSetHandlerInterceptor implements Interceptor {
 //    SystemMetaObject.forObject(resultMapping).setValue("javaType", Amount.class);
 //    log.info("resultMapping:{}",resultMap);
     Object result = invocation.proceed();
-    log.error("resultSet:{}", statement.getResultSet());
+    log.debug("resultSet:{}", statement.getResultSet());
     if (result instanceof Collection) {
       Collection<?> results = (Collection<?>) result;
 

@@ -84,13 +84,13 @@ public class InsertUpdateInterceptor implements Interceptor {
     BoundSql boundSql = handler.getBoundSql();
 
     Statement parse = CCJSqlParserUtil.parse(boundSql.getSql());
-    log.info("sql:{}", parse);
+    log.debug("sql:{}", parse);
     if (SqlCommandType.INSERT == sqlCommandType
         || SqlCommandType.UPDATE == sqlCommandType) {
 
       List<Column> columns = SqlCommandType.INSERT == sqlCommandType ? ((Insert) parse).getColumns()
           : ((Update) parse).getColumns();
-      log.info("ParameterMappings:{}", boundSql.getParameterMappings());
+      log.debug("ParameterMappings:{}", boundSql.getParameterMappings());
       ParameterMappingMatchColumnInsertUpdateVisitor parameterMappingMatchColumnInsertUpdateVisitor = ParameterMappingMatchColumnInsertUpdateVisitor
           .create(boundSql.getParameterMappings());
       parse.accept(parameterMappingMatchColumnInsertUpdateVisitor);

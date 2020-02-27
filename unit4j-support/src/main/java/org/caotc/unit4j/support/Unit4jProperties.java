@@ -18,15 +18,6 @@ package org.caotc.unit4j.support;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NonNull;
@@ -41,6 +32,16 @@ import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
 /**
  * 属性,生成{@link AmountCodecConfig}对象使用 //TODO 可变性考虑
  *
@@ -54,6 +55,8 @@ import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 @Accessors(fluent = false, chain = true)
 public class Unit4jProperties {
+  private static final String AMOUNT_VALUE_FIELD_NAME = "value";
+  private static final String AMOUNT_UNIT_FIELD_NAME = "unit";
 
   /**
    * 默认的数学运算配置
@@ -177,7 +180,9 @@ public class Unit4jProperties {
   public AmountCodecConfig createAmountCodecConfig() {
     return AmountCodecConfig.builder().configuration(getConfiguration()).strategy(getStrategy())
 //        .nameTransformer()
-        .fieldNameConverter(getNameJoiner())
+            .outputName(getNameJoiner().apply(ImmutableList.of()))
+            .outputValueName(getNameJoiner().apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
+            .outputUnitName(getNameJoiner().apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
         .valueCodecConfig(new AmountValueCodecConfig(getValueType(), getMathContext()))
         .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
             getUnitAliasUndefinedStrategy())).build();
@@ -232,20 +237,23 @@ public class Unit4jProperties {
   @NonNull
   public AmountCodecConfig createPropertyAmountCodecConfig(@NonNull String fieldName,
       AmountSerialize amountSerialize) {
-    return AmountCodecConfig.builder()
-        .configuration(Optional.ofNullable(amountSerialize).map(AmountSerialize::configId)
-            .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
-        .strategy(Optional.ofNullable(amountSerialize).map(AmountSerialize::strategy)
-            .orElseGet(this::getPropertyStrategy))
-        .targetUnit(Optional.ofNullable(amountSerialize).map(AmountSerialize::targetUnitId)
-            .map(Configuration::getUnitByIdExact).orElse(null))
-        .fieldNameConverter(valueFieldNameWords -> getFieldNameJoiner()
+    Function<@NonNull ImmutableList<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
             .apply(valueFieldNameWords,
-                Optional.ofNullable(amountSerialize).map(AmountSerialize::caseFormat)
-                    .map(
-                        caseFormat -> (Function<@NonNull String, @NonNull ImmutableList<String>>) caseFormat::split)
-                    .orElseGet(this::getFieldNameSplitter)
-                    .apply(fieldName)))
+                    Optional.ofNullable(amountSerialize).map(AmountSerialize::caseFormat)
+                            .map(
+                                    caseFormat -> (Function<@NonNull String, @NonNull ImmutableList<String>>) caseFormat::split)
+                            .orElseGet(this::getFieldNameSplitter)
+                            .apply(fieldName));
+    return AmountCodecConfig.builder()
+            .configuration(Optional.ofNullable(amountSerialize).map(AmountSerialize::configId)
+                    .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
+            .strategy(Optional.ofNullable(amountSerialize).map(AmountSerialize::strategy)
+                    .orElseGet(this::getPropertyStrategy))
+            .targetUnit(Optional.ofNullable(amountSerialize).map(AmountSerialize::targetUnitId)
+                    .map(Configuration::getUnitByIdExact).orElse(null))
+            .outputName(fieldNameConverter.apply(ImmutableList.of()))
+            .outputValueName(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
+            .outputUnitName(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
         .valueCodecConfig(new AmountValueCodecConfig(
             Optional.ofNullable(amountSerialize).map(AmountSerialize::valueType)
                 .orElseGet(() -> (Class) getValueType()),

@@ -16,8 +16,6 @@
 
 package org.caotc.unit4j.support;
 
-import com.google.common.collect.ImmutableList;
-import java.util.function.Function;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -38,9 +36,6 @@ import org.caotc.unit4j.core.unit.Unit;
 @Builder(toBuilder = true)
 public class AmountCodecConfig {
 
-  private static final String AMOUNT_VALUE_FIELD_NAME = "value";
-  private static final String AMOUNT_UNIT_FIELD_NAME = "unit";
-
   /**
    * 配置
    */
@@ -55,11 +50,11 @@ public class AmountCodecConfig {
    */
   @NonNull
   CodecStrategy strategy;
-  /**
-   * 属性名称转换器
-   */
-  @NonNull
-  Function<ImmutableList<String>, String> fieldNameConverter;
+//  /**
+//   * 属性名称转换器
+//   */
+//  @NonNull
+//  Function<ImmutableList<String>, String> fieldNameConverter;
 //  /**
 //   * 属性名称转换器
 //   */
@@ -76,20 +71,26 @@ public class AmountCodecConfig {
   @NonNull
   UnitCodecConfig unitCodecConfig;
 
-  @NonNull
-  public String outputName() {
-    return fieldNameConverter.apply(ImmutableList.of());
-  }
+  String outputName;
 
-  @NonNull
-  public String outputValueName() {
-    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME));
-  }
+  String outputValueName;
 
-  @NonNull
-  public String outputUnitName() {
-    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME));
-  }
+  String outputUnitName;
+
+//  @NonNull
+//  public String outputName() {
+//    return fieldNameConverter.apply(ImmutableList.of());
+//  }
+
+//  @NonNull
+//  public String outputValueName() {
+//    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME));
+//  }
+//
+//  @NonNull
+//  public String outputUnitName() {
+//    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME));
+//  }
 
   /**
    * 获取传入数量对象的序列化指令

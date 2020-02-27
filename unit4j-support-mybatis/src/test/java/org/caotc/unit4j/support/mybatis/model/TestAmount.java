@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.caotc.unit4j.api.annotation.AmountDeserialize;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
+import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.api.annotation.WithUnit;
 import org.caotc.unit4j.api.annotation.WithUnit.ValueType;
 
@@ -40,12 +41,12 @@ public class TestAmount {
 
   Long id;
 
-  @AmountSerialize(targetUnitId = "SECOND")
-  @AmountDeserialize(sourceUnitId = "SECOND")
   @WithUnit("MINUTE")
   BigDecimal withUnitValue;
 
-  @AmountDeserialize(sourceUnitId = "SECOND", targetUnitId = "MINUTE")
+  //TODO AmountSerialize,AmountDeserialize,WithUnit注解之间的关系,属性覆盖处理
+  @AmountSerialize(targetUnitId = "SECOND", strategy = CodecStrategy.FLAT)
+  @AmountDeserialize(targetUnitId = "MINUTE")
   @WithUnit(value = "unit", valueType = ValueType.PROPERTY_NAME)
   BigDecimal withUnitProperty;
 

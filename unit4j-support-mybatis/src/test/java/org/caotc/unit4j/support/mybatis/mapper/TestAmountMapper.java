@@ -1,6 +1,6 @@
 
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,6 @@ import org.caotc.unit4j.support.mybatis.model.TestAmount;
 
 
 public interface TestAmountMapper {
-
-  /**
-   * 保存一个实体，null的属性也会保存，不会使用数据库默认值
-   *
-   * @param entity 入库对象
-   * @return 入库数目
-   */
-  int insert(TestAmount entity);
-
   /**
    * 对象入库
    *
@@ -37,14 +28,6 @@ public interface TestAmountMapper {
    * @return 入库数目
    */
   int insertSelective(TestAmount entity);
-
-  /**
-   * 按主键更新，null的属性也会更新
-   *
-   * @param entity 更新对象
-   * @return 影响行数
-   */
-  int updateByPrimaryKey(TestAmount entity);
 
   /**
    * 按主键更新
