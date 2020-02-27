@@ -22,7 +22,6 @@ import com.alibaba.fastjson.serializer.BeanContext;
 import com.alibaba.fastjson.serializer.BeforeFilter;
 import com.alibaba.fastjson.serializer.ContextValueFilter;
 import com.alibaba.fastjson.serializer.PropertyFilter;
-import java.lang.reflect.Type;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +32,8 @@ import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
+
+import java.lang.reflect.Type;
 
 
 /**
@@ -57,9 +58,8 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @Override
   public Object process(BeanContext context, Object object, String name, Object value) {
     AmountCodecConfig amountCodecConfig = ReflectionUtil
-        .readablePropertyFromClass(object.getClass(), name)
-        .flatMap(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class))
-        .map(amountSerialize -> unit4jProperties.createAmountCodecConfig(name, amountSerialize))
+            .readablePropertyFromClass(object.getClass(), name)
+            .map(unit4jProperties::createPropertyAmountCodecConfig)
         .orElseGet(unit4jProperties::createAmountCodecConfig);
     return amountCodecConfig.serializeCommandsFromAmount((Amount) value);
   }
@@ -67,9 +67,8 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   @Override
   public boolean apply(Object object, String name, Object value) {
     AmountCodecConfig amountCodecConfig = ReflectionUtil
-        .readablePropertyFromClass(object.getClass(), name)
-        .flatMap(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class))
-        .map(amountSerialize -> unit4jProperties.createAmountCodecConfig(name, amountSerialize))
+            .readablePropertyFromClass(object.getClass(), name)
+            .map(unit4jProperties::createPropertyAmountCodecConfig)
         .orElseGet(unit4jProperties::createAmountCodecConfig);
     return amountCodecConfig.serializeCommandsFromAmount((Amount) value).commands().stream()
         .noneMatch(SerializeCommand.REMOVE_ORIGINAL_FIELD::equals);
@@ -86,7 +85,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
           fieldWrapper.read(object).map(Amount.class::cast).ifPresent(amount -> {
             AmountCodecConfig amountCodecConfig = fieldWrapper.annotation(AmountSerialize.class)
                 .map(amountSerialize -> unit4jProperties
-                    .createAmountCodecConfig(fieldWrapper.name(), amountSerialize))
+                        .createPropertyAmountCodecConfig(fieldWrapper))
                 .orElseGet(unit4jProperties::createAmountCodecConfig);
             SerializeCommands serializeCommands = amountCodecConfig
                 .serializeCommandsFromAmount(amount);

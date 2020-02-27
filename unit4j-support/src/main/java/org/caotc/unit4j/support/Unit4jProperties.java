@@ -30,13 +30,12 @@ import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
-import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.property.Property;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -191,25 +190,6 @@ public class Unit4jProperties {
   /**
    * 获取作为其他类属性的{@link Amount}对象的序列化反序列化配置
    *
-   * @param fieldName 属性名称
-   * @param amountSerialize 序列化注解
-   * @return 序列化反序列化配置
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  @NonNull
-  public AmountCodecConfig createAmountCodecConfig(String fieldName,
-      AmountSerialize amountSerialize) {
-    if (Objects.isNull(fieldName)) {
-      return createAmountCodecConfig();
-    }
-    return createPropertyAmountCodecConfig(fieldName, amountSerialize);
-  }
-
-  /**
-   * 获取作为其他类属性的{@link Amount}对象的序列化反序列化配置
-   *
    * @param amountReadableProperty 属性名称
    * @return 序列化反序列化配置
    * @author caotc
@@ -217,33 +197,17 @@ public class Unit4jProperties {
    * @since 1.0.0
    */
   @NonNull
-  public AmountCodecConfig createPropertyAmountCodecConfig(
-      @NonNull ReadableProperty<?, ?> amountReadableProperty) {
-    return createPropertyAmountCodecConfig(amountReadableProperty.name(),
-        amountReadableProperty.annotation(AmountSerialize.class).orElse(null));
-  }
-
-  /**
-   * 获取作为其他类属性的{@link Amount}对象的序列化反序列化配置
-   *
-   * @param fieldName 属性名称
-   * @param amountSerialize 序列化注解
-   * @return 序列化反序列化配置
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
   @SuppressWarnings("unchecked")
-  @NonNull
-  public AmountCodecConfig createPropertyAmountCodecConfig(@NonNull String fieldName,
-      AmountSerialize amountSerialize) {
+  public AmountCodecConfig createPropertyAmountCodecConfig(
+          @NonNull Property<?, ?> amountReadableProperty) {
+    AmountSerialize amountSerialize = amountReadableProperty.annotation(AmountSerialize.class).orElse(null);
     Function<@NonNull ImmutableList<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
             .apply(valueFieldNameWords,
                     Optional.ofNullable(amountSerialize).map(AmountSerialize::caseFormat)
                             .map(
                                     caseFormat -> (Function<@NonNull String, @NonNull ImmutableList<String>>) caseFormat::split)
                             .orElseGet(this::getFieldNameSplitter)
-                            .apply(fieldName));
+                            .apply(amountReadableProperty.name()));
     return AmountCodecConfig.builder()
             .configuration(Optional.ofNullable(amountSerialize).map(AmountSerialize::configId)
                     .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
@@ -254,14 +218,14 @@ public class Unit4jProperties {
             .outputName(fieldNameConverter.apply(ImmutableList.of()))
             .outputValueName(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
             .outputUnitName(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
-        .valueCodecConfig(new AmountValueCodecConfig(
-            Optional.ofNullable(amountSerialize).map(AmountSerialize::valueType)
-                .orElseGet(() -> (Class) getValueType()),
-            Optional.ofNullable(amountSerialize)
-                .map(a -> new MathContext(a.precision(), a.roundingMode()))
-                .orElseGet(this::getMathContext)))
-        .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
-            getUnitAliasUndefinedStrategy())).build();
+            .valueCodecConfig(new AmountValueCodecConfig(
+                    Optional.ofNullable(amountSerialize).map(AmountSerialize::valueType)
+                            .orElseGet(() -> (Class) getValueType()),
+                    Optional.ofNullable(amountSerialize)
+                            .map(a -> new MathContext(a.precision(), a.roundingMode()))
+                            .orElseGet(this::getMathContext)))
+            .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
+                    getUnitAliasUndefinedStrategy())).build();
   }
 
   /**

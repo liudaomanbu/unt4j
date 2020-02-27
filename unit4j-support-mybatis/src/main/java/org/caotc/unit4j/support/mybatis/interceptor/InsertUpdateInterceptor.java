@@ -33,7 +33,6 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.api.annotation.WithUnit;
 import org.caotc.unit4j.api.annotation.WithUnit.ValueType;
@@ -106,8 +105,7 @@ public class InsertUpdateInterceptor implements Interceptor {
                 .readAmount((ReadableProperty<? super Object, ?>) sqlParam.readableProperty,
                     boundSql.getParameterObject()).ifPresent(amount -> {
               AmountCodecConfig amountCodecConfig = unit4jProperties
-                  .createAmountCodecConfig(sqlParam.column.getColumnName(),
-                      sqlParam.readableProperty.annotation(AmountSerialize.class).orElse(null));
+                      .createPropertyAmountCodecConfig(sqlParam.readableProperty);
 
               if (Objects.nonNull(amountCodecConfig.targetUnit()) && !amountCodecConfig
                   .targetUnit().equals(amount.unit())) {

@@ -28,7 +28,6 @@ import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
@@ -93,10 +92,7 @@ public class SelectInterceptor implements Interceptor {
                 .amountWritablePropertiesFromClass(type);
 
         ImmutableSet<AmountCodecConfig> amountCodecConfigs = writableProperties.stream()
-                .map(writableProperty -> unit4jProperties
-                        .createAmountCodecConfig(writableProperty.name(),
-                                writableProperty.annotation(AmountSerialize.class)
-                                        .orElse(null))).collect(ImmutableSet.toImmutableSet());
+                .map(unit4jProperties::createPropertyAmountCodecConfig).collect(ImmutableSet.toImmutableSet());
 
         Select select = (Select) parse;
 

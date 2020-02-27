@@ -23,14 +23,16 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import java.io.IOException;
-import java.util.Objects;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.Unit4jProperties;
+
+import java.io.IOException;
+import java.util.Objects;
 
 
 /**
@@ -82,7 +84,8 @@ public class Unit4jContextualSerializer extends StdSerializer<Amount> implements
 //        }
         if (amountSerialize != null) {
           return new AmountSerializer(
-              unit4jProperties.createAmountCodecConfig(property.getName(), amountSerialize));
+                  unit4jProperties.createPropertyAmountCodecConfig(ReflectionUtil
+                          .readablePropertyFromClassExact(prov.getActiveView(), property.getName())));
         } else {
           return new AmountSerializer(unit4jProperties.createAmountCodecConfig());
         }
