@@ -16,9 +16,6 @@
 
 package org.caotc.unit4j.support.mybatis;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -33,6 +30,10 @@ import org.caotc.unit4j.support.mybatis.mapper.TestAmountMapper;
 import org.caotc.unit4j.support.mybatis.model.TestAmount;
 import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
 
 @Slf4j
 public class MybatisTest {
@@ -66,7 +67,7 @@ public class MybatisTest {
   void findByPrimaryKeyOnResultMap() {
     try (SqlSession session = sqlSessionFactory.openSession()) {
       TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      TestAmount testAmount = dao.findByPrimaryKeyOnResultMap(1L);
+      TestAmount testAmount = dao.findByPrimaryKeyOnResultMap(2L);
       log.info("testAmount:{}", testAmount);
     }
   }
