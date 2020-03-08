@@ -51,6 +51,4 @@ public class TestAmount {
   BigDecimal withUnitProperty;
 
   String unit;
-
-  Object object;
 }
