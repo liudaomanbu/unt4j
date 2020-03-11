@@ -2300,7 +2300,7 @@ public class ReflectionUtil {
   public static boolean isPropertyReader(@NonNull Invokable<?, ?> invokable,
       @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
     return Arrays.stream(propertyAccessorMethodFormats)
-        .anyMatch(methodNameStyle -> methodNameStyle.isGetInvokable(invokable));
+            .anyMatch(propertyAccessorMethodFormat -> propertyAccessorMethodFormat.isGetInvokable(invokable));
   }
 
   /**

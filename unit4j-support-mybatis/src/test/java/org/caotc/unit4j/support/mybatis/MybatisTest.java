@@ -42,7 +42,7 @@ public class MybatisTest {
   private static final Amount AMOUNT = Amount.create(123L, UnitConstant.SECOND);
   private static final TestAmount TEST_AMOUNT = new TestAmount()
           .withUnitValue(BigDecimal.TEN).withUnitProperty(BigDecimal.ONE)
-          .unit(UnitConstant.HOUR.id()).object("ssssssssssssssssss");
+          .unit(UnitConstant.HOUR.id());
   private static SqlSessionFactory sqlSessionFactory;
 
   static {
