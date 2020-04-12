@@ -29,3 +29,10 @@ hs_err_pid*
 /.idea
 *.iml
 *.eml
+unit4j-api/target
+unit4j-core/target
+unit4j-spring-boot-starter/target
+unit4j-support-fastjson/target
+unit4j-support-jackson/target
+unit4j-support-mybatis/target
+unit4j-support/target
