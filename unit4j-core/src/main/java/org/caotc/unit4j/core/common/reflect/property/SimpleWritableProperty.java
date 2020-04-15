@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,16 +21,17 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Ordering;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 可写属性
@@ -110,16 +111,4 @@ public class SimpleWritableProperty<T, R> extends AbstractWritableProperty<T, R>
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return propertyWriters.stream().map(PropertyWriter::annotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
-  @NonNull
-  public ImmutableList<Annotation> declaredAnnotations() {
-    return propertyWriters.stream().map(PropertyWriter::declaredAnnotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
 }

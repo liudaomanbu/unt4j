@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
+import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
+
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 
 /**
  * 属性
@@ -146,17 +147,6 @@ public interface Property<O, P> {
       @NonNull Class<X> annotationClass);
 
   /**
-   * 获取所有注解
-   *
-   * @return 所有注解集合
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull
-  ImmutableList<Annotation> annotations();
-
-  /**
    * 获取注解集合
    *
    * @param annotationClass 注解类
@@ -168,14 +158,4 @@ public interface Property<O, P> {
   @NonNull <X extends Annotation> ImmutableList<X> annotations(
       @NonNull Class<X> annotationClass);
 
-  /**
-   * 获取所有定义在该属性上的注解
-   *
-   * @return 所有定义在该属性上的集合
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull
-  ImmutableList<Annotation> declaredAnnotations();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Ordering;
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author caotc
@@ -102,12 +103,6 @@ public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O
   }
 
   @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return propertyReaders.stream().map(PropertyReader::annotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
-  @Override
   public @NonNull <X extends Annotation> ImmutableList<X> annotations(
       @NonNull Class<X> annotationClass) {
     return propertyReaders.stream()
@@ -115,9 +110,4 @@ public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
-  @Override
-  public @NonNull ImmutableList<Annotation> declaredAnnotations() {
-    return propertyReaders.stream().map(PropertyReader::declaredAnnotations)
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
 }

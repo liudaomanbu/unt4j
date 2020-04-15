@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
+
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 /**
  * 可读取属性
@@ -82,14 +83,4 @@ public class CompositeAccessibleProperty<T, R, E> extends
     return delegate.annotations(annotationClass);
   }
 
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return delegate.annotations();
-  }
-
-  @NonNull
-  @Override
-  public ImmutableList<Annotation> declaredAnnotations() {
-    return delegate.declaredAnnotations();
-  }
 }

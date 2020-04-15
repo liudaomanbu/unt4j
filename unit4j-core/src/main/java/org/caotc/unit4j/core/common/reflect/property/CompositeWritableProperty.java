@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ package org.caotc.unit4j.core.common.reflect.property;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 /**
  * 可写属性
@@ -98,14 +99,4 @@ public class CompositeWritableProperty<T, R, E> extends AbstractWritableProperty
     return delegate.annotations(annotationClass);
   }
 
-  @Override
-  public @NonNull ImmutableList<Annotation> annotations() {
-    return delegate.annotations();
-  }
-
-  @Override
-  @NonNull
-  public ImmutableList<Annotation> declaredAnnotations() {
-    return delegate.declaredAnnotations();
-  }
 }
