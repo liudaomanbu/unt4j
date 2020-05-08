@@ -26,10 +26,12 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -99,15 +101,16 @@ public class SimpleWritableProperty<T, R> extends AbstractWritableProperty<T, R>
   public @NonNull <X extends Annotation> Optional<X> annotation(
       @NonNull Class<X> annotationClass) {
     return propertyWriters.stream()
-        .map(propertyWriter -> propertyWriter.annotation(annotationClass))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
+            .map(propertyElement -> AnnotatedElementUtils.findMergedAnnotation(propertyElement, annotationClass))
+            .filter(Objects::nonNull)
+            .findFirst();
   }
 
   @Override
   public @NonNull <X extends Annotation> ImmutableList<X> annotations(
       @NonNull Class<X> annotationClass) {
     return propertyWriters.stream()
-        .map(propertyWriter -> propertyWriter.annotations(annotationClass))
+            .map(propertyWriter -> AnnotatedElementUtils.findAllMergedAnnotations(propertyWriter, annotationClass))
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 

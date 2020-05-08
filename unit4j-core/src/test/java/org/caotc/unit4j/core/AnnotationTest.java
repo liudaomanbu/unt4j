@@ -17,78 +17,52 @@
 package org.caotc.unit4j.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.AliasFor;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Arrays;
 
+/**
+ * @author caotc
+ * @date 2020-04-17
+ * @since 1.0.0
+ */
 @Slf4j
 public class AnnotationTest {
-  public static void main(String[] args) {
-    System.out.println(AnnotatedElementUtils.findAllMergedAnnotations(ChildController.class, PostMapping.class));
-    System.out.println(Arrays.toString(AnnotationUtils.getAnnotations(ChildController.class)));
-    System.out.println("ParentController getAnnotation @RequestMapping: " + AnnotationUtils.getAnnotation(ParentController.class, RequestMapping.class));
-    System.out.println("ChildController getAnnotation @RequestMapping: " + AnnotationUtils.getAnnotation(ChildController.class, RequestMapping.class));
-    System.out.println("ParentController findAnnotation @RequestMapping: " + AnnotationUtils.findAnnotation(ParentController.class, RequestMapping.class));
-    System.out.println("ChildController findAnnotation @RequestMapping: " + AnnotationUtils.findAnnotation(ChildController.class, RequestMapping.class));
-    System.out.println();
+    @MyCustomRole
+    public static class Parent {
+    }
 
-    System.out.println("ParentController getMergedAnnotation @RequestMapping: " + AnnotatedElementUtils.getMergedAnnotation(ParentController.class, RequestMapping.class));
-    System.out.println("ChildController getMergedAnnotation @RequestMapping: " + AnnotatedElementUtils.getMergedAnnotation(ChildController.class, RequestMapping.class));
-    System.out.println("ParentController findMergedAnnotation @RequestMapping: " + AnnotatedElementUtils.findMergedAnnotation(ParentController.class, RequestMapping.class));
-    System.out.println("ChildController findMergedAnnotation @RequestMapping: " + AnnotatedElementUtils.findMergedAnnotation(ChildController.class, RequestMapping.class));
-  }
-}
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    @Repeatable(Roles.class)
+    public @interface Role {
+        String value() default "";
+    }
 
-@RequestMapping(name = "parent", path = "parent/controller")
-class ParentController {
-}
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    public @interface Roles {
+        Role[] value();
+    }
 
-@PostMapping(name = "child", value = "child/controller", consume = "application/json")
-class ChildController extends ParentController {
-}
+    @Retention(RetentionPolicy.RUNTIME)
+    @Role("role_a")
+    @Role("role_b")
+    public @interface MyCustomRole {
+    }
 
-
-@Target({ElementType.METHOD, ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-//@Inherited
-@interface RequestMapping {
-
-  String name() default "";
-
-  @AliasFor("path")
-  String[] value() default {};
-
-
-  @AliasFor("value")
-  String[] path() default {};
-
-  String[] consume() default {};
-}
-
-
-@Target({ElementType.METHOD, ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@RequestMapping
-@interface PostMapping {
-
-  @AliasFor(annotation = RequestMapping.class)
-  String name() default "";
-
-  @AliasFor(annotation = RequestMapping.class)
-  String[] value() default {};
-
-  @AliasFor(annotation = RequestMapping.class)
-  String[] path() default {};
-
-  @AliasFor(annotation = RequestMapping.class)
-  String[] consume() default "";
+    @Test
+    public void test() {
+        log.info("findMergedAnnotation Role:{}", AnnotatedElementUtils.findMergedAnnotation(Parent.class, Role.class));
+        log.info("findAllMergedAnnotations Role:{}", AnnotatedElementUtils.findAllMergedAnnotations(Parent.class, Role.class));
+        log.info("findMergedRepeatableAnnotations Role:{}", AnnotatedElementUtils.findMergedRepeatableAnnotations(Parent.class, Role.class));
+    }
 }

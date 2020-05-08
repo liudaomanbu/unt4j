@@ -25,10 +25,12 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -94,15 +96,16 @@ public class SimpleReadableProperty<T, R> extends AbstractReadableProperty<T, R>
   public @NonNull <X extends Annotation> Optional<X> annotation(
       @NonNull Class<X> annotationClass) {
     return propertyReaders.stream()
-        .map(fieldWrapper -> fieldWrapper.annotation(annotationClass))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
+            .map(propertyElement -> AnnotatedElementUtils.findMergedAnnotation(propertyElement, annotationClass))
+            .filter(Objects::nonNull)
+            .findFirst();
   }
 
   @Override
   public @NonNull <X extends Annotation> ImmutableList<X> annotations(
       @NonNull Class<X> annotationClass) {
     return propertyReaders.stream()
-        .map(propertyGetter -> propertyGetter.annotations(annotationClass))
+            .map(propertyGetter -> AnnotatedElementUtils.findAllMergedAnnotations(propertyGetter, annotationClass))
         .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
   }
 
