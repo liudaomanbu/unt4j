@@ -17,20 +17,16 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
-import java.lang.annotation.Annotation;
-import java.util.Optional;
-
 /**
  * 可写属性
  *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> 拥有该属性的类
+ * @param <P> 属性类型
  * @author caotc
  * @date 2019-05-27
  * @see WritableProperty
@@ -38,8 +34,8 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class CompositeWritableProperty<T, R, E> extends AbstractWritableProperty<T, R> implements
-    WritableProperty<T, R> {
+public class CompositeWritableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T, WritableProperty<T, P>> implements
+        WritableProperty<O, P> {
 
   /**
    * static constructor
@@ -58,45 +54,31 @@ public class CompositeWritableProperty<T, R, E> extends AbstractWritableProperty
     return new CompositeWritableProperty<T, R, E>(targetReadableProperty, delegate);
   }
 
-  @NonNull
-  ReadableProperty<T, E> targetReadableProperty;
-  @NonNull
-  WritableProperty<E, R> delegate;
-
   private CompositeWritableProperty(
-      @NonNull ReadableProperty<T, E> targetReadableProperty,
-      @NonNull WritableProperty<E, R> delegate) {
+          @NonNull ReadableProperty<O, T> targetReadableProperty,
+          @NonNull WritableProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
-    this.targetReadableProperty = targetReadableProperty;
-    this.delegate = delegate;
   }
 
   @Override
-  public @NonNull CompositeWritableProperty<T, R, E> write(@NonNull T target, @NonNull R value) {
+  public @NonNull CompositeWritableProperty<O, P, T> write(@NonNull O target, @NonNull P value) {
     targetReadableProperty.read(target)
-        .ifPresent(actualTarget -> delegate.write(actualTarget, value));
+            .ifPresent(actualTarget -> delegate.write(actualTarget, value));
     return this;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends R> CompositeWritableProperty<T, R1, E> type(
-      @NonNull TypeToken<R1> propertyType) {
+  public @NonNull <R1 extends P> CompositeWritableProperty<O, R1, T> type(
+          @NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-        , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
-    return (CompositeWritableProperty<T, R1, E>) this;
+            , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
+    return (CompositeWritableProperty<O, R1, T>) this;
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return delegate.annotation(annotationClass);
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return delegate.annotations(annotationClass);
+  public boolean readable() {
+    return false;
   }
 
 }

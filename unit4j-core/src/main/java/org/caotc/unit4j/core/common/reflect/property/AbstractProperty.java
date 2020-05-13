@@ -17,15 +17,10 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 
 /**
  * 属性抽象类
@@ -38,56 +33,8 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
  */
 @EqualsAndHashCode
 @ToString
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractProperty<O, P> implements
     Property<O, P> {
-
-  @NonNull
-  String name;
-  @NonNull
-  TypeToken<? extends P> type;
-  boolean fieldExist;
-
-  protected AbstractProperty(
-      @NonNull ImmutableSet<? extends PropertyElement<O, P>> propertyElements) {
-    //属性读取器集合不能为空
-    Preconditions
-        .checkArgument(!propertyElements.isEmpty(), "propertyElements can't be empty");
-    //属性只能有一个
-    ImmutableSet<@NonNull String> propertyNames = propertyElements.stream()
-        .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
-    ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = propertyElements.stream()
-        .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
-    Preconditions.checkArgument(propertyNames.size() == 1 && propertyTypes.size() == 1,
-        "propertyElements is not a common property");
-    this.name = Iterables.getOnlyElement(propertyNames);
-    this.type = Iterables.getOnlyElement(propertyTypes);
-    this.fieldExist = propertyElements.stream().anyMatch(PropertyElement::basedOnField);
-  }
-
-  protected <T> AbstractProperty(@NonNull ReadableProperty<O, T> targetReadableProperty,
-      @NonNull Property<T, P> delegate) {
-    this.name = targetReadableProperty.name() + delegate.name();
-    this.type = delegate.type();
-    this.fieldExist = delegate.fieldExist();
-  }
-
-  @NonNull
-  @Override
-  public final String name() {
-    return name;
-  }
-
-  @NonNull
-  @Override
-  public final TypeToken<? extends P> type() {
-    return type;
-  }
-
-  @Override
-  public final boolean fieldExist() {
-    return fieldExist;
-  }
 
   @Override
   public final boolean accessible() {

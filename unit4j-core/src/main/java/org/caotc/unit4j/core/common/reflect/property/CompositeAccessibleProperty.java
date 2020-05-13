@@ -16,71 +16,92 @@
 
 package org.caotc.unit4j.core.common.reflect.property;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 
-import java.lang.annotation.Annotation;
 import java.util.Optional;
 
 /**
  * 可读取属性
  *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> 拥有该属性的类
+ * @param <P> 属性类型
  * @author caotc
  * @date 2019-05-27
  * @see PropertyReader
  * @since 1.0.0
  */
 @Value
-public class CompositeAccessibleProperty<T, R, E> extends
-    AbstractAccessibleProperty<T, R> implements
-    AccessibleProperty<T, R> {
-
-  @NonNull
-  ReadableProperty<T, E> targetReadableProperty;
-  @NonNull
-  AccessibleProperty<E, R> delegate;
+public class CompositeAccessibleProperty<O, P, T> extends
+        AbstractCompositeProperty<O, P, T, AccessibleProperty<T, P>> implements
+        AccessibleProperty<O, P> {
 
   protected CompositeAccessibleProperty(
-      @NonNull ReadableProperty<T, E> targetReadableProperty,
-      @NonNull AccessibleProperty<E, R> delegate) {
+          @NonNull ReadableProperty<O, T> targetReadableProperty,
+          @NonNull AccessibleProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
-    this.targetReadableProperty = targetReadableProperty;
-    this.delegate = delegate;
   }
 
   @Override
-  public @NonNull Optional<R> read(@NonNull T target) {
+  public boolean readable() {
+    return delegate.readable();
+  }
+
+  @Override
+  public boolean writable() {
+    return delegate.writable();
+  }
+
+  @Override
+  public @NonNull Optional<P> read(@NonNull O target) {
     return targetReadableProperty.read(target).flatMap(delegate::read);
   }
 
+  @NonNull
   @Override
-  public @NonNull AccessibleProperty<T, R> write(@NonNull T target, @NonNull R value) {
+  public P readExact(@NonNull O target) {
+    return delegate.readExact(targetReadableProperty.readExact(target));
+  }
+
+  @NonNull
+  @Override
+  public final <S> CompositeReadableProperty<O, S, P> compose(
+          ReadableProperty<P, S> readableProperty) {
+    return CompositeReadableProperty.create(this, readableProperty);
+  }
+
+  @Override
+  public final @NonNull <S> CompositeWritableProperty<O, S, P> compose(
+          WritableProperty<P, S> writableProperty) {
+    return CompositeWritableProperty.create(this, writableProperty);
+  }
+
+  @Override
+  public @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
+          AccessibleProperty<P, S> accessibleProperty) {
+    return new CompositeAccessibleProperty<>(this, accessibleProperty);
+  }
+
+  @Override
+  public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
     targetReadableProperty.read(target)
-        .ifPresent(actualTarget -> delegate.write(actualTarget, value));
+            .ifPresent(actualTarget -> delegate.write(actualTarget, value));
     return this;
   }
 
   @Override
-  public @NonNull <R1 extends R> CompositeAccessibleProperty<T, R1, E> type(
-      @NonNull TypeToken<R1> propertyType) {
-    return (CompositeAccessibleProperty<T, R1, E>) super.type(propertyType);
+  public @NonNull <P1 extends P> CompositeAccessibleProperty<O, P1, T> type(
+          @NonNull TypeToken<P1> propertyType) {
+    return (CompositeAccessibleProperty<O, P1, T>) super.type(propertyType);
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return delegate.annotation(annotationClass);
-  }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return delegate.annotations(annotationClass);
+  @NonNull
+  public <P1 extends P> CompositeAccessibleProperty<O, P1, T> type(
+          @NonNull Class<P1> newType) {
+    return type(TypeToken.of(newType));
   }
 
 }

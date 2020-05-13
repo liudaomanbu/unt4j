@@ -17,29 +17,20 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Ordering;
 import com.google.common.reflect.TypeToken;
-import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
  * 可写属性
  *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> 拥有该属性的类
+ * @param <P> 属性类型
  * @author caotc
  * @date 2019-05-27
  * @see WritableProperty
@@ -47,71 +38,46 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-public class SimpleWritableProperty<T, R> extends AbstractWritableProperty<T, R> implements
-    WritableProperty<T, R> {
-
-  /**
-   * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前+内存地址比较器
-   */
-  private static final Ordering<PropertyElement<?, ?>> ORDERING = Ordering.natural()
-      .<PropertyElement<?, ?>>onResultOf(PropertyElement::accessLevel)
-      .compound(Ordering.arbitrary());
-
-  @NonNull
-  ImmutableSortedSet<PropertyWriter<T, R>> propertyWriters;
+public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P, PropertyWriter<O, P>> implements
+        WritableProperty<O, P> {
 
   protected SimpleWritableProperty(
-      @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
-    this(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+          @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
+    super(propertyElements);
   }
 
   protected SimpleWritableProperty(
-      @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
-    this(ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+          @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
+    super(propertyElements);
   }
 
   protected SimpleWritableProperty(
-      @NonNull Stream<PropertyWriter<T, R>> propertyWriters) {
-    this(propertyWriters
-        .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
+          @NonNull Stream<PropertyWriter<O, P>> propertyElements) {
+    super(propertyElements);
   }
 
   protected SimpleWritableProperty(
-      @NonNull ImmutableSortedSet<PropertyWriter<T, R>> propertyWriters) {
-    super(propertyWriters);
-    this.propertyWriters = propertyWriters;
+          @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyElements) {
+    super(propertyElements);
   }
 
   @Override
-  public @NonNull SimpleWritableProperty<T, R> write(@NonNull T target, @NonNull R value) {
-    propertyWriters.first().write(target, value);
+  public @NonNull SimpleWritableProperty<O, P> write(@NonNull O target, @NonNull P value) {
+    propertyElements.first().write(target, value);
     return this;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends R> SimpleWritableProperty<T, R1> type(
-      @NonNull TypeToken<R1> propertyType) {
+  public @NonNull <R1 extends P> SimpleWritableProperty<O, R1> type(
+          @NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-        , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
-    return (SimpleWritableProperty<T, R1>) this;
+            , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
+    return (SimpleWritableProperty<O, R1>) this;
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(
-      @NonNull Class<X> annotationClass) {
-    return propertyWriters.stream()
-            .map(propertyElement -> AnnotatedElementUtils.findMergedAnnotation(propertyElement, annotationClass))
-            .filter(Objects::nonNull)
-            .findFirst();
+  public boolean readable() {
+    return false;
   }
-
-  @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return propertyWriters.stream()
-            .map(propertyWriter -> AnnotatedElementUtils.findAllMergedAnnotations(propertyWriter, annotationClass))
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
-  }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,24 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.reflect.TypeToken;
+import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
+
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 
 /**
  * 可读取属性
  *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> 拥有该属性的类
+ * @param <P> 属性类型
  * @author caotc
  * @date 2019-05-27
  * @see PropertyReader
  * @since 1.0.0
  */
-public interface ReadableProperty<T, R> extends Property<T, R> {
+public interface ReadableProperty<O, P> extends Property<O, P> {
 
   /**
    * 工厂方法
@@ -95,7 +96,7 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
    * @date 2019-11-22
    * @since 1.0.0
    */
-  @NonNull Optional<R> read(@NonNull T target);
+  @NonNull Optional<P> read(@NonNull O target);
 
   /**
    * 读取参数对象属性值
@@ -106,7 +107,7 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
    * @date 2019-11-22
    * @since 1.0.0
    */
-  @NonNull R readExact(@NonNull T target);
+  @NonNull P readExact(@NonNull O target);
 
   /**
    * compose two {@link ReadableProperty} to a {@link CompositeReadableProperty}
@@ -117,7 +118,7 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> CompositeReadableProperty<T, S, R> compose(ReadableProperty<R, S> readableProperty);
+  @NonNull <S> CompositeReadableProperty<O, S, P> compose(ReadableProperty<P, S> readableProperty);
 
   /**
    * compose {@link ReadableProperty} and {@link WritableProperty} to a {@link
@@ -129,7 +130,7 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> CompositeWritableProperty<T, S, R> compose(WritableProperty<R, S> writableProperty);
+  @NonNull <S> CompositeWritableProperty<O, S, P> compose(WritableProperty<P, S> writableProperty);
 
   /**
    * compose {@link ReadableProperty} and {@link AccessibleProperty} to a {@link
@@ -141,8 +142,8 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> CompositeAccessibleProperty<T, S, R> compose(
-      AccessibleProperty<R, S> accessibleProperty);
+  @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
+          AccessibleProperty<P, S> accessibleProperty);
 
   /**
    * 设置属性类型
@@ -155,6 +156,6 @@ public interface ReadableProperty<T, R> extends Property<T, R> {
    * @since 1.0.0
    */
   @Override
-  @NonNull <R1 extends R> ReadableProperty<T, R1> type(
+  @NonNull <R1 extends P> ReadableProperty<O, R1> type(
       @NonNull TypeToken<R1> propertyType);
 }

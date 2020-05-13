@@ -17,22 +17,19 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Ordering;
+import com.google.common.reflect.TypeToken;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -42,14 +39,14 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O, P> {
+public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P, PropertyElement<O, P>> implements AccessibleProperty<O, P> {
 
   /**
    * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前+内存地址比较器
    */
   private static final Ordering<PropertyElement<?, ?>> ORDERING = Ordering.natural()
-      .<PropertyElement<?, ?>>onResultOf(PropertyElement::accessLevel)
-      .compound(Ordering.arbitrary());
+          .<PropertyElement<?, ?>>onResultOf(PropertyElement::accessLevel)
+          .compound(Ordering.arbitrary());
 
   @NonNull
   ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
@@ -76,13 +73,23 @@ public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O
       @NonNull ImmutableSet<PropertyElement<O, P>> propertyElements) {
     super(propertyElements);
     this.propertyReaders = propertyElements.stream().filter(PropertyElement::isReader)
-        .map(PropertyElement::toReader).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
+            .map(PropertyElement::toReader).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
     this.propertyWriters = propertyElements.stream().filter(PropertyElement::isWriter)
-        .map(PropertyElement::toWriter).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
+            .map(PropertyElement::toWriter).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
     Preconditions
-        .checkArgument(!propertyReaders.isEmpty(), "propertyElements do not have PropertyReader");
+            .checkArgument(!propertyReaders.isEmpty(), "propertyElements do not have PropertyReader");
     Preconditions
-        .checkArgument(!propertyWriters.isEmpty(), "propertyElements do not have PropertyWriter");
+            .checkArgument(!propertyWriters.isEmpty(), "propertyElements do not have PropertyWriter");
+  }
+
+  @Override
+  public boolean writable() {
+    return true;
+  }
+
+  @Override
+  public boolean readable() {
+    return true;
   }
 
   @Override
@@ -94,23 +101,49 @@ public class SimpleAccessibleProperty<O, P> extends AbstractAccessibleProperty<O
   @Override
   public @NonNull Optional<P> read(@NonNull O target) {
     return propertyReaders.stream().map(propertyGetter -> propertyGetter.read(target))
-        .filter(Optional::isPresent).map(Optional::get).findFirst();
+            .filter(Optional::isPresent).map(Optional::get).findFirst();
+  }
+
+  @NonNull
+  @Override
+  public final P readExact(@NonNull O target) {
+    return read(target)
+            .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
+  }
+
+  @NonNull
+  @Override
+  public final <S> CompositeReadableProperty<O, S, P> compose(
+          ReadableProperty<P, S> readableProperty) {
+    return CompositeReadableProperty.create(this, readableProperty);
   }
 
   @Override
-  public @NonNull <X extends Annotation> Optional<X> annotation(@NonNull Class<X> annotationClass) {
-    return propertyReaders.stream()
-            .map(propertyElement -> AnnotatedElementUtils.findMergedAnnotation(propertyElement, annotationClass))
-            .filter(Objects::nonNull)
-            .findFirst();
+  public final @NonNull <S> CompositeWritableProperty<O, S, P> compose(
+          WritableProperty<P, S> writableProperty) {
+    return CompositeWritableProperty.create(this, writableProperty);
   }
 
   @Override
-  public @NonNull <X extends Annotation> ImmutableList<X> annotations(
-      @NonNull Class<X> annotationClass) {
-    return propertyReaders.stream()
-            .map(propertyGetter -> AnnotatedElementUtils.findAllMergedAnnotations(propertyGetter, annotationClass))
-        .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
+  public @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
+          AccessibleProperty<P, S> accessibleProperty) {
+    return new CompositeAccessibleProperty<>(this, accessibleProperty);
+  }
+
+  @Override
+  @NonNull
+  public <P1 extends P> SimpleAccessibleProperty<O, P1> type(
+          @NonNull Class<P1> newType) {
+    return type(TypeToken.of(newType));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public @NonNull <R1 extends P> SimpleAccessibleProperty<O, R1> type(
+          @NonNull TypeToken<R1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+            , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
+    return (SimpleAccessibleProperty<O, R1>) this;
   }
 
 }
