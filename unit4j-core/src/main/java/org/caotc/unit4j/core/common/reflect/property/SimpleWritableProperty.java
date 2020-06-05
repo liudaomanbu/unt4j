@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
 import java.util.Iterator;
@@ -38,32 +39,32 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P, PropertyWriter<O, P>> implements
+public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> implements
         WritableProperty<O, P> {
 
-  protected SimpleWritableProperty(
-          @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
-    super(propertyElements);
-  }
+    protected SimpleWritableProperty(
+            @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
+        super(ImmutableSortedSet.of(), propertyElements);
+    }
 
-  protected SimpleWritableProperty(
-          @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
-    super(propertyElements);
+    protected SimpleWritableProperty(
+            @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
+        super(ImmutableSortedSet.<PropertyReader<O, P>>of().iterator(), propertyElements);
   }
 
   protected SimpleWritableProperty(
           @NonNull Stream<PropertyWriter<O, P>> propertyElements) {
-    super(propertyElements);
+      super(Stream.empty(), propertyElements);
   }
 
   protected SimpleWritableProperty(
           @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyElements) {
-    super(propertyElements);
+      super(ImmutableSortedSet.of(), propertyElements);
   }
 
   @Override
   public @NonNull SimpleWritableProperty<O, P> write(@NonNull O target, @NonNull P value) {
-    propertyElements.first().write(target, value);
+      propertyWriters.first().write(target, value);
     return this;
   }
 

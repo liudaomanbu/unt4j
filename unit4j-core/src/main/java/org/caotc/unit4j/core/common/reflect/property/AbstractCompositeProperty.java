@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P>> extends AbstractProperty<O, P> {
+public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P>> implements Property<O, P> {
 
     @NonNull
     String name;
@@ -46,7 +46,7 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
 
     protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> targetReadableProperty,
                                         @NonNull D delegate) {
-        this.name = targetReadableProperty.name() + delegate.name();
+        this.name = targetReadableProperty.name() + "." + delegate.name();
         this.type = delegate.type();
         this.fieldExist = delegate.fieldExist();
         this.targetReadableProperty = targetReadableProperty;
@@ -69,7 +69,6 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     public final boolean fieldExist() {
         return fieldExist;
     }
-
 
     @Override
     public final @NonNull <X extends Annotation> Optional<X> annotation(

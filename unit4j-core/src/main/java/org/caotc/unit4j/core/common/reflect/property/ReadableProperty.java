@@ -16,9 +16,11 @@
 
 package org.caotc.unit4j.core.common.reflect.property;
 
+import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
+import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -46,8 +48,8 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> SimpleReadableProperty<T, R> create(
-      @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
+  static <T, R> ReadableProperty<T, R> create(
+          @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
     return new SimpleReadableProperty<>(propertyReaders);
   }
 
@@ -61,8 +63,8 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> SimpleReadableProperty<T, R> create(
-      @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
+  static <T, R> ReadableProperty<T, R> create(
+          @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
     return new SimpleReadableProperty<>(propertyReaders);
   }
 
@@ -76,8 +78,8 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> SimpleReadableProperty<T, R> create(
-      @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
+  static <T, R> ReadableProperty<T, R> create(
+          @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
     return new SimpleReadableProperty<>(propertyReaders);
   }
 
@@ -107,43 +109,61 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @date 2019-11-22
    * @since 1.0.0
    */
-  @NonNull P readExact(@NonNull O target);
+  @NonNull
+  default P readExact(@NonNull O target) {
+    return read(target)
+            .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
+  }
 
   /**
-   * compose two {@link ReadableProperty} to a {@link CompositeReadableProperty}
+   * compose two {@link ReadableProperty} to a {@link ReadableProperty}
    *
    * @param readableProperty readableProperty
-   * @return {@link CompositeReadableProperty}
+   * @return {@link ReadableProperty}
    * @author caotc
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> CompositeReadableProperty<O, S, P> compose(ReadableProperty<P, S> readableProperty);
+  @NonNull <S> ReadableProperty<O, S> compose(ReadableProperty<P, S> readableProperty);
 
   /**
    * compose {@link ReadableProperty} and {@link WritableProperty} to a {@link
-   * CompositeWritableProperty}
+   * WritableProperty}
    *
    * @param writableProperty writableProperty
-   * @return {@link CompositeWritableProperty}
+   * @return {@link WritableProperty}
    * @author caotc
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> CompositeWritableProperty<O, S, P> compose(WritableProperty<P, S> writableProperty);
+  @NonNull <S> WritableProperty<O, S> compose(WritableProperty<P, S> writableProperty);
 
   /**
    * compose {@link ReadableProperty} and {@link AccessibleProperty} to a {@link
-   * CompositeAccessibleProperty}
+   * AccessibleProperty}
    *
    * @param accessibleProperty accessibleProperty
-   * @return {@link CompositeAccessibleProperty}
+   * @return {@link AccessibleProperty}
    * @author caotc
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
+  @NonNull <S> AccessibleProperty<O, S> compose(
           AccessibleProperty<P, S> accessibleProperty);
+
+  /**
+   * 设置属性类型
+   *
+   * @param propertyType 属性类型
+   * @return this
+   * @author caotc
+   * @date 2019-06-25
+   * @since 1.0.0
+   */
+  @NonNull
+  default <P1 extends P> ReadableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+    return type(TypeToken.of(propertyType));
+  }
 
   /**
    * 设置属性类型
@@ -156,6 +176,12 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @since 1.0.0
    */
   @Override
-  @NonNull <R1 extends P> ReadableProperty<O, R1> type(
-      @NonNull TypeToken<R1> propertyType);
+  @NonNull
+  default <P1 extends P> ReadableProperty<O, P1> type(
+          @NonNull TypeToken<P1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+            , "ReadableProperty is known type %s,not %s ", type(), propertyType);
+    //noinspection unchecked
+    return (ReadableProperty<O, P1>) this;
+  }
 }

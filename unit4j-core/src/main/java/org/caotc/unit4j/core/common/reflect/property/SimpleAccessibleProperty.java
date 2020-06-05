@@ -17,17 +17,11 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Ordering;
-import com.google.common.reflect.TypeToken;
-import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -39,111 +33,66 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P, PropertyElement<O, P>> implements AccessibleProperty<O, P> {
+public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P> implements AccessibleProperty<O, P> {
 
-  /**
-   * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前+内存地址比较器
-   */
-  private static final Ordering<PropertyElement<?, ?>> ORDERING = Ordering.natural()
-          .<PropertyElement<?, ?>>onResultOf(PropertyElement::accessLevel)
-          .compound(Ordering.arbitrary());
+    public SimpleAccessibleProperty(@NonNull Iterable<PropertyReader<O, P>> propertyReaders, @NonNull Iterable<PropertyWriter<O, P>> propertyWriters) {
+        super(propertyReaders, propertyWriters);
+    }
 
-  @NonNull
-  ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
-  @NonNull
-  ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters;
+    public SimpleAccessibleProperty(@NonNull Iterator<PropertyReader<O, P>> propertyReaders, @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
+        super(propertyReaders, propertyWriters);
+    }
 
-  protected SimpleAccessibleProperty(
-      @NonNull Iterable<PropertyElement<O, P>> propertyReaders) {
-    this(ImmutableSet.copyOf(propertyReaders));
-  }
+    public SimpleAccessibleProperty(@NonNull Stream<PropertyReader<O, P>> propertyReaders, @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
+        super(propertyReaders, propertyWriters);
+    }
 
-  protected SimpleAccessibleProperty(
-      @NonNull Iterator<PropertyElement<O, P>> propertyReaders) {
-    this(ImmutableSet.copyOf(propertyReaders));
-  }
+    public SimpleAccessibleProperty(@NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders, @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters) {
+        super(propertyReaders, propertyWriters);
+        Preconditions
+                .checkArgument(!propertyReaders.isEmpty(), "propertyReaders can't be empty");
+        Preconditions
+                .checkArgument(!propertyWriters.isEmpty(), "propertyWriters can't be empty");
+    }
 
-  protected SimpleAccessibleProperty(
-      @NonNull Stream<PropertyElement<O, P>> propertyReaders) {
-    this(propertyReaders
-        .collect(ImmutableSet.toImmutableSet()));
-  }
+    @Override
+    public boolean writable() {
+        return true;
+    }
 
-  protected SimpleAccessibleProperty(
-      @NonNull ImmutableSet<PropertyElement<O, P>> propertyElements) {
-    super(propertyElements);
-    this.propertyReaders = propertyElements.stream().filter(PropertyElement::isReader)
-            .map(PropertyElement::toReader).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
-    this.propertyWriters = propertyElements.stream().filter(PropertyElement::isWriter)
-            .map(PropertyElement::toWriter).collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
-    Preconditions
-            .checkArgument(!propertyReaders.isEmpty(), "propertyElements do not have PropertyReader");
-    Preconditions
-            .checkArgument(!propertyWriters.isEmpty(), "propertyElements do not have PropertyWriter");
-  }
+    @Override
+    public boolean readable() {
+        return true;
+    }
 
-  @Override
-  public boolean writable() {
-    return true;
-  }
+    @Override
+    public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
+        propertyWriters.first().write(target, value);
+        return this;
+    }
 
-  @Override
-  public boolean readable() {
-    return true;
-  }
+    @Override
+    public @NonNull Optional<P> read(@NonNull O target) {
+        return propertyReaders.stream().map(propertyGetter -> propertyGetter.read(target))
+                .filter(Optional::isPresent).map(Optional::get).findFirst();
+    }
 
-  @Override
-  public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-    propertyWriters.first().write(target, value);
-    return this;
-  }
+    @NonNull
+    @Override
+    public final <S> ReadableProperty<O, S> compose(
+            ReadableProperty<P, S> readableProperty) {
+        return CompositeReadableProperty.create(this, readableProperty);
+    }
 
-  @Override
-  public @NonNull Optional<P> read(@NonNull O target) {
-    return propertyReaders.stream().map(propertyGetter -> propertyGetter.read(target))
-            .filter(Optional::isPresent).map(Optional::get).findFirst();
-  }
+    @Override
+    public final @NonNull <S> WritableProperty<O, S> compose(
+            WritableProperty<P, S> writableProperty) {
+        return CompositeWritableProperty.create(this, writableProperty);
+    }
 
-  @NonNull
-  @Override
-  public final P readExact(@NonNull O target) {
-    return read(target)
-            .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
-  }
-
-  @NonNull
-  @Override
-  public final <S> CompositeReadableProperty<O, S, P> compose(
-          ReadableProperty<P, S> readableProperty) {
-    return CompositeReadableProperty.create(this, readableProperty);
-  }
-
-  @Override
-  public final @NonNull <S> CompositeWritableProperty<O, S, P> compose(
-          WritableProperty<P, S> writableProperty) {
-    return CompositeWritableProperty.create(this, writableProperty);
-  }
-
-  @Override
-  public @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
-          AccessibleProperty<P, S> accessibleProperty) {
-    return new CompositeAccessibleProperty<>(this, accessibleProperty);
-  }
-
-  @Override
-  @NonNull
-  public <P1 extends P> SimpleAccessibleProperty<O, P1> type(
-          @NonNull Class<P1> newType) {
-    return type(TypeToken.of(newType));
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends P> SimpleAccessibleProperty<O, R1> type(
-          @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-            , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
-    return (SimpleAccessibleProperty<O, R1>) this;
-  }
-
+    @Override
+    public @NonNull <S> AccessibleProperty<O, S> compose(
+            AccessibleProperty<P, S> accessibleProperty) {
+        return new CompositeAccessibleProperty<>(this, accessibleProperty);
+    }
 }

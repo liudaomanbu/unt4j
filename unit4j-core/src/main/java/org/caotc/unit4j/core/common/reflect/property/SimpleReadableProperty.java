@@ -17,11 +17,10 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -38,31 +37,31 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P, PropertyReader<O, P>> implements
+public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P> implements
         ReadableProperty<O, P> {
     protected SimpleReadableProperty(
             @NonNull Iterable<PropertyReader<O, P>> propertyElements) {
-        super(propertyElements);
+        super(propertyElements, ImmutableSortedSet.of());
     }
 
     protected SimpleReadableProperty(
-            @NonNull Iterator<PropertyReader<O, P>> propertyElements) {
-        super(propertyElements);
+            @NonNull Iterator<PropertyReader<O, P>> propertyReaders) {
+        super(propertyReaders, ImmutableSortedSet.<PropertyWriter<O, P>>of().iterator());
     }
 
     protected SimpleReadableProperty(
-            @NonNull Stream<PropertyReader<O, P>> propertyElements) {
-        super(propertyElements);
+            @NonNull Stream<PropertyReader<O, P>> propertyReaders) {
+        super(propertyReaders, Stream.empty());
     }
 
     protected SimpleReadableProperty(
-            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyElements) {
-        super(propertyElements);
+            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders) {
+        super(propertyReaders, ImmutableSortedSet.of());
     }
 
     @Override
     public @NonNull Optional<P> read(@NonNull O target) {
-        return propertyElements.stream()
+        return propertyReaders.stream()
                 .map(propertyGetter -> propertyGetter.read(target))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -71,34 +70,21 @@ public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P, P
 
     @NonNull
     @Override
-    public final P readExact(@NonNull O target) {
-        return read(target)
-                .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
-    }
-
-    @NonNull
-    @Override
-    public final <S> CompositeReadableProperty<O, S, P> compose(
+    public final <S> ReadableProperty<O, S> compose(
             ReadableProperty<P, S> readableProperty) {
         return CompositeReadableProperty.create(this, readableProperty);
     }
 
     @Override
-    public final @NonNull <S> CompositeWritableProperty<O, S, P> compose(
+    public final @NonNull <S> WritableProperty<O, S> compose(
             WritableProperty<P, S> writableProperty) {
         return CompositeWritableProperty.create(this, writableProperty);
     }
 
     @Override
-    public @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
+    public @NonNull <S> AccessibleProperty<O, S> compose(
             AccessibleProperty<P, S> accessibleProperty) {
         return new CompositeAccessibleProperty<>(this, accessibleProperty);
-    }
-
-    @Override
-    public @NonNull <R1 extends P> SimpleReadableProperty<O, R1> type(
-            @NonNull TypeToken<R1> propertyType) {
-        return (SimpleReadableProperty<O, R1>) super.type(propertyType);
     }
 
     @Override

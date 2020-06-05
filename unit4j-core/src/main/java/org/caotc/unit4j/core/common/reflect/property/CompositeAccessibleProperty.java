@@ -16,7 +16,6 @@
 
 package org.caotc.unit4j.core.common.reflect.property;
 
-import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
@@ -61,47 +60,28 @@ public class CompositeAccessibleProperty<O, P, T> extends
 
   @NonNull
   @Override
-  public P readExact(@NonNull O target) {
-    return delegate.readExact(targetReadableProperty.readExact(target));
-  }
-
-  @NonNull
-  @Override
-  public final <S> CompositeReadableProperty<O, S, P> compose(
+  public final <S> ReadableProperty<O, S> compose(
           ReadableProperty<P, S> readableProperty) {
-    return CompositeReadableProperty.create(this, readableProperty);
+      return CompositeReadableProperty.create(this, readableProperty);
   }
 
-  @Override
-  public final @NonNull <S> CompositeWritableProperty<O, S, P> compose(
-          WritableProperty<P, S> writableProperty) {
-    return CompositeWritableProperty.create(this, writableProperty);
-  }
+    @Override
+    public final @NonNull <S> WritableProperty<O, S> compose(
+            WritableProperty<P, S> writableProperty) {
+        return CompositeWritableProperty.create(this, writableProperty);
+    }
 
-  @Override
-  public @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
-          AccessibleProperty<P, S> accessibleProperty) {
-    return new CompositeAccessibleProperty<>(this, accessibleProperty);
-  }
+    @Override
+    public @NonNull <S> AccessibleProperty<O, S> compose(
+            AccessibleProperty<P, S> accessibleProperty) {
+        return new CompositeAccessibleProperty<>(this, accessibleProperty);
+    }
 
   @Override
   public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
     targetReadableProperty.read(target)
             .ifPresent(actualTarget -> delegate.write(actualTarget, value));
     return this;
-  }
-
-  @Override
-  public @NonNull <P1 extends P> CompositeAccessibleProperty<O, P1, T> type(
-          @NonNull TypeToken<P1> propertyType) {
-    return (CompositeAccessibleProperty<O, P1, T>) super.type(propertyType);
-  }
-
-  @Override
-  @NonNull
-  public <P1 extends P> CompositeAccessibleProperty<O, P1, T> type(
-          @NonNull Class<P1> newType) {
-    return type(TypeToken.of(newType));
   }
 
 }

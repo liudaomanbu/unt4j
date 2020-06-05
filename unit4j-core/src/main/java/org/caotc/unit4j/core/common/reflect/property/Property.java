@@ -48,14 +48,15 @@ public interface Property<O, P> {
     boolean hasReader = Streams.stream(propertyElements).anyMatch(PropertyElement::isReader);
     if (!hasReader) {
       return WritableProperty
-          .create(Streams.stream(propertyElements).map(PropertyElement::toWriter));
+              .create(Streams.stream(propertyElements).map(PropertyElement::toWriter));
     }
     boolean hasWriter = Streams.stream(propertyElements).anyMatch(PropertyElement::isWriter);
     if (!hasWriter) {
       return ReadableProperty
-          .create(Streams.stream(propertyElements).map(PropertyElement::toReader));
+              .create(Streams.stream(propertyElements).map(PropertyElement::toReader));
     }
-    return new SimpleAccessibleProperty<>(propertyElements);
+    return new SimpleAccessibleProperty<>(Streams.stream(propertyElements).filter(PropertyElement::isReader).map(PropertyElement::toReader)
+            , Streams.stream(propertyElements).filter(PropertyElement::isWriter).map(PropertyElement::toWriter));
   }
 
 
@@ -95,7 +96,10 @@ public interface Property<O, P> {
    * @date 2019-06-25
    * @since 1.0.0
    */
-  @NonNull <P1 extends P> Property<O, P1> type(@NonNull Class<P1> propertyType);
+  @NonNull
+  default <P1 extends P> Property<O, P1> type(@NonNull Class<P1> propertyType) {
+    return type(TypeToken.of(propertyType));
+  }
 
   /**
    * 设置属性类型
@@ -106,8 +110,14 @@ public interface Property<O, P> {
    * @date 2019-11-22
    * @since 1.0.0
    */
-  @NonNull <P1 extends P> Property<O, P1> type(
-      @NonNull TypeToken<P1> propertyType);
+  @NonNull
+  default <P1 extends P> Property<O, P1> type(
+          @NonNull TypeToken<P1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+            , "Property is known type %s,not %s ", type(), propertyType);
+    //noinspection unchecked
+    return (Property<O, P1>) this;
+  }
 
   boolean fieldExist();
 

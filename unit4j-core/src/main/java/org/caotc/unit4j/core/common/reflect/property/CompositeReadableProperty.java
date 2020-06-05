@@ -16,7 +16,6 @@
 
 package org.caotc.unit4j.core.common.reflect.property;
 
-import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
@@ -48,10 +47,10 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
    * @since 1.0.0
    */
   @NonNull
-  protected static <T, R, E> CompositeReadableProperty<T, R, E> create(
-      @NonNull ReadableProperty<T, E> targetReadableProperty,
-      @NonNull ReadableProperty<E, R> delegate) {
-    return new CompositeReadableProperty<T, R, E>(targetReadableProperty, delegate);
+  protected static <T, R, E> ReadableProperty<T, R> create(
+          @NonNull ReadableProperty<T, E> targetReadableProperty,
+          @NonNull ReadableProperty<E, R> delegate) {
+      return new CompositeReadableProperty<T, R, E>(targetReadableProperty, delegate);
   }
 
   private CompositeReadableProperty(
@@ -65,36 +64,24 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
     return targetReadableProperty.read(target).flatMap(delegate::read);
   }
 
-  @NonNull
-  @Override
-  public P readExact(@NonNull O target) {
-    return delegate.readExact(targetReadableProperty.readExact(target));
-  }
+    @NonNull
+    @Override
+    public final <S> ReadableProperty<O, S> compose(
+            ReadableProperty<P, S> readableProperty) {
+        return CompositeReadableProperty.create(this, readableProperty);
+    }
 
-  @NonNull
-  @Override
-  public final <S> CompositeReadableProperty<O, S, P> compose(
-          ReadableProperty<P, S> readableProperty) {
-    return CompositeReadableProperty.create(this, readableProperty);
-  }
+    @Override
+    public final @NonNull <S> WritableProperty<O, S> compose(
+            WritableProperty<P, S> writableProperty) {
+        return CompositeWritableProperty.create(this, writableProperty);
+    }
 
-  @Override
-  public final @NonNull <S> CompositeWritableProperty<O, S, P> compose(
-          WritableProperty<P, S> writableProperty) {
-    return CompositeWritableProperty.create(this, writableProperty);
-  }
-
-  @Override
-  public @NonNull <S> CompositeAccessibleProperty<O, S, P> compose(
-          AccessibleProperty<P, S> accessibleProperty) {
-    return new CompositeAccessibleProperty<>(this, accessibleProperty);
-  }
-
-  @Override
-  public @NonNull <R1 extends P> CompositeReadableProperty<O, R1, T> type(
-          @NonNull TypeToken<R1> propertyType) {
-    return (CompositeReadableProperty<O, R1, T>) super.type(propertyType);
-  }
+    @Override
+    public @NonNull <S> AccessibleProperty<O, S> compose(
+            AccessibleProperty<P, S> accessibleProperty) {
+        return new CompositeAccessibleProperty<>(this, accessibleProperty);
+    }
 
   @Override
   public boolean writable() {

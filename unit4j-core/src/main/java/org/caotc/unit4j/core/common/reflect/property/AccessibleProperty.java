@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 
 package org.caotc.unit4j.core.common.reflect.property;
 
+import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
+import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+
 import java.util.Iterator;
 import java.util.stream.Stream;
-import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 
 /**
  * @param <O> 拥有该属性的类
@@ -34,31 +37,58 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
     WritableProperty<O, P> {
 
-  @NonNull
-  static <T, R> SimpleAccessibleProperty<T, R> create(
-      @NonNull Iterable<PropertyElement<T, R>> propertyReaders) {
-    return new SimpleAccessibleProperty<>(propertyReaders);
-  }
+    @NonNull
+    static <O, P> SimpleAccessibleProperty<O, P> create(
+            @NonNull Iterable<PropertyReader<O, P>> propertyReaders, @NonNull Iterable<PropertyWriter<O, P>> propertyWriters) {
+        return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
+    }
 
-  @NonNull
-  static <T, R> SimpleAccessibleProperty<T, R> create(
-      @NonNull Iterator<PropertyElement<T, R>> propertyReaders) {
-    return new SimpleAccessibleProperty<>(propertyReaders);
-  }
+    @NonNull
+    static <O, P> SimpleAccessibleProperty<O, P> create(
+            @NonNull Iterator<PropertyReader<O, P>> propertyReaders, @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
+        return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
+    }
 
-  @NonNull
-  static <T, R> SimpleAccessibleProperty<T, R> create(
-      @NonNull Stream<PropertyElement<T, R>> propertyReaders) {
-    return new SimpleAccessibleProperty<>(propertyReaders);
-  }
+    @NonNull
+    static <O, P> SimpleAccessibleProperty<O, P> create(
+            @NonNull Stream<PropertyReader<O, P>> propertyReaders, @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
+        return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
+    }
 
-  @Override
-  @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value);
+    @Override
+    @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value);
 
-  @Override
-  @NonNull <P1 extends P> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @NonNull
+    default <P1 extends P> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+        return type(TypeToken.of(propertyType));
+    }
 
-  @Override
-  @NonNull <R1 extends P> AccessibleProperty<O, R1> type(
-      @NonNull TypeToken<R1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-11-22
+     * @see Property#type
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull
+    default <P1 extends P> AccessibleProperty<O, P1> type(
+            @NonNull TypeToken<P1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+                , "AccessibleProperty is known type %s,not %s ", type(), propertyType);
+        //noinspection unchecked
+        return (AccessibleProperty<O, P1>) this;
+    }
 }
