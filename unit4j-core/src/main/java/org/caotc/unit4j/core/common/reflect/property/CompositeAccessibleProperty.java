@@ -58,25 +58,6 @@ public class CompositeAccessibleProperty<O, P, T> extends
     return targetReadableProperty.read(target).flatMap(delegate::read);
   }
 
-  @NonNull
-  @Override
-  public final <S> ReadableProperty<O, S> compose(
-          ReadableProperty<P, S> readableProperty) {
-      return CompositeReadableProperty.create(this, readableProperty);
-  }
-
-    @Override
-    public final @NonNull <S> WritableProperty<O, S> compose(
-            WritableProperty<P, S> writableProperty) {
-        return CompositeWritableProperty.create(this, writableProperty);
-    }
-
-    @Override
-    public @NonNull <S> AccessibleProperty<O, S> compose(
-            AccessibleProperty<P, S> accessibleProperty) {
-        return new CompositeAccessibleProperty<>(this, accessibleProperty);
-    }
-
   @Override
   public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
     targetReadableProperty.read(target)

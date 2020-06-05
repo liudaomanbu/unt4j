@@ -124,7 +124,10 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> ReadableProperty<O, S> compose(ReadableProperty<P, S> readableProperty);
+  @NonNull
+  default <S> ReadableProperty<O, S> compose(ReadableProperty<P, S> readableProperty) {
+    return CompositeReadableProperty.create(this, readableProperty);
+  }
 
   /**
    * compose {@link ReadableProperty} and {@link WritableProperty} to a {@link
@@ -136,7 +139,10 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> WritableProperty<O, S> compose(WritableProperty<P, S> writableProperty);
+  @NonNull
+  default <S> WritableProperty<O, S> compose(WritableProperty<P, S> writableProperty) {
+    return CompositeWritableProperty.create(this, writableProperty);
+  }
 
   /**
    * compose {@link ReadableProperty} and {@link AccessibleProperty} to a {@link
@@ -148,8 +154,11 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @date 2019-11-27
    * @since 1.0.0
    */
-  @NonNull <S> AccessibleProperty<O, S> compose(
-          AccessibleProperty<P, S> accessibleProperty);
+  @NonNull
+  default <S> AccessibleProperty<O, S> compose(
+          AccessibleProperty<P, S> accessibleProperty) {
+    return new CompositeAccessibleProperty<>(this, accessibleProperty);
+  }
 
   /**
    * 设置属性类型

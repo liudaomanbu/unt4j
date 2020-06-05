@@ -77,22 +77,4 @@ public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P>
                 .filter(Optional::isPresent).map(Optional::get).findFirst();
     }
 
-    @NonNull
-    @Override
-    public final <S> ReadableProperty<O, S> compose(
-            ReadableProperty<P, S> readableProperty) {
-        return CompositeReadableProperty.create(this, readableProperty);
-    }
-
-    @Override
-    public final @NonNull <S> WritableProperty<O, S> compose(
-            WritableProperty<P, S> writableProperty) {
-        return CompositeWritableProperty.create(this, writableProperty);
-    }
-
-    @Override
-    public @NonNull <S> AccessibleProperty<O, S> compose(
-            AccessibleProperty<P, S> accessibleProperty) {
-        return new CompositeAccessibleProperty<>(this, accessibleProperty);
-    }
 }
