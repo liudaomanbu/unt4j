@@ -88,9 +88,10 @@ public class InsertUpdateInterceptor implements Interceptor {
         BoundSql boundSql = handler.getBoundSql();
 
         Statement parse = CCJSqlParserUtil.parse(boundSql.getSql());
-        log.debug("sql:{}", parse);
+
         if (SqlCommandType.INSERT == sqlCommandType
                 || SqlCommandType.UPDATE == sqlCommandType) {
+            log.debug("original sql:{}", parse);
 
             List<Column> columns = SqlCommandType.INSERT == sqlCommandType ? ((Insert) parse).getColumns()
                     : ((Update) parse).getColumns();
@@ -170,6 +171,7 @@ public class InsertUpdateInterceptor implements Interceptor {
                             }
                         });
                     });
+            log.debug("new sql:{}", parse);
             SystemMetaObject.forObject(boundSql).setValue("sql", parse.toString());
 
         }
