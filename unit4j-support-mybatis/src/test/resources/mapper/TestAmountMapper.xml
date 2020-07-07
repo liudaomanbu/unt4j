@@ -38,7 +38,7 @@
     </resultMap>
 
     <sql id="baseColumnList">
-        id,data_value,data_unit
+        id,data
     </sql>
 
     <insert id="insertSelective" keyProperty="id" keyColumn="id" useGeneratedKeys="true"

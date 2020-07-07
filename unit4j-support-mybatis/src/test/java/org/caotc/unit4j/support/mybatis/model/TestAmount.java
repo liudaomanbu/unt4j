@@ -17,6 +17,7 @@
 package org.caotc.unit4j.support.mybatis.model;
 
 import lombok.Data;
+import org.caotc.unit4j.api.annotation.AmountDeserialize;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.Amount;
@@ -35,5 +36,6 @@ public class TestAmount {
     Long id;
 
     @AmountSerialize(strategy = CodecStrategy.FLAT)
+    @AmountDeserialize(strategy = CodecStrategy.FLAT)
     Amount data;
 }
