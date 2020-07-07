@@ -22,19 +22,7 @@
     <resultMap id="TestAmountResultMap"
                type="org.caotc.unit4j.support.mybatis.model.TestAmount">
         <id property="id" column="id"/>
-        <!--        <result property="data" column="data" javaType="Object"/>-->
-        <result property="data.value" column="data_value"/>
-        <result property="data.unit" column="data_unit"/>
-        <!--        <association property="data" columnPrefix="data_"-->
-        <!--                     resultMap="AmountResultMap">-->
-        <!--        </association>-->
-    </resultMap>
-
-    <resultMap id="AmountResultMap" type="org.caotc.unit4j.core.Amount">
-        <constructor>
-            <arg column="value" javaType="org.caotc.unit4j.core.math.number.AbstractNumber"/>
-            <arg column="unit" javaType="org.caotc.unit4j.core.unit.Unit"/>
-        </constructor>
+        <result property="data" column="data"/>
     </resultMap>
 
     <sql id="baseColumnList">
