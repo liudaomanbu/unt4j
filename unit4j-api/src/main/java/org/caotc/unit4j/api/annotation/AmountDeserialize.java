@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 
@@ -39,7 +40,7 @@ import static java.lang.annotation.ElementType.METHOD;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {METHOD, FIELD})
+@Target(value = {METHOD, FIELD, ANNOTATION_TYPE})
 public @interface AmountDeserialize {
 
   /**
@@ -68,20 +69,29 @@ public @interface AmountDeserialize {
    */
   String configId() default Configuration.DEFAULT_ID;
 
-  /**
-   * @return 当前属性名称格式
-   */
-  CaseFormat caseFormat() default CaseFormat.LOWER_CAMEL;
+    /**
+     * @return 当前属性名称格式
+     */
+    CaseFormat caseFormat() default CaseFormat.LOWER_CAMEL;
 
-  /**
-   * @return 目标单位id
-   */
-  String targetUnitId() default StringConstant.EMPTY;
+    /**
+     * @return 来源单位id
+     */
+    String sourceUnitId() default StringConstant.EMPTY;
 
-  /**
-   * @return 来源单位id
-   */
-  String sourceUnitId() default StringConstant.EMPTY;
+    /**
+     * @return 值字段名称
+     */
+    String valueName() default StringConstant.EMPTY;
 
-  //TODO 目标属性名称的格式以外的内容
+    /**
+     * @return 单位字段名称
+     */
+    String unitName() default StringConstant.EMPTY;
+
+    /**
+     * @return 字段名称
+     */
+    String name() default StringConstant.EMPTY;
+    //TODO 目标属性名称的格式以外的内容
 }

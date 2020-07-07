@@ -19,12 +19,13 @@ package org.caotc.unit4j.support.jackson;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import java.io.IOException;
 import lombok.Value;
 import org.caotc.unit4j.api.annotation.SerializeCommand;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.exception.NeverHappenException;
+
+import java.io.IOException;
 
 /**
  * {@link SerializeCommands}在jackson中的序列化器. {@link Amount}通过转换为序列化指令对象,来实现同时存在多套序列化格式的需求
@@ -51,7 +52,7 @@ public class SerializeCommandsSerializer extends StdSerializer<SerializeCommands
         case END_OBJECT:
           gen.writeEndObject();
           break;
-        case WRITE_FIELD_SEPARATOR:
+          case WRITE_FIELD_DELIMITER:
           break;
         case WRITE_FIELD:
           gen.writeObjectField(command.fieldName(), command.fieldValue());

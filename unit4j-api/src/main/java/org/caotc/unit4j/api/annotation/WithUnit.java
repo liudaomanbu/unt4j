@@ -16,13 +16,14 @@
 
 package org.caotc.unit4j.api.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 
 /**
  * 单位注解,标注在属性和get方法上
@@ -33,27 +34,12 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {METHOD, FIELD})
+@Target(value = {METHOD, FIELD, ANNOTATION_TYPE})
 public @interface WithUnit {
 
-  /**
-   * 单位值,为id或者别名
-   */
-  String value();
-
-  /**
-   * 单位属性
-   */
-  ValueType valueType() default ValueType.ID;
-
-  enum ValueType {
     /**
-     * id
+     * 单位值,为id或者别名
      */
-    ID,
-    /**
-     * propertyName
-     */
-    PROPERTY_NAME;
-  }
+    String value();
+
 }

@@ -19,12 +19,13 @@ package org.caotc.unit4j.api.annotation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import java.util.Set;
-import java.util.function.Function;
 import lombok.NonNull;
 import org.caotc.unit4j.api.annotation.SerializeCommand.Type;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
+
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * 序列化、反序列化时的策略
@@ -34,7 +35,7 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
  * @since 1.0.0
  */
 public enum CodecStrategy {
-  /**
+    /**
    * 像普通对象一样序列化，即输出为一个json对象，里面包含所有属性
    */
   OBJECT {
@@ -55,7 +56,7 @@ public enum CodecStrategy {
 //                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
 //      writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
 //          .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
-//              .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
+//              .command(SerializeCommand.WRITE_FIELD_DELIMITER));
 //      writeFieldCommands.stream().skip(writeFieldCommands.size() - 1).forEach(builder::command);
 //
 //      return builder.command(SerializeCommand.END_OBJECT).build();
@@ -104,7 +105,7 @@ public enum CodecStrategy {
 //                  fieldWrapper.read(value).orElse(null))).collect(ImmutableSet.toImmutableSet());
 //      writeFieldCommands.stream().limit(writeFieldCommands.size() - 1)
 //          .forEach(writeFieldCommand -> builder.command(writeFieldCommand)
-//              .command(SerializeCommand.WRITE_FIELD_SEPARATOR));
+//              .command(SerializeCommand.WRITE_FIELD_DELIMITER));
 //      writeFieldCommands.stream().skip(writeFieldCommands.size() - 1).forEach(builder::command);
 //      return builder.command(SerializeCommand.REMOVE_ORIGINAL_FIELD).build();
       return null;

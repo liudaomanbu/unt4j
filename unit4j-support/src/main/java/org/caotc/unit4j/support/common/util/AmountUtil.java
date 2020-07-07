@@ -21,22 +21,20 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.caotc.unit4j.api.annotation.AmountDeserialize;
 import org.caotc.unit4j.api.annotation.WithUnit;
-import org.caotc.unit4j.api.annotation.WithUnit.ValueType;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
-import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.unit.Unit;
+import org.caotc.unit4j.support.common.property.AccessibleAmountProperty;
+import org.caotc.unit4j.support.common.property.ReadableAmountProperty;
+import org.caotc.unit4j.support.common.property.WritableAmountProperty;
 import org.caotc.unit4j.support.exception.NotAmountPropertyException;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -56,15 +54,6 @@ public class AmountUtil {
     public static void checkAmountProperty(@NonNull Property<?, ?> amountProperty) {
         Preconditions.checkArgument(isAmountProperty(amountProperty), "%s is not a AmountProperty",
                 amountProperty);
-        Preconditions.checkState(!amountProperty.annotation(AmountDeserialize.class)
-                        .map(AmountDeserialize::targetUnitId)
-                        .filter(targetUnitId -> !targetUnitId.isEmpty())
-                        .isPresent() ||
-                        !amountProperty.annotation(WithUnit.class)
-                                .filter(withUnit -> ValueType.ID == withUnit.valueType())
-                                .map(WithUnit::value)
-                                .isPresent(),
-                "targetUnitId of AmountDeserialize and ID valueType of WithUnit cannot exist at the same time");
     }
 
     /**
@@ -77,66 +66,62 @@ public class AmountUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> amountWritablePropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, Amount>> writableAmountPropertiesFromClass(
             @NonNull Class<T> clazz) {
-        return amountWritablePropertiesFromClass(clazz, true);
-    }
-
-    /**
-     * 从传入的类中获取包括所有超类和接口的可写{@link org.caotc.unit4j.core.Amount}属性{@link WritableProperty}集合
-     *
-     * @param clazz           需要获取可写{@link org.caotc.unit4j.core.Amount}属性的类
-     * @param fieldExistCheck 是否检查是否有对应{@link Field}存在
-     * @return 可写{@link org.caotc.unit4j.core.Amount}属性{@link WritableProperty}集合
-     * @author caotc
-     * @date 2019-10-26
-     * @since 1.0.0
-     */
-    @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> amountWritablePropertiesFromClass(
-            @NonNull Class<T> clazz, boolean fieldExistCheck) {
-        return amountWritablePropertiesFromClass(clazz, fieldExistCheck,
-                PropertyAccessorMethodFormat.values());
-    }
-
-    /**
-     * 从传入的类中获取包括所有超类和接口的可写{@link org.caotc.unit4j.core.Amount}属性{@link WritableProperty}集合
-     *
-     * @param clazz                         需要获取可写{@link org.caotc.unit4j.core.Amount}属性的类
-     * @param fieldExistCheck               是否检查是否有对应{@link Field}存在
-     * @param propertyAccessorMethodFormats 属性写方法格式集合
-     * @return 可写{@link org.caotc.unit4j.core.Amount}属性{@link WritableProperty}集合
-     * @author caotc
-     * @date 2019-10-26
-     * @since 1.0.0
-     */
-    @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> amountWritablePropertiesFromClass(
-            @NonNull Class<T> clazz, boolean fieldExistCheck,
-            @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.writablePropertiesFromClass(clazz, fieldExistCheck,
-                propertyAccessorMethodFormats)
-                .stream().filter(AmountUtil::isAmountProperty)
-                .collect(ImmutableSet.toImmutableSet());
+        return writableAmountPropertyStreamFromClass(clazz).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> Stream<WritableProperty<T, ?>> writableAmountPropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, Amount>> readableAmountPropertyStreamFromClass(
+            @NonNull Class<T> type) {
+        return ReflectionUtil.readablePropertyStreamFromClass(type)
+                .filter(AmountUtil::isAmountProperty)
+                .map(AmountUtil::warp);
+    }
+
+    @NonNull
+    public static <T> Stream<WritableProperty<T, Amount>> writableAmountPropertyStreamFromClass(
             @NonNull Class<T> type) {
         return ReflectionUtil.writablePropertyStreamFromClass(type)
-                .filter(AmountUtil::isAmountProperty);
+                .filter(AmountUtil::isAmountProperty)
+                .map(AmountUtil::warp);
     }
 
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessibleAmountPropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, Amount>> accessibleAmountPropertyStreamFromClass(
             @NonNull T object) {
         return ReflectionUtil.accessiblePropertyStreamFromClass(object)
-                .filter(AmountUtil::isAmountProperty);
+                .filter(AmountUtil::isAmountProperty)
+                .map(AmountUtil::warp);
     }
 
     public static boolean isAmountProperty(@NonNull Property<?, ?> property) {
         return property.type().equals(AMOUNT_TYPE_TOKEN)
                 || property.annotation(WithUnit.class).isPresent();
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    private static <O, P> ReadableProperty<O, Amount> warp(@NonNull ReadableProperty<O, P> readableValueProperty) {
+        return readableValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
+                (ReadableProperty<O, Amount>) readableValueProperty
+                : new ReadableAmountProperty<O, P>(readableValueProperty);
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    private static <O, P> WritableProperty<O, Amount> warp(@NonNull WritableProperty<O, P> writableValueProperty) {
+        return writableValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
+                (WritableProperty<O, Amount>) writableValueProperty
+                : new WritableAmountProperty<O, P>(writableValueProperty);
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    private static <O, P> AccessibleProperty<O, Amount> warp(@NonNull AccessibleProperty<O, P> accessibleValueProperty) {
+        return accessibleValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
+                (AccessibleProperty<O, Amount>) accessibleValueProperty
+                : new AccessibleAmountProperty<O, P>(accessibleValueProperty);
     }
 
     @NonNull
@@ -155,7 +140,7 @@ public class AmountUtil {
 
         WithUnit withUnit = amountReadableProperty.annotation(WithUnit.class).orElseThrow(
                 () -> NotAmountPropertyException.create(amountReadableProperty));
-        Unit unit = readUnit(withUnit, object);
+        Unit unit = readUnit(withUnit);
 
         if (value instanceof BigDecimal) {
             return Optional.of(Amount.create((BigDecimal) value, unit));
@@ -194,11 +179,6 @@ public class AmountUtil {
             Object value = actualAmount.value(typeToken.getRawType(), MathContext.UNLIMITED);
             actual.write(object, value);
             Optional<WithUnit> withUnit = amountWritableProperty.annotation(WithUnit.class);
-            if (withUnit.isPresent() &&
-                    withUnit.get().valueType() == ValueType.PROPERTY_NAME) {
-                WritableProperty<T, String> unitWritableProperty = ReflectionUtil.writablePropertyFromClassExact((Class<T>) object.getClass(), withUnit.get().value());
-                unitWritableProperty.write(object, actualAmount.unit().id());
-            }
         }
     }
 
@@ -206,54 +186,17 @@ public class AmountUtil {
     public static <T> Optional<Unit> readDeserializeTargetUnit(
             @NonNull Property<T, ?> amountProperty) {
         checkAmountProperty(amountProperty);
-        Optional<Unit> fixedUnit = amountProperty.annotation(WithUnit.class)
-                .filter(withUnit -> ValueType.ID.equals(withUnit.valueType()))
+        return amountProperty.annotation(WithUnit.class)
                 .map(WithUnit::value)
                 //TODO 配置对象定制
                 .map(Configuration::getUnitByIdExact);
-        if (fixedUnit.isPresent()) {
-            return fixedUnit;
-        }
-        if (amountProperty.annotation(AmountDeserialize.class).isPresent()) {
-            return amountProperty.annotation(AmountDeserialize.class)
-                    .map(AmountDeserialize::targetUnitId)
-                    .filter(targetUnitId -> !StringConstant.EMPTY.equals(targetUnitId))
-                    //TODO 配置对象定制
-                    .map(Configuration::getUnitByIdExact);
-        }
-        return Optional.empty();
     }
 
     @NonNull
     public static <T> Unit readUnit(
-            @NonNull WithUnit withUnit,
-            @NonNull T object) {
-        String unitId;
-        if (withUnit.valueType() == ValueType.ID) {
-            unitId = withUnit.value();
-        } else {
-            @SuppressWarnings("unchecked")
-            ReadableProperty<T, String> unitIdReadableProperty = ReflectionUtil
-                    .readablePropertyFromClassExact(
-                            (Class<T>) object.getClass(), withUnit.value());
-            unitId = unitIdReadableProperty.readExact(object);
-        }
+            @NonNull WithUnit withUnit) {
+        String unitId = withUnit.value();
         return Configuration.getUnitByIdExact(unitId);
     }
 
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public static <T> Optional<? extends ReadableProperty<T, ?>> readableUnitProperty(
-            @NonNull ReadableProperty<T, ?> amountReadableProperty, @NonNull T object) {
-        if (amountReadableProperty.type().getRawType().equals(Amount.class)) {
-            return Optional.empty();
-        }
-        WithUnit withUnit = amountReadableProperty.annotation(WithUnit.class).orElseThrow(
-                () -> NotAmountPropertyException.create(amountReadableProperty));
-        if (withUnit.valueType() == ValueType.ID) {
-            return Optional.empty();
-        }
-        return ReflectionUtil
-                .readablePropertyFromClass((Class<T>) object.getClass(), withUnit.value());
-    }
 }

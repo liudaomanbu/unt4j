@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,6 @@
 
 package org.caotc.unit4j.support.mybatis.type.handler;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Objects;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.plugin.Interceptor;
@@ -31,6 +26,12 @@ import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.math.number.Fraction;
+
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Objects;
 
 /**
  * 如果没有该TypeHandler,会导致mybatis解析{@link org.apache.ibatis.mapping.BoundSql}时直接报错,无法在{@link
@@ -61,8 +62,9 @@ public class NumberTypeHandler extends BaseTypeHandler<AbstractNumber> {
 
   @Override
   public AbstractNumber getNullableResult(ResultSet rs, String columnName) throws SQLException {
+      //TODO 指定类型
     java.math.BigDecimal value = rs.getBigDecimal(columnName);
-    log.error("columnName:{},value:{}", columnName, value);
+      log.debug("columnName:{},value:{}", columnName, value);
     return BigDecimal.valueOf(value);
   }
 

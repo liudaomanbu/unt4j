@@ -37,6 +37,7 @@
     <module>unit4j-support-jackson</module>
     <module>unit4j-support-fastjson</module>
     <module>unit4j-spring-boot-starter</module>
+      <module>common-util</module>
   </modules>
 
   <properties>
@@ -67,7 +68,7 @@
     <logback.version>1.2.3</logback.version>
 
     <slf4j.version>1.7.25</slf4j.version>
-    <lombok.version>1.18.4</lombok.version>
+      <lombok.version>1.18.12</lombok.version>
     <guava.version>28.1-jre</guava.version>
     <jsqlparser.version>2.0</jsqlparser.version>
 
@@ -80,17 +81,22 @@
   </properties>
 
   <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.caotc</groupId>
-        <artifactId>unit4j-core</artifactId>
-        <version>${unit4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.caotc</groupId>
-        <artifactId>unit4j-api</artifactId>
-        <version>${unit4j-api.version}</version>
-      </dependency>
+      <dependencies>
+          <dependency>
+              <groupId>org.caotc</groupId>
+              <artifactId>common-util</artifactId>
+              <version>${unit4j.version}</version>
+          </dependency>
+          <dependency>
+              <groupId>org.caotc</groupId>
+              <artifactId>unit4j-core</artifactId>
+              <version>${unit4j.version}</version>
+          </dependency>
+          <dependency>
+              <groupId>org.caotc</groupId>
+              <artifactId>unit4j-api</artifactId>
+              <version>${unit4j-api.version}</version>
+          </dependency>
       <dependency>
         <groupId>org.caotc</groupId>
         <artifactId>unit4j-support</artifactId>

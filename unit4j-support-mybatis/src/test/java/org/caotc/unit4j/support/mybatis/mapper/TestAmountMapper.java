@@ -18,6 +18,7 @@
 package org.caotc.unit4j.support.mybatis.mapper;
 
 import org.caotc.unit4j.support.mybatis.model.TestAmount;
+import org.caotc.unit4j.support.mybatis.model.TestAmountField;
 
 
 public interface TestAmountMapper {
@@ -45,21 +46,29 @@ public interface TestAmountMapper {
    */
   TestAmount findByPrimaryKeyOnResultType(Long primaryKey);
 
-  /**
-   * 按主键查询
-   *
-   * @param primaryKey 业务主键
-   * @return 查询结果
-   */
-  TestAmount findByPrimaryKeyOnResultMap(Long primaryKey);
+    /**
+     * 按主键查询
+     *
+     * @param primaryKey 业务主键
+     * @return 查询结果
+     */
+    TestAmount findByPrimaryKeyOnResultMap(Long primaryKey);
 
-  /**
-   * 按主键删除
-   *
-   * @param primaryKey 业务主键
-   * @return 删除数目
-   */
-  int deleteByPrimaryKey(Long primaryKey);
+    /**
+     * 按主键查询
+     *
+     * @param primaryKey 业务主键
+     * @return 查询结果
+     */
+    TestAmountField findByPrimaryKeyOnTestAmountField(Long primaryKey);
+
+    /**
+     * 按主键删除
+     *
+     * @param primaryKey 业务主键
+     * @return 删除数目
+     */
+    int deleteByPrimaryKey(Long primaryKey);
 
 
 }

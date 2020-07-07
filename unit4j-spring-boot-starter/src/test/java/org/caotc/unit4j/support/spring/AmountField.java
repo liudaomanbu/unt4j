@@ -16,7 +16,6 @@
 
 package org.caotc.unit4j.support.spring;
 
-import java.math.RoundingMode;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import org.caotc.unit4j.api.annotation.AmountDeserialize;
@@ -26,15 +25,17 @@ import org.caotc.unit4j.api.annotation.DataType;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 
+import java.math.RoundingMode;
+
 
 @Value(staticConstructor = "create")
 @Accessors(fluent = false, chain = true)
 public class AmountField {
 
-  public static AmountField create(Amount amount) {
-    return create(amount, amount, amount, amount, amount.intValueExact(), amount.intValueExact(),
-        amount.intValueExact());
-  }
+    public static AmountField create(Amount amount) {
+        return create(amount, amount, amount, amount, amount.intValueExact(), amount.intValueExact(),
+                amount.intValueExact());
+    }
 
   Amount noAnnotationAmount;
 
@@ -47,12 +48,12 @@ public class AmountField {
   @AmountSerialize(strategy = CodecStrategy.FLAT, valueType = String.class)
   Amount annotationFlatAmount;
 
-  @AmountSerialize(strategy = CodecStrategy.VALUE, targetUnitId = "SECOND")
-  @AmountDeserialize(strategy = CodecStrategy.VALUE, targetUnitId = "MINUTE")
+    @AmountSerialize(strategy = CodecStrategy.VALUE, targetUnitId = "SECOND")
+    @AmountDeserialize(strategy = CodecStrategy.VALUE)
   Integer dbValue;
 
-  @AmountSerialize(strategy = CodecStrategy.FLAT, targetUnitId = "MINUTE")
-  @AmountDeserialize(strategy = CodecStrategy.VALUE, targetUnitId = "MINUTE")
+    @AmountSerialize(strategy = CodecStrategy.FLAT, targetUnitId = "MINUTE")
+    @AmountDeserialize(strategy = CodecStrategy.VALUE)
   Integer jsonValue;
 
   @DataType("createTime")

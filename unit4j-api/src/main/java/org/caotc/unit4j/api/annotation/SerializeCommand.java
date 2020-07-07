@@ -45,30 +45,30 @@ public class SerializeCommand {
      * 结束序列化一个对象
      */
     END_OBJECT,
-    /**
-     * 序列化属性
-     */
-    WRITE_FIELD,
-    /**
-     * 序列化属性之间分隔符
-     */
-    WRITE_FIELD_SEPARATOR,
-    /**
-     * 序列化属性
-     */
-    WRITE_VALUE,
-    /**
-     * 取消原始属性名称的输出(只有{@see AmountCodecStrategy.FLAT}使用)
-     */
-    REMOVE_ORIGINAL_FIELD;
+      /**
+       * 序列化属性
+       */
+      WRITE_FIELD,
+      /**
+       * 序列化属性之间分隔符
+       */
+      WRITE_FIELD_DELIMITER,
+      /**
+       * 序列化属性
+       */
+      WRITE_VALUE,
+      /**
+       * 取消原始属性名称的输出(只有{@see AmountCodecStrategy.FLAT}使用)
+       */
+      REMOVE_ORIGINAL_FIELD;
   }
 
   public static final SerializeCommand START_OBJECT = create(Type.START_OBJECT, null, null);
-  public static final SerializeCommand END_OBJECT = create(Type.END_OBJECT, null, null);
-  public static final SerializeCommand WRITE_FIELD_SEPARATOR = create(Type.WRITE_FIELD_SEPARATOR,
-      null, null);
-  public static final SerializeCommand REMOVE_ORIGINAL_FIELD = create(
-      Type.REMOVE_ORIGINAL_FIELD, null, null);
+    public static final SerializeCommand END_OBJECT = create(Type.END_OBJECT, null, null);
+    public static final SerializeCommand WRITE_FIELD_DELIMITER = create(Type.WRITE_FIELD_DELIMITER,
+            null, null);
+    public static final SerializeCommand REMOVE_ORIGINAL_FIELD = create(
+            Type.REMOVE_ORIGINAL_FIELD, null, null);
 
   /**
    * 指令类型

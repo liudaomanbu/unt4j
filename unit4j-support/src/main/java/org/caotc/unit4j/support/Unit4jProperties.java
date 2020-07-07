@@ -23,6 +23,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.caotc.unit4j.api.annotation.AmountDeserialize;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.Alias;
@@ -31,6 +32,7 @@ import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.Property;
+import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -214,10 +216,17 @@ public class Unit4jProperties {
             .strategy(Optional.ofNullable(amountSerialize).map(AmountSerialize::strategy)
                     .orElseGet(this::getPropertyStrategy))
             .targetUnit(Optional.ofNullable(amountSerialize).map(AmountSerialize::targetUnitId)
+                    .filter(targetUnitId -> !targetUnitId.isEmpty())
                     .map(Configuration::getUnitByIdExact).orElse(null))
-            .outputName(fieldNameConverter.apply(ImmutableList.of()))
-            .outputValueName(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
-            .outputUnitName(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
+            .outputName(Optional.ofNullable(amountSerialize).map(AmountSerialize::name)
+                    .filter(name -> !name.isEmpty())
+                    .orElse(fieldNameConverter.apply(ImmutableList.of())))
+            .outputValueName(Optional.ofNullable(amountSerialize).map(AmountSerialize::valueName)
+                    .filter(name -> !name.isEmpty())
+                    .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME))))
+            .outputUnitName(Optional.ofNullable(amountSerialize).map(AmountSerialize::unitName)
+                    .filter(name -> !name.isEmpty())
+                    .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
             .valueCodecConfig(new AmountValueCodecConfig(
                     Optional.ofNullable(amountSerialize).map(AmountSerialize::valueType)
                             .orElseGet(() -> (Class) getValueType()),
@@ -228,15 +237,54 @@ public class Unit4jProperties {
                     getUnitAliasUndefinedStrategy())).build();
   }
 
-  /**
-   * 舍入模式set方法
-   *
-   * @param roundingMode 舍入模式
-   * @return {@code this}
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public AmountCodecConfig createPropertyAmountCodecConfig(
+            @NonNull WritableProperty<?, ?> amountWritableProperty) {
+        AmountDeserialize amountDeserialize = amountWritableProperty.annotation(AmountDeserialize.class).orElse(null);
+        Function<@NonNull ImmutableList<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
+                .apply(valueFieldNameWords,
+                        Optional.ofNullable(amountDeserialize).map(AmountDeserialize::caseFormat)
+                                .map(
+                                        caseFormat -> (Function<@NonNull String, @NonNull ImmutableList<String>>) caseFormat::split)
+                                .orElseGet(this::getFieldNameSplitter)
+                                .apply(amountWritableProperty.name()));
+        return AmountCodecConfig.builder()
+                .configuration(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::configId)
+                        .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
+                .strategy(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::strategy)
+                        .orElseGet(this::getPropertyStrategy))
+//            .targetUnit(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::targetUnitId)
+//                    .filter(targetUnitId->!targetUnitId.isEmpty())
+//                    .map(Configuration::getUnitByIdExact).orElse(null))
+                .outputName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::name)
+                        .filter(name -> !name.isEmpty())
+                        .orElse(fieldNameConverter.apply(ImmutableList.of())))
+                .outputValueName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::valueName)
+                        .filter(name -> !name.isEmpty())
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME))))
+                .outputUnitName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::unitName)
+                        .filter(name -> !name.isEmpty())
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
+                .valueCodecConfig(new AmountValueCodecConfig(
+                        Optional.ofNullable(amountDeserialize).map(AmountDeserialize::valueType)
+                                .orElseGet(() -> (Class) getValueType()),
+                        Optional.ofNullable(amountDeserialize)
+                                .map(a -> new MathContext(a.precision(), a.roundingMode()))
+                                .orElseGet(this::getMathContext)))
+                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
+                        getUnitAliasUndefinedStrategy())).build();
+    }
+
+    /**
+     * 舍入模式set方法
+     *
+     * @param roundingMode 舍入模式
+     * @return {@code this}
+     * @author caotc
+     * @date 2019-05-29
+     * @since 1.0.0
+     */
   public Unit4jProperties setRoundingMode(@NonNull RoundingMode roundingMode) {
     this.roundingMode = roundingMode;
     mathContext = new MathContext(precision, roundingMode);

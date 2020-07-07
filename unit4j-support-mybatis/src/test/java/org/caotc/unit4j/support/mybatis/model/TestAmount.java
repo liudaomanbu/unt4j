@@ -16,16 +16,10 @@
 
 package org.caotc.unit4j.support.mybatis.model;
 
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.experimental.FieldDefaults;
-import org.caotc.unit4j.api.annotation.AmountDeserialize;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
-import org.caotc.unit4j.api.annotation.WithUnit;
-import org.caotc.unit4j.api.annotation.WithUnit.ValueType;
-
-import java.math.BigDecimal;
+import org.caotc.unit4j.core.Amount;
 
 
 /**
@@ -36,19 +30,10 @@ import java.math.BigDecimal;
  * @since 1.0.0
  */
 @Data
-@FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 public class TestAmount {
 
-  Long id;
+    Long id;
 
-  @WithUnit("MINUTE")
-  BigDecimal withUnitValue;
-
-  //TODO AmountSerialize,AmountDeserialize,WithUnit注解之间的关系,属性覆盖处理
-  @AmountSerialize(targetUnitId = "SECOND", strategy = CodecStrategy.FLAT)
-  @AmountDeserialize(targetUnitId = "MINUTE")
-  @WithUnit(value = "unit", valueType = ValueType.PROPERTY_NAME)
-  BigDecimal withUnitProperty;
-
-  String unit;
+    @AmountSerialize(strategy = CodecStrategy.FLAT)
+    Amount data;
 }

@@ -28,6 +28,7 @@ import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.constant.UnitConstant;
 import org.caotc.unit4j.support.mybatis.mapper.TestAmountMapper;
 import org.caotc.unit4j.support.mybatis.model.TestAmount;
+import org.caotc.unit4j.support.mybatis.model.TestAmountField;
 import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,82 +36,75 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.Random;
 
 @Slf4j
 public class MybatisTest {
+    private static final SqlSessionFactory SQL_SESSION_FACTORY;
+    private static final SqlSession SESSION;
+    private static final TestAmountMapper MAPPER;
+    private static final Random RANDOM = new Random();
 
-  private static final Amount AMOUNT = Amount.create(123L, UnitConstant.SECOND);
-  private static final TestAmount TEST_AMOUNT = new TestAmount()
-          .withUnitValue(BigDecimal.TEN).withUnitProperty(BigDecimal.ONE)
-          .unit(UnitConstant.HOUR.id());
-  private static SqlSessionFactory sqlSessionFactory;
-
-  static {
-    InputStream inputStream = null;
-    try {
-      inputStream = Resources.getResourceAsStream("mybatis-config.xml");
-    } catch (IOException e) {
-      e.printStackTrace();
+    static {
+        InputStream inputStream = null;
+        try {
+            inputStream = Resources.getResourceAsStream("mybatis-config.xml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SQL_SESSION_FACTORY = new SqlSessionFactoryBuilder().build(inputStream);
+        SESSION = SQL_SESSION_FACTORY.openSession();
+        MAPPER = SESSION.getMapper(TestAmountMapper.class);
     }
-    sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-  }
 
   @Test
   void findByPrimaryKeyOnResultType() {
-    try (SqlSession session = sqlSessionFactory.openSession()) {
-      TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      TestAmount result = dao.findByPrimaryKeyOnResultType(1L);
+      TestAmount result = MAPPER.findByPrimaryKeyOnResultType(1L);
       log.debug("result:{}", result);
-      Assertions.assertEquals(BigDecimal.TEN, result.withUnitValue());
-      Assertions.assertEquals(BigDecimal.ONE, result.withUnitProperty());
-      Assertions.assertEquals(UnitConstant.MINUTE.id(), result.unit());
-    }
+      Assertions.assertEquals(BigDecimal.ONE.negate(), result.data().bigDecimalValue());
+      Assertions.assertEquals(UnitConstant.SECOND, result.data().unit());
   }
 
   @Test
   void findByPrimaryKeyOnResultMap() {
-    try (SqlSession session = sqlSessionFactory.openSession()) {
-      TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      TestAmount result = dao.findByPrimaryKeyOnResultMap(1L);
+      TestAmount result = MAPPER.findByPrimaryKeyOnResultMap(1L);
       log.debug("result:{}", result);
-      Assertions.assertEquals(BigDecimal.TEN, result.withUnitValue());
-      Assertions.assertEquals(BigDecimal.ONE, result.withUnitProperty());
-      Assertions.assertEquals(UnitConstant.MINUTE.id(), result.unit());
-    }
+      Assertions.assertEquals(BigDecimal.ONE.negate(), result.data().bigDecimalValue());
+      Assertions.assertEquals(UnitConstant.SECOND, result.data().unit());
   }
 
   @Test
   void insert() {
-    try (SqlSession session = sqlSessionFactory.openSession()) {
-      TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      Amount amount = Amount.create(BigDecimal.ONE, UnitConstant.HOUR);
-      TestAmount param = new TestAmount()
-              .withUnitValue(BigDecimal.TEN).withUnitProperty(amount.bigDecimalValue())
-              .unit(amount.unit().id());
+      Amount amount = Amount.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
+      TestAmount param = new TestAmount().data(amount);
       log.debug("param:{}", param);
-      int effectRows = dao.insertSelective(param);
+      int effectRows = MAPPER.insertSelective(param);
       log.debug("effectRows:{}", effectRows);
       Assertions.assertEquals(1, effectRows);
 
-      TestAmount result = dao.findByPrimaryKeyOnResultType(param.id());
+      TestAmountField result = MAPPER.findByPrimaryKeyOnTestAmountField(param.id());
       log.debug("result:{}", result);
       Assertions.assertNotNull(result);
 
-      Assertions.assertEquals(param.withUnitValue(), result.withUnitValue());
-      Assertions.assertEquals(amount.convertTo(UnitConstant.MINUTE).unit().id(), result.unit());
-      Assertions.assertEquals(amount.convertTo(UnitConstant.MINUTE).bigDecimalValue(), result.withUnitProperty());
-      session.commit();
-    }
+      Assertions.assertEquals(param.data().value().bigDecimalValue().toString(), result.dataValue());
+      Assertions.assertEquals(param.data().unit().id(), result.dataUnit());
   }
 
   @Test
   void update() {
-    try (SqlSession session = sqlSessionFactory.openSession()) {
-      TestAmountMapper dao = session.getMapper(TestAmountMapper.class);
-      int effectRows = dao.updateByPrimaryKeySelective(TEST_AMOUNT);
-      session.commit();
-      log.info("effectRows:{}", effectRows);
-    }
+      Amount amount = Amount.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
+      TestAmount param = new TestAmount()
+              .data(amount).id(1L);
+      int effectRows = MAPPER.updateByPrimaryKeySelective(param);
+      log.debug("effectRows:{}", effectRows);
+      Assertions.assertEquals(1, effectRows);
+
+      TestAmountField result = MAPPER.findByPrimaryKeyOnTestAmountField(param.id());
+      log.debug("result:{}", result);
+      Assertions.assertNotNull(result);
+
+      Assertions.assertEquals(param.data().value().bigDecimalValue().toString(), result.dataValue());
+      Assertions.assertEquals(param.data().unit().id(), result.dataUnit());
   }
 
   @Test

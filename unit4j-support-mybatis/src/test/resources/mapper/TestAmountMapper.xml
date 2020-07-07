@@ -16,93 +16,86 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.caotc.unit4j.support.mybatis.mapper.TestAmountMapper">
 
-  <resultMap id="DoctorTeamMemberMap"
-             type="org.caotc.unit4j.support.mybatis.model.TestAmount">
-    <id property="id" column="id"/>
-    <result property="withUnitValue" column="with_unit_value"/>
-    <result property="withUnitProperty" column="with_unit_property"/>
-    <result property="unit" column="unit"/>
-  </resultMap>
+    <resultMap id="TestAmountResultMap"
+               type="org.caotc.unit4j.support.mybatis.model.TestAmount">
+        <id property="id" column="id"/>
+        <!--        <result property="data" column="data" javaType="Object"/>-->
+        <result property="data.value" column="data_value"/>
+        <result property="data.unit" column="data_unit"/>
+        <!--        <association property="data" columnPrefix="data_"-->
+        <!--                     resultMap="AmountResultMap">-->
+        <!--        </association>-->
+    </resultMap>
 
-  <resultMap id="amount" type="org.caotc.unit4j.core.Amount">
-    <!--    <constructor>-->
-    <!--      <idArg column="value" javaType="org.caotc.unit4j.core.math.number.AbstractNumber"/>-->
-    <!--      <idArg column="unit" javaType="org.caotc.unit4j.core.unit.Unit"/>-->
-    <!--    </constructor>-->
-    <id property="value" column="value"/>
-    <id property="unit" column="unit"/>
-  </resultMap>
+    <resultMap id="AmountResultMap" type="org.caotc.unit4j.core.Amount">
+        <constructor>
+            <arg column="value" javaType="org.caotc.unit4j.core.math.number.AbstractNumber"/>
+            <arg column="unit" javaType="org.caotc.unit4j.core.unit.Unit"/>
+        </constructor>
+    </resultMap>
 
-  <sql id="baseColumnList">
-        id,with_unit_value,with_unit_property,unit
+    <sql id="baseColumnList">
+        id,data_value,data_unit
     </sql>
 
-  <insert id="insertSelective" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
-    parameterType="org.caotc.unit4j.support.mybatis.model.TestAmount">
-    insert into test_amount(
-    <trim suffixOverrides=",">
-      <if test="withUnitValue!= null">with_unit_value,</if>
-      <if test="withUnitProperty!= null">with_unit_property,</if>
-      <if test="unit!= null">unit,</if>
-    </trim>
-    )
-    values (
-    <trim suffixOverrides=",">
-      <if test="withUnitValue!= null">#{withUnitValue},</if>
-      <if test="withUnitProperty!= null">#{withUnitProperty},</if>
-      <if test="unit!= null">#{unit},</if>
-    </trim>
-    )
-  </insert>
+    <insert id="insertSelective" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
+            parameterType="org.caotc.unit4j.support.mybatis.model.TestAmount">
+        insert into test_amount(
+        <trim suffixOverrides=",">
+            <if test="data!= null">data,</if>
+        </trim>
+        )
+        values (
+        <trim suffixOverrides=",">
+            <if test="data!= null">#{data},</if>
+        </trim>
+        )
+    </insert>
 
-  <update id="updateByPrimaryKeySelective">
-    update test_amount
-    <set>
-      <if test="amountValue!= null">amount_value = #{amountValue},</if>
-      <if test="doctorId!= null">amount_flat = #{doctorId},</if>
-    </set>
-    where id = #{ id }
-  </update>
+    <update id="updateByPrimaryKeySelective">
+        update test_amount
+        <set>
+            <if test="data!= null">data = #{data},</if>
+        </set>
+        where id = #{ id }
+    </update>
 
-  <select id="findByPrimaryKeyOnResultType"
-    resultType="org.caotc.unit4j.support.mybatis.model.TestAmount">
-    select
-    <include refid="baseColumnList"/>
-    from test_amount where id = #{ id }
-  </select>
+    <select id="findByPrimaryKeyOnResultType"
+            resultType="org.caotc.unit4j.support.mybatis.model.TestAmount">
+        select
+        <include refid="baseColumnList"/>
+        from test_amount where id = #{ id }
+    </select>
 
-  <select id="findByPrimaryKeyOnResultMap"
-    resultMap="DoctorTeamMemberMap">
-    select
-    <include refid="baseColumnList"/>
-    from test_amount where id = #{ id }
-  </select>
+    <select id="findByPrimaryKeyOnResultMap"
+            resultMap="TestAmountResultMap">
+        select
+        <include refid="baseColumnList"/>
+        from test_amount where id = #{ id }
+    </select>
 
-  <delete id="deleteByPrimaryKey">
+    <select id="findByPrimaryKeyOnTestAmountField"
+            resultType="org.caotc.unit4j.support.mybatis.model.TestAmountField">
+        select
+        <include refid="baseColumnList"/>
+        from test_amount where id = #{ id }
+    </select>
+
+    <delete id="deleteByPrimaryKey">
         delete from test_amount
         where id = #{ id }
     </delete>
 
-  <!-- 分页查询 start -->
-  <sql id="queryCondition">
-    <where>
-      <if test="id!= null">and id= #{id}</if>
-      <if test="doctorId!= null">and amount_flat= #{doctorId}</if>
-      <if test="amountValue!= null">and amount_value= #{amountValue}</if>
-    </where>
-  </sql>
+    <!-- 分页查询 start -->
+    <sql id="queryCondition">
+        <where>
+            <if test="id!= null">and id= #{id}</if>
+            <if test="data!= null">and data= #{data}</if>
+        </where>
+    </sql>
 
-  <!-- 分页查询 end -->
-
-  <sql id="updateQueryCondition">
-    <where>
-      <if test="query.id!= null">and id= #{query.id}</if>
-      <if test="query.doctorId!= null">and amount_flat= #{query.doctorId}</if>
-      <if test="query.amountValue!= null">and amount_value= #{query.amountValue}</if>
-    </where>
-  </sql>
 
 </mapper>
