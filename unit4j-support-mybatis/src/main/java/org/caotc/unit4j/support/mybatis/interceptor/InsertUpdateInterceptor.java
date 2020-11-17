@@ -17,6 +17,12 @@
 package org.caotc.unit4j.support.mybatis.interceptor;
 
 import com.google.common.collect.ImmutableList;
+import java.sql.Connection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -42,23 +48,15 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
+import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
-import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.constant.StringConstant;
-import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.support.AmountCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.common.util.AmountUtil;
 import org.caotc.unit4j.support.mybatis.sql.visitor.ParameterMappingMatchColumnInsertUpdateVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
-
-import java.sql.Connection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Stream;
 
 /**
  * @author caotc
@@ -91,23 +89,30 @@ public class InsertUpdateInterceptor implements Interceptor {
 
         if (SqlCommandType.INSERT == sqlCommandType
                 || SqlCommandType.UPDATE == sqlCommandType) {
-            log.debug("original sql:{}", parse);
+          log.debug("original sql:{}", parse);
 
-            List<Column> columns = SqlCommandType.INSERT == sqlCommandType ? ((Insert) parse).getColumns()
-                    : ((Update) parse).getColumns();
-            log.debug("ParameterMappings:{}", boundSql.getParameterMappings());
-            ParameterMappingMatchColumnInsertUpdateVisitor parameterMappingMatchColumnInsertUpdateVisitor = ParameterMappingMatchColumnInsertUpdateVisitor
-                    .create(boundSql.getParameterMappings());
-            parse.accept(parameterMappingMatchColumnInsertUpdateVisitor);
-            parameterMappingMatchColumnInsertUpdateVisitor.columnToParameterMappings().entrySet().stream()
-                    .map(entry -> SqlParam.create(entry.getValue(), entry.getKey(),
-                            readableProperty(entry.getValue(), boundSql.getParameterObject(), mappedStatement)
-                                    .orElseThrow(() ->
-                                            ReadablePropertyNotFoundException.create(boundSql.getParameterObject().getClass(), entry.getValue().getProperty()))))
-                    .filter(sqlParam -> AmountUtil.isAmountProperty(sqlParam.readableProperty))
-                    .forEach(sqlParam -> {
-                        //noinspection unchecked
-                        AmountUtil
+          List<Column> columns =
+              SqlCommandType.INSERT == sqlCommandType ? ((Insert) parse).getColumns()
+                  : ((Update) parse).getColumns();
+          log.debug("ParameterMappings:{}", boundSql.getParameterMappings());
+          ParameterMappingMatchColumnInsertUpdateVisitor parameterMappingMatchColumnInsertUpdateVisitor = ParameterMappingMatchColumnInsertUpdateVisitor
+              .create(boundSql.getParameterMappings());
+          parse.accept(parameterMappingMatchColumnInsertUpdateVisitor);
+
+//            AmountUtil.readableAmountPropertyStreamFromClass();
+          parameterMappingMatchColumnInsertUpdateVisitor.columnToParameterMappings().entrySet()
+              .stream()
+              .map(entry ->
+                  readableAmountProperty(entry.getValue(), boundSql.getParameterObject(),
+                      mappedStatement)
+                      .map(readableAmountProperty -> SqlParam
+                          .create(entry.getValue(), entry.getKey(), readableAmountProperty)))
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .forEach(sqlParam -> {
+                sqlParam.readableProperty.read(boundSql.getParameterObject());
+                //noinspection unchecked
+                AmountUtil
                                 .readAmount((ReadableProperty<? super Object, ?>) sqlParam.readableProperty,
                                         boundSql.getParameterObject()).ifPresent(amount -> {
                             AmountCodecConfig amountCodecConfig = unit4jProperties
@@ -188,42 +193,43 @@ public class InsertUpdateInterceptor implements Interceptor {
 
     }
 
-    private Optional<? extends ReadableProperty<?, ?>> readableProperty(
-            @NonNull ParameterMapping parameterMapping,
-            @NonNull Object parameterObject, @NonNull MappedStatement mappedStatement) {
-        Class<?> clazz = parameterObject.getClass();
-        String fieldName = parameterMapping.getProperty();
-        if (parameterMapping.getProperty().contains(StringConstant.DOT)) {
-            ImmutableList<String> propertyNames = ImmutableList
-                    .copyOf(StringConstant.DOT_SPLITTER.split(parameterMapping.getProperty()));
-            //获取复杂属性名的最后一层属性名之前的属性名
-            String directPropertyName = StringConstant.DOT_JOINER
-                    .join(propertyNames.subList(0, propertyNames.size() - 1));
-            Object directParameterObject = mappedStatement.getConfiguration()
-                    .newMetaObject(parameterObject).getValue(directPropertyName);
-            if (Objects.isNull(directParameterObject)) {
-                return Optional.empty();
-            }
-            clazz = directParameterObject.getClass();
-            fieldName = propertyNames.get(propertyNames.size() - 1);
-        }
-        return ReflectionUtil
-                .readablePropertyFromClass(clazz, fieldName);
+  private <T> Optional<? extends ReadableProperty<T, Amount>> readableAmountProperty(
+      @NonNull ParameterMapping parameterMapping,
+      @NonNull T parameterObject, @NonNull MappedStatement mappedStatement) {
+    Class<?> clazz = parameterObject.getClass();
+    String fieldName = parameterMapping.getProperty();
+    if (parameterMapping.getProperty().contains(StringConstant.DOT)) {
+      ImmutableList<String> propertyNames = ImmutableList
+          .copyOf(StringConstant.DOT_SPLITTER.split(parameterMapping.getProperty()));
+      //获取复杂属性名的最后一层属性名之前的属性名
+      String directPropertyName = StringConstant.DOT_JOINER
+          .join(propertyNames.subList(0, propertyNames.size() - 1));
+      Object directParameterObject = mappedStatement.getConfiguration()
+          .newMetaObject(parameterObject).getValue(directPropertyName);
+      if (Objects.isNull(directParameterObject)) {
+        return Optional.empty();
+      }
+      clazz = directParameterObject.getClass();
+      fieldName = propertyNames.get(propertyNames.size() - 1);
     }
+//        return AmountUtil
+//                .readableAmountPropertyFromClass(clazz, fieldName);
+    return null;
+  }
 
-    @Value(staticConstructor = "create")
-    private static class SqlParam {
+  @Value(staticConstructor = "create")
+  private static class SqlParam<O> {
 
-        @NonNull
-        ParameterMapping parameterMapping;
-        @NonNull
-        Column column;
-        @NonNull
-        ReadableProperty<?, ?> readableProperty;
-        //复杂属性名的最后一层属性名之前的属性名
-        @Getter(lazy = true)
-        @NonNull
-        String directPropertyName = generateDirectPropertyName();
+    @NonNull
+    ParameterMapping parameterMapping;
+    @NonNull
+    Column column;
+    @NonNull
+    ReadableProperty<O, Amount> readableProperty;
+    //复杂属性名的最后一层属性名之前的属性名
+    @Getter(lazy = true)
+    @NonNull
+    String directPropertyName = generateDirectPropertyName();
 
         private String generateDirectPropertyName() {
             if (parameterMapping().getProperty().contains(StringConstant.DOT)) {

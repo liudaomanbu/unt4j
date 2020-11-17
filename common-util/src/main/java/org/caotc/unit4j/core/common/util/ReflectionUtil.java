@@ -18,11 +18,22 @@ package org.caotc.unit4j.core.common.util;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -41,15 +52,6 @@ import org.caotc.unit4j.core.exception.AccessiblePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Stream;
 //TODO 将所有方法优化到只有一次流操作
 
 /**
@@ -65,11 +67,14 @@ import java.util.stream.Stream;
 public class ReflectionUtil {
 
     public static final boolean DEFAULT_FIELD_EXIST_CHECK = true;
+    private static final String FIELD_NAME_SEPARATOR = ".";
+    private static final Splitter FIELD_NAME_SEPARATOR_SPLITTER = Splitter.on(FIELD_NAME_SEPARATOR)
+        .omitEmptyStrings().trimResults();
     private static final PropertyAccessorMethodFormat[] DEFAULT_METHOD_NAME_STYLES = PropertyAccessorMethodFormat
-            .values();
+        .values();
     private static final Function<PropertyElement<?, ?>, ImmutableList<?>> KEY_FUNCTION = propertyElement -> ImmutableList
-            .of(propertyElement.propertyName(), propertyElement.propertyType(),
-                    propertyElement.isStatic());
+        .of(propertyElement.propertyName(), propertyElement.propertyType(),
+            propertyElement.isStatic());
 
     @NonNull
     public static ImmutableSet<Field> fieldsFromClass(@NonNull Type type) {
@@ -1647,11 +1652,17 @@ public class ReflectionUtil {
     public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
             @NonNull TypeToken<T> typeToken, @NonNull String fieldName, boolean fieldExistCheck,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertiesFromClass(typeToken, fieldExistCheck, propertyAccessorMethodFormats)
-                .stream()
-                .filter(propertyGetter -> propertyGetter.name().equals(fieldName))
-                .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
-                .findAny();
+        if (fieldName.contains(FIELD_NAME_SEPARATOR)) {
+            List<String> fieldNames = Streams.stream(FIELD_NAME_SEPARATOR_SPLITTER.split(fieldName))
+                .collect(ImmutableList.toImmutableList());
+//            fieldNames.subList();
+        }
+        return readablePropertiesFromClass(typeToken, fieldExistCheck,
+            propertyAccessorMethodFormats)
+            .stream()
+            .filter(propertyGetter -> propertyGetter.name().equals(fieldName))
+            .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
+            .findAny();
     }
 
     @NonNull

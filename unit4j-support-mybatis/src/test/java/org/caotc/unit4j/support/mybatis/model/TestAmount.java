@@ -21,6 +21,8 @@ import org.caotc.unit4j.api.annotation.AmountDeserialize;
 import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 
 /**
@@ -38,4 +40,10 @@ public class TestAmount {
     @AmountSerialize(strategy = CodecStrategy.FLAT)
     @AmountDeserialize(strategy = CodecStrategy.FLAT)
     Amount data;
+
+    public static void main(String[] args) {
+        ReadableProperty<TestAmount, Object> property = ReflectionUtil
+            .readablePropertyFromClassExact(TestAmount.class, "data.value");
+        System.out.println(property);
+    }
 }

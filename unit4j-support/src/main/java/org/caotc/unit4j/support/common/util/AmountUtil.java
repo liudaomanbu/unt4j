@@ -19,6 +19,11 @@ package org.caotc.unit4j.support.common.util;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.caotc.unit4j.api.annotation.WithUnit;
@@ -29,17 +34,12 @@ import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
+import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.common.property.AccessibleAmountProperty;
 import org.caotc.unit4j.support.common.property.ReadableAmountProperty;
 import org.caotc.unit4j.support.common.property.WritableAmountProperty;
 import org.caotc.unit4j.support.exception.NotAmountPropertyException;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author caotc
@@ -67,19 +67,39 @@ public class AmountUtil {
      */
     @NonNull
     public static <T> ImmutableSet<WritableProperty<T, Amount>> writableAmountPropertiesFromClass(
-            @NonNull Class<T> clazz) {
-        return writableAmountPropertyStreamFromClass(clazz).collect(ImmutableSet.toImmutableSet());
+        @NonNull Class<T> clazz) {
+      return writableAmountPropertyStreamFromClass(clazz).collect(ImmutableSet.toImmutableSet());
     }
 
-    @NonNull
-    public static <T> Stream<ReadableProperty<T, Amount>> readableAmountPropertyStreamFromClass(
-            @NonNull Class<T> type) {
-        return ReflectionUtil.readablePropertyStreamFromClass(type)
-                .filter(AmountUtil::isAmountProperty)
-                .map(AmountUtil::warp);
+  @NonNull
+  public static <T> ReadableProperty<T, Amount> readableAmountPropertyFromClassExact(
+      @NonNull Class<T> type, @NonNull String fieldName) {
+    ReadableProperty<T, ?> readableProperty = ReflectionUtil
+        .readablePropertyFromClassExact(type, fieldName);
+    if (!isAmountProperty(readableProperty)) {
+      throw ReadablePropertyNotFoundException
+          .create(TypeToken.of(type), fieldName);
     }
+    return warp(readableProperty);
+  }
 
-    @NonNull
+  @NonNull
+  public static <T> Optional<ReadableProperty<T, Amount>> readableAmountPropertyFromClass(
+      @NonNull Class<T> type, @NonNull String fieldName) {
+    return ReflectionUtil.readablePropertyFromClass(type, fieldName)
+        .filter(AmountUtil::isAmountProperty)
+        .map(AmountUtil::warp);
+  }
+
+  @NonNull
+  public static <T> Stream<ReadableProperty<T, Amount>> readableAmountPropertyStreamFromClass(
+      @NonNull Class<T> type) {
+    return ReflectionUtil.readablePropertyStreamFromClass(type)
+        .filter(AmountUtil::isAmountProperty)
+        .map(AmountUtil::warp);
+  }
+
+  @NonNull
     public static <T> Stream<WritableProperty<T, Amount>> writableAmountPropertyStreamFromClass(
             @NonNull Class<T> type) {
         return ReflectionUtil.writablePropertyStreamFromClass(type)

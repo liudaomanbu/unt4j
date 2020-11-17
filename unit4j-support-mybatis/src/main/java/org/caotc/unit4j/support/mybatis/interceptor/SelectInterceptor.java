@@ -19,6 +19,9 @@ package org.caotc.unit4j.support.mybatis.interceptor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.sql.Connection;
+import java.util.Properties;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.select.Select;
@@ -47,10 +50,6 @@ import org.caotc.unit4j.support.common.util.AmountUtil;
 import org.caotc.unit4j.support.mybatis.constant.AmountPropertyConstant;
 import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
-
-import java.sql.Connection;
-import java.util.Properties;
-import java.util.stream.Stream;
 
 /**
  * @author caotc

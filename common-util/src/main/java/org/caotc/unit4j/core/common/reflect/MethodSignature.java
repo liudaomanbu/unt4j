@@ -20,10 +20,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.Parameter;
 import com.google.common.reflect.TypeToken;
+import java.lang.reflect.Method;
 import lombok.NonNull;
 import lombok.Value;
-
-import java.lang.reflect.Method;
 
 /**
  * @author caotc
@@ -33,7 +32,7 @@ import java.lang.reflect.Method;
 @Value
 public class MethodSignature {
 
-    @NonNull
+  @NonNull
   public static MethodSignature from(@NonNull Method method) {
     return from(Invokable.from(method));
   }
