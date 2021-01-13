@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@ package org.caotc.unit4j.core.common.util;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
@@ -26,9 +29,6 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMe
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Optional;
 @Slf4j
 class ReflectionUtilTest {
 
@@ -52,10 +52,10 @@ class ReflectionUtilTest {
   @Test
   void methodsFromClass() {
     ImmutableSet<Method> expected = ImmutableSet.<Method>builder()
-            .add(Sub.class.getDeclaredMethods())
-            .add(Super.class.getDeclaredMethods())
-            .add(Object.class.getDeclaredMethods())
-            .build();
+        .add(Sub.class.getDeclaredMethods())
+        .add(Super.class.getDeclaredMethods())
+        .add(Object.class.getDeclaredMethods())
+        .build();
     ImmutableSet<Method> methods = ReflectionUtil.methodsFromClass(Sub.class);
     log.debug("methods:{}", methods);
     Assertions.assertEquals(expected, methods);
@@ -64,8 +64,8 @@ class ReflectionUtilTest {
   @Test
   void getMethodsFromClass() throws NoSuchMethodException {
     ImmutableSet<Method> expected = ImmutableSet.of(Sub.class.getMethod("getStringField")
-            , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
-            , Sub.class.getMethod("getIntField"));
+        , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
+        , Sub.class.getMethod("getIntField"));
     ImmutableSet<Method> getMethods = ReflectionUtil.getMethodsFromClass(Sub.class);
     log.debug("getMethods:{}", getMethods);
     Assertions.assertEquals(expected, getMethods);
@@ -74,8 +74,8 @@ class ReflectionUtilTest {
   @Test
   void getMethodsFromClass1() throws NoSuchMethodException {
     ImmutableSet<Method> expected = ImmutableSet.of(Sub.class.getMethod("getStringField")
-            , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
-            , Sub.class.getMethod("getIntField"));
+        , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
+        , Sub.class.getMethod("getIntField"));
     ImmutableSet<Method> getMethods = ReflectionUtil.getMethodsFromClass(Sub.class);
     log.debug("getMethods:{}", getMethods);
     Assertions.assertEquals(expected, getMethods);
@@ -84,8 +84,8 @@ class ReflectionUtilTest {
   @Test
   void getMethodsFromClass2() throws NoSuchMethodException {
     ImmutableSet<Method> expectedGetMethods = ImmutableSet.of(Sub.class.getMethod("getStringField")
-            , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
-            , Sub.class.getMethod("getIntField"));
+        , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
+        , Sub.class.getMethod("getIntField"));
     ImmutableSet<Method> javaBeanGetMethods = ReflectionUtil.getMethodsFromClass(Sub.class);
     log.debug("javaBeanGetMethods:{}", javaBeanGetMethods);
     Assertions.assertEquals(expectedGetMethods, javaBeanGetMethods);
@@ -100,9 +100,12 @@ class ReflectionUtilTest {
 
   @Test
   void setMethodsFromClass1() throws NoSuchMethodException {
-    ImmutableSet<Method> expectedSetMethods = ImmutableSet.of(Sub.class.getMethod("setNumberField", Number.class)
-            , Sub.class.getMethod("setNumberField", int.class), Sub.class.getMethod("setNumberField", long.class)
-            , Sub.class.getMethod("setStringField", String.class), Sub.class.getMethod("setIntField", int.class));
+    ImmutableSet<Method> expectedSetMethods = ImmutableSet
+        .of(Sub.class.getMethod("setNumberField", Number.class)
+            , Sub.class.getMethod("setNumberField", int.class),
+            Sub.class.getMethod("setNumberField", long.class)
+            , Sub.class.getMethod("setStringField", String.class),
+            Sub.class.getMethod("setIntField", int.class));
     ImmutableSet<Method> setMethods = ReflectionUtil.setMethodsFromClass(Sub.class);
     log.debug("setMethods:{}", setMethods);
     Assertions.assertEquals(expectedSetMethods, setMethods);
@@ -146,19 +149,11 @@ class ReflectionUtilTest {
     Assertions.assertEquals(3, readableProperties.size());
   }
 
-  @Test
-  void readablePropertiesFromClass1() {
-    ImmutableSet<ReadableProperty<Sub, ?>> readableProperties = ReflectionUtil
-            .readablePropertiesFromClass(Sub.class, false);
-    log.debug("readableProperties:{}", readableProperties);
-    readableProperties.forEach(readableProperty -> log.debug(readableProperty.name() + ":" + readableProperty.type()));
-    Assertions.assertEquals(8, readableProperties.size());
-  }
 
   @Test
   void readablePropertiesFromClass2() {
     ImmutableSet<ReadableProperty<Sub, ?>> readableProperties = ReflectionUtil
-        .readablePropertiesFromClass(Sub.class, true, PropertyAccessorMethodFormat.FLUENT);
+        .readablePropertiesFromClass(Sub.class, PropertyAccessorMethodFormat.FLUENT);
     log.debug("readableProperties:{}", readableProperties);
     Assertions.assertEquals(3, readableProperties.size());
   }
@@ -176,18 +171,18 @@ class ReflectionUtilTest {
   @Test
   void readablePropertyFromClass1() {
     Optional<ReadableProperty<Sub, Object>> readNumberField = ReflectionUtil
-        .readablePropertyFromClass(Sub.class, "readNumberField", false);
+        .readablePropertyFromClass(Sub.class, "readNumberField");
     Assertions.assertTrue(readNumberField.isPresent());
   }
 
   @Test
   void readablePropertyFromClass2() {
     Optional<ReadableProperty<Sub, Object>> javaBeanReadNumberField = ReflectionUtil
-        .readablePropertyFromClass(Sub.class, "readNumberField", false,
+        .readablePropertyFromClass(Sub.class, "readNumberField",
             PropertyAccessorMethodFormat.JAVA_BEAN);
     Assertions.assertTrue(javaBeanReadNumberField.isPresent());
     Optional<ReadableProperty<Sub, Object>> fluentReadNumberField = ReflectionUtil
-        .readablePropertyFromClass(Sub.class, "readNumberField", false,
+        .readablePropertyFromClass(Sub.class, "readNumberField",
             PropertyAccessorMethodFormat.FLUENT);
     Assertions.assertTrue(fluentReadNumberField.isPresent());
   }
@@ -203,15 +198,16 @@ class ReflectionUtilTest {
   @Test
   void writablePropertiesFromClass1() {
     ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
-            .writablePropertiesFromClass(Sub.class, false);
-    writableProperties.forEach(writableProperty -> log.debug(writableProperty.name() + ":" + writableProperty.type()));
+        .writablePropertiesFromClass(Sub.class);
+    writableProperties.forEach(
+        writableProperty -> log.debug(writableProperty.name() + ":" + writableProperty.type()));
     Assertions.assertEquals(10, writableProperties.size());
   }
 
   @Test
   void writablePropertiesFromClass2() {
     ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
-        .writablePropertiesFromClass(Sub.class, true, PropertyAccessorMethodFormat.FLUENT);
+        .writablePropertiesFromClass(Sub.class, PropertyAccessorMethodFormat.FLUENT);
     log.debug("writableProperties:{}", writableProperties);
     Assertions.assertEquals(3, writableProperties.size());
   }
@@ -229,14 +225,14 @@ class ReflectionUtilTest {
   @Test
   void writablePropertyFromClass1() {
     Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
-        .writablePropertyFromClass(Sub.class, "stringField", false);
+        .writablePropertyFromClass(Sub.class, "stringField");
     Assertions.assertTrue(stringField.isPresent());
   }
 
   @Test
   void writablePropertyFromClass2() {
     Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
-        .writablePropertyFromClass(Sub.class, "stringField", false,
+        .writablePropertyFromClass(Sub.class, "stringField",
             PropertyAccessorMethodFormat.FLUENT);
     Assertions.assertTrue(stringField.isPresent());
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public class PropertyName {
   ImmutableList<String> propertyNames;
 
   @NonNull
-  public PropertyName first() {
+  public PropertyName firstTier() {
     return new PropertyName(propertyNames().subList(0, 1));
   }
 
@@ -66,12 +66,17 @@ public class PropertyName {
   }
 
   @NonNull
-  public PropertyName subPropertyName(int fromIndex) {
-    return subPropertyName(fromIndex, propertyNames().size());
+  public PropertyName sub(int fromIndex) {
+    return sub(fromIndex, propertyNames().size());
   }
 
   @NonNull
-  public PropertyName subPropertyName(int fromIndex, int toIndex) {
+  public PropertyName sub(int fromIndex, int toIndex) {
     return new PropertyName(propertyNames().subList(fromIndex, toIndex));
+  }
+
+  @NonNull
+  public String flat() {
+    return JOINER.join(propertyNames());
   }
 }
