@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
-import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
-import org.caotc.unit4j.core.exception.AnnotationNotFoundException;
-
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
+import org.caotc.unit4j.core.exception.AnnotationNotFoundException;
 
 /**
  * 属性
@@ -79,6 +78,8 @@ public interface Property<O, P> {
 
   /**
    * 获取属性类型
+   *
+   * todo typeToken泛型应该是必定P还是? extends P
    *
    * @return 属性类型
    * @author caotc

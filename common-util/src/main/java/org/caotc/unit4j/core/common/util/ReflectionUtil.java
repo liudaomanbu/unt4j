@@ -546,10 +546,10 @@ public class ReflectionUtil {
     public <T, R> Optional<Invokable<T, R>> setInvokableFromClass(@NonNull TypeToken<T> type,
         @NonNull String fieldName, @NonNull TypeToken<R> parameterTypeToken) {
         return setInvokableStreamFromClass(type, fieldName)
-            .filter(setInvokeable -> MethodSignature.from(setInvokeable).parameterTypes()
+            .filter(setInvokable -> MethodSignature.from(setInvokable).parameterTypes()
                 .equals(ImmutableList.of(parameterTypeToken)))
             .findAny()
-            .map(setInvokeable -> (Invokable<T, R>) setInvokeable);
+            .map(setInvokable -> (Invokable<T, R>) setInvokable);
     }
 
     @SuppressWarnings("unchecked")
@@ -1533,34 +1533,47 @@ public class ReflectionUtil {
     }
 
 
-    @NonNull
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
-        @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return readablePropertyFromClass(type, fieldName,
-            DEFAULT_METHOD_NAME_STYLES);
-    }
+  @NonNull
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull TypeToken<T> type, @NonNull String fieldName) {
+    return readablePropertyFromClass(type, fieldName,
+        DEFAULT_METHOD_NAME_STYLES);
+  }
 
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
-        @NonNull TypeToken<T> type, @NonNull String fieldName,
-        @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        PropertyName propertyName = PropertyName.from(fieldName);
-        String firstTierPropertyName = propertyName.firstTier().flat();
-//        if (propertyName.complex()) {
-//            PropertyName sub = propertyName.sub(1);
-//            return readablePropertyFromClassInternal(type,
-//                firstTierPropertyName,fieldExistCheck,
-//                propertyAccessorMethodFormats)
-//                .flatMap(f -> readablePropertyFromClassInternal(
-//                     f.type(), sub.flat(), fieldExistCheck,
-//                    propertyAccessorMethodFormats).map(r->f.compose(r))
-//                );
-//        }
-        return readablePropertyFromClassInternal(type,
-            firstTierPropertyName,
-            propertyAccessorMethodFormats);
+  @NonNull
+  public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+      @NonNull TypeToken<T> type, @NonNull String fieldName,
+      @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+    return readablePropertyFromClassInternalCompose(type, fieldName, propertyAccessorMethodFormats);
+  }
+
+  //todo 待优化
+  @SuppressWarnings("unchecked")
+  @NonNull
+  private static <T, R, E> Optional<ReadableProperty<T, R>> readablePropertyFromClassInternalCompose(
+      @NonNull TypeToken<T> type, @NonNull String fieldName,
+      @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+    PropertyName propertyName = PropertyName.from(fieldName);
+    String firstTierPropertyName = propertyName.firstTier().flat();
+    if (propertyName.complex()) {
+      PropertyName sub = propertyName.sub(1);
+      Optional<ReadableProperty<T, E>> transferReadableProperty = readablePropertyFromClassInternal(
+          type,
+          firstTierPropertyName,
+          propertyAccessorMethodFormats);
+      return transferReadableProperty
+          .flatMap(f -> {
+                Optional<ReadableProperty<E, R>> result = readablePropertyFromClassInternal(
+                    (TypeToken<E>) f.type(), sub.flat(),
+                    propertyAccessorMethodFormats);
+                return result.map(f::compose);
+              }
+          );
     }
+    return readablePropertyFromClassInternal(type,
+        firstTierPropertyName,
+        propertyAccessorMethodFormats);
+  }
 
     @SuppressWarnings("unchecked")
     @NonNull

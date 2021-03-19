@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
+import org.caotc.unit4j.core.common.util.model.Sub;
+import org.caotc.unit4j.core.common.util.model.Super;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -146,7 +148,7 @@ class ReflectionUtilTest {
     ImmutableSet<ReadableProperty<Sub, ?>> readableProperties = ReflectionUtil
         .readablePropertiesFromClass(Sub.class);
     log.debug("readableProperties:{}", readableProperties);
-    Assertions.assertEquals(3, readableProperties.size());
+    Assertions.assertEquals(4, readableProperties.size());
   }
 
 
@@ -201,7 +203,7 @@ class ReflectionUtilTest {
         .writablePropertiesFromClass(Sub.class);
     writableProperties.forEach(
         writableProperty -> log.debug(writableProperty.name() + ":" + writableProperty.type()));
-    Assertions.assertEquals(10, writableProperties.size());
+    Assertions.assertEquals(5, writableProperties.size());
   }
 
   @Test

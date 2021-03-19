@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,16 +42,18 @@ public class WritableAmountProperty<O, P> extends BaseAmountProperty<O, P, Writa
         return this;
     }
 
-    @NonNull
-    public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
-        return type(TypeToken.of(propertyType));
-    }
+  @Override
+  @NonNull
+  public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+    return type(TypeToken.of(propertyType));
+  }
 
-    @NonNull
-    public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
-        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-                , "Property is known type %s,not %s ", type(), propertyType);
-        //noinspection unchecked
-        return (WritableProperty<O, P1>) this;
-    }
+  @Override
+  @NonNull
+  public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+        , "Property is known type %s,not %s ", type(), propertyType);
+    //noinspection unchecked
+    return (WritableProperty<O, P1>) this;
+  }
 }

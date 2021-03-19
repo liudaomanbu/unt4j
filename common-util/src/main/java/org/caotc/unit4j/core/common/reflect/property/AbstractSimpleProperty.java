@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -32,13 +38,6 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * 简单属性抽象类
@@ -65,39 +64,48 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     TypeToken<? extends P> type;
     boolean fieldExist;
     @NonNull
-    protected ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
+    protected ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders;
     @NonNull
-    protected ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters;
+    protected ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters;
 
     protected AbstractSimpleProperty(
-            @NonNull Iterable<PropertyReader<O, P>> propertyReaders, @NonNull Iterable<PropertyWriter<O, P>> propertyWriters) {
-        this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders), ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+        @NonNull Iterable<PropertyReader<? super O, P>> propertyReaders,
+        @NonNull Iterable<PropertyWriter<? super O, P>> propertyWriters) {
+        this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
+            ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
     }
 
     protected AbstractSimpleProperty(
-            @NonNull Iterator<PropertyReader<O, P>> propertyReaders, @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
-        this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders), ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+        @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
+        @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
+        this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
+            ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
     }
 
     protected AbstractSimpleProperty(
-            @NonNull Stream<PropertyReader<O, P>> propertyReaders, @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
+        @NonNull Stream<PropertyReader<? super O, P>> propertyReaders,
+        @NonNull Stream<PropertyWriter<? super O, P>> propertyWriters) {
         this(propertyReaders
-                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)), propertyWriters
-                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
+            .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)), propertyWriters
+            .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
     }
 
     protected AbstractSimpleProperty(
-            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders, @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters) {
+        @NonNull ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders,
+        @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters) {
         //属性读取器集合不能为空
         Preconditions
-                .checkArgument(!propertyReaders.isEmpty() || !propertyWriters.isEmpty(), "propertyReaders and propertyWriters can't be all empty");
+            .checkArgument(!propertyReaders.isEmpty() || !propertyWriters.isEmpty(),
+                "propertyReaders and propertyWriters can't be all empty");
         //属性只能有一个
-        ImmutableSet<@NonNull String> propertyNames = Streams.concat(propertyReaders.stream(), propertyWriters.stream())
-                .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
-        ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = Streams.concat(propertyReaders.stream(), propertyWriters.stream())
-                .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
+        ImmutableSet<@NonNull String> propertyNames = Streams
+            .concat(propertyReaders.stream(), propertyWriters.stream())
+            .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
+        ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = Streams
+            .concat(propertyReaders.stream(), propertyWriters.stream())
+            .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
         Preconditions.checkArgument(propertyNames.size() == 1 && propertyTypes.size() == 1,
-                "propertyReaders and propertyWriters not belong to a common property");
+            "propertyReaders and propertyWriters not belong to a common property");
         this.name = Iterables.getOnlyElement(propertyNames);
         this.type = Iterables.getOnlyElement(propertyTypes);
         this.fieldExist = Streams.concat(propertyReaders.stream(), propertyWriters.stream()).anyMatch(PropertyElement::basedOnField);

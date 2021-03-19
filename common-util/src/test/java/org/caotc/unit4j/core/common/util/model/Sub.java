@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.core.common.util;
+package org.caotc.unit4j.core.common.util.model;
 
 import lombok.Data;
 import lombok.ToString;
@@ -81,12 +81,4 @@ public class Sub extends Super {
   public int intField() {
     return intField;
   }
-}
-
-@FieldDefaults(makeFinal = false)
-@ToString
-abstract class Super {
-
-  protected String stringField = "super";
-  protected int intField = 99;
 }

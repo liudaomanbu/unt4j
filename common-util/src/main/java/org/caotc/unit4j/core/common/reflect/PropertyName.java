@@ -62,7 +62,7 @@ public class PropertyName {
   }
 
   public boolean complex() {
-    return propertyNames().size() == 1;
+    return propertyNames().size() != 1;
   }
 
   @NonNull

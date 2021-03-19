@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
-import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-
 import java.util.Iterator;
 import java.util.stream.Stream;
+import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
 /**
  * 可写属性
@@ -47,9 +46,9 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> WritableProperty<T, R> create(
-            @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
+        @NonNull Iterable<PropertyWriter<? super T, R>> propertyWriters) {
 
-        return new SimpleWritableProperty<>(propertyWriters);
+      return new SimpleWritableProperty<>(propertyWriters);
     }
 
     /**
@@ -63,8 +62,8 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> WritableProperty<T, R> create(
-            @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
-        return new SimpleWritableProperty<>(propertyWriters);
+        @NonNull Iterator<PropertyWriter<? super T, R>> propertyWriters) {
+      return new SimpleWritableProperty<>(propertyWriters);
     }
 
     /**
@@ -78,9 +77,9 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> WritableProperty<T, R> create(
-            @NonNull Stream<PropertyWriter<T, R>> propertyWriters) {
-        return new SimpleWritableProperty<>(propertyWriters);
-  }
+        @NonNull Stream<PropertyWriter<? super T, R>> propertyWriters) {
+      return new SimpleWritableProperty<>(propertyWriters);
+    }
 
   @Override
   default boolean writable() {
@@ -108,6 +107,7 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      * @date 2019-06-25
      * @since 1.0.0
      */
+    @Override
     @NonNull
     default <P1 extends P> WritableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
         return type(TypeToken.of(propertyType));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ package org.caotc.unit4j.core.common.reflect.property;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.reflect.TypeToken;
+import java.util.Iterator;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-
-import java.util.Iterator;
-import java.util.stream.Stream;
 
 /**
  * 可写属性
@@ -42,24 +41,24 @@ import java.util.stream.Stream;
 public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> implements
         WritableProperty<O, P> {
 
-    protected SimpleWritableProperty(
-            @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
-        super(ImmutableSortedSet.of(), propertyElements);
-    }
-
-    protected SimpleWritableProperty(
-            @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
-        super(ImmutableSortedSet.<PropertyReader<O, P>>of().iterator(), propertyElements);
+  protected SimpleWritableProperty(
+      @NonNull Iterable<PropertyWriter<? super O, P>> propertyElements) {
+    super(ImmutableSortedSet.of(), propertyElements);
   }
 
   protected SimpleWritableProperty(
-          @NonNull Stream<PropertyWriter<O, P>> propertyElements) {
-      super(Stream.empty(), propertyElements);
+      @NonNull Iterator<PropertyWriter<? super O, P>> propertyElements) {
+    super(ImmutableSortedSet.<PropertyReader<? super O, P>>of().iterator(), propertyElements);
   }
 
   protected SimpleWritableProperty(
-          @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyElements) {
-      super(ImmutableSortedSet.of(), propertyElements);
+      @NonNull Stream<PropertyWriter<? super O, P>> propertyElements) {
+    super(Stream.empty(), propertyElements);
+  }
+
+  protected SimpleWritableProperty(
+      @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyElements) {
+    super(ImmutableSortedSet.of(), propertyElements);
   }
 
   @Override

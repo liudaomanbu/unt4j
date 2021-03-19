@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,13 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.collect.ImmutableSortedSet;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * 可读取属性
@@ -39,23 +38,24 @@ import java.util.stream.Stream;
 @Value
 public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P> implements
         ReadableProperty<O, P> {
+
     protected SimpleReadableProperty(
-            @NonNull Iterable<PropertyReader<O, P>> propertyElements) {
+        @NonNull Iterable<PropertyReader<? super O, P>> propertyElements) {
         super(propertyElements, ImmutableSortedSet.of());
     }
 
     protected SimpleReadableProperty(
-            @NonNull Iterator<PropertyReader<O, P>> propertyReaders) {
-        super(propertyReaders, ImmutableSortedSet.<PropertyWriter<O, P>>of().iterator());
+        @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders) {
+        super(propertyReaders, ImmutableSortedSet.<PropertyWriter<? super O, P>>of().iterator());
     }
 
     protected SimpleReadableProperty(
-            @NonNull Stream<PropertyReader<O, P>> propertyReaders) {
+        @NonNull Stream<PropertyReader<? super O, P>> propertyReaders) {
         super(propertyReaders, Stream.empty());
     }
 
     protected SimpleReadableProperty(
-            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders) {
+        @NonNull ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders) {
         super(propertyReaders, ImmutableSortedSet.of());
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
-import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.Element;
-
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
+import lombok.NonNull;
+import lombok.ToString;
+import org.caotc.unit4j.core.common.reflect.Element;
 
 /**
  * 属性元素抽象类
@@ -32,6 +32,7 @@ import java.lang.reflect.Member;
  * @date 2019-05-27
  * @since 1.0.0
  */
+@ToString
 public abstract class AbstractPropertyElement<O, P> extends Element implements
     PropertyElement<O, P> {
 

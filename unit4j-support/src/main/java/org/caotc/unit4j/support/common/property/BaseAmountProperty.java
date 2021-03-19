@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package org.caotc.unit4j.support.common.property;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,9 +34,6 @@ import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.common.util.AmountUtil;
-
-import java.lang.annotation.Annotation;
-import java.util.Optional;
 
 /**
  * @author caotc
@@ -64,18 +63,20 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
         return TypeToken.of(Amount.class);
     }
 
-    @NonNull
-    public <P1 extends Amount> Property<O, P1> type(@NonNull Class<P1> propertyType) {
-        return type(TypeToken.of(propertyType));
-    }
+  @Override
+  @NonNull
+  public <P1 extends Amount> Property<O, P1> type(@NonNull Class<P1> propertyType) {
+    return type(TypeToken.of(propertyType));
+  }
 
-    @NonNull
-    public <P1 extends Amount> Property<O, P1> type(@NonNull TypeToken<P1> propertyType) {
-        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-                , "Property is known type %s,not %s ", type(), propertyType);
-        //noinspection unchecked
-        return (Property<O, P1>) this;
-    }
+  @Override
+  @NonNull
+  public <P1 extends Amount> Property<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+        , "Property is known type %s,not %s ", type(), propertyType);
+    //noinspection unchecked
+    return (Property<O, P1>) this;
+  }
 
     @Override
     public boolean fieldExist() {

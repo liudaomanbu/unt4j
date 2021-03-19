@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
+import java.util.Iterator;
+import java.util.stream.Stream;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-
-import java.util.Iterator;
-import java.util.stream.Stream;
 
 /**
  * @param <O> 拥有该属性的类
@@ -39,19 +38,22 @@ public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterable<PropertyReader<O, P>> propertyReaders, @NonNull Iterable<PropertyWriter<O, P>> propertyWriters) {
+        @NonNull Iterable<PropertyReader<? super O, P>> propertyReaders,
+        @NonNull Iterable<PropertyWriter<? super O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterator<PropertyReader<O, P>> propertyReaders, @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
+        @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
+        @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Stream<PropertyReader<O, P>> propertyReaders, @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
+        @NonNull Stream<PropertyReader<? super O, P>> propertyReaders,
+        @NonNull Stream<PropertyWriter<? super O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 
@@ -67,6 +69,7 @@ public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
      * @date 2019-06-25
      * @since 1.0.0
      */
+    @Override
     @NonNull
     default <P1 extends P> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType) {
         return type(TypeToken.of(propertyType));
