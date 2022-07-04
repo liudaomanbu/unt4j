@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package org.caotc.unit4j.core.common.util;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
@@ -30,6 +27,10 @@ import org.caotc.unit4j.core.common.util.model.Sub;
 import org.caotc.unit4j.core.common.util.model.Super;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Optional;
 
 @Slf4j
 class ReflectionUtilTest {
@@ -192,8 +193,10 @@ class ReflectionUtilTest {
   @Test
   void writablePropertiesFromClass() {
     ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
-        .writablePropertiesFromClass(Sub.class);
-    log.debug("writableProperties:{}", writableProperties);
+            .writablePropertiesFromClass(Sub.class);
+    for (WritableProperty<Sub, ?> writableProperty : writableProperties) {
+      log.debug("writableProperty:{}", writableProperty.name() + "," + writableProperty.type());
+    }
     Assertions.assertEquals(3, writableProperties.size());
   }
 
