@@ -23,7 +23,7 @@
   <groupId>org.caotc</groupId>
   <artifactId>unit4j</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0</version>
+  <version>1.0.0-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <url>https://github.com/liudaomanbu/unit4j</url>
@@ -43,19 +43,20 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <unit4j.version>1.0.0${project.release.version}</unit4j.version>
-    <unit4j-api.version>1.0.0${project.release.version}
+    <unit4j.version>${project.version}</unit4j.version>
+    <unit4j-api.version>${project.version}
     </unit4j-api.version>
-    <unit4j-support.version>1.0.0${project.release.version}
+    <unit4j-support.version>${project.version}
     </unit4j-support.version>
-    <unit4j-support-mybatis.version>1.0.0${project.release.version}
+    <unit4j-support-mybatis.version>${project.version}
     </unit4j-support-mybatis.version>
-    <unit4j-support-jackson.version>1.0.0${project.release.version}
+    <unit4j-support-jackson.version>${project.version}
     </unit4j-support-jackson.version>
-    <unit4j-support-fastjson.version>1.0.0${project.release.version}
+    <unit4j-support-fastjson.version>${project.version}
     </unit4j-support-fastjson.version>
-    <unit4j-spring-boot-starter.version>1.0.0${project.release.version}
+    <unit4j-spring-boot-starter.version>${project.version}
     </unit4j-spring-boot-starter.version>
+    <common-util.version>1.0.0-SNAPSHOT</common-util.version>
 
     <maven.compiler.version>3.1</maven.compiler.version>
     <maven.surefire.version>2.19.1</maven.surefire.version>

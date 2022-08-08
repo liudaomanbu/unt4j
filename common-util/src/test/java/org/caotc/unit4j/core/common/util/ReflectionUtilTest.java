@@ -197,7 +197,7 @@ class ReflectionUtilTest {
     for (WritableProperty<Sub, ?> writableProperty : writableProperties) {
       log.debug("writableProperty:{}", writableProperty.name() + "," + writableProperty.type());
     }
-    Assertions.assertEquals(3, writableProperties.size());
+    Assertions.assertEquals(5, writableProperties.size());
   }
 
   @Test
