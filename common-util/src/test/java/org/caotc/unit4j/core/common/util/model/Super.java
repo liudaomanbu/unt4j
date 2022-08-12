@@ -18,6 +18,7 @@ package org.caotc.unit4j.core.common.util.model;
 
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.FieldNameConstants;
 
 /**
  * @author caotc
@@ -26,6 +27,7 @@ import lombok.experimental.FieldDefaults;
  */
 @FieldDefaults(makeFinal = false)
 @ToString
+@FieldNameConstants
 public class Super {
 
   protected String stringField = "super";

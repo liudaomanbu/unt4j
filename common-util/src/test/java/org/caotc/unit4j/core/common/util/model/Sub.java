@@ -16,30 +16,38 @@
 
 package org.caotc.unit4j.core.common.util.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.FieldNameConstants;
+import lombok.extern.slf4j.XSlf4j;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(makeFinal = false)
 @ToString(callSuper = true)
+@FieldNameConstants
+@XSlf4j
 public class Sub extends Super {
   String stringField = "sub";
   Number numberField = 88;
 
   public void setNumberField(Number numberField) {
-    System.out.println("setNumberField Number");
     this.numberField = numberField;
+    log.debug("setNumberField Number");
   }
 
   public void setNumberField(int numberField) {
-    System.out.println("setNumberField int");
     this.numberField = numberField;
+    log.debug("setNumberField int");
   }
 
   public void setNumberField(long numberField) {
-    System.out.println("setNumberField long");
     this.numberField = numberField;
+    log.debug("setNumberField long");
   }
 
   public void setStringField(String stringField) {

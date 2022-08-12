@@ -17,11 +17,12 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Member;
 import lombok.NonNull;
 import lombok.ToString;
 import org.caotc.unit4j.core.common.reflect.Element;
+
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Member;
 
 /**
  * 属性元素抽象类
@@ -36,8 +37,8 @@ import org.caotc.unit4j.core.common.reflect.Element;
 public abstract class AbstractPropertyElement<O, P> extends Element implements
     PropertyElement<O, P> {
 
-  protected <M extends AccessibleObject & Member> AbstractPropertyElement(
-      @NonNull M member) {
+  protected <M extends AnnotatedElement & Member> AbstractPropertyElement(
+          @NonNull M member) {
     super(member);
   }
 

@@ -16,21 +16,12 @@
 
 package org.caotc.unit4j.core.common.util;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -41,15 +32,20 @@ import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.caotc.unit4j.core.common.reflect.property.accessor.*;
 import org.caotc.unit4j.core.exception.AccessiblePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 //TODO 将所有方法优化到只有一次流操作
 
 /**
@@ -60,7 +56,6 @@ import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
  * @since 1.0.0
  */
 @UtilityClass
-@Beta
 @Slf4j
 public class ReflectionUtil {
 
@@ -71,8 +66,8 @@ public class ReflectionUtil {
             propertyElement.isStatic());
 
     @NonNull
-    public static ImmutableSet<Field> fieldsFromClass(@NonNull Type type) {
-        return fieldStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+    public static ImmutableSet<Field> fields(@NonNull Type type) {
+        return fieldStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     /**
@@ -85,73 +80,86 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static ImmutableSet<Field> fieldsFromClass(@NonNull Class<?> type) {
-        return fieldStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+    public static ImmutableSet<Field> fields(@NonNull Class<?> type) {
+        return fieldStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static ImmutableSet<Field> fieldsFromClass(@NonNull TypeToken<?> type) {
-        return fieldStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+    public static ImmutableSet<Field> fields(@NonNull TypeToken<?> type) {
+        return fieldStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static Stream<Field> fieldStreamFromClass(@NonNull Type type) {
-        return fieldStreamFromClass(TypeToken.of(type));
+    public static Stream<Field> fieldStream(@NonNull Type type) {
+        return fieldStream(TypeToken.of(type));
     }
 
     @NonNull
-    public static Stream<Field> fieldStreamFromClass(@NonNull Class<?> type) {
-        return fieldStreamFromClass(TypeToken.of(type));
+    public static Stream<Field> fieldStream(@NonNull Class<?> type) {
+        return fieldStream(TypeToken.of(type));
     }
 
     @NonNull
-    public static Stream<Field> fieldStreamFromClass(@NonNull TypeToken<?> type) {
+    public static Stream<Field> fieldStream(@NonNull TypeToken<?> type) {
         return type.getTypes().rawTypes().stream().map(Class::getDeclaredFields).flatMap(
-            Arrays::stream);
+                Arrays::stream);
     }
 
+    //todo need?
     @NonNull
     public static ImmutableSet<FieldElement<?, ?>> fieldElementsFromClass(
-        @NonNull Type type) {
+            @NonNull Type type) {
         return fieldElementStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
     }
 
+    //todo need?
     @NonNull
     public static <T> ImmutableSet<FieldElement<T, ?>> fieldElementsFromClass(
-        @NonNull Class<T> type) {
+            @NonNull Class<T> type) {
         return fieldElementStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
     }
 
+    //todo need?
     @NonNull
     public static <T> ImmutableSet<FieldElement<T, ?>> fieldElementsFromClass(
-        @NonNull TypeToken<T> type) {
+            @NonNull TypeToken<T> type) {
         return fieldElementStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
     }
 
+    //todo need?
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T> Stream<FieldElement<T, ?>> fieldElementStreamFromClass(
-        @NonNull Type type) {
+            @NonNull Type type) {
         return fieldElementStreamFromClass((TypeToken<T>) TypeToken.of(type));
     }
 
+    //todo need?
     @NonNull
     public static <T> Stream<FieldElement<T, ?>> fieldElementStreamFromClass(
-        @NonNull Class<T> type) {
+            @NonNull Class<T> type) {
         return fieldElementStreamFromClass(TypeToken.of(type));
     }
 
+    //todo need?
     @NonNull
     public static <T> Stream<FieldElement<T, ?>> fieldElementStreamFromClass(
-        @NonNull TypeToken<T> type) {
+            @NonNull TypeToken<T> type) {
         return type.getTypes().rawTypes().stream().map(Class::getDeclaredFields).flatMap(
-            Arrays::stream).map(FieldElement::from);
+                Arrays::stream).map(FieldElement::from);
+    }
+
+    @NonNull
+    public static ImmutableSet<Field> fields(@NonNull Type type,
+                                             @NonNull String fieldName) {
+        return fieldStream(type).filter(field -> fieldName.equals(field.getName()))
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     /**
      * 从传入的类中获取包括所有超类和接口的所有属性中属性名称为指定名称的属性
      *
-     * @param type 需要获取属性的类
+     * @param type      需要获取属性的类
      * @param fieldName 指定属性名称
      * @return 包括所有超类和接口的所有属性中属性名称为指定名称的属性
      * @author caotc
@@ -160,10 +168,17 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static ImmutableSet<Field> fieldsFromClass(@NonNull Class<?> type,
-        @NonNull String fieldName) {
-        return fieldsFromClass(type).stream().filter(field -> fieldName.equals(field.getName()))
-            .collect(ImmutableSet.toImmutableSet());
+    public static ImmutableSet<Field> fields(@NonNull Class<?> type,
+                                             @NonNull String fieldName) {
+        return fieldStream(type).filter(field -> fieldName.equals(field.getName()))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    @NonNull
+    public static ImmutableSet<Field> fields(@NonNull TypeToken<?> type,
+                                             @NonNull String fieldName) {
+        return fieldStream(type).filter(field -> fieldName.equals(field.getName()))
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     /**
@@ -176,88 +191,94 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static ImmutableSet<Method> methodsFromClass(@NonNull Class<?> type) {
-        return methodStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+    public static ImmutableSet<Method> methods(@NonNull Class<?> type) {
+        return methodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static ImmutableSet<Method> methodsFromClass(@NonNull Type type) {
-        return methodStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+    public static ImmutableSet<Method> methods(@NonNull Type type) {
+        return methodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static ImmutableSet<Method> methodsFromClass(@NonNull TypeToken<?> type) {
-        return methodStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+    public static ImmutableSet<Method> methods(@NonNull TypeToken<?> type) {
+        return methodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static Stream<Method> methodStreamFromClass(@NonNull Type type) {
-        return methodStreamFromClass(TypeToken.of(type));
+    public static Stream<Method> methodStream(@NonNull Type type) {
+        return methodStream(TypeToken.of(type));
     }
 
     @NonNull
-    public static Stream<Method> methodStreamFromClass(@NonNull Class<?> type) {
-        return methodStreamFromClass(TypeToken.of(type));
+    public static Stream<Method> methodStream(@NonNull Class<?> type) {
+        return methodStream(TypeToken.of(type));
     }
 
     @NonNull
-    public static Stream<Method> methodStreamFromClass(@NonNull TypeToken<?> type) {
+    public static Stream<Method> methodStream(@NonNull TypeToken<?> type) {
         return type.getTypes().rawTypes().stream()
-            .map(Class::getDeclaredMethods)
-            .flatMap(Arrays::stream);
+                .map(Class::getDeclaredMethods)
+                .flatMap(Arrays::stream);
     }
 
+    //todo Beta
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T> ImmutableSet<Invokable<T, ?>> methodInvokablesFromClass(
-        @NonNull Type type) {
+            @NonNull Type type) {
         return methodInvokablesFromClass((TypeToken<T>) TypeToken.of(type));
     }
 
+    //todo Beta
     @NonNull
     public static <T> ImmutableSet<Invokable<T, ?>> methodInvokablesFromClass(
-        @NonNull Class<T> type) {
+            @NonNull Class<T> type) {
         return methodInvokablesFromClass(TypeToken.of(type));
     }
 
+    //todo Beta
     @NonNull
     public static <T> ImmutableSet<Invokable<T, ?>> methodInvokablesFromClass(
-        @NonNull TypeToken<T> type) {
+            @NonNull TypeToken<T> type) {
         return methodInvokableStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
     }
 
+    //todo Beta
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T> Stream<Invokable<T, ?>> methodInvokableStreamFromClass(
-        @NonNull Type type) {
+            @NonNull Type type) {
         return methodInvokableStreamFromClass((TypeToken<T>) TypeToken.of(type));
     }
 
+    //todo Beta
     @NonNull
     public static <T> Stream<Invokable<T, ?>> methodInvokableStreamFromClass(
-        @NonNull Class<T> type) {
+            @NonNull Class<T> type) {
         return methodInvokableStreamFromClass(TypeToken.of(type));
     }
 
+    //todo Beta
     @NonNull
     public static <T> Stream<Invokable<T, ?>> methodInvokableStreamFromClass(
-        @NonNull TypeToken<T> type) {
-        return methodStreamFromClass(type).map(type::method);
+            @NonNull TypeToken<T> type) {
+        return methodStream(type).map(type::method);
     }
 
     @NonNull
-    public static ImmutableSet<Constructor<?>> constructorsFromClass(@NonNull Type type) {
+    public static ImmutableSet<Constructor<?>> constructors(@NonNull Type type) {
         return constructorStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<Constructor<T>> constructorsFromClass(@NonNull Class<T> type) {
+    public static <T> ImmutableSet<Constructor<T>> constructors(@NonNull Class<T> type) {
         return constructorStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<Constructor<T>> constructorsFromClass(
-        @NonNull TypeToken<T> type) {
+    public static <T> ImmutableSet<Constructor<T>> constructors(
+            @NonNull TypeToken<T> type) {
         return constructorStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
     }
 
@@ -387,8 +408,8 @@ public class ReflectionUtil {
 
     @NonNull
     public Stream<Method> getMethodStreamFromClass(@NonNull TypeToken<?> type) {
-        return methodStreamFromClass(type)
-            .filter(method -> isPropertyReader(method, PropertyAccessorMethodFormat.JAVA_BEAN));
+        return methodStream(type)
+                .filter(method -> isPropertyReader(method, PropertyAccessorMethodFormat.JAVA_BEAN));
     }
 
     @SuppressWarnings("unchecked")
@@ -500,8 +521,8 @@ public class ReflectionUtil {
 
     @NonNull
     public Stream<Method> setMethodStreamFromClass(@NonNull TypeToken<?> type) {
-        return methodStreamFromClass(type)
-            .filter(method -> isPropertyWriter(method, PropertyAccessorMethodFormat.JAVA_BEAN));
+        return methodStream(type)
+                .filter(method -> isPropertyWriter(method, PropertyAccessorMethodFormat.JAVA_BEAN));
     }
 
     @SuppressWarnings("unchecked")
@@ -1881,8 +1902,8 @@ public class ReflectionUtil {
                 .map(methodNameStyle -> PropertyElement.from(invokable, methodNameStyle)));
 
         return Stream
-            .concat(fieldStreamFromClass(type).map(PropertyElement::from),
-                propertyElementStream);
+                .concat(fieldStream(type).map(PropertyElement::from),
+                        propertyElementStream);
     }
 
     @NonNull

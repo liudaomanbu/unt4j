@@ -26,7 +26,7 @@ import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -44,8 +44,8 @@ import java.lang.reflect.Method;
 public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyElement<T, R> implements
     PropertyWriter<T, R> {
 
-  <M extends AccessibleObject & Member> AbstractPropertyWriter(
-      @NonNull M member) {
+  <M extends AnnotatedElement & Member> AbstractPropertyWriter(
+          @NonNull M member) {
     super(member);
   }
 

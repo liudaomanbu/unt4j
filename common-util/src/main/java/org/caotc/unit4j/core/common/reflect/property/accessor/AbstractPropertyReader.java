@@ -19,17 +19,18 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.util.Optional;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
+
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.util.Optional;
 
 /**
  * 属性获取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -44,8 +45,8 @@ import org.caotc.unit4j.core.common.util.ReflectionUtil;
 public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyElement<T, R> implements
     PropertyReader<T, R> {
 
-  <M extends AccessibleObject & Member> AbstractPropertyReader(
-      @NonNull M member) {
+  <M extends AnnotatedElement & Member> AbstractPropertyReader(
+          @NonNull M member) {
     super(member);
   }
 

@@ -19,21 +19,13 @@ package org.caotc.unit4j.core.common.reflect;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Optional;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.ToString.Exclude;
 import org.caotc.unit4j.core.exception.NeverHappenException;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.Optional;
 
 /**
  * @author caotc
@@ -50,42 +42,32 @@ public class Element extends AccessibleObject implements Member {
 
   @NonNull
   @Exclude
-  AccessibleObject accessibleObject;
+  AnnotatedElement annotatedElement;
   @NonNull
   Member member;
 
-  protected <M extends AccessibleObject & Member> Element(@NonNull M member) {
+  protected <M extends AnnotatedElement & Member> Element(@NonNull M member) {
     this(member, member);
   }
 
   @Override
   public final boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-    return accessibleObject.isAnnotationPresent(annotationClass);
+    return annotatedElement.isAnnotationPresent(annotationClass);
   }
 
   @Override
   public final <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
-    return accessibleObject.getAnnotation(annotationClass);
+    return annotatedElement.getAnnotation(annotationClass);
   }
 
   @Override
   public final Annotation[] getAnnotations() {
-    return accessibleObject.getAnnotations();
+    return annotatedElement.getAnnotations();
   }
 
   @Override
   public final Annotation[] getDeclaredAnnotations() {
-    return accessibleObject.getDeclaredAnnotations();
-  }
-
-  @Override
-  public final void setAccessible(boolean flag) throws SecurityException {
-    accessibleObject.setAccessible(flag);
-  }
-
-  @Override
-  public final boolean isAccessible() {
-    return accessibleObject.isAccessible();
+    return annotatedElement.getDeclaredAnnotations();
   }
 
   @Override

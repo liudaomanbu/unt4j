@@ -18,57 +18,138 @@ package org.caotc.unit4j.core.common.util;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.Invokable;
+import com.google.common.reflect.TypeToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
+import org.caotc.unit4j.core.common.util.model.PropertyConstant;
 import org.caotc.unit4j.core.common.util.model.Sub;
 import org.caotc.unit4j.core.common.util.model.Super;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 @Slf4j
 class ReflectionUtilTest {
 
   @Test
-  void fieldsFromClass() {
-    ImmutableSet<Field> fields = ReflectionUtil.fieldsFromClass(Sub.class);
-    log.debug("fields:{}", fields);
-    Assertions.assertEquals(4, fields.size());
+  void fieldsFromType() {
+    Assertions.assertEquals(PropertyConstant.SUPER_FIELDS, ReflectionUtil.fields((Type) Super.class));
+    Assertions.assertEquals(PropertyConstant.SUB_FIELDS, ReflectionUtil.fields((Type) Sub.class));
   }
 
   @Test
-  void fieldsFromClass1() {
-    ImmutableSet<Field> stringFields = ReflectionUtil.fieldsFromClass(Sub.class, "stringField");
-    log.debug("stringFields:{}", stringFields);
-    Assertions.assertEquals(2, stringFields.size());
-    ImmutableSet<Field> numberFields = ReflectionUtil.fieldsFromClass(Sub.class, "numberField");
-    log.debug("numberFields:{}", numberFields);
-    Assertions.assertEquals(1, numberFields.size());
+  void fieldsFromClass() {
+    Assertions.assertEquals(PropertyConstant.SUPER_FIELDS, ReflectionUtil.fields(Super.class));
+    Assertions.assertEquals(PropertyConstant.SUB_FIELDS, ReflectionUtil.fields(Sub.class));
+  }
+
+  @Test
+  void fieldsFromTypeToken() {
+    Assertions.assertEquals(PropertyConstant.SUPER_FIELDS, ReflectionUtil.fields(TypeToken.of(Super.class)));
+    Assertions.assertEquals(PropertyConstant.SUB_FIELDS, ReflectionUtil.fields(Sub.class));
+  }
+
+  @Test
+  void fieldStreamFromType() {
+    Assertions.assertEquals(PropertyConstant.SUPER_FIELDS, ReflectionUtil.fieldStream((Type) Super.class).collect(ImmutableSet.toImmutableSet()));
+    Assertions.assertEquals(PropertyConstant.SUB_FIELDS, ReflectionUtil.fieldStream((Type) Sub.class).collect(ImmutableSet.toImmutableSet()));
+  }
+
+  @Test
+  void fieldStreamFromClass() {
+    Assertions.assertEquals(PropertyConstant.SUPER_FIELDS, ReflectionUtil.fieldStream(Super.class).collect(ImmutableSet.toImmutableSet()));
+    Assertions.assertEquals(PropertyConstant.SUB_FIELDS, ReflectionUtil.fieldStream(Sub.class).collect(ImmutableSet.toImmutableSet()));
+  }
+
+  @Test
+  void fieldStreamFromTypeToken() {
+    Assertions.assertEquals(PropertyConstant.SUPER_FIELDS, ReflectionUtil.fieldStream(TypeToken.of(Super.class)).collect(ImmutableSet.toImmutableSet()));
+    Assertions.assertEquals(PropertyConstant.SUB_FIELDS, ReflectionUtil.fieldStream(Sub.class).collect(ImmutableSet.toImmutableSet()));
+  }
+
+  @Test
+  void fieldsByNameFromType() {
+    Assertions.assertEquals(PropertyConstant.SUB_STRING_FIELDS, ReflectionUtil.fields((Type) Sub.class, "stringField"));
+    Assertions.assertEquals(ImmutableSet.of(PropertyConstant.SUB_NUMBER_FIELD), ReflectionUtil.fields((Type) Sub.class, "numberField"));
+  }
+
+  @Test
+  void fieldsByNameFromClass() {
+    Assertions.assertEquals(PropertyConstant.SUB_STRING_FIELDS, ReflectionUtil.fields(Sub.class, "stringField"));
+    Assertions.assertEquals(ImmutableSet.of(PropertyConstant.SUB_NUMBER_FIELD), ReflectionUtil.fields(Sub.class, "numberField"));
+  }
+
+  @Test
+  void fieldsByNameFromTypeToken() {
+    Assertions.assertEquals(PropertyConstant.SUB_STRING_FIELDS, ReflectionUtil.fields(TypeToken.of(Sub.class), "stringField"));
+    Assertions.assertEquals(ImmutableSet.of(PropertyConstant.SUB_NUMBER_FIELD), ReflectionUtil.fields(TypeToken.of(Sub.class), "numberField"));
+  }
+
+  @Test
+  void methodsFromType() {
+    Assertions.assertEquals(PropertyConstant.SUPER_METHODS, ReflectionUtil.methods((Type) Super.class));
+    Assertions.assertEquals(PropertyConstant.SUB_METHODS, ReflectionUtil.methods((Type) Sub.class));
   }
 
   @Test
   void methodsFromClass() {
-    ImmutableSet<Method> expected = ImmutableSet.<Method>builder()
-        .add(Sub.class.getDeclaredMethods())
-        .add(Super.class.getDeclaredMethods())
-        .add(Object.class.getDeclaredMethods())
-        .build();
-    ImmutableSet<Method> methods = ReflectionUtil.methodsFromClass(Sub.class);
-    log.debug("methods:{}", methods);
-    Assertions.assertEquals(expected, methods);
+    Assertions.assertEquals(PropertyConstant.SUPER_METHODS, ReflectionUtil.methods(Super.class));
+    Assertions.assertEquals(PropertyConstant.SUB_METHODS, ReflectionUtil.methods(Sub.class));
+  }
+
+  @Test
+  void methodsFromTypeToken() {
+    Assertions.assertEquals(PropertyConstant.SUPER_METHODS, ReflectionUtil.methods(TypeToken.of(Super.class)));
+    Assertions.assertEquals(PropertyConstant.SUB_METHODS, ReflectionUtil.methods(TypeToken.of(Sub.class)));
+  }
+
+  @Test
+  void methodStreamFromType() {
+    Assertions.assertEquals(PropertyConstant.SUPER_METHODS, ReflectionUtil.methodStream((Type) Super.class).collect(ImmutableSet.toImmutableSet()));
+    Assertions.assertEquals(PropertyConstant.SUB_METHODS, ReflectionUtil.methodStream((Type) Sub.class).collect(ImmutableSet.toImmutableSet()));
+  }
+
+  @Test
+  void methodStreamFromClass() {
+    Assertions.assertEquals(PropertyConstant.SUPER_METHODS, ReflectionUtil.methodStream(Super.class).collect(ImmutableSet.toImmutableSet()));
+    Assertions.assertEquals(PropertyConstant.SUB_METHODS, ReflectionUtil.methodStream(Sub.class).collect(ImmutableSet.toImmutableSet()));
+  }
+
+  @Test
+  void methodStreamFromTypeToken() {
+    Assertions.assertEquals(PropertyConstant.SUPER_METHODS, ReflectionUtil.methodStream(TypeToken.of(Super.class)).collect(ImmutableSet.toImmutableSet()));
+    Assertions.assertEquals(PropertyConstant.SUB_METHODS, ReflectionUtil.methodStream(TypeToken.of(Sub.class)).collect(ImmutableSet.toImmutableSet()));
+  }
+
+  @Test
+  void constructorsFromType() {
+    Assertions.assertEquals(PropertyConstant.SUPER_CONSTRUCTORS, ReflectionUtil.constructors((Type) Super.class));
+    Assertions.assertEquals(PropertyConstant.SUB_CONSTRUCTORS, ReflectionUtil.constructors((Type) Sub.class));
+  }
+
+  @Test
+  void constructorsFromClass() {
+    Assertions.assertEquals(PropertyConstant.SUPER_CONSTRUCTORS, ReflectionUtil.constructors((Type) Super.class));
+    Assertions.assertEquals(PropertyConstant.SUB_CONSTRUCTORS, ReflectionUtil.constructors((Type) Sub.class));
+  }
+
+  @Test
+  void constructorsFromTypeToken() {
+    Assertions.assertEquals(PropertyConstant.SUPER_CONSTRUCTORS, ReflectionUtil.constructors((Type) Super.class));
+    Assertions.assertEquals(PropertyConstant.SUB_CONSTRUCTORS, ReflectionUtil.constructors((Type) Sub.class));
   }
 
   @Test
   void getMethodsFromClass() throws NoSuchMethodException {
     ImmutableSet<Method> expected = ImmutableSet.of(Sub.class.getMethod("getStringField")
-        , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
-        , Sub.class.getMethod("getIntField"));
+            , Sub.class.getMethod("getNumberField"), Sub.class.getMethod("getReadNumberField")
+            , Sub.class.getMethod("getIntField"));
     ImmutableSet<Method> getMethods = ReflectionUtil.getMethodsFromClass(Sub.class);
     log.debug("getMethods:{}", getMethods);
     Assertions.assertEquals(expected, getMethods);
