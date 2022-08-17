@@ -42,27 +42,15 @@ import java.util.Optional;
  */
 public interface PropertyElement<O, P> extends AnnotatedElement, Member {
 
-  @NonNull
-  static <T, R> PropertyElement<T, R> from(@NonNull Field field) {
-    return from(FieldElement.from(field));
-  }
-
-  @NonNull
-  static <T, R> PropertyElement<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
-    return ReflectionUtil.isPropertyWriter(fieldElement) ? PropertyAccessor.from(fieldElement)
-        : PropertyReader.from(fieldElement);
-  }
+    @NonNull
+    static <T, R> PropertyElement<T, R> from(@NonNull Field field) {
+        return from(FieldElement.from(field));
+    }
 
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull Invokable<T, R> invokable,
-                                             @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
-        if (ReflectionUtil.isPropertyReader(invokable)) {
-            return PropertyReader.from(invokable, propertyAccessorMethodFormat);
-        }
-        if (ReflectionUtil.isPropertyWriter(invokable)) {
-            return PropertyWriter.from(invokable, propertyAccessorMethodFormat);
-        }
-        throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
+    static <T, R> PropertyElement<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
+        return ReflectionUtil.isPropertyWriter(fieldElement) ? PropertyAccessor.from(fieldElement)
+                : PropertyReader.from(fieldElement);
     }
 
     @NonNull
@@ -77,156 +65,156 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
         throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
     }
 
-  /**
-   * 获取属性名称
-   *
-   * @return 属性名称
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull
-  String propertyName();
+    /**
+     * 获取属性名称
+     *
+     * @return 属性名称
+     * @author caotc
+     * @date 2019-11-22
+     * @since 1.0.0
+     */
+    @NonNull
+    String propertyName();
 
-  /**
-   * 获取属性类型
-   *
-   * @return 属性类型
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull
-  TypeToken<? extends P> propertyType();
+    /**
+     * 获取属性类型
+     *
+     * @return 属性类型
+     * @author caotc
+     * @date 2019-11-22
+     * @since 1.0.0
+     */
+    @NonNull
+    TypeToken<? extends P> propertyType();
 
-  /**
-   * get owner type of {@code O}
-   *
-   * @return owner type
-   * @author caotc
-   * @date 2019-12-04
-   * @since 1.0.0
-   */
-  @NonNull
-  TypeToken<O> ownerType();
+    /**
+     * get owner type of {@code O}
+     *
+     * @return owner type
+     * @author caotc
+     * @date 2019-12-04
+     * @since 1.0.0
+     */
+    @NonNull
+    TypeToken<O> ownerType();
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @NonNull <R1 extends P> PropertyElement<O, R1> propertyType(@NonNull Class<R1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @NonNull <R1 extends P> PropertyElement<O, R1> propertyType(@NonNull Class<R1> propertyType);
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @NonNull <R1 extends P> PropertyElement<O, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @NonNull <R1 extends P> PropertyElement<O, R1> propertyType(@NonNull TypeToken<R1> propertyType);
 
-  boolean isReader();
+    boolean isReader();
 
-  boolean isWriter();
+    boolean isWriter();
 
-  default boolean isAccessor() {
-    return isReader() && isWriter();
-  }
+    default boolean isAccessor() {
+        return isReader() && isWriter();
+    }
 
-  default PropertyReader<O, P> toReader() {
-    Preconditions.checkArgument(isReader(), "it is not a PropertyReader");
-    return (PropertyReader<O, P>) this;
-  }
+    default PropertyReader<O, P> toReader() {
+        Preconditions.checkArgument(isReader(), "it is not a PropertyReader");
+        return (PropertyReader<O, P>) this;
+    }
 
-  default PropertyWriter<O, P> toWriter() {
-    Preconditions.checkArgument(isWriter(), "it is not a PropertyWriter");
-    return (PropertyWriter<O, P>) this;
-  }
+    default PropertyWriter<O, P> toWriter() {
+        Preconditions.checkArgument(isWriter(), "it is not a PropertyWriter");
+        return (PropertyWriter<O, P>) this;
+    }
 
-  default PropertyAccessor<O, P> toAccessor() {
-    Preconditions.checkArgument(isAccessor(), "it is not a PropertyAccessor");
-    return (PropertyAccessor<O, P>) this;
-  }
+    default PropertyAccessor<O, P> toAccessor() {
+        Preconditions.checkArgument(isAccessor(), "it is not a PropertyAccessor");
+        return (PropertyAccessor<O, P>) this;
+    }
 
-  boolean basedOnField();
+    boolean basedOnField();
 
-  /**
-   * @author caotc
-   * @date 2019-12-09
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  boolean isStatic();
+    /**
+     * @author caotc
+     * @date 2019-12-09
+     * @implNote
+     * @implSpec
+     * @apiNote
+     * @since 1.0.0
+     */
+    boolean isStatic();
 
-  /**
-   * @author caotc
-   * @date 2019-12-09
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  boolean isFinal();
+    /**
+     * @author caotc
+     * @date 2019-12-09
+     * @implNote
+     * @implSpec
+     * @apiNote
+     * @since 1.0.0
+     */
+    boolean isFinal();
 
-  /**
-   * @author caotc
-   * @date 2019-12-09
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  boolean isAbstract();
+    /**
+     * @author caotc
+     * @date 2019-12-09
+     * @implNote
+     * @implSpec
+     * @apiNote
+     * @since 1.0.0
+     */
+    boolean isAbstract();
 
-  /**
-   * @author caotc
-   * @date 2019-12-09
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  boolean isSynchronized();
+    /**
+     * @author caotc
+     * @date 2019-12-09
+     * @implNote
+     * @implSpec
+     * @apiNote
+     * @since 1.0.0
+     */
+    boolean isSynchronized();
 
-  /**
-   * @author caotc
-   * @date 2019-12-09
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  boolean isVolatile();
+    /**
+     * @author caotc
+     * @date 2019-12-09
+     * @implNote
+     * @implSpec
+     * @apiNote
+     * @since 1.0.0
+     */
+    boolean isVolatile();
 
-  /**
-   * @author caotc
-   * @date 2019-12-09
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  boolean isTransient();
+    /**
+     * @author caotc
+     * @date 2019-12-09
+     * @implNote
+     * @implSpec
+     * @apiNote
+     * @since 1.0.0
+     */
+    boolean isTransient();
 
-  /**
-   * 该元素的权限级别
-   *
-   * @return 权限级别
-   * @author caotc
-   * @date 2019-07-14
-   * @since 1.0.0
-   */
-  @NonNull
-  AccessLevel accessLevel();
+    /**
+     * 该元素的权限级别
+     *
+     * @return 权限级别
+     * @author caotc
+     * @date 2019-07-14
+     * @since 1.0.0
+     */
+    @NonNull
+    AccessLevel accessLevel();
 
     /**
      * 获取注解
@@ -240,16 +228,16 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
     @NonNull <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass);
 
-  /**
-   * 获取所有注解
-   *
-   * @return 所有注解集合
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull
-  ImmutableList<Annotation> annotations();
+    /**
+     * 获取所有注解
+     *
+     * @return 所有注解集合
+     * @author caotc
+     * @date 2019-11-22
+     * @since 1.0.0
+     */
+    @NonNull
+    ImmutableList<Annotation> annotations();
 
     /**
      * 获取注解集合
@@ -263,16 +251,16 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
     @NonNull <X extends Annotation> ImmutableList<X> annotations(
             @NonNull Class<X> annotationClass);
 
-  /**
-   * 获取所有定义在该属性上的注解
-   *
-   * @return 所有定义在该属性上的集合
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull
-  ImmutableList<Annotation> declaredAnnotations();
+    /**
+     * 获取所有定义在该属性上的注解
+     *
+     * @return 所有定义在该属性上的集合
+     * @author caotc
+     * @date 2019-11-22
+     * @since 1.0.0
+     */
+    @NonNull
+    ImmutableList<Annotation> declaredAnnotations();
 
 
 }

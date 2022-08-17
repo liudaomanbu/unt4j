@@ -41,23 +41,6 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
    * 工厂方法
    *
    * @param setMethod set方法
-   * @param propertyAccessorMethodFormat 方法名称风格
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Method setMethod,
-                                          @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
-      return from((Invokable<T, ?>) Invokable.from(setMethod), propertyAccessorMethodFormat);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param setMethod set方法
    * @param propertyName 属性名称
    * @return 属性设置器
    * @author caotc
@@ -69,24 +52,6 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
   static <T, R> PropertyWriter<T, R> from(@NonNull Method setMethod,
                                           @NonNull String propertyName) {
       return from((Invokable<T, ?>) Invokable.from(setMethod), propertyName);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param setInvokable set方法
-   * @param propertyAccessorMethodFormat 方法名称风格
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Invokable<T, ?> setInvokable,
-                                          @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
-      return new InvokablePropertyWriter<>(setInvokable,
-              propertyAccessorMethodFormat.fieldNameFromSetInvokable(setInvokable));
   }
 
   /**

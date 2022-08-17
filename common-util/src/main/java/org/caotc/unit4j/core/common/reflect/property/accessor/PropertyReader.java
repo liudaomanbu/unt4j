@@ -42,23 +42,6 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * 工厂方法
    *
    * @param getMethod get方法
-   * @param propertyAccessorMethodFormat 方法名风格
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
-  @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Method getMethod,
-                                          @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
-      return from((Invokable<T, R>) Invokable.from(getMethod), propertyAccessorMethodFormat);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param getMethod get方法
    * @param propertyName 属性名称
    * @return 属性获取器
    * @author caotc
@@ -70,23 +53,6 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
   static <T, R> PropertyReader<T, R> from(@NonNull Method getMethod,
                                           @NonNull String propertyName) {
       return from((Invokable<T, R>) Invokable.from(getMethod), propertyName);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param getInvokable get方法封装的Invokable
-   * @param propertyAccessorMethodFormat 方法名风格
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Invokable<T, R> getInvokable,
-                                          @NonNull PropertyAccessorMethodFormat propertyAccessorMethodFormat) {
-      return new InvokablePropertyReader<>(getInvokable,
-              propertyAccessorMethodFormat.fieldNameFromGetInvokable(getInvokable));
   }
 
   /**
