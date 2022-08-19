@@ -28,7 +28,7 @@ import lombok.experimental.FieldNameConstants;
 @FieldDefaults(makeFinal = false)
 @ToString
 @FieldNameConstants
-public class Super implements StringSetter {
+public class Super implements StringFieldSetter {
 
   protected String stringField = "super";
   protected int intField = 99;

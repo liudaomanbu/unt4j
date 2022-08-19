@@ -31,17 +31,17 @@ import lombok.extern.slf4j.XSlf4j;
 @ToString(callSuper = true)
 @FieldNameConstants
 @XSlf4j
-public class Sub extends Super {
-  String stringField = "sub";
-  Number numberField = 88;
+public class Sub extends Super implements StringFieldGetter {
+    String stringField = "sub";
+    Number numberField = 88;
 
-  public void setNumberField(Number numberField) {
-    this.numberField = numberField;
-    log.debug("setNumberField Number");
-  }
+    public void setNumberField(Number numberField) {
+        this.numberField = numberField;
+        log.debug("setNumberField Number");
+    }
 
-  public void setNumberField(int numberField) {
-    this.numberField = numberField;
+    public void setNumberField(int numberField) {
+        this.numberField = numberField;
     log.debug("setNumberField int");
   }
 

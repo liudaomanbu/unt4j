@@ -174,6 +174,7 @@ public class ReflectionUtil {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
+    //todo nullable?
     @NonNull
     public static ImmutableSet<Field> fields(@NonNull TypeToken<?> type,
                                              @NonNull String fieldName) {
@@ -726,11 +727,11 @@ public class ReflectionUtil {
     @NonNull
     public Optional<Method> getMethod(@NonNull TypeToken<?> type,
                                       @NonNull String fieldName) {
-        //todo 子类重写
         return getMethodStream(type)
-                .filter(getMethod -> fieldName
-                        .equals(PropertyAccessorMethodFormat.JAVA_BEAN.fieldNameFromGetMethod(getMethod)))
-                .findFirst();
+                .filter(getMethod -> fieldName.equals(PropertyAccessorMethodFormat.JAVA_BEAN.fieldNameFromGetMethod(getMethod)))
+                //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
+                // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
+                .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2);
     }
 
     @NonNull
@@ -749,36 +750,74 @@ public class ReflectionUtil {
     public Method setMethodExact(@NonNull TypeToken<?> type,
                                  @NonNull String fieldName) {
         ImmutableSet<Method> setMethods = setMethods(type, fieldName);
-        ImmutableSet<Class<?>> fieldTypes = setMethods.stream().map(Method::getParameterTypes)
-                .flatMap(Arrays::stream)
-                .collect(ImmutableSet.toImmutableSet());
-        Preconditions
-                .checkArgument(fieldTypes.size() == 1, "set method that named %s is not only",
-                        fieldName);
-        //todo 子类重写
+        if (setMethods.size() > 1) {//当有同名set方法并且入参类型不同形成重载时认为这是不同的属性
+            ImmutableSet<Class<?>> fieldTypes = setMethods.stream().map(Method::getParameterTypes)
+                    .flatMap(Arrays::stream)
+                    .collect(ImmutableSet.toImmutableSet());
+            //todo expectionType定义?
+            Preconditions.checkArgument(fieldTypes.size() == 1, "set method that named %s is not only", fieldName);
+        }
         return setMethods.stream()
-                .filter(m -> !isOverride(m))
-                .findFirst()
+                //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
+                // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
+                .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2)
                 .orElseThrow(
                         () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
     }
 
     @NonNull
     public Method setMethodExact(@NonNull Type type,
-                                 @NonNull String fieldName, @NonNull Type argumentType) {
-        return setMethodExact(TypeToken.of(type), fieldName, TypeToken.of(argumentType));
+                                 @NonNull String fieldName, @NonNull Type fieldType) {
+        return setMethodExact(TypeToken.of(type), fieldName, TypeToken.of(fieldType));
+    }
+
+    @NonNull
+    public Method setMethodExact(@NonNull Type type,
+                                 @NonNull String fieldName, @NonNull Class<?> fieldClass) {
+        return setMethodExact(TypeToken.of(type), fieldName, TypeToken.of(fieldClass));
+    }
+
+    @NonNull
+    public Method setMethodExact(@NonNull Type type,
+                                 @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
+        return setMethodExact(TypeToken.of(type), fieldName, fieldType);
     }
 
     @NonNull
     public Method setMethodExact(@NonNull Class<?> type,
-                                 @NonNull String fieldName, @NonNull Class<?> argumentClass) {
-        return setMethodExact(TypeToken.of(type), fieldName, TypeToken.of(argumentClass));
+                                 @NonNull String fieldName, @NonNull Type fieldType) {
+        return setMethodExact(TypeToken.of(type), fieldName, TypeToken.of(fieldType));
+    }
+
+    @NonNull
+    public Method setMethodExact(@NonNull Class<?> type,
+                                 @NonNull String fieldName, @NonNull Class<?> fieldClass) {
+        return setMethodExact(TypeToken.of(type), fieldName, TypeToken.of(fieldClass));
+    }
+
+    @NonNull
+    public Method setMethodExact(@NonNull Class<?> type,
+                                 @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
+        return setMethodExact(TypeToken.of(type), fieldName, fieldType);
     }
 
     @NonNull
     public Method setMethodExact(@NonNull TypeToken<?> type,
-                                 @NonNull String fieldName, @NonNull TypeToken<?> argumentTypeToken) {
-        return setMethodFromClass(type, fieldName, argumentTypeToken)
+                                 @NonNull String fieldName, @NonNull Type fieldType) {
+        return setMethodExact(type, fieldName, TypeToken.of(fieldType));
+    }
+
+    @NonNull
+    public Method setMethodExact(@NonNull TypeToken<?> type,
+                                 @NonNull String fieldName, @NonNull Class<?> fieldClass) {
+        return setMethodExact(type, fieldName, TypeToken.of(fieldClass));
+
+    }
+
+    @NonNull
+    public Method setMethodExact(@NonNull TypeToken<?> type,
+                                 @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
+        return setMethodFromClass(type, fieldName, fieldType)
                 .orElseThrow(
                         () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
     }
@@ -799,9 +838,10 @@ public class ReflectionUtil {
     public Optional<Method> setMethodFromClass(@NonNull TypeToken<?> type,
                                                @NonNull String fieldName, @NonNull TypeToken<?> argumentTypeToken) {
         return setMethodStream(type, fieldName)
+                //todo TypeToken equals?
                 .filter(
-                        setMethod -> setMethod.getParameterTypes()[0]
-                                .equals(argumentTypeToken.getRawType()))
+                        setMethod -> TypeToken.of(setMethod.getGenericParameterTypes()[0])
+                                .equals(argumentTypeToken))
                 .findAny();
     }
 
