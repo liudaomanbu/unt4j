@@ -817,26 +817,26 @@ public class ReflectionUtil {
     @NonNull
     public Method setMethodExact(@NonNull TypeToken<?> type,
                                  @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
-        return setMethodFromClass(type, fieldName, fieldType)
+        return setMethod(type, fieldName, fieldType)
                 .orElseThrow(
                         () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
     }
 
     @NonNull
-    public Optional<Method> setMethodFromClass(@NonNull Type type,
-                                               @NonNull String fieldName, @NonNull Type argumentType) {
-        return setMethodFromClass(TypeToken.of(type), fieldName, TypeToken.of(argumentType));
+    public Optional<Method> setMethod(@NonNull Type type,
+                                      @NonNull String fieldName, @NonNull Type argumentType) {
+        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(argumentType));
     }
 
     @NonNull
-    public Optional<Method> setMethodFromClass(@NonNull Class<?> type,
-                                               @NonNull String fieldName, @NonNull Class<?> argumentClass) {
-        return setMethodFromClass(TypeToken.of(type), fieldName, TypeToken.of(argumentClass));
+    public Optional<Method> setMethod(@NonNull Class<?> type,
+                                      @NonNull String fieldName, @NonNull Class<?> argumentClass) {
+        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(argumentClass));
     }
 
     @NonNull
-    public Optional<Method> setMethodFromClass(@NonNull TypeToken<?> type,
-                                               @NonNull String fieldName, @NonNull TypeToken<?> argumentTypeToken) {
+    public Optional<Method> setMethod(@NonNull TypeToken<?> type,
+                                      @NonNull String fieldName, @NonNull TypeToken<?> argumentTypeToken) {
         return setMethodStream(type, fieldName)
                 //todo TypeToken equals?
                 .filter(

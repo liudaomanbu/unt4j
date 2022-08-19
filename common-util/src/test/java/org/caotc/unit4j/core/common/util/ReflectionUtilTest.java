@@ -579,6 +579,132 @@ class ReflectionUtilTest {
         Assertions.assertEquals(setMethod, result);
     }
 
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldType(Type type, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, fieldName, (Type) Void.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldTypeAndErrorFieldName(Type type, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, errorFieldName, fieldType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldClass(Type type, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, fieldName, Void.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldClassAndErrorFieldName(Type type, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, errorFieldName, fieldClass));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldTypeToken(Type type, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, fieldName, TypeToken.of(Void.class)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldTypeTokenAndErrorFieldName(Type type, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, errorFieldName, fieldType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldType(Class<?> clazz, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(clazz, fieldName, (Type) Void.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldTypeAndErrorFieldName(Class<?> clazz, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(clazz, errorFieldName, fieldType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldClass(Class<?> clazz, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(clazz, fieldName, Void.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldClassAndErrorFieldName(Class<?> clazz, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(clazz, errorFieldName, fieldClass));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldTypeToken(Class<?> clazz, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(clazz, fieldName, TypeToken.of(Void.class)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldTypeTokenAndErrorFieldName(Class<?> clazz, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(clazz, errorFieldName, fieldType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldType(TypeToken<?> type, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, fieldName, (Type) Void.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldTypeAndErrorFieldName(TypeToken<?> type, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, errorFieldName, fieldType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldClass(TypeToken<?> type, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, fieldName, Void.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldClassAndErrorFieldName(TypeToken<?> type, String fieldName, Method setMethod) {
+        Class<?> fieldType = setMethod.getParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, errorFieldName, fieldType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodExactWithErrorFieldTypeToken(TypeToken<?> type, String fieldName, Method setMethod) {
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, fieldName, TypeToken.of(Void.class)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodExactWithFieldTypeTokenAndErrorFieldName(TypeToken<?> type, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        String errorFieldName = Math.random() + "";
+        Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, errorFieldName, fieldType));
+    }
+
     @Test
     void readablePropertiesFromClass() {
         ImmutableSet<ReadableProperty<Sub, ?>> readableProperties = ReflectionUtil
