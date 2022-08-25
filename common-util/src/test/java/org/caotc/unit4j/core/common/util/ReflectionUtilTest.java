@@ -1304,8 +1304,12 @@ class ReflectionUtilTest {
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyReaderSets")
     <T> void propertyReaders(Type type, Set<PropertyReader<T, ?>> propertyReaders) {
         Set<PropertyReader<T, ?>> result = ReflectionUtil.propertyReaders(type);
-        log.debug("type:{},result:{}", type, result);
-        Assertions.assertEquals(propertyReaders, result);
+        Set<PropertyReader<T, ?>> result2 = ReflectionUtil.propertyReaders(type);
+        log.debug("result1:{}", result);
+        log.debug("result2:{}", result2);
+        Assertions.assertEquals(result, result2);
+//        log.debug("type:{},result:{}", type, result);
+//        Assertions.assertEquals(propertyReaders, result);
     }
 //    @Test
 //    void readablePropertyFromClass() {

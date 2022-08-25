@@ -146,7 +146,7 @@ public class ReflectionUtil {
     public static <T> Stream<FieldElement<T, ?>> fieldElementStreamFromClass(
             @NonNull TypeToken<T> type) {
         return type.getTypes().rawTypes().stream().map(Class::getDeclaredFields).flatMap(
-                Arrays::stream).map(FieldElement::from);
+                Arrays::stream).map(FieldElement::of);
     }
 
     @NonNull
@@ -2346,7 +2346,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isPropertyWriter(@NonNull Field field) {
-        return isPropertyWriter(FieldElement.from(field));
+        return isPropertyWriter(FieldElement.of(field));
     }
 
     /**

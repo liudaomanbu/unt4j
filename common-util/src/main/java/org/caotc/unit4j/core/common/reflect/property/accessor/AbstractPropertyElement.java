@@ -20,7 +20,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
-import org.caotc.unit4j.core.common.reflect.Element;
+import org.caotc.unit4j.core.common.reflect.BaseElement;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
@@ -36,18 +36,19 @@ import java.lang.reflect.Member;
  */
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public abstract class AbstractPropertyElement<O, P> extends Element implements
-    PropertyElement<O, P> {
+public abstract class AbstractPropertyElement<O, P> extends BaseElement implements
+        PropertyElement<O, P> {
 
-  protected <M extends AnnotatedElement & Member> AbstractPropertyElement(
-          @NonNull M member) {
-    super(member);
-  }
+    protected <M extends AnnotatedElement & Member> AbstractPropertyElement(
+            @NonNull M member) {
+        super(member);
+    }
 
-  @SuppressWarnings("unchecked")
-  @NonNull
-  @Override
-  public final TypeToken<O> ownerType() {
-    return (TypeToken<O>) super.ownerType();
-  }
+    @SuppressWarnings("unchecked")
+    @NonNull
+    @Override
+    public final TypeToken<O> ownerType() {
+        return (TypeToken<O>) super.ownerType();
+    }
+
 }

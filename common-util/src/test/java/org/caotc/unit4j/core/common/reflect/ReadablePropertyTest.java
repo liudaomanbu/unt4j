@@ -18,13 +18,14 @@ package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.util.model.Sub;
 import org.caotc.unit4j.core.common.util.model.Super;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 /**
  * @author caotc
@@ -37,11 +38,11 @@ class ReadablePropertyTest {
   @Test
   void test() throws NoSuchFieldException {
     FieldElement<Super, Object> superStringField = FieldElement
-        .from(Super.class.getDeclaredField("stringField"));
+            .of(Super.class.getDeclaredField("stringField"));
     FieldElement<Sub, Object> subStringField = FieldElement
-        .from(Sub.class.getDeclaredField("stringField"));
+            .of(Sub.class.getDeclaredField("stringField"));
     FieldElement<Sub, Object> subNumberField = FieldElement
-        .from(Sub.class.getDeclaredField("numberField"));
+            .of(Sub.class.getDeclaredField("numberField"));
 
     PropertyReader<Super, Object> superStringFieldPropertyReader = PropertyReader
         .from(superStringField);

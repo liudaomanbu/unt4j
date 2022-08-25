@@ -82,7 +82,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    */
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Field field) {
-    return from(FieldElement.from(field));
+    return from(FieldElement.of(field));
   }
 
   @NonNull

@@ -16,12 +16,15 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
+import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import javax.annotation.CheckForNull;
 import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 
 /**
@@ -29,7 +32,15 @@ import java.lang.reflect.Type;
  * @date 2019-11-29
  * @since 1.0.0
  */
-public class FieldElement<O, P> extends BaseElement {
+public class InvokableElement<O, P> extends BaseElement {
+
+  Invokable<O, P> invokable;
+
+  private InvokableElement(
+          @NonNull Invokable<O, P> invokable) {
+    super(invokable);
+    this.invokable = invokable;
+  }
 
   /**
    * @author caotc
@@ -40,37 +51,29 @@ public class FieldElement<O, P> extends BaseElement {
    * @since 1.0.0
    */
   @NonNull
-  public static <O, P> FieldElement<O, P> of(@NonNull Field field) {
-    return new FieldElement<>(field);
-  }
-
-  Field field;
-
-  private FieldElement(
-      @NonNull Field field) {
-    super(field);
-    this.field = field;
+  public static <O, P> InvokableElement<O, P> of(@NonNull Invokable<O, P> invokable) {
+    return new InvokableElement<>(invokable);
   }
 
   @SuppressWarnings("unchecked")
   @NonNull
-  public final TypeToken<? extends P> type() {
+  public final TypeToken<? extends P> returnType() {
     return (TypeToken<? extends P>) TypeToken.of(genericReturnType());
   }
 
   @NonNull
-  public final <P1 extends P> FieldElement<O, P1> type(Class<P1> returnType) {
-    return type(TypeToken.of(returnType));
+  public final <P1 extends P> InvokableElement<O, P1> returnType(Class<P1> returnType) {
+    return returnType(TypeToken.of(returnType));
   }
 
   @SuppressWarnings("unchecked")
   @NonNull
-  public final <P1 extends P> FieldElement<O, P1> type(TypeToken<P1> returnType) {
-    if (!returnType.isSupertypeOf(type())) {
+  public final <P1 extends P> InvokableElement<O, P1> returnType(TypeToken<P1> returnType) {
+    if (!returnType.isSupertypeOf(returnType())) {
       throw new IllegalArgumentException(
-          "FieldElement is known to return " + type() + ", not " + returnType);
+              "FieldElement is known to return " + returnType() + ", not " + returnType);
     }
-    return (FieldElement<O, P1>) this;
+    return (InvokableElement<O, P1>) this;
   }
 
   @SuppressWarnings("unchecked")
@@ -89,35 +92,49 @@ public class FieldElement<O, P> extends BaseElement {
 
   @NonNull
   public AnnotatedType annotatedType() {
-    return field.getAnnotatedType();
+    return invokable.getAnnotatedType();
   }
 
   @NonNull
   Type genericReturnType() {
-    return field.getGenericType();
+    return invokable.getGenericType();
   }
 
   @SneakyThrows
   @NonNull
-  public FieldElement<O, P> set(O obj, P value) {
-    field.set(obj, value);
+  public InvokableElement<O, P> set(O obj, P value) {
+    invokable.set(obj, value);
     return this;
   }
 
   @SuppressWarnings("unchecked")
   @SneakyThrows
   public P get(O obj) {
-    return (P) field.get(obj);
+    return (P) invokable.get(obj);
   }
 
   @Override
   public boolean accessible() {
-    return field.isAccessible();
+    return invokable.isAccessible();
   }
 
   @Override
-  public @NonNull FieldElement<O, P> accessible(boolean accessible) {
-    field.setAccessible(accessible);
+  public @NonNull InvokableElement<O, P> accessible(boolean accessible) {
+    invokable.setAccessible(accessible);
     return this;
+  }
+
+  public boolean isOverridable() {
+    return invokable.isOverridable();
+  }
+
+  public boolean isVarArgs() {
+    return invokable.isVarArgs();
+  }
+
+  @NonNull
+  public final P invoke(@CheckForNull O receiver, @Nullable Object... args)
+          throws InvocationTargetException, IllegalAccessException {
+    return invokable.invoke(receiver, args);
   }
 }

@@ -82,7 +82,7 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
   @SuppressWarnings("unchecked")
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Field field) {
-    return from(FieldElement.from(field));
+    return from(FieldElement.of(field));
   }
 
   @NonNull

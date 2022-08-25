@@ -17,19 +17,14 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import lombok.AccessLevel;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.util.Optional;
 
 /**
  * 属性元素
@@ -40,11 +35,11 @@ import java.util.Optional;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyElement<O, P> extends AnnotatedElement, Member {
+public interface PropertyElement<O, P> extends Element {
 
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull Field field) {
-        return from(FieldElement.from(field));
+        return from(FieldElement.of(field));
     }
 
     @NonNull
@@ -86,17 +81,6 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
      */
     @NonNull
     TypeToken<? extends P> propertyType();
-
-    /**
-     * get owner type of {@code O}
-     *
-     * @return owner type
-     * @author caotc
-     * @date 2019-12-04
-     * @since 1.0.0
-     */
-    @NonNull
-    TypeToken<O> ownerType();
 
     /**
      * 设置属性类型
@@ -144,123 +128,4 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
     }
 
     boolean basedOnField();
-
-    /**
-     * @author caotc
-     * @date 2019-12-09
-     * @implNote
-     * @implSpec
-     * @apiNote
-     * @since 1.0.0
-     */
-    boolean isStatic();
-
-    /**
-     * @author caotc
-     * @date 2019-12-09
-     * @implNote
-     * @implSpec
-     * @apiNote
-     * @since 1.0.0
-     */
-    boolean isFinal();
-
-    /**
-     * @author caotc
-     * @date 2019-12-09
-     * @implNote
-     * @implSpec
-     * @apiNote
-     * @since 1.0.0
-     */
-    boolean isAbstract();
-
-    /**
-     * @author caotc
-     * @date 2019-12-09
-     * @implNote
-     * @implSpec
-     * @apiNote
-     * @since 1.0.0
-     */
-    boolean isSynchronized();
-
-    /**
-     * @author caotc
-     * @date 2019-12-09
-     * @implNote
-     * @implSpec
-     * @apiNote
-     * @since 1.0.0
-     */
-    boolean isVolatile();
-
-    /**
-     * @author caotc
-     * @date 2019-12-09
-     * @implNote
-     * @implSpec
-     * @apiNote
-     * @since 1.0.0
-     */
-    boolean isTransient();
-
-    /**
-     * 该元素的权限级别
-     *
-     * @return 权限级别
-     * @author caotc
-     * @date 2019-07-14
-     * @since 1.0.0
-     */
-    @NonNull
-    AccessLevel accessLevel();
-
-    /**
-     * 获取注解
-     *
-     * @param annotationClass 注解类
-     * @return 注解的 {@link Optional}
-     * @author caotc
-     * @date 2019-11-22
-     * @since 1.0.0
-     */
-    @NonNull <X extends Annotation> Optional<X> annotation(
-            @NonNull Class<X> annotationClass);
-
-    /**
-     * 获取所有注解
-     *
-     * @return 所有注解集合
-     * @author caotc
-     * @date 2019-11-22
-     * @since 1.0.0
-     */
-    @NonNull
-    ImmutableList<Annotation> annotations();
-
-    /**
-     * 获取注解集合
-     *
-     * @param annotationClass 注解类
-     * @return 该类注解集合
-     * @author caotc
-     * @date 2019-11-22
-     * @since 1.0.0
-     */
-    @NonNull <X extends Annotation> ImmutableList<X> annotations(
-            @NonNull Class<X> annotationClass);
-
-    /**
-     * 获取所有定义在该属性上的注解
-     *
-     * @return 所有定义在该属性上的集合
-     * @author caotc
-     * @date 2019-11-22
-     * @since 1.0.0
-     */
-    @NonNull
-    ImmutableList<Annotation> declaredAnnotations();
-
-
 }

@@ -32,7 +32,7 @@ class FieldElementTest {
   @Test
   void test() throws NoSuchFieldException {
     FieldElement<Sub, Object> stringField = FieldElement
-        .from(Super.class.getDeclaredField("stringField"));
+            .of(Super.class.getDeclaredField("stringField"));
     log.debug("stringField:{}", stringField);
     log.debug("ownerType:{}", stringField.ownerType());
 

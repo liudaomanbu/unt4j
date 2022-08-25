@@ -50,7 +50,7 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
   @SuppressWarnings("unchecked")
   @NonNull
   public static <T, R> PropertyAccessor<T, R> from(@NonNull Field field) {
-    return from(FieldElement.from(field));
+    return from(FieldElement.of(field));
   }
 
   /**
