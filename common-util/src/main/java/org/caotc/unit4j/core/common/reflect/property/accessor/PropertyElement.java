@@ -57,10 +57,10 @@ public interface PropertyElement<O, P> extends AnnotatedElement, Member {
     static <T, R> PropertyElement<T, R> from(@NonNull Invokable<T, R> invokable,
                                              @NonNull String propertyName) {
         if (ReflectionUtil.isPropertyReader(invokable)) {
-            PropertyReader.from(invokable, propertyName);
+            return PropertyReader.from(invokable, propertyName);
         }
         if (ReflectionUtil.isPropertyWriter(invokable)) {
-            PropertyReader.from(invokable, propertyName);
+            return PropertyReader.from(invokable, propertyName);
         }
         throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
     }

@@ -36,8 +36,8 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Element extends AccessibleObject implements Member {
 
   @NonNull

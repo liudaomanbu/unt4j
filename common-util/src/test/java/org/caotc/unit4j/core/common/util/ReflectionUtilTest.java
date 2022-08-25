@@ -22,9 +22,10 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
-import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.util.model.PropertyConstant;
 import org.caotc.unit4j.core.common.util.model.Sub;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
@@ -705,102 +706,687 @@ class ReflectionUtilTest {
         Assertions.assertThrows(MethodNotFoundException.class, () -> ReflectionUtil.setMethodExact(type, errorFieldName, fieldType));
     }
 
-    @Test
-    void readablePropertiesFromClass() {
-        ImmutableSet<ReadableProperty<Sub, ?>> readableProperties = ReflectionUtil
-                .readablePropertiesFromClass(Sub.class);
-        log.debug("readableProperties:{}", readableProperties);
-        Assertions.assertEquals(4, readableProperties.size());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethod(Type type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
     }
 
-    @Test
-    void readablePropertiesFromClass2() {
-        ImmutableSet<ReadableProperty<Sub, ?>> readableProperties = ReflectionUtil
-                .readablePropertiesFromClass(Sub.class, PropertyAccessorMethodFormat.FLUENT);
-        log.debug("readableProperties:{}", readableProperties);
-        Assertions.assertEquals(3, readableProperties.size());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethod(Class<?> clazz, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, fieldName);
+        log.debug("class:{},fieldName:{},result:{}", clazz, fieldName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
     }
 
-    @Test
-    void readablePropertyFromClass() {
-        Optional<ReadableProperty<Sub, Object>> stringField = ReflectionUtil
-                .readablePropertyFromClass(Sub.class, "stringField");
-        Assertions.assertTrue(stringField.isPresent());
-        Optional<ReadableProperty<Sub, Object>> nonField = ReflectionUtil
-                .readablePropertyFromClass(Sub.class, "nonField");
-        Assertions.assertFalse(nonField.isPresent());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethod(TypeToken<?> type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
     }
 
-    @Test
-    void readablePropertyFromClass1() {
-        Optional<ReadableProperty<Sub, Object>> readNumberField = ReflectionUtil
-                .readablePropertyFromClass(Sub.class, "readNumberField");
-        Assertions.assertTrue(readNumberField.isPresent());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void setMethodWithErrorFieldName(Type type) {
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName);
+        log.debug("type:{},errorFieldName:{},result:{}", type, errorFieldName, result);
+        Assertions.assertFalse(result.isPresent());
     }
 
-    @Test
-    void readablePropertyFromClass2() {
-        Optional<ReadableProperty<Sub, Object>> javaBeanReadNumberField = ReflectionUtil
-                .readablePropertyFromClass(Sub.class, "readNumberField",
-                        PropertyAccessorMethodFormat.JAVA_BEAN);
-        Assertions.assertTrue(javaBeanReadNumberField.isPresent());
-        Optional<ReadableProperty<Sub, Object>> fluentReadNumberField = ReflectionUtil
-                .readablePropertyFromClass(Sub.class, "readNumberField",
-                        PropertyAccessorMethodFormat.FLUENT);
-        Assertions.assertTrue(fluentReadNumberField.isPresent());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void setMethodWithErrorFieldName(Class<?> clazz) {
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, errorFieldName);
+        log.debug("class:{},errorFieldName:{},result:{}", clazz, errorFieldName, result);
+        Assertions.assertFalse(result.isPresent());
     }
 
-    @Test
-    void writablePropertiesFromClass() {
-        ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
-                .writablePropertiesFromClass(Sub.class);
-        for (WritableProperty<Sub, ?> writableProperty : writableProperties) {
-            log.debug("writableProperty:{}", writableProperty.name() + "," + writableProperty.type());
-        }
-        Assertions.assertEquals(5, writableProperties.size());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokens")
+    void setMethodWithErrorFieldName(TypeToken<?> type) {
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName);
+        log.debug("type:{},errorFieldName:{},result:{}", type, errorFieldName, result);
+        Assertions.assertFalse(result.isPresent());
     }
 
-    @Test
-    void writablePropertiesFromClass1() {
-        ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
-                .writablePropertiesFromClass(Sub.class);
-        writableProperties.forEach(
-                writableProperty -> log.debug(writableProperty.name() + ":" + writableProperty.type()));
-        Assertions.assertEquals(5, writableProperties.size());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndDuplicateSetMethodFieldNames")
+    void setMethodWithDuplicateSetMethodFieldName(Type type, String duplicateSetMethodFieldName) {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethod(type, duplicateSetMethodFieldName));
     }
 
-    @Test
-    void writablePropertiesFromClass2() {
-        ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
-                .writablePropertiesFromClass(Sub.class, PropertyAccessorMethodFormat.FLUENT);
-        log.debug("writableProperties:{}", writableProperties);
-        Assertions.assertEquals(3, writableProperties.size());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndDuplicateSetMethodFieldNames")
+    void setMethodWithDuplicateSetMethodFieldName(Class<?> clazz, String duplicateSetMethodFieldName) {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethod(clazz, duplicateSetMethodFieldName));
     }
 
-    @Test
-    void writablePropertyFromClass() {
-        Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
-                .writablePropertyFromClass(Sub.class, "stringField");
-        Assertions.assertTrue(stringField.isPresent());
-        Optional<WritableProperty<Sub, Object>> nonField = ReflectionUtil
-                .writablePropertyFromClass(Sub.class, "nonField");
-        Assertions.assertFalse(nonField.isPresent());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndDuplicateSetMethodFieldNames")
+    void setMethodWithDuplicateSetMethodFieldName(TypeToken<?> type, String duplicateSetMethodFieldName) {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethod(type, duplicateSetMethodFieldName));
     }
 
-    @Test
-    void writablePropertyFromClass1() {
-        Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
-                .writablePropertyFromClass(Sub.class, "stringField");
-        Assertions.assertTrue(stringField.isPresent());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldType(Type type, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, fieldType);
+        log.debug("type:{},fieldName:{},fieldType:{},result:{}", type, fieldName, fieldType, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
     }
 
-    @Test
-    void writablePropertyFromClass2() {
-        Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
-                .writablePropertyFromClass(Sub.class, "stringField",
-                        PropertyAccessorMethodFormat.FLUENT);
-        Assertions.assertTrue(stringField.isPresent());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldClass(Type type, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, fieldClass);
+        log.debug("type:{},fieldName:{},fieldClass:{},result:{}", type, fieldName, fieldClass, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
     }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeToken(Type type, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, fieldType);
+        log.debug("type:{},fieldName:{},fieldType:{},result:{}", type, fieldName, fieldType, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldType(Class<?> clazz, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, fieldName, fieldType);
+        log.debug("class:{},fieldName:{},fieldType:{},result:{}", clazz, fieldName, fieldType, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldClass(Class<?> clazz, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, fieldName, fieldClass);
+        log.debug("class:{},fieldName:{},fieldClass:{},result:{}", clazz, fieldName, fieldClass, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeToken(Class<?> clazz, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, fieldName, fieldType);
+        log.debug("class:{},fieldName:{},fieldType:{},result:{}", clazz, fieldName, fieldType, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithFieldType(TypeToken<?> type, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, fieldType);
+        log.debug("type:{},fieldName:{},fieldType:{},result:{}", type, fieldName, fieldType, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithFieldClass(TypeToken<?> type, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, fieldClass);
+        log.debug("type:{},fieldName:{},fieldClass:{},result:{}", type, fieldName, fieldClass, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeToken(TypeToken<?> type, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, fieldType);
+        log.debug("type:{},fieldName:{},fieldType:{},result:{}", type, fieldName, fieldType, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(setMethod, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldType(Type type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, (Type) Void.class);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeAndErrorFieldName(Type type, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName, fieldType);
+        log.debug("type:{},errorFieldName:{},fieldType:{},result:{}", type, errorFieldName, fieldType, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldClass(Type type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, Void.class);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldClassAndErrorFieldName(Type type, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName, fieldClass);
+        log.debug("type:{},errorFieldName:{},fieldClass:{},result:{}", type, errorFieldName, fieldClass, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldTypeToken(Type type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, TypeToken.of(Void.class));
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeTokenAndErrorFieldName(Type type, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName, fieldType);
+        log.debug("type:{},errorFieldName:{},fieldType:{},result:{}", type, errorFieldName, fieldType, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldType(Class<?> clazz, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, fieldName, (Type) Void.class);
+        log.debug("class:{},fieldName:{},result:{}", clazz, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeAndErrorFieldName(Class<?> clazz, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, errorFieldName, fieldType);
+        log.debug("class:{},errorFieldName:{},fieldType:{},result:{}", clazz, errorFieldName, fieldType, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldClass(Class<?> clazz, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, fieldName, Void.class);
+        log.debug("class:{},fieldName:{},result:{}", clazz, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldClassAndErrorFieldName(Class<?> clazz, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, errorFieldName, fieldClass);
+        log.debug("class:{},errorFieldName:{},fieldClass:{},result:{}", clazz, errorFieldName, fieldClass, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldTypeToken(Class<?> clazz, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, fieldName, TypeToken.of(Void.class));
+        log.debug("class:{},fieldName:{},result:{}", clazz, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeTokenAndErrorFieldName(Class<?> clazz, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(clazz, errorFieldName, fieldType);
+        log.debug("class:{},errorFieldName:{},fieldType:{},result:{}", clazz, errorFieldName, fieldType, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldType(TypeToken<?> type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, (Type) Void.class);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeAndErrorFieldName(TypeToken<?> type, String fieldName, Method setMethod) {
+        Type fieldType = setMethod.getGenericParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName, fieldType);
+        log.debug("type:{},errorFieldName:{},fieldType:{},result:{}", type, errorFieldName, fieldType, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldClass(TypeToken<?> type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, Void.class);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithFieldClassAndErrorFieldName(TypeToken<?> type, String fieldName, Method setMethod) {
+        Class<?> fieldClass = setMethod.getParameterTypes()[0];
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName, fieldClass);
+        log.debug("type:{},errorFieldName:{},fieldClass:{},result:{}", type, errorFieldName, fieldClass, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithErrorFieldTypeToken(TypeToken<?> type, String fieldName, Method setMethod) {
+        Optional<Method> result = ReflectionUtil.setMethod(type, fieldName, TypeToken.of(Void.class));
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethods")
+    void setMethodWithFieldTypeTokenAndErrorFieldName(TypeToken<?> type, String fieldName, Method setMethod) {
+        TypeToken<?> fieldType = TypeToken.of(setMethod.getGenericParameterTypes()[0]);
+        String errorFieldName = Math.random() + "";
+        Optional<Method> result = ReflectionUtil.setMethod(type, errorFieldName, fieldType);
+        log.debug("type:{},errorFieldName:{},fieldType:{},result:{}", type, errorFieldName, fieldType, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethodSets")
+    void setMethods(Type type, String fieldName, Set<Method> setMethods) {
+        Set<Method> result = ReflectionUtil.setMethods(type, fieldName);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertEquals(setMethods, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethodSets")
+    void setMethods(Class<?> clazz, String fieldName, Set<Method> setMethods) {
+        Set<Method> result = ReflectionUtil.setMethods(clazz, fieldName);
+        log.debug("class:{},fieldName:{},result:{}", clazz, fieldName, result);
+        Assertions.assertEquals(setMethods, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethodSets")
+    void setMethods(TypeToken<?> type, String fieldName, Set<Method> setMethods) {
+        Set<Method> result = ReflectionUtil.setMethods(type, fieldName);
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertEquals(setMethods, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void setMethodsWithErrorFieldName(Type type) {
+        String errorFieldName = Math.random() + "";
+        Set<Method> result = ReflectionUtil.setMethods(type, errorFieldName);
+        log.debug("type:{},errorFieldName:{},result:{}", type, errorFieldName, result);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void setMethodsWithErrorFieldName(Class<?> clazz) {
+        String errorFieldName = Math.random() + "";
+        Set<Method> result = ReflectionUtil.setMethods(clazz, errorFieldName);
+        log.debug("class:{},errorFieldName:{},result:{}", clazz, errorFieldName, result);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokens")
+    void setMethodsWithErrorFieldName(TypeToken<?> type) {
+        String errorFieldName = Math.random() + "";
+        Set<Method> result = ReflectionUtil.setMethods(type, errorFieldName);
+        log.debug("type:{},errorFieldName:{},result:{}", type, errorFieldName, result);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethodSets")
+    void setMethodStream(Type type, String fieldName, Set<Method> setMethods) {
+        Set<Method> result = ReflectionUtil.setMethodStream(type, fieldName).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertEquals(setMethods, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndFieldNameAndSetMethodSets")
+    void setMethodStream(Class<?> clazz, String fieldName, Set<Method> setMethods) {
+        Set<Method> result = ReflectionUtil.setMethodStream(clazz, fieldName).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},fieldName:{},result:{}", clazz, fieldName, result);
+        Assertions.assertEquals(setMethods, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndFieldNameAndSetMethodSets")
+    void setMethodStream(TypeToken<?> type, String fieldName, Set<Method> setMethods) {
+        Set<Method> result = ReflectionUtil.setMethodStream(type, fieldName).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},fieldName:{},result:{}", type, fieldName, result);
+        Assertions.assertEquals(setMethods, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void setMethodStreamWithErrorFieldName(Type type) {
+        String errorFieldName = Math.random() + "";
+        Set<Method> result = ReflectionUtil.setMethodStream(type, errorFieldName).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},errorFieldName:{},result:{}", type, errorFieldName, result);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void setMethodStreamWithErrorFieldName(Class<?> clazz) {
+        String errorFieldName = Math.random() + "";
+        Set<Method> result = ReflectionUtil.setMethodStream(clazz, errorFieldName).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},errorFieldName:{},result:{}", clazz, errorFieldName, result);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokens")
+    void setMethodStreamWithErrorFieldName(TypeToken<?> type) {
+        String errorFieldName = Math.random() + "";
+        Set<Method> result = ReflectionUtil.setMethodStream(type, errorFieldName).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},errorFieldName:{},result:{}", type, errorFieldName, result);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void propertyStream(Type type) {
+        //todo
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void propertyStream(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void propertyStream(Class<?> clazz) {
+        //todo
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(clazz).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void propertyStream(Class<?> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(clazz).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void propertyStream(TypeToken<?> type) {
+        //todo
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void propertyStream(TypeToken<?> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void properties(Type type) {
+        //todo
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void properties(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void properties(Class<T> clazz) {
+        //todo
+        Set<Property<T, ?>> result = ReflectionUtil.properties(clazz);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void properties(Class<T> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<Property<T, ?>> result = ReflectionUtil.properties(clazz);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void properties(TypeToken<T> type) {
+        //todo
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void properties(TypeToken<T> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void readablePropertyStream(Type type) {
+        //todo
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void readablePropertyStream(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void readablePropertyStream(Class<?> clazz) {
+        //todo
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void readablePropertyStream(Class<?> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void readablePropertyStream(TypeToken<?> type) {
+        //todo
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    void readablePropertyStream(TypeToken<?> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void readableProperties(Type type) {
+        //todo
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void readableProperties(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void readableProperties(Class<T> clazz) {
+        //todo
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(clazz);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void readableProperties(Class<T> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(clazz);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void readableProperties(TypeToken<T> type) {
+        //todo
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
+    <T> void readableProperties(TypeToken<T> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        //todo
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyReaderSets")
+    <T> void propertyReaders(Type type, Set<PropertyReader<T, ?>> propertyReaders) {
+        Set<PropertyReader<T, ?>> result = ReflectionUtil.propertyReaders(type);
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(propertyReaders, result);
+    }
+//    @Test
+//    void readablePropertyFromClass() {
+//        Optional<ReadableProperty<Sub, Object>> stringField = ReflectionUtil
+//                .readablePropertyFromClass(Sub.class, "stringField");
+//        Assertions.assertTrue(stringField.isPresent());
+//        Optional<ReadableProperty<Sub, Object>> nonField = ReflectionUtil
+//                .readablePropertyFromClass(Sub.class, "nonField");
+//        Assertions.assertFalse(nonField.isPresent());
+//    }
+//
+//    @Test
+//    void readablePropertyFromClass1() {
+//        Optional<ReadableProperty<Sub, Object>> readNumberField = ReflectionUtil
+//                .readablePropertyFromClass(Sub.class, "readNumberField");
+//        Assertions.assertTrue(readNumberField.isPresent());
+//    }
+//
+//    @Test
+//    void readablePropertyFromClass2() {
+//        Optional<ReadableProperty<Sub, Object>> javaBeanReadNumberField = ReflectionUtil
+//                .readablePropertyFromClass(Sub.class, "readNumberField",
+//                        PropertyAccessorMethodFormat.JAVA_BEAN);
+//        Assertions.assertTrue(javaBeanReadNumberField.isPresent());
+//        Optional<ReadableProperty<Sub, Object>> fluentReadNumberField = ReflectionUtil
+//                .readablePropertyFromClass(Sub.class, "readNumberField",
+//                        PropertyAccessorMethodFormat.FLUENT);
+//        Assertions.assertTrue(fluentReadNumberField.isPresent());
+//    }
+//
+//    @Test
+//    void writablePropertiesFromClass() {
+//        ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
+//                .writablePropertiesFromClass(Sub.class);
+//        for (WritableProperty<Sub, ?> writableProperty : writableProperties) {
+//            log.debug("writableProperty:{}", writableProperty.name() + "," + writableProperty.type());
+//        }
+//        Assertions.assertEquals(5, writableProperties.size());
+//    }
+//
+//    @Test
+//    void writablePropertiesFromClass1() {
+//        ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
+//                .writablePropertiesFromClass(Sub.class);
+//        writableProperties.forEach(
+//                writableProperty -> log.debug(writableProperty.name() + ":" + writableProperty.type()));
+//        Assertions.assertEquals(5, writableProperties.size());
+//    }
+//
+//    @Test
+//    void writablePropertiesFromClass2() {
+//        ImmutableSet<WritableProperty<Sub, ?>> writableProperties = ReflectionUtil
+//                .writablePropertiesFromClass(Sub.class, PropertyAccessorMethodFormat.FLUENT);
+//        log.debug("writableProperties:{}", writableProperties);
+//        Assertions.assertEquals(3, writableProperties.size());
+//    }
+//
+//    @Test
+//    void writablePropertyFromClass() {
+//        Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
+//                .writablePropertyFromClass(Sub.class, "stringField");
+//        Assertions.assertTrue(stringField.isPresent());
+//        Optional<WritableProperty<Sub, Object>> nonField = ReflectionUtil
+//                .writablePropertyFromClass(Sub.class, "nonField");
+//        Assertions.assertFalse(nonField.isPresent());
+//    }
+//
+//    @Test
+//    void writablePropertyFromClass1() {
+//        Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
+//                .writablePropertyFromClass(Sub.class, "stringField");
+//        Assertions.assertTrue(stringField.isPresent());
+//    }
+//
+//    @Test
+//    void writablePropertyFromClass2() {
+//        Optional<WritableProperty<Sub, Object>> stringField = ReflectionUtil
+//                .writablePropertyFromClass(Sub.class, "stringField",
+//                        PropertyAccessorMethodFormat.FLUENT);
+//        Assertions.assertTrue(stringField.isPresent());
+//    }
 
     @Test
     @SneakyThrows

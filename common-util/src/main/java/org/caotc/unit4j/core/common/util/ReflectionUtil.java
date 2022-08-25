@@ -749,20 +749,8 @@ public class ReflectionUtil {
     @NonNull
     public Method setMethodExact(@NonNull TypeToken<?> type,
                                  @NonNull String fieldName) {
-        ImmutableSet<Method> setMethods = setMethods(type, fieldName);
-        if (setMethods.size() > 1) {//当有同名set方法并且入参类型不同形成重载时认为这是不同的属性
-            ImmutableSet<Class<?>> fieldTypes = setMethods.stream().map(Method::getParameterTypes)
-                    .flatMap(Arrays::stream)
-                    .collect(ImmutableSet.toImmutableSet());
-            //todo expectionType定义?
-            Preconditions.checkArgument(fieldTypes.size() == 1, "set method that named %s is not only", fieldName);
-        }
-        return setMethods.stream()
-                //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
-                // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
-                .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2)
-                .orElseThrow(
-                        () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
+        return setMethod(type, fieldName)
+                .orElseThrow(() -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
     }
 
     @NonNull
@@ -823,26 +811,79 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public Optional<Method> setMethod(@NonNull Type type,
-                                      @NonNull String fieldName, @NonNull Type argumentType) {
-        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(argumentType));
+    public Optional<Method> setMethod(@NonNull Type type, @NonNull String fieldName) {
+        return setMethod(TypeToken.of(type), fieldName);
     }
 
     @NonNull
-    public Optional<Method> setMethod(@NonNull Class<?> type,
-                                      @NonNull String fieldName, @NonNull Class<?> argumentClass) {
-        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(argumentClass));
+    public Optional<Method> setMethod(@NonNull Class<?> type, @NonNull String fieldName) {
+        return setMethod(TypeToken.of(type), fieldName);
     }
 
     @NonNull
-    public Optional<Method> setMethod(@NonNull TypeToken<?> type,
-                                      @NonNull String fieldName, @NonNull TypeToken<?> argumentTypeToken) {
+    public Optional<Method> setMethod(@NonNull TypeToken<?> type, @NonNull String fieldName) {
+        ImmutableSet<Method> setMethods = setMethods(type, fieldName);
+        if (setMethods.size() > 1) {//当有同名set方法并且入参类型不同形成重载时认为这是不同的属性
+            ImmutableSet<Class<?>> fieldTypes = setMethods.stream().map(Method::getParameterTypes)
+                    .flatMap(Arrays::stream)
+                    .collect(ImmutableSet.toImmutableSet());
+            //todo exceptionType定义?
+            Preconditions.checkArgument(fieldTypes.size() == 1, "set method that named %s is not only", fieldName);
+        }
+        return setMethods.stream()
+                //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
+                // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
+                .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2);
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull Type type, @NonNull String fieldName, @NonNull Type fieldType) {
+        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(fieldType));
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull Type type, @NonNull String fieldName, @NonNull Class<?> fieldClass) {
+        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(fieldClass));
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull Type type, @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
+        return setMethod(TypeToken.of(type), fieldName, fieldType);
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull Class<?> type, @NonNull String fieldName, @NonNull Type fieldType) {
+        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(fieldType));
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull Class<?> type, @NonNull String fieldName, @NonNull Class<?> fieldClass) {
+        return setMethod(TypeToken.of(type), fieldName, TypeToken.of(fieldClass));
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull Class<?> type, @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
+        return setMethod(TypeToken.of(type), fieldName, fieldType);
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull TypeToken<?> type, @NonNull String fieldName, @NonNull Type fieldType) {
+        return setMethod(type, fieldName, TypeToken.of(fieldType));
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull TypeToken<?> type, @NonNull String fieldName, @NonNull Class<?> fieldClass) {
+        return setMethod(type, fieldName, TypeToken.of(fieldClass));
+    }
+
+    @NonNull
+    public Optional<Method> setMethod(@NonNull TypeToken<?> type, @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
         return setMethodStream(type, fieldName)
                 //todo TypeToken equals?
-                .filter(
-                        setMethod -> TypeToken.of(setMethod.getGenericParameterTypes()[0])
-                                .equals(argumentTypeToken))
-                .findAny();
+                .filter(setMethod -> TypeToken.of(setMethod.getGenericParameterTypes()[0]).equals(fieldType))
+                //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
+                // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
+                .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2);
     }
 
     @NonNull
@@ -895,9 +936,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+    public static <T> Stream<Property<T, ?>> propertyStream(
             @NonNull Type type) {
-        return propertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -913,10 +954,10 @@ public class ReflectionUtil {
      */
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+    public static <T> Stream<Property<T, ?>> propertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
@@ -931,9 +972,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+    public static <T> Stream<Property<T, ?>> propertyStream(
             @NonNull Class<T> type) {
-        return propertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -948,10 +989,10 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+    public static <T> Stream<Property<T, ?>> propertyStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStreamFromClass(TypeToken.of(type), propertyAccessorMethodFormats);
+        return propertyStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     /**
@@ -965,9 +1006,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+    public static <T> Stream<Property<T, ?>> propertyStream(
             @NonNull TypeToken<T> type) {
-        return propertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -982,12 +1023,12 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<Property<T, ?>> propertyStreamFromClass(
+    public static <T> Stream<Property<T, ?>> propertyStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
 
         ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyElement<T, ?>> signatureToPropertyElements =
-                propertyElementStreamFromClass(type, propertyAccessorMethodFormats)
+                propertyElementStream(type, propertyAccessorMethodFormats)
                         .collect(ImmutableListMultimap
                                 .toImmutableListMultimap(KEY_FUNCTION, Function.identity()));
 
@@ -997,45 +1038,45 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+    public static <T> ImmutableSet<Property<T, ?>> properties(
             @NonNull Type type) {
-        return propertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+    public static <T> ImmutableSet<Property<T, ?>> properties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertiesFromClass((TypeToken<T>) TypeToken.of(type),
+        return properties((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+    public static <T> ImmutableSet<Property<T, ?>> properties(
             @NonNull Class<T> type) {
-        return propertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+    public static <T> ImmutableSet<Property<T, ?>> properties(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+    public static <T> ImmutableSet<Property<T, ?>> properties(
             @NonNull TypeToken<T> type) {
-        return propertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<Property<T, ?>> propertiesFromClass(
+    public static <T> ImmutableSet<Property<T, ?>> properties(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
@@ -1050,9 +1091,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStream(
             @NonNull Type type) {
-        return readablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return readablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1068,10 +1109,10 @@ public class ReflectionUtil {
      */
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return readablePropertyStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
@@ -1086,9 +1127,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStream(
             @NonNull Class<T> type) {
-        return readablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return readablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1103,10 +1144,10 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyStreamFromClass(TypeToken.of(type), propertyAccessorMethodFormats);
+        return readablePropertyStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     /**
@@ -1120,9 +1161,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStream(
             @NonNull TypeToken<T> type) {
-        return readablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return readablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1137,56 +1178,56 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, ?>> readablePropertyStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyStream(type, propertyAccessorMethodFormats)
                 .filter(Property::readable)
                 .map(Property::toReadable);
     }
 
 
     @NonNull
-    public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+    public static <T> ImmutableSet<ReadableProperty<T, ?>> readableProperties(
             @NonNull Type type) {
-        return readablePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+    public static <T> ImmutableSet<ReadableProperty<T, ?>> readableProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertiesFromClass((TypeToken<T>) TypeToken.of(type),
+        return readableProperties((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+    public static <T> ImmutableSet<ReadableProperty<T, ?>> readableProperties(
             @NonNull Class<T> type) {
-        return readablePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+    public static <T> ImmutableSet<ReadableProperty<T, ?>> readableProperties(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return readablePropertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+    public static <T> ImmutableSet<ReadableProperty<T, ?>> readableProperties(
             @NonNull TypeToken<T> type) {
-        return readablePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<ReadableProperty<T, ?>> readablePropertiesFromClass(
+    public static <T> ImmutableSet<ReadableProperty<T, ?>> readableProperties(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return readablePropertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
@@ -1201,9 +1242,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStream(
             @NonNull Type type) {
-        return writablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return writablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1219,10 +1260,10 @@ public class ReflectionUtil {
      */
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return writablePropertyStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
@@ -1237,9 +1278,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStream(
             @NonNull Class<T> type) {
-        return writablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return writablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1254,10 +1295,10 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyStreamFromClass(TypeToken.of(type), propertyAccessorMethodFormats);
+        return writablePropertyStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     /**
@@ -1271,9 +1312,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStream(
             @NonNull TypeToken<T> type) {
-        return writablePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return writablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1288,57 +1329,57 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStreamFromClass(
+    public static <T> Stream<WritableProperty<T, ?>> writablePropertyStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyStream(type, propertyAccessorMethodFormats)
                 .filter(Property::writable)
                 .map(Property::toWritable);
     }
 
 
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, ?>> writableProperties(
             @NonNull Type type) {
-        return writablePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, ?>> writableProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertiesFromClass((TypeToken<T>) TypeToken.of(type),
+        return writableProperties((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, ?>> writableProperties(
             @NonNull Class<T> type) {
-        return writablePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, ?>> writableProperties(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return writablePropertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
 
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, ?>> writableProperties(
             @NonNull TypeToken<T> type) {
-        return writablePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, ?>> writablePropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, ?>> writableProperties(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return writablePropertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
@@ -1353,9 +1394,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull Type type) {
-        return accessiblePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return accessiblePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1371,10 +1412,10 @@ public class ReflectionUtil {
      */
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return accessiblePropertyStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
@@ -1389,9 +1430,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull T object) {
-        return accessiblePropertyStreamFromClass(object, DEFAULT_METHOD_NAME_STYLES);
+        return accessiblePropertyStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1407,10 +1448,10 @@ public class ReflectionUtil {
      */
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull T object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyStreamFromClass((Class<T>) object.getClass(),
+        return accessiblePropertyStream((Class<T>) object.getClass(),
                 propertyAccessorMethodFormats);
     }
 
@@ -1425,9 +1466,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull Class<T> type) {
-        return accessiblePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return accessiblePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1442,10 +1483,10 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyStreamFromClass(TypeToken.of(type),
+        return accessiblePropertyStream(TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
@@ -1460,9 +1501,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull TypeToken<T> type) {
-        return accessiblePropertyStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return accessiblePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1477,80 +1518,80 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, ?>> accessiblePropertyStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyStream(type, propertyAccessorMethodFormats)
                 .filter(Property::accessible)
                 .map(Property::toAccessible);
     }
 
 
     @NonNull
-    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessibleProperties(
             @NonNull Type type) {
-        return accessiblePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessibleProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertiesFromClass((TypeToken<T>) type,
+        return accessibleProperties((TypeToken<T>) type,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessibleProperties(
             @NonNull Class<T> type) {
-        return accessiblePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessibleProperties(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return accessiblePropertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessibleProperties(
             @NonNull TypeToken<T> type) {
-        return accessiblePropertiesFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessiblePropertiesFromClass(
+    public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessibleProperties(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyStreamFromClass(type, propertyAccessorMethodFormats)
+        return accessiblePropertyStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
 
     @NonNull
-    public static <R> ReadableProperty<?, R> readablePropertyFromClassExact(
+    public static <R> ReadableProperty<?, R> readablePropertyExact(
             @NonNull Type type, @NonNull String fieldName) {
-        return readablePropertyFromClassExact(type, fieldName,
+        return readablePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <R> ReadableProperty<?, R> readablePropertyFromClassExact(
+    public static <R> ReadableProperty<?, R> readablePropertyExact(
             @NonNull Type type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyFromClassExact(TypeToken.of(type), fieldName,
+        return readablePropertyExact(TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+    public static <T, R> ReadableProperty<T, R> readablePropertyExact(
             @NonNull Class<T> type, @NonNull String fieldName) {
-        return readablePropertyFromClassExact(type, fieldName,
+        return readablePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
@@ -1567,41 +1608,41 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+    public static <T, R> ReadableProperty<T, R> readablePropertyExact(
             @NonNull Class<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyFromClassExact(TypeToken.of(type), fieldName,
+        return readablePropertyExact(TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+    public static <T, R> ReadableProperty<T, R> readablePropertyExact(
             @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return readablePropertyFromClassExact(type, fieldName,
+        return readablePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> ReadableProperty<T, R> readablePropertyFromClassExact(
+    public static <T, R> ReadableProperty<T, R> readablePropertyExact(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<T, R>readablePropertyFromClass(type, fieldName,
+        return ReflectionUtil.<T, R>readableProperty(type, fieldName,
                         propertyAccessorMethodFormats)
                 .orElseThrow(() -> ReadablePropertyNotFoundException
                         .create(type, fieldName));
     }
 
 
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+    public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull Type type, @NonNull String fieldName) {
-        return readablePropertyFromClass(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+        return readableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+    public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull Type type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyFromClass((TypeToken<T>) TypeToken.of(type), fieldName,
+        return readableProperty((TypeToken<T>) TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
@@ -1616,9 +1657,9 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+    public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull Class<T> type, @NonNull String fieldName) {
-        return readablePropertyFromClass(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+        return readableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
@@ -1635,62 +1676,62 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+    public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull Class<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyFromClass(TypeToken.of(type), fieldName,
+        return readableProperty(TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+    public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return readablePropertyFromClass(type, fieldName,
+        return readableProperty(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClass(
+    public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyFromClassInternalCompose(type, fieldName, propertyAccessorMethodFormats);
+        return readablePropertyInternalCompose(type, fieldName, propertyAccessorMethodFormats);
     }
 
     //todo 待优化
     @SuppressWarnings("unchecked")
     @NonNull
-    private static <T, R, E> Optional<ReadableProperty<T, R>> readablePropertyFromClassInternalCompose(
+    private static <T, R, E> Optional<ReadableProperty<T, R>> readablePropertyInternalCompose(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         PropertyName propertyName = PropertyName.from(fieldName);
         String firstTierPropertyName = propertyName.firstTier().flat();
         if (propertyName.complex()) {
             PropertyName sub = propertyName.sub(1);
-            Optional<ReadableProperty<T, E>> transferReadableProperty = readablePropertyFromClassInternal(
+            Optional<ReadableProperty<T, E>> transferReadableProperty = readablePropertyInternal(
                     type,
                     firstTierPropertyName,
                     propertyAccessorMethodFormats);
             return transferReadableProperty
                     .flatMap(f -> {
-                                Optional<ReadableProperty<E, R>> result = readablePropertyFromClassInternal(
-                                        (TypeToken<E>) f.type(), sub.flat(),
-                                        propertyAccessorMethodFormats);
+                        Optional<ReadableProperty<E, R>> result = readablePropertyInternal(
+                                (TypeToken<E>) f.type(), sub.flat(),
+                                propertyAccessorMethodFormats);
                                 return result.map(f::compose);
                             }
                     );
         }
-        return readablePropertyFromClassInternal(type,
+        return readablePropertyInternal(type,
                 firstTierPropertyName,
                 propertyAccessorMethodFormats);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    private static <T, R> Optional<ReadableProperty<T, R>> readablePropertyFromClassInternal(
+    private static <T, R> Optional<ReadableProperty<T, R>> readablePropertyInternal(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertiesFromClass(type, propertyAccessorMethodFormats)
+        return readableProperties(type, propertyAccessorMethodFormats)
                 .stream()
                 .filter(propertyGetter -> propertyGetter.name().equals(fieldName))
                 .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
@@ -1699,96 +1740,96 @@ public class ReflectionUtil {
 
 
     @NonNull
-    public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+    public static <T, R> WritableProperty<T, R> writablePropertyExact(
             @NonNull Type type, @NonNull String fieldName) {
-        return writablePropertyFromClassExact(type, fieldName,
+        return writablePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+    public static <T, R> WritableProperty<T, R> writablePropertyExact(
             @NonNull Type type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyFromClassExact((TypeToken<T>) TypeToken.of(type), fieldName,
+        return writablePropertyExact((TypeToken<T>) TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+    public static <T, R> WritableProperty<T, R> writablePropertyExact(
             @NonNull Class<T> type, @NonNull String fieldName) {
-        return writablePropertyFromClassExact(type, fieldName,
+        return writablePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+    public static <T, R> WritableProperty<T, R> writablePropertyExact(
             @NonNull Class<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyFromClassExact(TypeToken.of(type), fieldName,
+        return writablePropertyExact(TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+    public static <T, R> WritableProperty<T, R> writablePropertyExact(
             @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return writablePropertyFromClassExact(type, fieldName,
+        return writablePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> WritableProperty<T, R> writablePropertyFromClassExact(
+    public static <T, R> WritableProperty<T, R> writablePropertyExact(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<T, R>writablePropertyFromClass(type, fieldName,
+        return ReflectionUtil.<T, R>writableProperty(type, fieldName,
                         propertyAccessorMethodFormats)
                 .orElseThrow(() -> WritablePropertyNotFoundException
                         .create(type, fieldName));
     }
 
     @NonNull
-    public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+    public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
             @NonNull Type type, @NonNull String fieldName) {
-        return writablePropertyFromClass(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+        return writableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+    public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
             @NonNull Type type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyFromClass((TypeToken<T>) TypeToken.of(type), fieldName,
+        return writableProperty((TypeToken<T>) TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+    public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
             @NonNull Class<T> type, @NonNull String fieldName) {
-        return writablePropertyFromClass(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+        return writableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+    public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
             @NonNull Class<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyFromClass(TypeToken.of(type), fieldName,
+        return writableProperty(TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+    public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
             @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return writablePropertyFromClass(type, fieldName,
+        return writableProperty(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T, R> Optional<WritableProperty<T, R>> writablePropertyFromClass(
+    public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertiesFromClass(type, propertyAccessorMethodFormats)
+        return writableProperties(type, propertyAccessorMethodFormats)
                 .stream()
                 .filter(propertyWriter -> propertyWriter.name().equals(fieldName))
                 .map(propertyWriter -> (WritableProperty<T, R>) propertyWriter)
@@ -1797,99 +1838,99 @@ public class ReflectionUtil {
 
 
     @NonNull
-    public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+    public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
             @NonNull Type type, @NonNull String fieldName) {
-        return accessiblePropertyFromClassExact(type, fieldName,
+        return accessiblePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+    public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
             @NonNull Type type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyFromClassExact((TypeToken<T>) TypeToken.of(type), fieldName,
+        return accessiblePropertyExact((TypeToken<T>) TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+    public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
             @NonNull Class<T> type, @NonNull String fieldName) {
-        return accessiblePropertyFromClassExact(type, fieldName,
+        return accessiblePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+    public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
             @NonNull Class<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyFromClassExact(TypeToken.of(type), fieldName,
+        return accessiblePropertyExact(TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+    public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
             @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return accessiblePropertyFromClassExact(type, fieldName,
+        return accessiblePropertyExact(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> AccessibleProperty<T, R> accessiblePropertyFromClassExact(
+    public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<T, R>accessiblePropertyFromClass(type, fieldName,
+        return ReflectionUtil.<T, R>accessibleProperty(type, fieldName,
                         propertyAccessorMethodFormats)
                 .orElseThrow(() -> AccessiblePropertyNotFoundException
                         .create(type, fieldName));
     }
 
     @NonNull
-    public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+    public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
             @NonNull Type type, @NonNull String fieldName) {
-        return accessiblePropertyFromClass(type, fieldName,
+        return accessibleProperty(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+    public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
             @NonNull Type type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyFromClass((TypeToken<T>) TypeToken.of(type), fieldName,
+        return accessibleProperty((TypeToken<T>) TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+    public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
             @NonNull Class<T> type, @NonNull String fieldName) {
-        return accessiblePropertyFromClass(type, fieldName,
+        return accessibleProperty(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+    public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
             @NonNull Class<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyFromClass(TypeToken.of(type), fieldName,
+        return accessibleProperty(TypeToken.of(type), fieldName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
-    public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+    public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
             @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return accessiblePropertyFromClass(type, fieldName,
+        return accessibleProperty(type, fieldName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T, R> Optional<AccessibleProperty<T, R>> accessiblePropertyFromClass(
+    public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertiesFromClass(type, propertyAccessorMethodFormats)
+        return accessibleProperties(type, propertyAccessorMethodFormats)
                 .stream()
                 .filter(propertyWriter -> propertyWriter.name().equals(fieldName))
                 .map(propertyWriter -> (AccessibleProperty<T, R>) propertyWriter)
@@ -1898,87 +1939,87 @@ public class ReflectionUtil {
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElements(
             @NonNull Type type) {
-        return propertyElementsFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyElements((TypeToken<T>) TypeToken.of(type),
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElements(
             @NonNull Class<T> type) {
-        return propertyElementsFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElements(
             @NonNull TypeToken<T> type) {
-        return propertyElementsFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElements(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementsFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyElements((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElements(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyElementStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElementsFromClass(
+    public static <T> ImmutableSet<PropertyElement<T, ?>> propertyElements(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyElementStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+    public static <T> Stream<PropertyElement<T, ?>> propertyElementStream(
             @NonNull Type type) {
-        return propertyElementStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyElementStream((TypeToken<T>) TypeToken.of(type),
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+    public static <T> Stream<PropertyElement<T, ?>> propertyElementStream(
             @NonNull Class<T> type) {
-        return propertyElementStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyElementStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+    public static <T> Stream<PropertyElement<T, ?>> propertyElementStream(
             @NonNull TypeToken<T> type) {
-        return propertyElementStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyElementStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+    public static <T> Stream<PropertyElement<T, ?>> propertyElementStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyElementStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+    public static <T> Stream<PropertyElement<T, ?>> propertyElementStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStreamFromClass(TypeToken.of(type), propertyAccessorMethodFormats);
+        return propertyElementStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyElement<T, ?>> propertyElementStreamFromClass(
+    public static <T> Stream<PropertyElement<T, ?>> propertyElementStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
 
@@ -1994,257 +2035,257 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReaders(
             @NonNull Type type) {
-        return propertyReadersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReaders(
             @NonNull Class<T> type) {
-        return propertyReadersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReaders(
             @NonNull TypeToken<T> type) {
-        return propertyReadersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReaders(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyReadersFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyReaders((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReaders(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyReaderStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyReaderStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReadersFromClass(
+    public static <T> ImmutableSet<PropertyReader<T, ?>> propertyReaders(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyReaderStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyReaderStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStream(
             @NonNull Type type) {
-        return propertyReaderStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyReaderStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStream(
             @NonNull Class<T> type) {
-        return propertyReaderStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyReaderStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStream(
             @NonNull TypeToken<T> type) {
-        return propertyReaderStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyReaderStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyReaderStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyReaderStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyReaderStreamFromClass(TypeToken.of(type), propertyAccessorMethodFormats);
+        return propertyReaderStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStreamFromClass(
+    public static <T> Stream<PropertyReader<T, ?>> propertyReaderStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyElementStream(type, propertyAccessorMethodFormats)
                 .filter(PropertyElement::isReader).map(PropertyElement::toReader);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWriters(
             @NonNull Type type) {
-        return propertyWritersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWriters(
             @NonNull Class<T> type) {
-        return propertyWritersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWriters(
             @NonNull TypeToken<T> type) {
-        return propertyWritersFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWriters(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyWritersFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyWriters((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWriters(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyWriterStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyWriterStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWritersFromClass(
+    public static <T> ImmutableSet<PropertyWriter<T, ?>> propertyWriters(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyWriterStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyWriterStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStream(
             @NonNull Type type) {
-        return propertyWriterStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyWriterStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStream(
             @NonNull Class<T> type) {
-        return propertyWriterStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyWriterStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStream(
             @NonNull TypeToken<T> type) {
-        return propertyWriterStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyWriterStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyWriterStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyWriterStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyWriterStreamFromClass(TypeToken.of(type), propertyAccessorMethodFormats);
+        return propertyWriterStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStreamFromClass(
+    public static <T> Stream<PropertyWriter<T, ?>> propertyWriterStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyElementStream(type, propertyAccessorMethodFormats)
                 .filter(PropertyElement::isWriter).map(PropertyElement::toWriter);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessors(
             @NonNull Type type) {
-        return propertyAccessorsFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessors(
             @NonNull Class<T> type) {
-        return propertyAccessorsFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessors(
             @NonNull TypeToken<T> type) {
-        return propertyAccessorsFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessors(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyAccessorsFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyAccessors((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessors(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyAccessorStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyAccessorStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessorsFromClass(
+    public static <T> ImmutableSet<PropertyAccessor<T, ?>> propertyAccessors(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyAccessorStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyAccessorStream(type, propertyAccessorMethodFormats)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStream(
             @NonNull Type type) {
-        return propertyAccessorStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyAccessorStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStream(
             @NonNull Class<T> type) {
-        return propertyAccessorStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyAccessorStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStream(
             @NonNull TypeToken<T> type) {
-        return propertyAccessorStreamFromClass(type, DEFAULT_METHOD_NAME_STYLES);
+        return propertyAccessorStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyAccessorStreamFromClass((TypeToken<T>) TypeToken.of(type),
+        return propertyAccessorStream((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStream(
             @NonNull Class<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyAccessorStreamFromClass(TypeToken.of(type), propertyAccessorMethodFormats);
+        return propertyAccessorStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStreamFromClass(
+    public static <T> Stream<PropertyAccessor<T, ?>> propertyAccessorStream(
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStreamFromClass(type, propertyAccessorMethodFormats)
+        return propertyElementStream(type, propertyAccessorMethodFormats)
                 .filter(PropertyElement::isAccessor).map(PropertyElement::toAccessor);
     }
 

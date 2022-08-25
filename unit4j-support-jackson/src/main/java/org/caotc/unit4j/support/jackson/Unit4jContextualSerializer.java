@@ -85,7 +85,7 @@ public class Unit4jContextualSerializer extends StdSerializer<Amount> implements
         if (amountSerialize != null) {
           return new AmountSerializer(
                   unit4jProperties.createPropertyAmountCodecConfig(ReflectionUtil
-                          .readablePropertyFromClassExact(prov.getActiveView(), property.getName())));
+                          .readablePropertyExact(prov.getActiveView(), property.getName())));
         } else {
           return new AmountSerializer(unit4jProperties.createAmountCodecConfig());
         }

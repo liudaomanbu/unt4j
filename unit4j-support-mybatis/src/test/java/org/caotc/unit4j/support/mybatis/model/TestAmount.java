@@ -43,7 +43,7 @@ public class TestAmount {
 
     public static void main(String[] args) {
         ReadableProperty<TestAmount, Object> property = ReflectionUtil
-            .readablePropertyFromClassExact(TestAmount.class, "data.value");
+                .readablePropertyExact(TestAmount.class, "data.value");
         System.out.println(property);
     }
 }

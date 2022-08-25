@@ -17,6 +17,7 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import org.caotc.unit4j.core.common.reflect.Element;
@@ -34,6 +35,7 @@ import java.lang.reflect.Member;
  * @since 1.0.0
  */
 @ToString
+@EqualsAndHashCode(callSuper = true)
 public abstract class AbstractPropertyElement<O, P> extends Element implements
     PropertyElement<O, P> {
 

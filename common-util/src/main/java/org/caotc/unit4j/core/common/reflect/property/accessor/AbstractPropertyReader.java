@@ -19,10 +19,7 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.Value;
+import lombok.*;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
@@ -42,6 +39,7 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyElement<T, R> implements
     PropertyReader<T, R> {
 
@@ -158,6 +156,7 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
    * @since 1.0.0
    */
   @Value
+  @EqualsAndHashCode(callSuper = true)
   public static class InvokablePropertyReader<T, R> extends AbstractPropertyReader<T, R> {
 
     /**
