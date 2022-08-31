@@ -19,16 +19,12 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.Value;
-import org.caotc.unit4j.core.common.reflect.FieldElement;
+import lombok.*;
+import org.caotc.unit4j.core.common.reflect.Element;
+import org.caotc.unit4j.core.common.reflect.InvokableElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 
 /**
@@ -40,13 +36,14 @@ import java.lang.reflect.Method;
  * @date 2019-05-27
  * @since 1.0.0
  */
-@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = false)
 public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyElement<T, R> implements
-    PropertyWriter<T, R> {
+        PropertyWriter<T, R> {
 
-  <M extends AnnotatedElement & Member> AbstractPropertyWriter(
-          @NonNull M member) {
-    super(member);
+  protected AbstractPropertyWriter(
+          @NonNull Element element) {
+    super(element);
   }
 
   /**
@@ -132,51 +129,6 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
   }
 
   /**
-   * {@link Field}实现的属性设置器
-   *
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Value
-  public static class FieldElementPropertyWriter<T, R> extends AbstractPropertyWriter<T, R> {
-
-    /**
-     * 属性
-     */
-    @NonNull
-    FieldElement<T, R> fieldElement;
-
-    FieldElementPropertyWriter(@NonNull FieldElement<T, R> fieldElement) {
-      super(fieldElement);
-      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(fieldElement),
-          "%s is not a PropertyWriter");
-      this.fieldElement = fieldElement;
-    }
-
-    @Override
-    public void writeInternal(@NonNull T obj, @NonNull R value) {
-      fieldElement.set(obj, value);
-    }
-
-    @Override
-    public @NonNull TypeToken<? extends R> propertyType() {
-      return fieldElement.type();
-    }
-
-    @Override
-    public boolean basedOnField() {
-      return true;
-    }
-
-    @Override
-    public @NonNull String propertyName() {
-      return fieldElement.getName();
-    }
-
-  }
-
-  /**
    * set{@link Invokable}实现的属性设置器
    *
    * @author caotc
@@ -184,25 +136,27 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
    * @since 1.0.0
    */
   @Value
+  @EqualsAndHashCode(callSuper = true)
+  @ToString(callSuper = false)
   public static class InvokablePropertyWriter<T, R> extends AbstractPropertyWriter<T, R> {
 
     /**
      * set方法
      */
     @NonNull
-    Invokable<T, ?> setInvokable;
+    InvokableElement<T, ?> setInvokable;
     /**
      * set方法名称风格
      */
     @NonNull
     String propertyName;
 
-    InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
-        @NonNull String propertyName) {
+    InvokablePropertyWriter(@NonNull InvokableElement<T, ?> invokable,
+                            @NonNull String propertyName) {
       super(invokable);
       Preconditions
-          .checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a setInvokable",
-              invokable);
+              .checkArgument(ReflectionUtil.isPropertyWriter(invokable.invokable()), "%s is not a setInvokable",
+                      invokable);
       this.setInvokable = invokable;
       this.propertyName = propertyName;
     }
@@ -216,7 +170,7 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
     @SuppressWarnings("unchecked")
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
-      return (TypeToken<? extends R>) setInvokable.getParameters().get(0).getType();
+      return (TypeToken<? extends R>) setInvokable.parameters().get(0).getType();
     }
 
     @Override

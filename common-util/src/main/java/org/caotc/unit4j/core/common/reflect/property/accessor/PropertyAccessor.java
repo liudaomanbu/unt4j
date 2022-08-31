@@ -18,15 +18,15 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
+import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.util.Optional;
 
 /**
@@ -34,7 +34,8 @@ import java.util.Optional;
  * @date 2019-11-23
  * @since 1.0.0
  */
-@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = false)
 public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, R> implements
         PropertyReader<T, R>, PropertyWriter<T, R> {
 
@@ -66,9 +67,9 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
     return new FieldElementPropertyAccessor<>(fieldElement);
   }
 
-  protected <M extends AccessibleObject & Member> PropertyAccessor(
-      @NonNull M member) {
-    super(member);
+  protected PropertyAccessor(
+          @NonNull Element element) {
+    super(element);
   }
 
   @Override
@@ -139,6 +140,8 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
    * @since 1.0.0
    */
   @Value
+  @EqualsAndHashCode(callSuper = true)
+  @ToString(callSuper = false)
   public static class FieldElementPropertyAccessor<T, R> extends PropertyAccessor<T, R> {
 
     /**

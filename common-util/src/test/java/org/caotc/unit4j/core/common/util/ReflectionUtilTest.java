@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 class ReflectionUtilTest {
@@ -1304,13 +1305,29 @@ class ReflectionUtilTest {
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyReaderSets")
     <T> void propertyReaders(Type type, Set<PropertyReader<T, ?>> propertyReaders) {
         Set<PropertyReader<T, ?>> result = ReflectionUtil.propertyReaders(type);
-        Set<PropertyReader<T, ?>> result2 = ReflectionUtil.propertyReaders(type);
-        log.debug("result1:{}", result);
-        log.debug("result2:{}", result2);
-        Assertions.assertEquals(result, result2);
-//        log.debug("type:{},result:{}", type, result);
+        log.debug("type:{},result:{}", type, result);
+        for (PropertyReader<T, ?> reader : result) {
+            if (!propertyReaders.contains(reader)) {
+                log.error("reader:{}", reader);
+            }
+        }
 //        Assertions.assertEquals(propertyReaders, result);
     }
+
+    @Test
+    void readerEquals() {
+        Set<PropertyReader<Sub, ?>> result = ReflectionUtil.propertyReaders(Sub.class).stream().filter(r -> r.propertyName().equals("stringField") && !r.basedOnField() && !r.isAbstract()).collect(Collectors.toSet());
+        Assertions.assertTrue(result.contains(PropertyConstant.SUB_STRING_FIELD_GET_METHOD_READER));
+        Invokable<?, Object> invokable1 = Invokable.from(PropertyConstant.STRING_FIELD_GETTER_STRING_FIELD_GET_METHOD);
+        Invokable<?, Object> invokable2 = TypeToken.of(Sub.class).method(PropertyConstant.STRING_FIELD_GETTER_STRING_FIELD_GET_METHOD);
+        log.info("invokable1 getDeclaringClass:{}", invokable1.getDeclaringClass());
+        log.info("invokable2 getDeclaringClass:{}", invokable2.getDeclaringClass());
+        log.info("invokable1 getOwnerType:{}", invokable1.getOwnerType());
+        log.info("invokable2 getOwnerType:{}", invokable2.getOwnerType());
+        Assertions.assertEquals(invokable1, invokable2);
+        //        Assertions.assertEquals(PropertyConstant.SUB_STRING_FIELD_GET_METHOD_READER, reader);
+    }
+
 //    @Test
 //    void readablePropertyFromClass() {
 //        Optional<ReadableProperty<Sub, Object>> stringField = ReflectionUtil

@@ -19,8 +19,7 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.FieldElement;
-import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyWriter.FieldElementPropertyWriter;
+import org.caotc.unit4j.core.common.reflect.InvokableElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyWriter.InvokablePropertyWriter;
 
 import java.lang.reflect.Field;
@@ -67,27 +66,7 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Invokable<T, ?> setInvokable,
                                           @NonNull String propertyName) {
-      return new InvokablePropertyWriter<>(setInvokable, propertyName);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param field 属性
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Field field) {
-    return from(FieldElement.of(field));
-  }
-
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
-    return new FieldElementPropertyWriter<>(fieldElement);
+      return new InvokablePropertyWriter<>(InvokableElement.of(setInvokable), propertyName);
   }
 
   /**

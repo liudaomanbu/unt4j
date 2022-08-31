@@ -20,7 +20,7 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
-import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyReader.FieldElementPropertyReader;
+import org.caotc.unit4j.core.common.reflect.InvokableElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyReader.InvokablePropertyReader;
 
 import java.lang.reflect.Field;
@@ -52,6 +52,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Method getMethod,
                                           @NonNull String propertyName) {
+//    return from((Invokable<T, R>)TypeToken.of(getMethod.getDeclaringClass()).method(getMethod), propertyName);
       return from((Invokable<T, R>) Invokable.from(getMethod), propertyName);
   }
 
@@ -68,7 +69,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Invokable<T, R> getInvokable,
                                           @NonNull String propertyName) {
-      return new InvokablePropertyReader<>(getInvokable, propertyName);
+    return new InvokablePropertyReader<>(InvokableElement.of(getInvokable), propertyName);
   }
 
   /**
@@ -87,7 +88,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
 
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
-    return new FieldElementPropertyReader<>(fieldElement);
+    return PropertyElement.from(fieldElement).toReader();
   }
 
   /**

@@ -20,12 +20,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.*;
+import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
+import org.caotc.unit4j.core.common.reflect.InvokableElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
@@ -38,13 +38,13 @@ import java.util.Optional;
  * @date 2019-05-27
  * @since 1.0.0
  */
-@Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = false)
 public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyElement<T, R> implements
-    PropertyReader<T, R> {
+        PropertyReader<T, R> {
 
-  <M extends AnnotatedElement & Member> AbstractPropertyReader(
-          @NonNull M member) {
+  protected AbstractPropertyReader(
+          @NonNull Element member) {
     super(member);
   }
 
@@ -113,6 +113,8 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
    * @since 1.0.0
    */
   @Value
+  @EqualsAndHashCode(callSuper = true)
+  @ToString(callSuper = false)
   public static class FieldElementPropertyReader<T, R> extends AbstractPropertyReader<T, R> {
 
     /**
@@ -157,23 +159,24 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
    */
   @Value
   @EqualsAndHashCode(callSuper = true)
+  @ToString(callSuper = false)
   public static class InvokablePropertyReader<T, R> extends AbstractPropertyReader<T, R> {
 
     /**
      * get方法
      */
-    @NonNull Invokable<T, R> getInvokable;
+    @NonNull InvokableElement<T, R> getInvokable;
     /**
      * 属性名称
      */
     @NonNull String propertyName;
 
-    InvokablePropertyReader(@NonNull Invokable<T, R> invokable,
-        @NonNull String propertyName) {
+    InvokablePropertyReader(@NonNull InvokableElement<T, R> invokable,
+                            @NonNull String propertyName) {
       super(invokable);
       Preconditions
-          .checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a getInvokable",
-              invokable);
+              .checkArgument(ReflectionUtil.isPropertyReader(invokable.invokable()), "%s is not a getInvokable",
+                      invokable);
       this.getInvokable = invokable;
       this.propertyName = propertyName;
     }
@@ -187,7 +190,7 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
 
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
-      return getInvokable.getReturnType();
+      return getInvokable.returnType();
     }
 
     @Override

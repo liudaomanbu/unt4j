@@ -37,7 +37,7 @@ class FieldElementTest {
     log.debug("ownerType:{}", stringField.ownerType());
 
     Sub object = new Sub();
-    stringField.setAccessible(true);
-    log.debug("value:{}", stringField.get(object));
+    stringField.accessible(true);
+      log.debug("value:{}", stringField.get(object));
   }
 }

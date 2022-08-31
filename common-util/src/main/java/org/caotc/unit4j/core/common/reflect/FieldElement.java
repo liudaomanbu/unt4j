@@ -17,8 +17,10 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.reflect.TypeToken;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import lombok.ToString;
 
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
@@ -29,6 +31,8 @@ import java.lang.reflect.Type;
  * @date 2019-11-29
  * @since 1.0.0
  */
+@ToString(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class FieldElement<O, P> extends BaseElement {
 
   /**

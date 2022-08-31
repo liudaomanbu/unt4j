@@ -44,8 +44,13 @@ public interface PropertyElement<O, P> extends Element {
 
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
-        return ReflectionUtil.isPropertyWriter(fieldElement) ? PropertyAccessor.from(fieldElement)
-                : PropertyReader.from(fieldElement);
+        if (ReflectionUtil.isPropertyWriter(fieldElement)) {
+            return PropertyAccessor.from(fieldElement);
+        }
+        if (ReflectionUtil.isPropertyReader(fieldElement)) {
+            return new AbstractPropertyReader.FieldElementPropertyReader<>(fieldElement);
+        }
+        throw new IllegalArgumentException(String.format("%s is not a PropertyElement", fieldElement));
     }
 
     @NonNull
@@ -55,7 +60,7 @@ public interface PropertyElement<O, P> extends Element {
             return PropertyReader.from(invokable, propertyName);
         }
         if (ReflectionUtil.isPropertyWriter(invokable)) {
-            return PropertyReader.from(invokable, propertyName);
+            return PropertyWriter.from(invokable, propertyName);
         }
         throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
     }

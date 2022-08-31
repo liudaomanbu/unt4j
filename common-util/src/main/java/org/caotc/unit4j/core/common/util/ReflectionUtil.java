@@ -2030,7 +2030,8 @@ public class ReflectionUtil {
                         .map(methodNameStyle -> PropertyElement.from(invokable, methodNameStyle.propertyName(invokable))));
 
         return Stream
-                .concat(fieldStream(type).map(PropertyElement::from),
+                .concat(fieldStream(type).filter(field -> isPropertyReader(field) || isPropertyWriter(field))
+                                .map(PropertyElement::from),
                         propertyElementStream);
     }
 
@@ -2290,6 +2291,30 @@ public class ReflectionUtil {
     }
 
     /**
+     * @author caotc
+     * @date 2019-12-08
+     * @implNote
+     * @implSpec
+     * @apiNote 非static的final属性只有在值为固定值时会因为编译器优化导致get方法无法读取到修改后的值
+     * @since 1.0.0
+     */
+    public static boolean isPropertyReader(@NonNull Field field) {
+        return isPropertyWriter(FieldElement.of(field));
+    }
+
+    /**
+     * @author caotc
+     * @date 2019-12-08
+     * @implNote
+     * @implSpec
+     * @apiNote 非static的final属性只有在值为固定值时会因为编译器优化导致get方法无法读取到修改后的值
+     * @since 1.0.0
+     */
+    public static boolean isPropertyReader(@NonNull FieldElement<?, ?> fieldElement) {
+        return !fieldElement.isStatic();
+    }
+
+    /**
      * 检查传入方法是否是get方法
      *
      * @param method                        需要检查的方法
@@ -2358,7 +2383,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isPropertyWriter(@NonNull FieldElement<?, ?> fieldElement) {
-        return !fieldElement.isFinal() || !fieldElement.isStatic();
+        return !fieldElement.isStatic() && !fieldElement.isFinal();
     }
 
     /**

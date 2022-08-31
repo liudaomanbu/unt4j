@@ -16,22 +16,28 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Invokable;
+import com.google.common.reflect.Parameter;
 import com.google.common.reflect.TypeToken;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.SneakyThrows;
+import lombok.ToString;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.annotation.CheckForNull;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
 
 /**
  * @author caotc
  * @date 2019-11-29
  * @since 1.0.0
  */
+@ToString(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
+@Getter
 public class InvokableElement<O, P> extends BaseElement {
 
   Invokable<O, P> invokable;
@@ -55,62 +61,43 @@ public class InvokableElement<O, P> extends BaseElement {
     return new InvokableElement<>(invokable);
   }
 
-  @SuppressWarnings("unchecked")
   @NonNull
   public final TypeToken<? extends P> returnType() {
-    return (TypeToken<? extends P>) TypeToken.of(genericReturnType());
+    return invokable.getReturnType();
   }
 
   @NonNull
-  public final <P1 extends P> InvokableElement<O, P1> returnType(Class<P1> returnType) {
-    return returnType(TypeToken.of(returnType));
+  public final <P1 extends P> InvokableElement<O, P1> returning(Class<P1> returnType) {
+    return returning(TypeToken.of(returnType));
   }
 
   @SuppressWarnings("unchecked")
   @NonNull
-  public final <P1 extends P> InvokableElement<O, P1> returnType(TypeToken<P1> returnType) {
+  public final <P1 extends P> InvokableElement<O, P1> returning(TypeToken<P1> returnType) {
     if (!returnType.isSupertypeOf(returnType())) {
       throw new IllegalArgumentException(
               "FieldElement is known to return " + returnType() + ", not " + returnType);
     }
+    invokable.returning(returnType);
     return (InvokableElement<O, P1>) this;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   @NonNull
   public final Class<? super O> getDeclaringClass() {
-    return (Class<? super O>) super.getDeclaringClass();
+    return invokable.getDeclaringClass();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   @NonNull
   public TypeToken<O> ownerType() {
-    return (TypeToken<O>) TypeToken.of(getDeclaringClass());
+    //todo TypeToken.method 返回的invokable的OwnerType是参数TypeToken
+    return invokable.getOwnerType();
   }
 
   @NonNull
-  public AnnotatedType annotatedType() {
-    return invokable.getAnnotatedType();
-  }
-
-  @NonNull
-  Type genericReturnType() {
-    return invokable.getGenericType();
-  }
-
-  @SneakyThrows
-  @NonNull
-  public InvokableElement<O, P> set(O obj, P value) {
-    invokable.set(obj, value);
-    return this;
-  }
-
-  @SuppressWarnings("unchecked")
-  @SneakyThrows
-  public P get(O obj) {
-    return (P) invokable.get(obj);
+  public AnnotatedType annotatedReturnType() {
+    return invokable.getAnnotatedReturnType();
   }
 
   @Override
@@ -136,5 +123,15 @@ public class InvokableElement<O, P> extends BaseElement {
   public final P invoke(@CheckForNull O receiver, @Nullable Object... args)
           throws InvocationTargetException, IllegalAccessException {
     return invokable.invoke(receiver, args);
+  }
+
+  @NonNull
+  public final ImmutableList<Parameter> parameters() {
+    return invokable.getParameters();
+  }
+
+  @NonNull
+  public final ImmutableList<TypeToken<? extends Throwable>> exceptionTypes() {
+    return invokable.getExceptionTypes();
   }
 }

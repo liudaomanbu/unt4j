@@ -138,8 +138,8 @@ public class Provider {
 
     static Stream<Arguments> classAndPropertyReaderSets() {
         return Stream.of(Arguments.of(StringFieldGetter.class, ImmutableSet.of(PropertyConstant.STRING_FIELD_GETTER_STRING_FIELD_GET_METHOD_READER))
-                /*, Arguments.of(StringFieldSetter.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
                 , Arguments.of(Super.class, PropertyConstant.SUPER_READERS)
-                , Arguments.of(Sub.class,  PropertyConstant.SUB_READERS)*/);
+                , Arguments.of(Sub.class, PropertyConstant.SUB_READERS));
     }
 }

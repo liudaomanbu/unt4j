@@ -21,9 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import org.caotc.unit4j.core.common.reflect.BaseElement;
-
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Member;
+import org.caotc.unit4j.core.common.reflect.Element;
 
 /**
  * 属性元素抽象类
@@ -34,14 +32,17 @@ import java.lang.reflect.Member;
  * @date 2019-05-27
  * @since 1.0.0
  */
-@ToString
+@ToString(callSuper = false)
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractPropertyElement<O, P> extends BaseElement implements
         PropertyElement<O, P> {
+    @NonNull
+    Element element;
 
-    protected <M extends AnnotatedElement & Member> AbstractPropertyElement(
-            @NonNull M member) {
-        super(member);
+    protected AbstractPropertyElement(
+            @NonNull Element element) {
+        super(element);
+        this.element = element;
     }
 
     @SuppressWarnings("unchecked")
@@ -51,4 +52,14 @@ public abstract class AbstractPropertyElement<O, P> extends BaseElement implemen
         return (TypeToken<O>) super.ownerType();
     }
 
+    @Override
+    public boolean accessible() {
+        return element.accessible();
+    }
+
+    @Override
+    public @NonNull PropertyElement<O, P> accessible(boolean accessible) {
+        element.accessible(accessible);
+        return this;
+    }
 }
