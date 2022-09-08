@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 @UtilityClass
 public class Provider {
     static Stream<Class<?>> classes() {
-        return classAndFieldSets().map(Arguments::get).map(array -> (Class<?>) array[0]);
+        return Stream.of(NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class, ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class);
     }
 
     static Stream<TypeToken<?>> typeTokens() {
@@ -24,14 +24,48 @@ public class Provider {
     }
 
     static Stream<Arguments> classAndFieldSets() {
-        return Stream.of(Arguments.of(Super.class, PropertyConstant.SUPER_FIELDS)
-                , Arguments.of(Sub.class, PropertyConstant.SUB_FIELDS)
-                , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
-                , Arguments.of(StringFieldGetter.class, ImmutableSet.of()));
+        return Stream.of(Arguments.of(NoFieldObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldObject.class, Constant.STRING_FIELD_OBJECT_FIELDS)
+                , Arguments.of(FinalFieldObject.class, Constant.FINAL_FIELD_OBJECT_FIELDS)
+                , Arguments.of(StaticFieldObject.class, Constant.STATIC_FIELD_OBJECT_FIELDS)
+                , Arguments.of(ChildrenLongFieldObject.class, Constant.CHILDREN_LONG_FIELD_OBJECT_FIELDS)
+                , Arguments.of(ChildrenSameNameFieldObject.class, Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS)
+                , Arguments.of(MultipleFieldObject.class, Constant.MULTIPLE_FIELD_OBJECT_FIELDS));
     }
 
     static Stream<Arguments> typeTokenAndFieldSets() {
         return classAndFieldSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> classAndFieldNameAndFields() {
+        return Stream.of(Arguments.of(StringFieldObject.class, StringFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(FinalFieldObject.class, FinalFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(StaticFieldObject.class, "stringField", ImmutableSet.of(Constant.STATIC_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(ChildrenLongFieldObject.class, StringFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(ChildrenLongFieldObject.class, ChildrenLongFieldObject.Fields.LONG_FIELD, ImmutableSet.of(Constant.CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD))
+                , Arguments.of(ChildrenSameNameFieldObject.class, ChildrenSameNameFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD, Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(MultipleFieldObject.class, MultipleFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.MULTIPLE_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(MultipleFieldObject.class, MultipleFieldObject.Fields.INT_FIELD, ImmutableSet.of(Constant.MULTIPLE_FIELD_OBJECT_INT_FIELD))
+                , Arguments.of(MultipleFieldObject.class, MultipleFieldObject.Fields.INTEGER_FIELD, ImmutableSet.of(Constant.MULTIPLE_FIELD_OBJECT_INTEGER_FIELD))
+                , Arguments.of(MultipleFieldObject.class, MultipleFieldObject.Fields.BOOLEAN_FIELD, ImmutableSet.of(Constant.MULTIPLE_FIELD_OBJECT_BOOLEAN_FIELD)));
+    }
+
+    static Stream<Arguments> typeTokenAndFieldNameAndFields() {
+        return classAndFieldNameAndFields().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndMethodSets() {
+        return Stream.of(Arguments.of(NoFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(StringFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(FinalFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(StaticFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(ChildrenLongFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(ChildrenSameNameFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(MultipleFieldObject.class, Constant.OBJECT_METHODS));
+    }
+
+    static Stream<Arguments> typeTokenAndMethodSets() {
+        return classAndMethodSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
     }
 
     static Stream<Arguments> classAndFieldNameAndGetMethods() {
@@ -103,16 +137,7 @@ public class Provider {
         return classAndSetMethodSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
     }
 
-    static Stream<Arguments> classAndMethodSets() {
-        return Stream.of(Arguments.of(Super.class, PropertyConstant.SUPER_METHODS)
-                , Arguments.of(Sub.class, PropertyConstant.SUB_METHODS)
-                , Arguments.of(StringFieldSetter.class, ImmutableSet.of(PropertyConstant.STRING_FIELD_SETTER_STRING_FIELD_SET_METHOD))
-                , Arguments.of(StringFieldGetter.class, ImmutableSet.of(PropertyConstant.STRING_FIELD_GETTER_STRING_FIELD_GET_METHOD)));
-    }
 
-    static Stream<Arguments> typeTokenAndMethodSets() {
-        return classAndMethodSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
-    }
 
     static Stream<Arguments> classAndConstructorSets() {
         return Stream.of(Arguments.of(Super.class, PropertyConstant.SUPER_CONSTRUCTORS)
@@ -125,16 +150,7 @@ public class Provider {
         return classAndConstructorSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
     }
 
-    static Stream<Arguments> classAndFieldNameAndFields() {
-        return Stream.of(Arguments.of(Super.class, Super.Fields.STRING_FIELD, ImmutableSet.of(PropertyConstant.SUPER_STRING_FIELD))
-                , Arguments.of(Super.class, Super.Fields.INT_FIELD, ImmutableSet.of(PropertyConstant.SUPER_INT_FIELD))
-                , Arguments.of(Sub.class, Sub.Fields.STRING_FIELD, PropertyConstant.SUB_STRING_FIELDS)
-                , Arguments.of(Sub.class, Sub.Fields.NUMBER_FIELD, ImmutableSet.of(PropertyConstant.SUB_NUMBER_FIELD)));
-    }
 
-    static Stream<Arguments> typeTokenAndFieldNameAndFields() {
-        return classAndFieldNameAndFields().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
-    }
 
     static Stream<Arguments> classAndPropertyReaderSets() {
         return Stream.of(Arguments.of(StringFieldGetter.class, ImmutableSet.of(PropertyConstant.STRING_FIELD_GETTER_STRING_FIELD_GET_METHOD_READER))
@@ -142,4 +158,6 @@ public class Provider {
                 , Arguments.of(Super.class, PropertyConstant.SUPER_READERS)
                 , Arguments.of(Sub.class, PropertyConstant.SUB_READERS));
     }
+
+
 }
