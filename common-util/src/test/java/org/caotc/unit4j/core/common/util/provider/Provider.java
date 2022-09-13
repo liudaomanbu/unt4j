@@ -16,7 +16,10 @@ import java.util.stream.Stream;
 @UtilityClass
 public class Provider {
     static Stream<Class<?>> classes() {
-        return Stream.of(NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class, ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class);
+        return Stream.of(NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class
+                , ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
+                , PrivateConstructObject.class, ProtectedConstructObject.class, ProtectedConstructChildrenObject.class
+                , MultipleConstructObject.class);
     }
 
     static Stream<TypeToken<?>> typeTokens() {
@@ -25,6 +28,10 @@ public class Provider {
 
     static Stream<Arguments> classAndFieldSets() {
         return Stream.of(Arguments.of(NoFieldObject.class, ImmutableSet.of())
+                , Arguments.of(PrivateConstructObject.class, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructObject.class, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructChildrenObject.class, ImmutableSet.of())
+                , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldObject.class, Constant.STRING_FIELD_OBJECT_FIELDS)
                 , Arguments.of(FinalFieldObject.class, Constant.FINAL_FIELD_OBJECT_FIELDS)
                 , Arguments.of(StaticFieldObject.class, Constant.STATIC_FIELD_OBJECT_FIELDS)
@@ -61,11 +68,33 @@ public class Provider {
                 , Arguments.of(StaticFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(ChildrenLongFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(ChildrenSameNameFieldObject.class, Constant.OBJECT_METHODS)
-                , Arguments.of(MultipleFieldObject.class, Constant.OBJECT_METHODS));
+                , Arguments.of(MultipleFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(PrivateConstructObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(ProtectedConstructObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(ProtectedConstructChildrenObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(MultipleConstructObject.class, Constant.OBJECT_METHODS));
     }
 
     static Stream<Arguments> typeTokenAndMethodSets() {
         return classAndMethodSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> classAndConstructorSets() {
+        return Stream.of(Arguments.of(NoFieldObject.class, ImmutableSet.of(Constant.NO_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(StringFieldObject.class, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(StaticFieldObject.class, ImmutableSet.of(Constant.STATIC_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(FinalFieldObject.class, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(ChildrenLongFieldObject.class, ImmutableSet.of(Constant.CHILDREN_LONG_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(MultipleFieldObject.class, ImmutableSet.of(Constant.MULTIPLE_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(PrivateConstructObject.class, ImmutableSet.of(Constant.PRIVATE_CONSTRUCT_OBJECT_CONSTRUCTOR))
+                , Arguments.of(ProtectedConstructObject.class, ImmutableSet.of(Constant.PROTECTED_CONSTRUCT_OBJECT_CONSTRUCTOR))
+                , Arguments.of(ProtectedConstructChildrenObject.class, ImmutableSet.of(Constant.PROTECTED_CONSTRUCT_CHILDREN_OBJECT_CONSTRUCTOR))
+                , Arguments.of(MultipleConstructObject.class, Constant.MULTIPLE_CONSTRUCT_OBJECT_CONSTRUCTORS));
+    }
+
+    static Stream<Arguments> typeTokenAndConstructorSets() {
+        return classAndConstructorSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
     }
 
     static Stream<Arguments> classAndFieldNameAndGetMethods() {
@@ -136,20 +165,6 @@ public class Provider {
     static Stream<Arguments> typeTokenAndSetMethodSets() {
         return classAndSetMethodSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
     }
-
-
-
-    static Stream<Arguments> classAndConstructorSets() {
-        return Stream.of(Arguments.of(Super.class, PropertyConstant.SUPER_CONSTRUCTORS)
-                , Arguments.of(Sub.class, PropertyConstant.SUB_CONSTRUCTORS)
-                , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
-                , Arguments.of(StringFieldGetter.class, ImmutableSet.of()));
-    }
-
-    static Stream<Arguments> typeTokenAndConstructorSets() {
-        return classAndConstructorSets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
-    }
-
 
 
     static Stream<Arguments> classAndPropertyReaderSets() {
