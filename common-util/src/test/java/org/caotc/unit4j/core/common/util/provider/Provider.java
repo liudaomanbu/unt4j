@@ -20,8 +20,11 @@ public class Provider {
                 , ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
                 , PrivateConstructObject.class, ProtectedConstructObject.class, ProtectedConstructChildrenObject.class
                 , MultipleConstructObject.class, StringFieldGetMethodObject.class, StringFieldFluentGetMethodObject.class
-                , StringFieldAndStringFieldGetMethodObject.class, StringFieldGetterObject.class, BooleanFieldIsMethodObject.class
-                , BooleanFieldGetMethodObject.class, StringFieldGetter.class);
+                , StringFieldAndStringFieldGetMethodObject.class, StringFieldGetter.class, StringFieldGetterObject.class
+                , BooleanFieldIsMethodObject.class, BooleanFieldGetMethodObject.class, StringFieldSetMethodObject.class
+                , StringFieldFluentSetMethodObject.class, StringFieldAndStringFieldSetMethodObject.class
+                , StringFieldChainSetMethodObject.class, StringFieldSetter.class, StringFieldSetterObject.class
+                , DuplicateNumberFieldSetMethodObject.class);
     }
 
     static Stream<TypeToken<?>> typeTokens() {
@@ -46,7 +49,14 @@ public class Provider {
                 , Arguments.of(StringFieldGetterObject.class, ImmutableSet.of())
                 , Arguments.of(BooleanFieldIsMethodObject.class, ImmutableSet.of())
                 , Arguments.of(BooleanFieldGetMethodObject.class, ImmutableSet.of())
-                , Arguments.of(StringFieldGetter.class, ImmutableSet.of()));
+                , Arguments.of(StringFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldFluentSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD))
+                , Arguments.of(StringFieldChainSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of())
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of()));
     }
 
     static Stream<Arguments> typeTokenAndFieldSets() {
@@ -86,10 +96,17 @@ public class Provider {
                 , Arguments.of(StringFieldGetMethodObject.class, Constant.STRING_FIELD_GET_METHOD_OBJECT_METHODS)
                 , Arguments.of(StringFieldFluentGetMethodObject.class, Constant.STRING_FIELD_FLUENT_GET_METHOD_OBJECT_METHODS)
                 , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_METHODS)
-                , Arguments.of(StringFieldGetter.class, Constant.STRING_FIELD_GETTER_METHODS)
+                , Arguments.of(StringFieldGetter.class, ImmutableSet.of(Constant.STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD))
                 , Arguments.of(StringFieldGetterObject.class, Constant.STRING_FIELD_GETTER_OBJECT_METHODS)
                 , Arguments.of(BooleanFieldIsMethodObject.class, Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_METHODS)
-                , Arguments.of(BooleanFieldGetMethodObject.class, Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_METHODS));
+                , Arguments.of(BooleanFieldGetMethodObject.class, Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_METHODS)
+                , Arguments.of(StringFieldSetMethodObject.class, Constant.STRING_FIELD_SET_METHOD_OBJECT_METHODS)
+                , Arguments.of(StringFieldFluentSetMethodObject.class, Constant.STRING_FIELD_FLUENT_SET_METHOD_OBJECT_METHODS)
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_METHODS)
+                , Arguments.of(StringFieldChainSetMethodObject.class, Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_METHODS)
+                , Arguments.of(StringFieldSetter.class, ImmutableSet.of(Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD))
+                , Arguments.of(StringFieldSetterObject.class, Constant.STRING_FIELD_SETTER_OBJECT_METHODS)
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_METHODS));
     }
 
     static Stream<Arguments> typeTokenAndMethodSets() {
@@ -114,7 +131,14 @@ public class Provider {
                 , Arguments.of(StringFieldGetter.class, ImmutableSet.of())
                 , Arguments.of(StringFieldGetterObject.class, ImmutableSet.of(Constant.STRING_FIELD_GETTER_OBJECT_CONSTRUCTOR))
                 , Arguments.of(BooleanFieldIsMethodObject.class, ImmutableSet.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_CONSTRUCTOR))
-                , Arguments.of(BooleanFieldGetMethodObject.class, ImmutableSet.of(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_CONSTRUCTOR)));
+                , Arguments.of(BooleanFieldGetMethodObject.class, ImmutableSet.of(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(StringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(StringFieldFluentSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_FLUENT_SET_METHOD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(StringFieldChainSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of(Constant.STRING_FIELD_SETTER_OBJECT_CONSTRUCTOR))
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR)));
     }
 
     static Stream<Arguments> typeTokenAndConstructorSets() {
@@ -139,6 +163,7 @@ public class Provider {
                 , Arguments.of(BooleanFieldIsMethodObject.class, ImmutableSet.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_IS_BOOLEAN_FIELD_METHOD))
                 , Arguments.of(ChildrenLongFieldObject.class, ImmutableSet.of())
                 , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of())
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(FinalFieldObject.class, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
                 , Arguments.of(MultipleFieldObject.class, ImmutableSet.of())
@@ -148,11 +173,17 @@ public class Provider {
                 , Arguments.of(ProtectedConstructObject.class, ImmutableSet.of())
                 , Arguments.of(StaticFieldObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD))
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldChainSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldFluentGetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldFluentSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldGetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD))
                 , Arguments.of(StringFieldGetter.class, ImmutableSet.of(Constant.STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD))
                 , Arguments.of(StringFieldGetterObject.class, Constant.STRING_FIELD_GETTER_OBJECT_GET_METHODS)
-                , Arguments.of(StringFieldObject.class, ImmutableSet.of()));
+                , Arguments.of(StringFieldObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of()));
     }
 
     static Stream<Arguments> typeTokenAndGetMethodSets() {
@@ -160,7 +191,7 @@ public class Provider {
     }
 
     static Stream<Arguments> classAndDuplicateSetMethodFieldNames() {
-        return Stream.of(Arguments.of(Sub.class, Sub.Fields.NUMBER_FIELD));
+        return Stream.of(Arguments.of(DuplicateNumberFieldSetMethodObject.class, "numberField"));
     }
 
     static Stream<Arguments> typeTokenAndDuplicateSetMethodFieldNames() {
@@ -168,11 +199,11 @@ public class Provider {
     }
 
     static Stream<Arguments> classAndFieldNameAndSetMethods() {
-        return Stream.of(Arguments.of(Super.class, Super.Fields.STRING_FIELD, PropertyConstant.SUPER_STRING_FIELD_SET_METHOD)
-                , Arguments.of(Super.class, Super.Fields.INT_FIELD, PropertyConstant.SUPER_INT_FIELD_SET_METHOD)
-                , Arguments.of(Sub.class, Sub.Fields.STRING_FIELD, PropertyConstant.SUB_STRING_FIELD_SET_METHOD)
-                , Arguments.of(Sub.class, Super.Fields.INT_FIELD, PropertyConstant.SUB_INT_FIELD_SET_METHOD)
-                , Arguments.of(StringFieldSetter.class, "stringField", PropertyConstant.STRING_FIELD_SETTER_STRING_FIELD_SET_METHOD));
+        return Stream.of(Arguments.of(StringFieldSetMethodObject.class, "stringField", Constant.STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD)
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, StringFieldAndStringFieldSetMethodObject.Fields.STRING_FIELD, Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD)
+                , Arguments.of(StringFieldChainSetMethodObject.class, "stringField", Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD)
+                , Arguments.of(StringFieldSetter.class, "stringField", Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD)
+                , Arguments.of(StringFieldSetterObject.class, "stringField", Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD));
     }
 
     static Stream<Arguments> typeTokenAndFieldNameAndSetMethods() {
@@ -180,12 +211,13 @@ public class Provider {
     }
 
     static Stream<Arguments> classAndFieldNameAndSetMethodSets() {
-        return Stream.of(Arguments.of(Super.class, Super.Fields.STRING_FIELD, PropertyConstant.SUPER_STRING_FIELD_SET_METHODS)
-                , Arguments.of(Super.class, Super.Fields.INT_FIELD, ImmutableSet.of(PropertyConstant.SUPER_INT_FIELD_SET_METHOD))
-                , Arguments.of(Sub.class, Sub.Fields.STRING_FIELD, PropertyConstant.SUB_STRING_FIELD_SET_METHODS)
-                , Arguments.of(Sub.class, Super.Fields.INT_FIELD, PropertyConstant.SUB_INT_FIELD_SET_METHODS)
-                , Arguments.of(StringFieldSetter.class, "stringField", ImmutableSet.of(PropertyConstant.STRING_FIELD_SETTER_STRING_FIELD_SET_METHOD))
-                , Arguments.of(Sub.class, Sub.Fields.NUMBER_FIELD, PropertyConstant.SUB_NUMBER_FIELD_SET_METHODS));
+        return Stream.of(Arguments.of(StringFieldSetMethodObject.class, "stringField", ImmutableSet.of(Constant.STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD))
+                , Arguments.of(StringFieldFluentSetMethodObject.class, "stringField", ImmutableSet.of()
+                        , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, StringFieldAndStringFieldSetMethodObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD))
+                        , Arguments.of(StringFieldChainSetMethodObject.class, "stringField", ImmutableSet.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD))
+                        , Arguments.of(StringFieldSetter.class, "stringField", ImmutableSet.of(Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD))
+                        , Arguments.of(StringFieldSetterObject.class, "stringField", Constant.STRING_FIELD_SETTER_OBJECT_SET_METHODS)
+                        , Arguments.of(DuplicateNumberFieldSetMethodObject.class, "numberField", Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS)));
     }
 
     static Stream<Arguments> typeTokenAndFieldNameAndSetMethodSets() {
@@ -193,10 +225,31 @@ public class Provider {
     }
 
     static Stream<Arguments> classAndSetMethodSets() {
-        return Stream.of(Arguments.of(Super.class, PropertyConstant.SUPER_SET_METHODS)
-                , Arguments.of(Sub.class, PropertyConstant.SUB_SET_METHODS)
-                , Arguments.of(StringFieldSetter.class, ImmutableSet.of(PropertyConstant.STRING_FIELD_SETTER_STRING_FIELD_SET_METHOD))
-                , Arguments.of(StringFieldGetter.class, ImmutableSet.of()));
+        return Stream.of(Arguments.of(BooleanFieldGetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(BooleanFieldIsMethodObject.class, ImmutableSet.of())
+                , Arguments.of(ChildrenLongFieldObject.class, ImmutableSet.of())
+                , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of())
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS)
+                , Arguments.of(FinalFieldObject.class, ImmutableSet.of())
+                , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
+                , Arguments.of(MultipleFieldObject.class, ImmutableSet.of())
+                , Arguments.of(NoFieldObject.class, ImmutableSet.of())
+                , Arguments.of(PrivateConstructObject.class, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructChildrenObject.class, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructObject.class, ImmutableSet.of())
+                , Arguments.of(StaticFieldObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD))
+                , Arguments.of(StringFieldChainSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD))
+                , Arguments.of(StringFieldFluentGetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldFluentSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldGetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(StringFieldGetterObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD))
+                , Arguments.of(StringFieldSetter.class, ImmutableSet.of(Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD))
+                , Arguments.of(StringFieldSetterObject.class, Constant.STRING_FIELD_SETTER_OBJECT_SET_METHODS));
     }
 
     static Stream<Arguments> typeTokenAndSetMethodSets() {
