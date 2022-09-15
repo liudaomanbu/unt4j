@@ -42,14 +42,14 @@ public enum PropertyAccessorMethodFormat {
         private static final String SET_METHOD_PREFIX = "set";
 
         @Override
-        public boolean getInvokableNameMatches(@NonNull Invokable<?, ?> invokable) {
+        public boolean propertyReaderNameMatches(@NonNull Invokable<?, ?> invokable) {
             return invokable.getName().startsWith(GET_METHOD_PREFIX)
                     || (boolean.class.equals(invokable.getReturnType().getRawType()) && invokable.getName()
                     .startsWith(IS_METHOD_PREFIX));
         }
 
         @Override
-        protected boolean setInvokableNameMatches(@NonNull Invokable<?, ?> invokable) {
+        protected boolean propertyWriterNameMatches(@NonNull Invokable<?, ?> invokable) {
             return invokable.getName().startsWith(SET_METHOD_PREFIX);
         }
 
@@ -89,15 +89,15 @@ public enum PropertyAccessorMethodFormat {
      */
     FLUENT {
         @Override
-        public boolean getInvokableNameMatches(@NonNull Invokable<?, ?> invokable) {
-            return !JAVA_BEAN.getInvokableNameMatches(invokable) && !JAVA_BEAN
-                    .setInvokableNameMatches(invokable);
+        public boolean propertyReaderNameMatches(@NonNull Invokable<?, ?> invokable) {
+            return !JAVA_BEAN.propertyReaderNameMatches(invokable) && !JAVA_BEAN
+                    .propertyWriterNameMatches(invokable);
         }
 
         @Override
-        protected boolean setInvokableNameMatches(@NonNull Invokable<?, ?> invokable) {
-            return !JAVA_BEAN.getInvokableNameMatches(invokable) && !JAVA_BEAN
-                    .setInvokableNameMatches(invokable);
+        protected boolean propertyWriterNameMatches(@NonNull Invokable<?, ?> invokable) {
+            return !JAVA_BEAN.propertyReaderNameMatches(invokable) && !JAVA_BEAN
+                    .propertyWriterNameMatches(invokable);
         }
 
         @NonNull
@@ -131,8 +131,8 @@ public enum PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    public boolean isGetMethod(@NonNull Method method) {
-        return isGetInvokable(Invokable.from(method));
+    public boolean isPropertyReader(@NonNull Method method) {
+        return isPropertyReader(Invokable.from(method));
     }
 
     /**
@@ -144,12 +144,12 @@ public enum PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    public boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
+    public boolean isPropertyReader(@NonNull Invokable<?, ?> invokable) {
         return !invokable.getDeclaringClass().equals(Object.class)
                 && !invokable.isStatic()
                 && invokable.getParameters().isEmpty()
                 && !invokable.getReturnType().getRawType().equals(void.class)
-                && getInvokableNameMatches(invokable)
+                && propertyReaderNameMatches(invokable)
                 && !ReflectionUtil.isOverride(invokable, Object.class);
     }
 
@@ -163,7 +163,7 @@ public enum PropertyAccessorMethodFormat {
      * @since 1.0.0
      */
     public boolean isSetMethod(@NonNull Method method) {
-        return isSetInvokable(Invokable.from(method));
+        return isPropertyWriter(Invokable.from(method));
     }
 
     /**
@@ -175,12 +175,12 @@ public enum PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    public boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
+    public boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable) {
         return !invokable.getDeclaringClass().equals(Object.class)
                 && (invokable.getReturnType().getRawType().equals(void.class) || invokable.getReturnType()
                 .equals(invokable.getOwnerType()))
                 && invokable.getParameters().size() == 1
-                && setInvokableNameMatches(invokable)
+                && propertyWriterNameMatches(invokable)
                 && !ReflectionUtil.isOverride(invokable, Object.class);
     }
 
@@ -266,10 +266,10 @@ public enum PropertyAccessorMethodFormat {
 
     @NonNull
     public String propertyName(@NonNull Invokable<?, ?> propertyAccessorInvokable) {
-        if (isGetInvokable(propertyAccessorInvokable)) {
+        if (isPropertyReader(propertyAccessorInvokable)) {
             return fieldNameFromGetInvokable(propertyAccessorInvokable);
         }
-        if (isSetInvokable(propertyAccessorInvokable)) {
+        if (isPropertyWriter(propertyAccessorInvokable)) {
             return fieldNameFromSetInvokable(propertyAccessorInvokable);
         }
         throw new IllegalArgumentException(String.format("%s is not a propertyAccessorInvokable", propertyAccessorInvokable));
@@ -284,7 +284,7 @@ public enum PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    protected abstract boolean getInvokableNameMatches(@NonNull Invokable<?, ?> invokable);
+    protected abstract boolean propertyReaderNameMatches(@NonNull Invokable<?, ?> invokable);
 
     /**
      * 检查传入方法是否在方法名上属于该命名风格的set方法
@@ -295,5 +295,5 @@ public enum PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    protected abstract boolean setInvokableNameMatches(@NonNull Invokable<?, ?> invokable);
+    protected abstract boolean propertyWriterNameMatches(@NonNull Invokable<?, ?> invokable);
 }

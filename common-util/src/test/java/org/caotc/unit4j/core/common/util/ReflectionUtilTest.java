@@ -1309,7 +1309,7 @@ class ReflectionUtilTest {
                 log.error("reader:{}", reader);
             }
         }
-//        Assertions.assertcEquals(propertyReaders, result);
+        Assertions.assertEquals(propertyReaders, result);
     }
 
     @SneakyThrows

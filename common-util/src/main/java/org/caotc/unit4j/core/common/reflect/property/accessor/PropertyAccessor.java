@@ -153,7 +153,7 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
     FieldElementPropertyAccessor(@NonNull FieldElement<T, R> fieldElement) {
       super(fieldElement);
       Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(fieldElement),
-          "%s is not a PropertyWriter");
+              "%s is not a PropertyWriter", fieldElement);
       this.fieldElement = fieldElement;
     }
 

@@ -1,7 +1,10 @@
 package org.caotc.unit4j.core.common.util.model;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -87,6 +90,19 @@ public class Constant {
     public static final ImmutableSet<Field> FINAL_FIELD_OBJECT_FIELDS;
     public static final ImmutableSet<Field> STATIC_FIELD_OBJECT_FIELDS;
     public static final ImmutableSet<Field> MULTIPLE_FIELD_OBJECT_FIELDS;
+    public static final PropertyReader<BooleanFieldGetMethodObject, Boolean> BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER;
+    public static final PropertyReader<BooleanFieldIsMethodObject, Boolean> BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER;
+    public static final ImmutableSet<PropertyReader<ChildrenLongFieldObject, ?>> CHILDREN_LONG_FIELD_OBJECT_PROPERTY_READERS;
+    public static final ImmutableSet<PropertyReader<ChildrenSameNameFieldObject, ?>> CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_READERS;
+    public static final PropertyReader<FinalFieldObject, String> FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_READER;
+    public static final ImmutableSet<PropertyReader<MultipleFieldObject, ?>> MULTIPLE_FIELD_OBJECT_PROPERTY_READERS;
+    public static final ImmutableSet<PropertyReader<StringFieldAndStringFieldGetMethodObject, ?>> STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_PROPERTY_READERS;
+    public static final PropertyReader<StringFieldAndStringFieldSetMethodObject, String> STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER;
+    public static final PropertyReader<StringFieldFluentGetMethodObject, String> STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER;
+    public static final PropertyReader<StringFieldGetMethodObject, String> STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER;
+    public static final PropertyReader<StringFieldGetter, String> STRING_FIELD_GETTER_STRING_FIELD_PROPERTY_READER;
+    public static final ImmutableSet<PropertyReader<StringFieldGetterObject, ?>> STRING_FIELD_GETTER_OBJECT_PROPERTY_READERS;
+    public static final PropertyReader<StringFieldObject, String> STRING_FIELD_OBJECT_STRING_FIELD_PROPERTY_READER;
 
     static {
         try {
@@ -162,6 +178,19 @@ public class Constant {
             FINAL_FIELD_OBJECT_FIELDS = ImmutableSet.of(FINAL_FIELD_OBJECT_STRING_FIELD);
             STATIC_FIELD_OBJECT_FIELDS = ImmutableSet.of(STATIC_FIELD_OBJECT_STRING_FIELD);
             MULTIPLE_FIELD_OBJECT_FIELDS = ImmutableSet.of(MULTIPLE_FIELD_OBJECT_STRING_FIELD, MULTIPLE_FIELD_OBJECT_INTEGER_FIELD, MULTIPLE_FIELD_OBJECT_INT_FIELD, MULTIPLE_FIELD_OBJECT_BOOLEAN_FIELD);
+            BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER = PropertyReader.from(BOOLEAN_FIELD_GET_METHOD_OBJECT_GET_BOOLEAN_FIELD_METHOD, "booleanField");
+            BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER = PropertyReader.from(BOOLEAN_FIELD_IS_METHOD_OBJECT_IS_BOOLEAN_FIELD_METHOD, "booleanField");
+            CHILDREN_LONG_FIELD_OBJECT_PROPERTY_READERS = CHILDREN_LONG_FIELD_OBJECT_FIELDS.stream().map(PropertyAccessor::<ChildrenLongFieldObject, Object>from).collect(ImmutableSet.toImmutableSet());
+            CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_READERS = CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS.stream().map(PropertyAccessor::<ChildrenSameNameFieldObject, String>from).collect(ImmutableSet.toImmutableSet());
+            FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_READER = PropertyAccessor.from(FINAL_FIELD_OBJECT_STRING_FIELD);
+            MULTIPLE_FIELD_OBJECT_PROPERTY_READERS = MULTIPLE_FIELD_OBJECT_FIELDS.stream().map(PropertyAccessor::<MultipleFieldObject, Object>from).collect(ImmutableSet.toImmutableSet());
+            STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_PROPERTY_READERS = ImmutableSet.of(PropertyAccessor.from(STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD), PropertyReader.from(STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, StringFieldAndStringFieldGetMethodObject.Fields.STRING_FIELD));
+            STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER = PropertyAccessor.from(STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD);
+            STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER = PropertyReader.from(STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_FIELD_METHOD, "stringField");
+            STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER = PropertyReader.from(STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, "stringField");
+            STRING_FIELD_GETTER_STRING_FIELD_PROPERTY_READER = PropertyReader.from(STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD, "stringField");
+            STRING_FIELD_GETTER_OBJECT_PROPERTY_READERS = STRING_FIELD_GETTER_OBJECT_GET_METHODS.stream().map(method -> PropertyReader.from(TypeToken.of(StringFieldGetterObject.class).method(method), "stringField")).collect(ImmutableSet.toImmutableSet());
+            STRING_FIELD_OBJECT_STRING_FIELD_PROPERTY_READER = PropertyAccessor.from(STRING_FIELD_OBJECT_STRING_FIELD);
         } catch (NoSuchFieldException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

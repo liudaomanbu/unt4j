@@ -2025,8 +2025,8 @@ public class ReflectionUtil {
 
         Stream<PropertyElement<T, ?>> propertyElementStream = methodInvokableStreamFromClass(type)
                 .flatMap(invokable -> Arrays.stream(propertyAccessorMethodFormats)
-                        .filter(methodNameStyle -> methodNameStyle.isSetInvokable(invokable)
-                                || methodNameStyle.isGetInvokable(invokable))
+                        .filter(methodNameStyle -> methodNameStyle.isPropertyWriter(invokable)
+                                || methodNameStyle.isPropertyReader(invokable))
                         .map(methodNameStyle -> PropertyElement.from(invokable, methodNameStyle.propertyName(invokable))));
 
         return Stream
@@ -2359,7 +2359,7 @@ public class ReflectionUtil {
         return Arrays.stream(propertyAccessorMethodFormats)
                 .anyMatch(
                         propertyAccessorMethodFormat -> propertyAccessorMethodFormat
-                                .isGetInvokable(invokable));
+                                .isPropertyReader(invokable));
     }
 
     /**
@@ -2383,7 +2383,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isPropertyWriter(@NonNull FieldElement<?, ?> fieldElement) {
-        return !fieldElement.isStatic() && !fieldElement.isFinal();
+        return !fieldElement.isStatic();
     }
 
     /**
@@ -2438,7 +2438,7 @@ public class ReflectionUtil {
     public static boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable,
                                            @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return Arrays.stream(propertyAccessorMethodFormats)
-                .anyMatch(methodNameStyle -> methodNameStyle.isSetInvokable(invokable));
+                .anyMatch(methodNameStyle -> methodNameStyle.isPropertyWriter(invokable));
     }
 
     /**

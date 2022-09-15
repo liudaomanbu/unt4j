@@ -258,10 +258,31 @@ public class Provider {
 
 
     static Stream<Arguments> classAndPropertyReaderSets() {
-        return Stream.of(Arguments.of(StringFieldGetter.class, ImmutableSet.of(PropertyConstant.STRING_FIELD_GETTER_STRING_FIELD_GET_METHOD_READER))
+        return Stream.of(Arguments.of(BooleanFieldGetMethodObject.class, ImmutableSet.of(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER))
+                , Arguments.of(BooleanFieldIsMethodObject.class, ImmutableSet.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER))
+                , Arguments.of(ChildrenLongFieldObject.class, Constant.CHILDREN_LONG_FIELD_OBJECT_PROPERTY_READERS)
+                , Arguments.of(ChildrenSameNameFieldObject.class, Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_READERS)
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(FinalFieldObject.class, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_READER))
+                , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
+                , Arguments.of(MultipleFieldObject.class, Constant.MULTIPLE_FIELD_OBJECT_PROPERTY_READERS)
+                , Arguments.of(NoFieldObject.class, ImmutableSet.of())
+                , Arguments.of(PrivateConstructObject.class, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructChildrenObject.class, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructObject.class, ImmutableSet.of())
+                , Arguments.of(StaticFieldObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_PROPERTY_READERS)
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER))
+                , Arguments.of(StringFieldChainSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldFluentGetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER))
+                , Arguments.of(StringFieldFluentSetMethodObject.class, ImmutableSet.of())
+                , Arguments.of(StringFieldGetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER))
+                , Arguments.of(StringFieldGetter.class, ImmutableSet.of(Constant.STRING_FIELD_GETTER_STRING_FIELD_PROPERTY_READER))
+                , Arguments.of(StringFieldGetterObject.class, Constant.STRING_FIELD_GETTER_OBJECT_PROPERTY_READERS)
+                , Arguments.of(StringFieldObject.class, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD_PROPERTY_READER))
+                , Arguments.of(StringFieldSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
-                , Arguments.of(Super.class, PropertyConstant.SUPER_READERS)
-                , Arguments.of(Sub.class, PropertyConstant.SUB_READERS));
+                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of()));
     }
 
 
