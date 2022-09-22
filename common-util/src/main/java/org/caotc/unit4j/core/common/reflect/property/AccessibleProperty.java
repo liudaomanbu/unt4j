@@ -18,11 +18,13 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
-import java.util.Iterator;
-import java.util.stream.Stream;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 /**
  * @param <O> 拥有该属性的类
@@ -34,19 +36,25 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
  * @since 1.0.0
  */
 public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
-    WritableProperty<O, P> {
+        WritableProperty<O, P> {
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-        @NonNull Iterable<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Iterable<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Iterable<? extends PropertyAccessor<? super O, P>> propertyAccessors) {
+        return new SimpleAccessibleProperty<>(propertyAccessors, propertyAccessors);
+    }
+
+    @NonNull
+    static <O, P> SimpleAccessibleProperty<O, P> create(
+            @NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,
+            @NonNull Iterable<? extends PropertyWriter<? super O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-        @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
+            @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 

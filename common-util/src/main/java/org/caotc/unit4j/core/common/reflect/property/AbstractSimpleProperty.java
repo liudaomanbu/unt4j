@@ -17,19 +17,8 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Streams;
+import com.google.common.collect.*;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -38,6 +27,13 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 简单属性抽象类
@@ -69,10 +65,10 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     protected ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters;
 
     protected AbstractSimpleProperty(
-        @NonNull Iterable<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Iterable<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,
+            @NonNull Iterable<? extends PropertyWriter<? super O, P>> propertyWriters) {
         this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
-            ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+                ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
     }
 
     protected AbstractSimpleProperty(
@@ -105,7 +101,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
             .concat(propertyReaders.stream(), propertyWriters.stream())
             .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
         Preconditions.checkArgument(propertyNames.size() == 1 && propertyTypes.size() == 1,
-            "propertyReaders and propertyWriters not belong to a common property");
+                "propertyReaders and propertyWriters not belong to a common property.propertyNames:%s,propertyTypes:%s", propertyNames, propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
         this.type = Iterables.getOnlyElement(propertyTypes);
         this.fieldExist = Streams.concat(propertyReaders.stream(), propertyWriters.stream()).anyMatch(PropertyElement::basedOnField);

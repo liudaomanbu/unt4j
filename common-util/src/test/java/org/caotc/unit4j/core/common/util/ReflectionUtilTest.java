@@ -22,6 +22,7 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
@@ -1180,14 +1181,16 @@ class ReflectionUtilTest {
 //        //todo
 //        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
 //    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void properties(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
-//    }
-//
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndPropertySets")
+    <T> void properties(Type type, PropertyAccessorMethodFormat propertyAccessorMethodFormat, Set<Property<T, ?>> properties) {
+        //todo
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
+        log.debug("type:{},propertyAccessorMethodFormat:{},result:{}", type, propertyAccessorMethodFormat, result);
+        Assertions.assertEquals(properties, result);
+    }
+
 //    @ParameterizedTest
 //    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
 //    <T> void properties(Class<T> clazz) {

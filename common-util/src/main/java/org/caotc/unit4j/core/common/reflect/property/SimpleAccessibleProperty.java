@@ -18,13 +18,14 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author caotc
@@ -34,18 +35,18 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 @Value
 public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P> implements AccessibleProperty<O, P> {
 
-    public SimpleAccessibleProperty(@NonNull Iterable<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Iterable<PropertyWriter<? super O, P>> propertyWriters) {
+    public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,
+                                    @NonNull Iterable<? extends PropertyWriter<? super O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
     public SimpleAccessibleProperty(@NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
+                                    @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
     public SimpleAccessibleProperty(@NonNull Stream<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Stream<PropertyWriter<? super O, P>> propertyWriters) {
+                                    @NonNull Stream<PropertyWriter<? super O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
