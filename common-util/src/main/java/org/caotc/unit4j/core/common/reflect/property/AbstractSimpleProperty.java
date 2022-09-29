@@ -26,13 +26,11 @@ import lombok.ToString;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -91,19 +89,29 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters) {
         //属性读取器集合不能为空
         Preconditions
-            .checkArgument(!propertyReaders.isEmpty() || !propertyWriters.isEmpty(),
-                "propertyReaders and propertyWriters can't be all empty");
+                .checkArgument(!propertyReaders.isEmpty() || !propertyWriters.isEmpty(),
+                        "propertyReaders and propertyWriters can't be all empty");
         //属性只能有一个
         ImmutableSet<@NonNull String> propertyNames = Streams
-            .concat(propertyReaders.stream(), propertyWriters.stream())
-            .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
+                .concat(propertyReaders.stream(), propertyWriters.stream())
+                .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
+        //todo check declaringTypes
+        Preconditions.checkArgument(propertyNames.size() == 1,
+                "propertyReaders and propertyWriters not belong to a common property.propertyNames:%s", propertyNames);
         ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = Streams
-            .concat(propertyReaders.stream(), propertyWriters.stream())
-            .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
-        Preconditions.checkArgument(propertyNames.size() == 1 && propertyTypes.size() == 1,
-                "propertyReaders and propertyWriters not belong to a common property.propertyNames:%s,propertyTypes:%s", propertyNames, propertyTypes);
+                .concat(propertyReaders.stream(), propertyWriters.stream())
+                .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
+        if (propertyTypes.size() > 1) {
+            propertyTypes = propertyTypes.stream()
+                    .map(type -> (TypeToken<? extends P>) ReflectionUtil.primitiveTypeToWrapperType(type))
+                    .collect(ImmutableSet.toImmutableSet());
+        }
+        List<TypeToken<?>> lowestCommonAncestors = ReflectionUtil.lowestCommonAncestors(propertyTypes);
+
+        Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
+                "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
-        this.type = Iterables.getOnlyElement(propertyTypes);
+        this.type = (TypeToken<? extends P>) lowestCommonAncestors.get(0);//todo
         this.fieldExist = Streams.concat(propertyReaders.stream(), propertyWriters.stream()).anyMatch(PropertyElement::basedOnField);
         this.propertyReaders = propertyReaders;
         this.propertyWriters = propertyWriters;

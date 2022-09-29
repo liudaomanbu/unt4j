@@ -26,11 +26,9 @@ import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-import org.caotc.unit4j.core.common.util.model.PropertyConstant;
-import org.caotc.unit4j.core.common.util.model.Sub;
+import org.caotc.unit4j.core.common.util.model.*;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -1191,6 +1189,12 @@ class ReflectionUtilTest {
         Assertions.assertEquals(properties, result);
     }
 
+    @Test
+    <T> void test() {
+        Property<BooleanFieldGetMethodObject, ?> property = ReflectionUtil.properties(BooleanFieldGetMethodObject.class).iterator().next();
+        Assertions.assertEquals(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_PROPERTY, property);
+    }
+
 //    @ParameterizedTest
 //    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
 //    <T> void properties(Class<T> clazz) {
@@ -1629,7 +1633,7 @@ class ReflectionUtilTest {
         Assertions.assertTrue(isSetInvokable);
     }
 
-    @RepeatedTest(1000)
+    //    @RepeatedTest(1000)
     void isOverrideTest() {
         List<Method> setMethods = Lists.newArrayList(PropertyConstant.SUPER_STRING_FIELD_SET_METHOD, PropertyConstant.SUB_STRING_FIELD_SET_METHOD, PropertyConstant.STRING_FIELD_SETTER_STRING_FIELD_SET_METHOD);
         Collections.shuffle(setMethods);
@@ -1637,5 +1641,27 @@ class ReflectionUtilTest {
         Optional<Method> actual = setMethods.stream().reduce((m1, m2) -> ReflectionUtil.isOverride(m1, m2) ? m1 : m2);
         Assertions.assertTrue(actual.isPresent());
         Assertions.assertEquals(PropertyConstant.SUB_STRING_FIELD_SET_METHOD, actual.get());
+    }
+
+    @Test
+    @SneakyThrows
+    void aaae() {
+        TypeToken<StringFieldGetter> stringFieldGetterType = TypeToken.of(StringFieldGetter.class);
+        TypeToken<Object> objectType = TypeToken.of(Object.class);
+        log.info("stringFieldGetterType.isSubtypeOf(objectType):{}", stringFieldGetterType.isSubtypeOf(objectType));
+        log.info("objectType.isSubtypeOf(stringFieldGetterType):{}", objectType.isSubtypeOf(stringFieldGetterType));
+        log.info("stringFieldGetterType.isSupertypeOf(objectType):{}", stringFieldGetterType.isSupertypeOf(objectType));
+        log.info("objectType.isSupertypeOf(stringFieldGetterType):{}", objectType.isSupertypeOf(stringFieldGetterType));
+        log.info("StringFieldGetter.class.isAssignableFrom(Object.class):{}", StringFieldGetter.class.isAssignableFrom(Object.class));
+        log.info("Object.class.isAssignableFrom(StringFieldGetter.class):{}", Object.class.isAssignableFrom(StringFieldGetter.class));
+        log.info("TypeToken.of(String.class).getTypes():{}", TypeToken.of(String.class).getTypes());
+        log.info("TypeToken.of(Integer.class).getTypes():{}", TypeToken.of(Integer.class).getTypes());
+        log.info("TypeToken.of(int.class).getTypes():{}", TypeToken.of(int.class).getTypes());
+        log.info("lowestCommonSuperclasses(Lists.newArrayList(String.class,Integer.class)):{}", ReflectionUtil.lowestCommonSuperclasses(Lists.newArrayList(String.class, Integer.class)));
+        log.info("lowestCommonSuperclasses(Lists.newArrayList(int.class,Integer.class)):{}", ReflectionUtil.lowestCommonSuperclasses(Lists.newArrayList(int.class, Integer.class)));
+        log.info("lowestCommonSuperclasses(Lists.newArrayList(Integer.class,Long.class)):{}", ReflectionUtil.lowestCommonSuperclasses(Lists.newArrayList(Integer.class, Long.class)));
+        log.info("lowestCommonAncestors(Lists.newArrayList(String.class,Integer.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(String.class), TypeToken.of(Integer.class))));
+        log.info("lowestCommonAncestors(Lists.newArrayList(int.class,Integer.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(int.class), TypeToken.of(Integer.class))));
+        log.info("lowestCommonAncestors(Lists.newArrayList(Integer.class,Long.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(Integer.class), TypeToken.of(Long.class))));
     }
 }

@@ -17,9 +17,7 @@
 package org.caotc.unit4j.core.common.util;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.*;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
@@ -42,9 +40,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 //TODO 将所有方法优化到只有一次流操作
 
@@ -64,6 +62,20 @@ public class ReflectionUtil {
     private static final Function<PropertyElement<?, ?>, ImmutableList<?>> KEY_FUNCTION = propertyElement -> ImmutableList
             .of(propertyElement.propertyName(), propertyElement.propertyType(),
                     propertyElement.isStatic());
+    private static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_CLASS_TO_WRAPPER_CLASS = ImmutableBiMap.<Class<?>, Class<?>>builder()
+            .put(byte.class, Byte.class)
+            .put(short.class, Short.class)
+            .put(int.class, Integer.class)
+            .put(long.class, Long.class)
+            .put(char.class, Character.class)
+            .put(boolean.class, Boolean.class)
+            .put(float.class, Float.class)
+            .put(double.class, Double.class)
+            .buildOrThrow();
+    private static final ImmutableBiMap<Class<?>, Class<?>> WRAPPER_CLASS_TO_PRIMITIVE_CLASS = PRIMITIVE_CLASS_TO_WRAPPER_CLASS.inverse();
+    private static final ImmutableBiMap<TypeToken<?>, TypeToken<?>> PRIMITIVE_TYPE_TO_WRAPPER_TYPE = PRIMITIVE_CLASS_TO_WRAPPER_CLASS.entrySet().stream()
+            .collect(ImmutableBiMap.toImmutableBiMap(entry -> TypeToken.of(entry.getKey()), entry -> TypeToken.of(entry.getValue())));
+    private static final ImmutableBiMap<TypeToken<?>, TypeToken<?>> WRAPPER_TYPE_TO_PRIMITIVE_TYPE = PRIMITIVE_TYPE_TO_WRAPPER_TYPE.inverse();
 
     @NonNull
     public static ImmutableSet<Field> fields(@NonNull Type type) {
@@ -2528,5 +2540,118 @@ public class ReflectionUtil {
         return superInvokable.isOverridable()
                 && superInvokable.getOwnerType().isSupertypeOf(invokable.getOwnerType())
                 && MethodSignature.from(superInvokable).equals(MethodSignature.from(invokable));
+    }
+
+    static Set<Class<?>> getSuperclasses(Class<?> clazz) {
+        final Set<Class<?>> result = new LinkedHashSet<>();
+        final Queue<Class<?>> queue = new ArrayDeque<>();
+        queue.add(clazz);
+        if (clazz.isInterface()) {
+            queue.add(Object.class); // optional
+        }
+        while (!queue.isEmpty()) {
+            Class<?> c = queue.remove();
+            if (result.add(c)) {
+                Class<?> sup = c.getSuperclass();
+                if (sup != null) queue.add(sup);
+                queue.addAll(Arrays.asList(c.getInterfaces()));
+            }
+        }
+        return result;
+    }
+
+    static Set<Class<?>> commonSuperclasses(Iterable<Class<?>> classes) {
+        Iterator<Class<?>> it = classes.iterator();
+        if (!it.hasNext()) {
+            return Collections.emptySet();
+        }
+        // begin with set from first hierarchy
+        Set<Class<?>> result = getSuperclasses(it.next());
+        // remove non-superclasses of remaining
+        while (it.hasNext()) {
+            Class<?> c = it.next();
+            result.removeIf(sup -> !sup.isAssignableFrom(c));
+        }
+        return result;
+    }
+
+    public static List<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
+        Collection<Class<?>> commonSupers = commonSuperclasses(classes);
+        return lowestClasses(commonSupers);
+    }
+
+    static List<Class<?>> lowestClasses(Collection<Class<?>> classes) {
+        final LinkedList<Class<?>> source = new LinkedList<>(classes);
+        final ArrayList<Class<?>> result = new ArrayList<>(classes.size());
+        while (!source.isEmpty()) {
+            Iterator<Class<?>> srcIt = source.iterator();
+            Class<?> c = srcIt.next();
+            srcIt.remove();
+            while (srcIt.hasNext()) {
+                Class<?> c2 = srcIt.next();
+                if (c2.isAssignableFrom(c)) {
+                    srcIt.remove();
+                } else if (c.isAssignableFrom(c2)) {
+                    c = c2;
+                    srcIt.remove();
+                }
+            }
+            result.add(c);
+        }
+        result.trimToSize();
+        return result;
+    }
+
+    public static List<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> classes) {
+        Iterator<? extends TypeToken<?>> it = classes.iterator();
+        if (!it.hasNext()) {
+            return Collections.emptyList();
+        }
+        // begin with set from first hierarchy
+        Set<? extends TypeToken<?>> result = it.next().getTypes();
+        // remove non-superclasses of remaining
+        result = result.stream()
+                .filter(sup -> Streams.stream(classes)
+                        .allMatch(type -> sup.isSupertypeOf(type)))
+                .collect(Collectors.toSet());
+        return lowestAncestors(result);
+    }
+
+    static List<TypeToken<?>> lowestAncestors(Collection<? extends TypeToken<?>> classes) {
+        final LinkedList<TypeToken<?>> source = new LinkedList<>(classes);
+        final ArrayList<TypeToken<?>> result = new ArrayList<>(classes.size());
+        while (!source.isEmpty()) {
+            Iterator<TypeToken<?>> srcIt = source.iterator();
+            TypeToken<?> c = srcIt.next();
+            srcIt.remove();
+            while (srcIt.hasNext()) {
+                TypeToken<?> c2 = srcIt.next();
+                if (c2.isSupertypeOf(c)) {
+                    srcIt.remove();
+                } else if (c.isSupertypeOf(c2)) {
+                    c = c2;
+                    srcIt.remove();
+                }
+            }
+            result.add(c);
+        }
+        result.trimToSize();
+        return result;
+    }
+
+    public static Class<?> primitiveClassToWrapperClass(@NonNull Class<?> clazz) {
+        return PRIMITIVE_CLASS_TO_WRAPPER_CLASS.getOrDefault(clazz, clazz);
+    }
+
+    public static Class<?> wrapperClassToPrimitiveClass(@NonNull Class<?> clazz) {
+        return WRAPPER_CLASS_TO_PRIMITIVE_CLASS.getOrDefault(clazz, clazz);
+    }
+
+    public static TypeToken<?> primitiveTypeToWrapperType(@NonNull TypeToken<?> type) {
+        return PRIMITIVE_TYPE_TO_WRAPPER_TYPE.getOrDefault(type, type);
+    }
+
+    public static TypeToken<?> wrapperTypeToPrimitiveType(@NonNull TypeToken<?> type) {
+        return WRAPPER_TYPE_TO_PRIMITIVE_TYPE.getOrDefault(type, type);
     }
 }

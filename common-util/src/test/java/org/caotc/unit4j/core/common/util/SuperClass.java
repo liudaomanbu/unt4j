@@ -11,8 +11,7 @@ import java.util.Arrays;
  */
 public abstract class SuperClass {
 
-    private void toBeOverriden() {
-
+    protected void toBeOverriden() {
         System.out.println("In super class.");
 
     }
@@ -41,9 +40,7 @@ class Main {
         method.setAccessible(true);
         method.invoke(object);
 
-        Arrays.stream(B.class.getDeclaredMethods()).forEach(m -> {
-            System.out.println(m);
-        });
+        Arrays.stream(B.class.getDeclaredMethods()).forEach(System.out::println);
     }
 
     static class A {
