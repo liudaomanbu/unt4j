@@ -60,7 +60,7 @@ public class ReflectionUtil {
     private static final PropertyAccessorMethodFormat[] DEFAULT_METHOD_NAME_STYLES = PropertyAccessorMethodFormat
             .values();
     private static final Function<PropertyElement<?, ?>, ImmutableList<?>> KEY_FUNCTION = propertyElement -> ImmutableList
-            .of(propertyElement.propertyName(), propertyElement.propertyType(),
+            .of(propertyElement.propertyName(), /*propertyElement.propertyType(),*/ //todo remove?
                     propertyElement.isStatic());
     private static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_CLASS_TO_WRAPPER_CLASS = ImmutableBiMap.<Class<?>, Class<?>>builder()
             .put(byte.class, Byte.class)

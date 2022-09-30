@@ -4,11 +4,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.util.model.*;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
@@ -20,7 +22,11 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @UtilityClass
+@Slf4j
 public class Provider {
+    private static final PropertyAccessorMethodFormat[] JAVA_BEAN = new PropertyAccessorMethodFormat[]{PropertyAccessorMethodFormat.JAVA_BEAN};
+    private static final PropertyAccessorMethodFormat[] FLUENT = new PropertyAccessorMethodFormat[]{PropertyAccessorMethodFormat.FLUENT};
+
     static Stream<Class<?>> classes() {
         return Stream.of(NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class
                 , ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
@@ -473,56 +479,81 @@ public class Provider {
     }
 
     static Stream<Arguments> classAndPropertyAccessorMethodFormatAndPropertySets() {
-        return Stream.of(Arguments.of(BooleanFieldGetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_PROPERTY))
-                , Arguments.of(BooleanFieldGetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(BooleanFieldIsMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(BooleanFieldIsMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_PROPERTY))
-                , Arguments.of(ChildrenLongFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, Constant.CHILDREN_LONG_FIELD_OBJECT_PROPERTIES)
-                , Arguments.of(ChildrenLongFieldObject.class, PropertyAccessorMethodFormat.FLUENT, Constant.CHILDREN_LONG_FIELD_OBJECT_PROPERTIES)
-                , Arguments.of(ChildrenSameNameFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(ChildrenSameNameFieldObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY))
-                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(FinalFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(FinalFieldObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(MultipleConstructObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(MultipleConstructObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(MultipleFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, Constant.MULTIPLE_FIELD_OBJECT_PROPERTIES)
-                , Arguments.of(MultipleFieldObject.class, PropertyAccessorMethodFormat.FLUENT, Constant.MULTIPLE_FIELD_OBJECT_PROPERTIES)
-                , Arguments.of(NoFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(NoFieldObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(PrivateConstructObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(PrivateConstructObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(ProtectedConstructChildrenObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(ProtectedConstructChildrenObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(ProtectedConstructObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(ProtectedConstructObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StaticFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(StaticFieldObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(AccessibleProperty.create(ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR))))
-                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(AccessibleProperty.create(ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR))))
-                , Arguments.of(StringFieldChainSetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldChainSetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StringFieldFluentGetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(StringFieldFluentGetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldFluentSetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
-                , Arguments.of(StringFieldFluentSetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.STRING_FIELD_FLUENT_SET_METHOD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldGetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldGetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StringFieldGetter.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_GETTER_STRING_PROPERTY))
-                , Arguments.of(StringFieldGetter.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StringFieldGetterObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_GETTER_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldGetterObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StringFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldSetMethodObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_SET_METHOD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldSetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StringFieldSetter.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_SETTER_STRING_PROPERTY))
-                , Arguments.of(StringFieldSetter.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
-                , Arguments.of(StringFieldSetterObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_SETTER_OBJECT_STRING_PROPERTY))
-                , Arguments.of(StringFieldSetterObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of()));
+        return Stream.of(Arguments.of(BooleanFieldGetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_PROPERTY))
+                , Arguments.of(BooleanFieldGetMethodObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(BooleanFieldGetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_PROPERTY))
+                , Arguments.of(BooleanFieldIsMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_PROPERTY))
+                , Arguments.of(BooleanFieldIsMethodObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(BooleanFieldIsMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_PROPERTY))
+                , Arguments.of(ChildrenLongFieldObject.class, JAVA_BEAN, Constant.CHILDREN_LONG_FIELD_OBJECT_PROPERTIES)
+                , Arguments.of(ChildrenLongFieldObject.class, FLUENT, Constant.CHILDREN_LONG_FIELD_OBJECT_PROPERTIES)
+                , Arguments.of(ChildrenLongFieldObject.class, PropertyAccessorMethodFormat.values(), Constant.CHILDREN_LONG_FIELD_OBJECT_PROPERTIES)
+                , Arguments.of(ChildrenSameNameFieldObject.class, JAVA_BEAN, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(ChildrenSameNameFieldObject.class, FLUENT, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(ChildrenSameNameFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY))
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY))
+                , Arguments.of(FinalFieldObject.class, JAVA_BEAN, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(FinalFieldObject.class, FLUENT, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(FinalFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(MultipleConstructObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(MultipleConstructObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(MultipleConstructObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of())
+                , Arguments.of(MultipleFieldObject.class, JAVA_BEAN, Constant.MULTIPLE_FIELD_OBJECT_PROPERTIES)
+                , Arguments.of(MultipleFieldObject.class, FLUENT, Constant.MULTIPLE_FIELD_OBJECT_PROPERTIES)
+                , Arguments.of(MultipleFieldObject.class, PropertyAccessorMethodFormat.values(), Constant.MULTIPLE_FIELD_OBJECT_PROPERTIES)
+                , Arguments.of(NoFieldObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(NoFieldObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(NoFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of())
+                , Arguments.of(PrivateConstructObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(PrivateConstructObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(PrivateConstructObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of())
+                , Arguments.of(ProtectedConstructChildrenObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructChildrenObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructChildrenObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of())
+                , Arguments.of(ProtectedConstructObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(ProtectedConstructObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of())
+                , Arguments.of(StaticFieldObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(StaticFieldObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StaticFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of())
+                , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, FLUENT, ImmutableSet.of(AccessibleProperty.create(ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR))))
+                , Arguments.of(StringFieldAndStringFieldGetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, FLUENT, ImmutableSet.of(AccessibleProperty.create(ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR))))
+                , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldChainSetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldChainSetMethodObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StringFieldChainSetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldFluentGetMethodObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(StringFieldFluentGetMethodObject.class, FLUENT, ImmutableSet.of(Constant.STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldFluentGetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldFluentSetMethodObject.class, JAVA_BEAN, ImmutableSet.of())
+                , Arguments.of(StringFieldFluentSetMethodObject.class, FLUENT, ImmutableSet.of(Constant.STRING_FIELD_FLUENT_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldFluentSetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_FLUENT_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldGetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldGetMethodObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StringFieldGetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldGetter.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_GETTER_STRING_PROPERTY))
+                , Arguments.of(StringFieldGetter.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StringFieldGetter.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_GETTER_STRING_PROPERTY))
+                , Arguments.of(StringFieldGetterObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_GETTER_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldGetterObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StringFieldGetterObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_GETTER_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldObject.class, FLUENT, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldSetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldSetMethodObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StringFieldSetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_SET_METHOD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldSetter.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_SETTER_STRING_PROPERTY))
+                , Arguments.of(StringFieldSetter.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StringFieldSetter.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_SETTER_STRING_PROPERTY))
+                , Arguments.of(StringFieldSetterObject.class, JAVA_BEAN, ImmutableSet.of(Constant.STRING_FIELD_SETTER_OBJECT_STRING_PROPERTY))
+                , Arguments.of(StringFieldSetterObject.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(StringFieldSetterObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_SETTER_OBJECT_STRING_PROPERTY)));
     }
 
     static Stream<Arguments> typeTokenAndPropertyAccessorMethodFormatAndPropertySets() {
@@ -531,11 +562,8 @@ public class Provider {
 
     static Stream<Arguments> classAndPropertySets() {
         return classAndPropertyAccessorMethodFormatAndPropertySets()
-                .collect(ImmutableMap.toImmutableMap(arguments -> arguments.get()[0], Function.identity()
-                        , (arguments1, arguments2) ->
-                                Arguments.of(arguments1.get()[0], Stream.of(arguments1.get()[2], arguments2.get()[2]).map(a -> (Set<?>) a).flatMap(Collection::stream).collect(ImmutableSet.toImmutableSet()))
-                ))
-                .values().stream();
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[1], PropertyAccessorMethodFormat.values()))
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[2]));
     }
 
     static Stream<Arguments> typeTokenAndPropertySets() {

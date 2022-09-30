@@ -1174,20 +1174,23 @@ class ReflectionUtilTest {
 //        //todo
 //        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
 //    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void properties(Type type) {
-//        //todo
-//        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
-//    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertySets")
+    <T> void properties(Type type, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
+        log.debug("type:{},result:{}", type, result);
+        if (!properties.equals(result)) {
+            System.out.println();
+        }
+        Assertions.assertEquals(properties, result);
+    }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndPropertySets")
-    <T> void properties(Type type, PropertyAccessorMethodFormat propertyAccessorMethodFormat, Set<Property<T, ?>> properties) {
-        //todo
-        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
-        log.debug("type:{},propertyAccessorMethodFormat:{},result:{}", type, propertyAccessorMethodFormat, result);
+    <T> void properties(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
         Assertions.assertEquals(properties, result);
     }
 
