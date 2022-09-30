@@ -46,7 +46,7 @@ import java.util.stream.Stream;
 @ToString
 public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     /**
-     * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前+内存地址比较器
+     * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前
      */
     private static final Ordering<PropertyElement<?, ?>> ORDERING = Ordering.natural()
             .onResultOf(PropertyElement::accessLevel);
