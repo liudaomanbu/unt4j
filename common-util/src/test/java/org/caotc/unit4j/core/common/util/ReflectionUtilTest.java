@@ -26,7 +26,9 @@ import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-import org.caotc.unit4j.core.common.util.model.*;
+import org.caotc.unit4j.core.common.util.model.PropertyConstant;
+import org.caotc.unit4j.core.common.util.model.StringFieldGetter;
+import org.caotc.unit4j.core.common.util.model.Sub;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -1187,12 +1189,6 @@ class ReflectionUtilTest {
         Set<Property<T, ?>> result = ReflectionUtil.properties(type);
         log.debug("type:{},propertyAccessorMethodFormat:{},result:{}", type, propertyAccessorMethodFormat, result);
         Assertions.assertEquals(properties, result);
-    }
-
-    @Test
-    <T> void test() {
-        Property<BooleanFieldGetMethodObject, ?> property = ReflectionUtil.properties(BooleanFieldGetMethodObject.class).iterator().next();
-        Assertions.assertEquals(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_PROPERTY, property);
     }
 
 //    @ParameterizedTest
