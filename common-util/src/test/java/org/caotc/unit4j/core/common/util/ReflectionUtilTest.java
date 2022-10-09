@@ -23,6 +23,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.Property;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
@@ -1133,56 +1134,59 @@ class ReflectionUtilTest {
         Assertions.assertTrue(result.isEmpty());
     }
 
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void propertyStream(Type type) {
-//        //todo
-//        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void propertyStream(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void propertyStream(Class<?> clazz) {
-//        //todo
-//        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(clazz).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void propertyStream(Class<?> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(clazz).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokens")
-//    void propertyStream(TypeToken<?> type) {
-//        //todo
-//        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void propertyStream(TypeToken<?> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertySets")
+    void propertyStream(Type type, Set<Property<?, ?>> properties) {
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndPropertySets")
+    void propertyStream(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<Property<?, ?>> properties) {
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertySets")
+    <T> void propertyStream(Class<T> clazz, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.propertyStream(clazz).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},result:{}", clazz, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndPropertySets")
+    <T> void propertyStream(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.propertyStream(clazz, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertySets")
+    <T> void propertyStream(TypeToken<T> type, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.propertyStream(type).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndPropertySets")
+    <T> void propertyStream(TypeToken<?> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<Property<T, ?>> properties) {
+        Set<Property<?, ?>> result = ReflectionUtil.propertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(properties, result);
+    }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertySets")
     <T> void properties(Type type, Set<Property<T, ?>> properties) {
         Set<Property<T, ?>> result = ReflectionUtil.properties(type);
         log.debug("type:{},result:{}", type, result);
-        if (!properties.equals(result)) {
-            System.out.println();
-        }
         Assertions.assertEquals(properties, result);
     }
 
@@ -1194,117 +1198,133 @@ class ReflectionUtilTest {
         Assertions.assertEquals(properties, result);
     }
 
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void properties(Class<T> clazz) {
-//        //todo
-//        Set<Property<T, ?>> result = ReflectionUtil.properties(clazz);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void properties(Class<T> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<Property<T, ?>> result = ReflectionUtil.properties(clazz);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void properties(TypeToken<T> type) {
-//        //todo
-//        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void properties(TypeToken<T> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void readablePropertyStream(Type type) {
-//        //todo
-//        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void readablePropertyStream(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void readablePropertyStream(Class<?> clazz) {
-//        //todo
-//        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void readablePropertyStream(Class<?> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void readablePropertyStream(TypeToken<?> type) {
-//        //todo
-//        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    void readablePropertyStream(TypeToken<?> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void readableProperties(Type type) {
-//        //todo
-//        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void readableProperties(Type type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void readableProperties(Class<T> clazz) {
-//        //todo
-//        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(clazz);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void readableProperties(Class<T> clazz, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(clazz);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void readableProperties(TypeToken<T> type) {
-//        //todo
-//        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
-//    }
-//
-//    @ParameterizedTest
-//    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classes")
-//    <T> void readableProperties(TypeToken<T> type, PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-//        //todo
-//        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
-//    }
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertySets")
+    <T> void properties(Class<T> clazz, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.properties(clazz);
+        log.debug("class:{},result:{}", clazz, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndPropertySets")
+    <T> void properties(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.properties(clazz, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertySets")
+    <T> void properties(TypeToken<T> type, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type);
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndPropertySets")
+    <T> void properties(TypeToken<T> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<Property<T, ?>> properties) {
+        Set<Property<T, ?>> result = ReflectionUtil.properties(type, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(properties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    void readablePropertyStream(Type type, Set<ReadableProperty<?, ?>> readableProperties) {
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    void readablePropertyStream(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<ReadableProperty<?, ?>> readableProperties) {
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    <T> void readablePropertyStream(Class<T> clazz, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readablePropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},result:{}", clazz, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    <T> void readablePropertyStream(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readablePropertyStream(clazz, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndReadablePropertySets")
+    <T> void readablePropertyStream(TypeToken<T> type, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    <T> void readablePropertyStream(TypeToken<T> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<?, ?>> result = ReflectionUtil.readablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    <T> void readableProperties(Type type, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    <T> void readableProperties(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    <T> void readableProperties(Class<T> clazz, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(clazz);
+        log.debug("class:{},result:{}", clazz, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    <T> void readableProperties(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(clazz, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndReadablePropertySets")
+    <T> void readableProperties(TypeToken<T> type, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type);
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    <T> void readableProperties(TypeToken<T> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<ReadableProperty<T, ?>> readableProperties) {
+        Set<ReadableProperty<T, ?>> result = ReflectionUtil.readableProperties(type, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperties, result);
+    }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyReaderSets")

@@ -6,6 +6,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
+import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
 import org.caotc.unit4j.core.common.util.model.*;
 import org.junit.jupiter.params.provider.Arguments;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
  * @date 2022-08-18
  * @since 1.0.0
  */
+@SuppressWarnings("ALL")
 @UtilityClass
 @Slf4j
 public class Provider {
@@ -568,5 +570,25 @@ public class Provider {
 
     static Stream<Arguments> typeTokenAndPropertySets() {
         return classAndPropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> classAndPropertyAccessorMethodFormatAndReadablePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndPropertySets()
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[1], ((Collection<Property<?, ?>>) arguments.get()[2]).stream()
+                        .filter(Property::readable).map(Property::toReadable).collect(ImmutableSet.toImmutableSet())));
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyAccessorMethodFormatAndReadablePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndReadablePropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndReadablePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndReadablePropertySets()
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[1], PropertyAccessorMethodFormat.values()))
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> typeTokenAndReadablePropertySets() {
+        return classAndReadablePropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
     }
 }
