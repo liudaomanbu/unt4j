@@ -1550,7 +1550,7 @@ public class ReflectionUtil {
     public static <T> ImmutableSet<AccessibleProperty<T, ?>> accessibleProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessibleProperties((TypeToken<T>) type,
+        return accessibleProperties((TypeToken<T>) TypeToken.of(type),
                 propertyAccessorMethodFormats);
     }
 
@@ -1583,35 +1583,35 @@ public class ReflectionUtil {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-
     @NonNull
-    public static <R> ReadableProperty<?, R> readablePropertyExact(
-            @NonNull Type type, @NonNull String fieldName) {
-        return readablePropertyExact(type, fieldName,
+    public static <T, R> ReadableProperty<T, R> readablePropertyExact(
+            @NonNull Type type, @NonNull String propertyName) {
+        return readablePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
+    @SuppressWarnings("unchecked")
     @NonNull
-    public static <R> ReadableProperty<?, R> readablePropertyExact(
-            @NonNull Type type, @NonNull String fieldName,
+    public static <T, R> ReadableProperty<T, R> readablePropertyExact(
+            @NonNull Type type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyExact(TypeToken.of(type), fieldName,
+        return readablePropertyExact((TypeToken<T>) TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
     public static <T, R> ReadableProperty<T, R> readablePropertyExact(
-            @NonNull Class<T> type, @NonNull String fieldName) {
-        return readablePropertyExact(type, fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName) {
+        return readablePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
      * 获取指定{@link ReadableProperty}
      *
-     * @param type      需要获取可读属性{@link ReadableProperty}的类
-     * @param fieldName 属性名称
+     * @param type         需要获取可读属性{@link ReadableProperty}的类
+     * @param propertyName 属性名称
      * @return {@link ReadableProperty}
      * @throws ReadablePropertyNotFoundException readablePropertyNotFoundException
      * @author caotc
@@ -1621,48 +1621,48 @@ public class ReflectionUtil {
      */
     @NonNull
     public static <T, R> ReadableProperty<T, R> readablePropertyExact(
-            @NonNull Class<T> type, @NonNull String fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyExact(TypeToken.of(type), fieldName,
+        return readablePropertyExact(TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
     public static <T, R> ReadableProperty<T, R> readablePropertyExact(
-            @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return readablePropertyExact(type, fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName) {
+        return readablePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> ReadableProperty<T, R> readablePropertyExact(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<T, R>readableProperty(type, fieldName,
+        return ReflectionUtil.<T, R>readableProperty(type, propertyName,
                         propertyAccessorMethodFormats)
                 .orElseThrow(() -> ReadablePropertyNotFoundException
-                        .create(type, fieldName));
+                        .create(type, propertyName));
     }
 
 
     public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
-            @NonNull Type type, @NonNull String fieldName) {
-        return readableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+            @NonNull Type type, @NonNull String propertyName) {
+        return readableProperty(type, propertyName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
-            @NonNull Type type, @NonNull String fieldName,
+            @NonNull Type type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readableProperty((TypeToken<T>) TypeToken.of(type), fieldName,
+        return readableProperty((TypeToken<T>) TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
     /**
      * 从传入的类中获取包括所有超类和接口的所有可读属性{@link ReadableProperty}集合
      *
-     * @param type      需要获取可读属性{@link ReadableProperty}集合的类
-     * @param fieldName 指定属性名称
+     * @param type         需要获取可读属性{@link ReadableProperty}集合的类
+     * @param propertyName 指定属性名称
      * @return 所有可读属性 {@link ReadableProperty}集合
      * @author caotc
      * @date 2019-05-10
@@ -1670,15 +1670,15 @@ public class ReflectionUtil {
      */
     @NonNull
     public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
-            @NonNull Class<T> type, @NonNull String fieldName) {
-        return readableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+            @NonNull Class<T> type, @NonNull String propertyName) {
+        return readableProperty(type, propertyName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     /**
      * 从传入的类中获取包括所有超类和接口的所有可读属性{@link ReadableProperty}集合
      *
      * @param type                          需要获取可读属性{@link ReadableProperty}的类
-     * @param fieldName                     指定属性名称
+     * @param propertyName                     指定属性名称
      * @param propertyAccessorMethodFormats get方法格式集合
      * @return 所有可读属性 {@link ReadableProperty}集合
      * @author caotc
@@ -1689,25 +1689,25 @@ public class ReflectionUtil {
      */
     @NonNull
     public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
-            @NonNull Class<T> type, @NonNull String fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readableProperty(TypeToken.of(type), fieldName,
+        return readableProperty(TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
     public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
-            @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return readableProperty(type, fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName) {
+        return readableProperty(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyInternalCompose(type, fieldName, propertyAccessorMethodFormats);
+        return readablePropertyInternalCompose(type, propertyName, propertyAccessorMethodFormats);
     }
 
     //todo 待优化

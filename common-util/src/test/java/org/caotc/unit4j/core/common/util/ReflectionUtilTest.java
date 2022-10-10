@@ -22,6 +22,7 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
@@ -31,7 +32,10 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 import org.caotc.unit4j.core.common.util.model.PropertyConstant;
 import org.caotc.unit4j.core.common.util.model.StringFieldGetter;
 import org.caotc.unit4j.core.common.util.model.Sub;
+import org.caotc.unit4j.core.exception.AccessiblePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
+import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
+import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -1328,7 +1332,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndWritablePropertySets")
     void writablePropertyStream(Type type, Set<WritableProperty<?, ?>> writableProperties) {
         Set<WritableProperty<?, ?>> result = ReflectionUtil.writablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
         log.debug("type:{},result:{}", type, result);
@@ -1336,7 +1340,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndWritablePropertySets")
     void writablePropertyStream(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<WritableProperty<?, ?>> writableProperties) {
         Set<WritableProperty<?, ?>> result = ReflectionUtil.writablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
         log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
@@ -1344,7 +1348,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndWritablePropertySets")
     <T> void writablePropertyStream(Class<T> clazz, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writablePropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
         log.debug("class:{},result:{}", clazz, result);
@@ -1352,7 +1356,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndWritablePropertySets")
     <T> void writablePropertyStream(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writablePropertyStream(clazz, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
         log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
@@ -1360,7 +1364,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndWritablePropertySets")
     <T> void writablePropertyStream(TypeToken<T> type, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writablePropertyStream(type).collect(ImmutableSet.toImmutableSet());
         log.debug("type:{},result:{}", type, result);
@@ -1368,7 +1372,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndWritablePropertySets")
     <T> void writablePropertyStream(TypeToken<T> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<?, ?>> result = ReflectionUtil.writablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
         log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
@@ -1376,7 +1380,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndWritablePropertySets")
     <T> void writableProperties(Type type, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writableProperties(type);
         log.debug("type:{},result:{}", type, result);
@@ -1384,7 +1388,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndWritablePropertySets")
     <T> void writableProperties(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writableProperties(type, propertyAccessorMethodFormats);
         log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
@@ -1392,7 +1396,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndWritablePropertySets")
     <T> void writableProperties(Class<T> clazz, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writableProperties(clazz);
         log.debug("class:{},result:{}", clazz, result);
@@ -1400,7 +1404,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndWritablePropertySets")
     <T> void writableProperties(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writableProperties(clazz, propertyAccessorMethodFormats);
         log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
@@ -1408,7 +1412,7 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndWritablePropertySets")
     <T> void writableProperties(TypeToken<T> type, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writableProperties(type);
         log.debug("type:{},result:{}", type, result);
@@ -1416,11 +1420,683 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndReadablePropertySets")
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndWritablePropertySets")
     <T> void writableProperties(TypeToken<T> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<WritableProperty<T, ?>> writableProperties) {
         Set<WritableProperty<T, ?>> result = ReflectionUtil.writableProperties(type, propertyAccessorMethodFormats);
         log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
         Assertions.assertEquals(writableProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndAccessiblePropertySets")
+    void accessiblePropertyStream(Type type, Set<AccessibleProperty<?, ?>> accessibleProperties) {
+        Set<AccessibleProperty<?, ?>> result = ReflectionUtil.accessiblePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndAccessiblePropertySets")
+    void accessiblePropertyStream(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<AccessibleProperty<?, ?>> accessibleProperties) {
+        Set<AccessibleProperty<?, ?>> result = ReflectionUtil.accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndAccessiblePropertySets")
+    <T> void accessiblePropertyStream(Class<T> clazz, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessiblePropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},result:{}", clazz, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndAccessiblePropertySets")
+    <T> void accessiblePropertyStream(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessiblePropertyStream(clazz, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndAccessiblePropertySets")
+    <T> void accessiblePropertyStream(TypeToken<T> type, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessiblePropertyStream(type).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndAccessiblePropertySets")
+    <T> void accessiblePropertyStream(TypeToken<T> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<?, ?>> result = ReflectionUtil.accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndAccessiblePropertySets")
+    <T> void accessibleProperties(Type type, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessibleProperties(type);
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndAccessiblePropertySets")
+    <T> void accessibleProperties(Type type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessibleProperties(type, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndAccessiblePropertySets")
+    <T> void accessibleProperties(Class<T> clazz, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessibleProperties(clazz);
+        log.debug("class:{},result:{}", clazz, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyAccessorMethodFormatAndAccessiblePropertySets")
+    <T> void accessibleProperties(Class<T> clazz, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessibleProperties(clazz, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndAccessiblePropertySets")
+    <T> void accessibleProperties(TypeToken<T> type, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessibleProperties(type);
+        log.debug("type:{},result:{}", type, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyAccessorMethodFormatAndAccessiblePropertySets")
+    <T> void accessibleProperties(TypeToken<T> type, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, Set<AccessibleProperty<T, ?>> accessibleProperties) {
+        Set<AccessibleProperty<T, ?>> result = ReflectionUtil.accessibleProperties(type, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyAccessorMethodFormats:{},result:{}", type, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperties, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndReadablePropertys")
+    <T> void readablePropertyExact(Type type, String propertyName, ReadableProperty<T, ?> readableProperty) {
+        ReadableProperty<T, ?> result = ReflectionUtil.readablePropertyExact(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertEquals(readableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys")
+    <T> void readablePropertyExact(Type type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, ReadableProperty<T, ?> readableProperty) {
+        ReadableProperty<T, ?> result = ReflectionUtil.readablePropertyExact(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndReadablePropertys")
+    <T> void readablePropertyExact(Class<T> clazz, String propertyName, ReadableProperty<T, ?> readableProperty) {
+        ReadableProperty<T, ?> result = ReflectionUtil.readablePropertyExact(clazz, propertyName);
+        log.debug("class:{},propertyName:{},result:{}", clazz, propertyName, result);
+        Assertions.assertEquals(readableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys")
+    <T> void readablePropertyExact(Class<T> clazz, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, ReadableProperty<T, ?> readableProperty) {
+        ReadableProperty<T, ?> result = ReflectionUtil.readablePropertyExact(clazz, propertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndReadablePropertys")
+    <T> void readablePropertyExact(TypeToken<T> type, String propertyName, ReadableProperty<T, ?> readableProperty) {
+        ReadableProperty<T, ?> result = ReflectionUtil.readablePropertyExact(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertEquals(readableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys")
+    <T> void readablePropertyExact(TypeToken<T> type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, ReadableProperty<T, ?> readableProperty) {
+        ReadableProperty<T, ?> result = ReflectionUtil.readablePropertyExact(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(readableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyName")
+    void readablePropertyExactWithErrorPropertyName(Type type, String errorPropertyName) {
+        log.debug("type:{},errorPropertyName:{}", type, errorPropertyName);
+        Assertions.assertThrows(ReadablePropertyNotFoundException.class, () -> ReflectionUtil.readablePropertyExact(type, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats")
+    void readablePropertyExactWithErrorPropertyName(Type type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", type, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(ReadablePropertyNotFoundException.class, () -> ReflectionUtil.readablePropertyExact(type, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyName")
+    void readablePropertyExactWithErrorPropertyName(Class<?> clazz, String errorPropertyName) {
+        log.debug("class:{},errorPropertyName:{}", clazz, errorPropertyName);
+        Assertions.assertThrows(ReadablePropertyNotFoundException.class, () -> ReflectionUtil.readablePropertyExact(clazz, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats")
+    void readablePropertyExactWithErrorPropertyName(Class<?> clazz, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("class:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", clazz, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(ReadablePropertyNotFoundException.class, () -> ReflectionUtil.readablePropertyExact(clazz, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorReadablePropertyName")
+    void readablePropertyExactWithErrorPropertyName(TypeToken<?> type, String errorPropertyName) {
+        log.debug("type:{},errorPropertyName:{}", type, errorPropertyName);
+        Assertions.assertThrows(ReadablePropertyNotFoundException.class, () -> ReflectionUtil.readablePropertyExact(type, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats")
+    void readablePropertyExactWithErrorPropertyName(TypeToken<?> type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", type, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(ReadablePropertyNotFoundException.class, () -> ReflectionUtil.readablePropertyExact(type, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndReadablePropertys")
+    <T, R> void readableProperty(Type type, String propertyName, ReadableProperty<T, R> readableProperty) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(readableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys")
+    <T, R> void readableProperty(Type type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, ReadableProperty<T, R> readableProperty) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(readableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndReadablePropertys")
+    <T, R> void readableProperty(Class<T> clazz, String propertyName, ReadableProperty<T, R> readableProperty) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(clazz, propertyName);
+        log.debug("class:{},propertyName:{},result:{}", clazz, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(readableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys")
+    <T, R> void readableProperty(Class<T> clazz, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, ReadableProperty<T, R> readableProperty) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(clazz, propertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(readableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndReadablePropertys")
+    <T, R> void readableProperty(TypeToken<T> type, String propertyName, ReadableProperty<T, R> readableProperty) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(readableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys")
+    <T, R> void readableProperty(TypeToken<T> type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, ReadableProperty<T, R> readableProperty) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(readableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyName")
+    <T, R> void readablePropertyWithErrorPropertyName(Type type, String errorPropertyName) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, errorPropertyName);
+        log.debug("type:{},errorPropertyName:{},result:{}", type, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void readablePropertyWithErrorPropertyName(Type type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", type, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyName")
+    <T, R> void readablePropertyWithErrorPropertyName(Class<T> clazz, String errorPropertyName) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(clazz, errorPropertyName);
+        log.debug("class:{},errorPropertyName:{},result:{}", clazz, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void readablePropertyWithErrorPropertyName(Class<T> clazz, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(clazz, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorReadablePropertyName")
+    <T, R> void readablePropertyWithErrorPropertyName(TypeToken<T> type, String errorPropertyName) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, errorPropertyName);
+        log.debug("type:{},errorPropertyName:{},result:{}", type, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void readablePropertyWithErrorPropertyName(TypeToken<T> type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<ReadableProperty<T, R>> result = ReflectionUtil.readableProperty(type, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", type, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndWritablePropertys")
+    <T> void writablePropertyExact(Type type, String propertyName, WritableProperty<T, ?> writableProperty) {
+        WritableProperty<T, ?> result = ReflectionUtil.writablePropertyExact(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertEquals(writableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys")
+    <T> void writablePropertyExact(Type type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, WritableProperty<T, ?> writableProperty) {
+        WritableProperty<T, ?> result = ReflectionUtil.writablePropertyExact(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(writableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndWritablePropertys")
+    <T> void writablePropertyExact(Class<T> clazz, String propertyName, WritableProperty<T, ?> writableProperty) {
+        WritableProperty<T, ?> result = ReflectionUtil.writablePropertyExact(clazz, propertyName);
+        log.debug("class:{},propertyName:{},result:{}", clazz, propertyName, result);
+        Assertions.assertEquals(writableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys")
+    <T> void writablePropertyExact(Class<T> clazz, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, WritableProperty<T, ?> writableProperty) {
+        WritableProperty<T, ?> result = ReflectionUtil.writablePropertyExact(clazz, propertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(writableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndWritablePropertys")
+    <T> void writablePropertyExact(TypeToken<T> type, String propertyName, WritableProperty<T, ?> writableProperty) {
+        WritableProperty<T, ?> result = ReflectionUtil.writablePropertyExact(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertEquals(writableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys")
+    <T> void writablePropertyExact(TypeToken<T> type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, WritableProperty<T, ?> writableProperty) {
+        WritableProperty<T, ?> result = ReflectionUtil.writablePropertyExact(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(writableProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyName")
+    void writablePropertyExactWithErrorPropertyName(Type type, String errorPropertyName) {
+        log.debug("type:{},errorPropertyName:{}", type, errorPropertyName);
+        Assertions.assertThrows(WritablePropertyNotFoundException.class, () -> ReflectionUtil.writablePropertyExact(type, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats")
+    void writablePropertyExactWithErrorPropertyName(Type type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", type, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(WritablePropertyNotFoundException.class, () -> ReflectionUtil.writablePropertyExact(type, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyName")
+    void writablePropertyExactWithErrorPropertyName(Class<?> clazz, String errorPropertyName) {
+        log.debug("class:{},errorPropertyName:{}", clazz, errorPropertyName);
+        Assertions.assertThrows(WritablePropertyNotFoundException.class, () -> ReflectionUtil.writablePropertyExact(clazz, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats")
+    void writablePropertyExactWithErrorPropertyName(Class<?> clazz, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("class:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", clazz, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(WritablePropertyNotFoundException.class, () -> ReflectionUtil.writablePropertyExact(clazz, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorWritablePropertyName")
+    void writablePropertyExactWithErrorPropertyName(TypeToken<?> type, String errorPropertyName) {
+        log.debug("type:{},errorPropertyName:{}", type, errorPropertyName);
+        Assertions.assertThrows(WritablePropertyNotFoundException.class, () -> ReflectionUtil.writablePropertyExact(type, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats")
+    void writablePropertyExactWithErrorPropertyName(TypeToken<?> type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", type, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(WritablePropertyNotFoundException.class, () -> ReflectionUtil.writablePropertyExact(type, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndWritablePropertys")
+    <T, R> void writableProperty(Type type, String propertyName, WritableProperty<T, R> writableProperty) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(writableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys")
+    <T, R> void writableProperty(Type type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, WritableProperty<T, R> writableProperty) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(writableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndWritablePropertys")
+    <T, R> void writableProperty(Class<T> clazz, String propertyName, WritableProperty<T, R> writableProperty) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(clazz, propertyName);
+        log.debug("class:{},propertyName:{},result:{}", clazz, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(writableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys")
+    <T, R> void writableProperty(Class<T> clazz, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, WritableProperty<T, R> writableProperty) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(clazz, propertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(writableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndWritablePropertys")
+    <T, R> void writableProperty(TypeToken<T> type, String propertyName, WritableProperty<T, R> writableProperty) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(writableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys")
+    <T, R> void writableProperty(TypeToken<T> type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, WritableProperty<T, R> writableProperty) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(writableProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyName")
+    <T, R> void writablePropertyWithErrorPropertyName(Type type, String errorPropertyName) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, errorPropertyName);
+        log.debug("type:{},errorPropertyName:{},result:{}", type, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void writablePropertyWithErrorPropertyName(Type type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", type, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyName")
+    <T, R> void writablePropertyWithErrorPropertyName(Class<T> clazz, String errorPropertyName) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(clazz, errorPropertyName);
+        log.debug("class:{},errorPropertyName:{},result:{}", clazz, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void writablePropertyWithErrorPropertyName(Class<T> clazz, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(clazz, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorWritablePropertyName")
+    <T, R> void writablePropertyWithErrorPropertyName(TypeToken<T> type, String errorPropertyName) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, errorPropertyName);
+        log.debug("type:{},errorPropertyName:{},result:{}", type, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void writablePropertyWithErrorPropertyName(TypeToken<T> type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<WritableProperty<T, R>> result = ReflectionUtil.writableProperty(type, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", type, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndAccessiblePropertys")
+    <T> void accessiblePropertyExact(Type type, String propertyName, AccessibleProperty<T, ?> accessibleProperty) {
+        AccessibleProperty<T, ?> result = ReflectionUtil.accessiblePropertyExact(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertEquals(accessibleProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys")
+    <T> void accessiblePropertyExact(Type type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, AccessibleProperty<T, ?> accessibleProperty) {
+        AccessibleProperty<T, ?> result = ReflectionUtil.accessiblePropertyExact(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndAccessiblePropertys")
+    <T> void accessiblePropertyExact(Class<T> clazz, String propertyName, AccessibleProperty<T, ?> accessibleProperty) {
+        AccessibleProperty<T, ?> result = ReflectionUtil.accessiblePropertyExact(clazz, propertyName);
+        log.debug("class:{},propertyName:{},result:{}", clazz, propertyName, result);
+        Assertions.assertEquals(accessibleProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys")
+    <T> void accessiblePropertyExact(Class<T> clazz, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, AccessibleProperty<T, ?> accessibleProperty) {
+        AccessibleProperty<T, ?> result = ReflectionUtil.accessiblePropertyExact(clazz, propertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndAccessiblePropertys")
+    <T> void accessiblePropertyExact(TypeToken<T> type, String propertyName, AccessibleProperty<T, ?> accessibleProperty) {
+        AccessibleProperty<T, ?> result = ReflectionUtil.accessiblePropertyExact(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertEquals(accessibleProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys")
+    <T> void accessiblePropertyExact(TypeToken<T> type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, AccessibleProperty<T, ?> accessibleProperty) {
+        AccessibleProperty<T, ?> result = ReflectionUtil.accessiblePropertyExact(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertEquals(accessibleProperty, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyName")
+    void accessiblePropertyExactWithErrorPropertyName(Type type, String errorPropertyName) {
+        log.debug("type:{},errorPropertyName:{}", type, errorPropertyName);
+        Assertions.assertThrows(AccessiblePropertyNotFoundException.class, () -> ReflectionUtil.accessiblePropertyExact(type, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats")
+    void accessiblePropertyExactWithErrorPropertyName(Type type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", type, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(AccessiblePropertyNotFoundException.class, () -> ReflectionUtil.accessiblePropertyExact(type, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyName")
+    void accessiblePropertyExactWithErrorPropertyName(Class<?> clazz, String errorPropertyName) {
+        log.debug("class:{},errorPropertyName:{}", clazz, errorPropertyName);
+        Assertions.assertThrows(AccessiblePropertyNotFoundException.class, () -> ReflectionUtil.accessiblePropertyExact(clazz, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats")
+    void accessiblePropertyExactWithErrorPropertyName(Class<?> clazz, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("class:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", clazz, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(AccessiblePropertyNotFoundException.class, () -> ReflectionUtil.accessiblePropertyExact(clazz, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorAccessiblePropertyName")
+    void accessiblePropertyExactWithErrorPropertyName(TypeToken<?> type, String errorPropertyName) {
+        log.debug("type:{},errorPropertyName:{}", type, errorPropertyName);
+        Assertions.assertThrows(AccessiblePropertyNotFoundException.class, () -> ReflectionUtil.accessiblePropertyExact(type, errorPropertyName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats")
+    void accessiblePropertyExactWithErrorPropertyName(TypeToken<?> type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{}", type, errorPropertyName, propertyAccessorMethodFormats);
+        Assertions.assertThrows(AccessiblePropertyNotFoundException.class, () -> ReflectionUtil.accessiblePropertyExact(type, errorPropertyName, propertyAccessorMethodFormats));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndAccessiblePropertys")
+    <T, R> void accessibleProperty(Type type, String propertyName, AccessibleProperty<T, R> accessibleProperty) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(accessibleProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys")
+    <T, R> void accessibleProperty(Type type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, AccessibleProperty<T, R> accessibleProperty) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(accessibleProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndAccessiblePropertys")
+    <T, R> void accessibleProperty(Class<T> clazz, String propertyName, AccessibleProperty<T, R> accessibleProperty) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(clazz, propertyName);
+        log.debug("class:{},propertyName:{},result:{}", clazz, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(accessibleProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys")
+    <T, R> void accessibleProperty(Class<T> clazz, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, AccessibleProperty<T, R> accessibleProperty) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(clazz, propertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(accessibleProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndAccessiblePropertys")
+    <T, R> void accessibleProperty(TypeToken<T> type, String propertyName, AccessibleProperty<T, R> accessibleProperty) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, propertyName);
+        log.debug("type:{},propertyName:{},result:{}", type, propertyName, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(accessibleProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys")
+    <T, R> void accessibleProperty(TypeToken<T> type, String propertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats, AccessibleProperty<T, R> accessibleProperty) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, propertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},propertyName:{},propertyAccessorMethodFormats:{},result:{}", type, propertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(accessibleProperty, result.get());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyName")
+    <T, R> void accessiblePropertyWithErrorPropertyName(Type type, String errorPropertyName) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, errorPropertyName);
+        log.debug("type:{},errorPropertyName:{},result:{}", type, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void accessiblePropertyWithErrorPropertyName(Type type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", type, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyName")
+    <T, R> void accessiblePropertyWithErrorPropertyName(Class<T> clazz, String errorPropertyName) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(clazz, errorPropertyName);
+        log.debug("class:{},errorPropertyName:{},result:{}", clazz, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void accessiblePropertyWithErrorPropertyName(Class<T> clazz, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(clazz, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("class:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", clazz, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorAccessiblePropertyName")
+    <T, R> void accessiblePropertyWithErrorPropertyName(TypeToken<T> type, String errorPropertyName) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, errorPropertyName);
+        log.debug("type:{},errorPropertyName:{},result:{}", type, errorPropertyName, result);
+        Assertions.assertFalse(result.isPresent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats")
+    <T, R> void accessiblePropertyWithErrorPropertyName(TypeToken<T> type, String errorPropertyName, PropertyAccessorMethodFormat[] propertyAccessorMethodFormats) {
+        Optional<AccessibleProperty<T, R>> result = ReflectionUtil.accessibleProperty(type, errorPropertyName, propertyAccessorMethodFormats);
+        log.debug("type:{},errorPropertyName:{},propertyAccessorMethodFormats:{},result:{}", type, errorPropertyName, propertyAccessorMethodFormats, result);
+        Assertions.assertFalse(result.isPresent());
     }
 
     @ParameterizedTest

@@ -591,4 +591,190 @@ public class Provider {
     static Stream<Arguments> typeTokenAndReadablePropertySets() {
         return classAndReadablePropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
     }
+
+    static Stream<Arguments> classAndPropertyAccessorMethodFormatAndWritablePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndPropertySets()
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[1], ((Collection<Property<?, ?>>) arguments.get()[2]).stream()
+                        .filter(Property::writable).map(Property::toWritable).collect(ImmutableSet.toImmutableSet())));
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyAccessorMethodFormatAndWritablePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndWritablePropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndWritablePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndWritablePropertySets()
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[1], PropertyAccessorMethodFormat.values()))
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> typeTokenAndWritablePropertySets() {
+        return classAndWritablePropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> classAndPropertyAccessorMethodFormatAndAccessiblePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndPropertySets()
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[1], ((Collection<Property<?, ?>>) arguments.get()[2]).stream()
+                        .filter(Property::accessible).map(Property::toAccessible).collect(ImmutableSet.toImmutableSet())));
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyAccessorMethodFormatAndAccessiblePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndAccessiblePropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndAccessiblePropertySets() {
+        return classAndPropertyAccessorMethodFormatAndAccessiblePropertySets()
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[1], PropertyAccessorMethodFormat.values()))
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> typeTokenAndAccessiblePropertySets() {
+        return classAndAccessiblePropertySets().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys() {
+        return classAndPropertyAccessorMethodFormatAndPropertySets()
+                .flatMap(arguments -> ((Collection<Property<?, ?>>) arguments.get()[2]).stream()
+                        .map(property -> Arguments.of(arguments.get()[0], property.name(), arguments.get()[1], property)));
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2], arguments.get()[3]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndPropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys()
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[2], PropertyAccessorMethodFormat.values()))
+                .map(arguments -> Arguments.of(arguments.get()[0], arguments.get()[1], arguments.get()[3]));
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndPropertys() {
+        return classAndPropertyNameAndPropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys()
+                .filter(arguments -> ((Property<?, ?>) arguments.get()[3]).readable());
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndReadablePropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2], arguments.get()[3]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndReadablePropertys() {
+        return classAndPropertyNameAndPropertys()
+                .filter(arguments -> ((Property<?, ?>) arguments.get()[2]).readable());
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndReadablePropertys() {
+        return classAndPropertyNameAndReadablePropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys()
+                .map(arguments -> {
+                    Property<?, ?> property = (Property<?, ?>) arguments.get()[3];
+                    String errorReadablePropertyName = property.readable() ? Math.random() + "" : property.name();
+                    return Arguments.of(arguments.get()[0], errorReadablePropertyName, arguments.get()[2]);
+                });
+    }
+
+    static Stream<Arguments> typeTokenAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats() {
+        return classAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats()
+                .map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndErrorReadablePropertyName() {
+        return classAndErrorReadablePropertyNameAndPropertyAccessorMethodFormats()
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[2], PropertyAccessorMethodFormat.values()));
+    }
+
+    static Stream<Arguments> typeTokenAndErrorReadablePropertyName() {
+        return classAndErrorReadablePropertyName()
+                .map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys()
+                .filter(arguments -> ((Property<?, ?>) arguments.get()[3]).writable());
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndWritablePropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2], arguments.get()[3]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndWritablePropertys() {
+        return classAndPropertyNameAndPropertys()
+                .filter(arguments -> ((Property<?, ?>) arguments.get()[2]).writable());
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndWritablePropertys() {
+        return classAndPropertyNameAndWritablePropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys()
+                .map(arguments -> {
+                    Property<?, ?> property = (Property<?, ?>) arguments.get()[3];
+                    String errorWritablePropertyName = property.writable() ? Math.random() + "" : property.name();
+                    return Arguments.of(arguments.get()[0], errorWritablePropertyName, arguments.get()[2]);
+                });
+    }
+
+    static Stream<Arguments> typeTokenAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats() {
+        return classAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats()
+                .map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndErrorWritablePropertyName() {
+        return classAndErrorWritablePropertyNameAndPropertyAccessorMethodFormats()
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[2], PropertyAccessorMethodFormat.values()));
+    }
+
+    static Stream<Arguments> typeTokenAndErrorWritablePropertyName() {
+        return classAndErrorWritablePropertyName()
+                .map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys()
+                .filter(arguments -> ((Property<?, ?>) arguments.get()[3]).accessible());
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndAccessiblePropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2], arguments.get()[3]));
+    }
+
+    static Stream<Arguments> classAndPropertyNameAndAccessiblePropertys() {
+        return classAndPropertyNameAndPropertys()
+                .filter(arguments -> ((Property<?, ?>) arguments.get()[2]).accessible());
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyNameAndAccessiblePropertys() {
+        return classAndPropertyNameAndAccessiblePropertys().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats() {
+        return classAndPropertyNameAndPropertyAccessorMethodFormatAndPropertys()
+                .map(arguments -> {
+                    Property<?, ?> property = (Property<?, ?>) arguments.get()[3];
+                    String errorAccessiblePropertyName = property.accessible() ? Math.random() + "" : property.name();
+                    return Arguments.of(arguments.get()[0], errorAccessiblePropertyName, arguments.get()[2]);
+                });
+    }
+
+    static Stream<Arguments> typeTokenAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats() {
+        return classAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats()
+                .map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> classAndErrorAccessiblePropertyName() {
+        return classAndErrorAccessiblePropertyNameAndPropertyAccessorMethodFormats()
+                .filter(arguments -> Arrays.equals((PropertyAccessorMethodFormat[]) arguments.get()[2], PropertyAccessorMethodFormat.values()));
+    }
+
+    static Stream<Arguments> typeTokenAndErrorAccessiblePropertyName() {
+        return classAndErrorAccessiblePropertyName()
+                .map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
 }
