@@ -1753,97 +1753,97 @@ public class ReflectionUtil {
 
     @NonNull
     public static <T, R> WritableProperty<T, R> writablePropertyExact(
-            @NonNull Type type, @NonNull String fieldName) {
-        return writablePropertyExact(type, fieldName,
+            @NonNull Type type, @NonNull String propertyName) {
+        return writablePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T, R> WritableProperty<T, R> writablePropertyExact(
-            @NonNull Type type, @NonNull String fieldName,
+            @NonNull Type type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyExact((TypeToken<T>) TypeToken.of(type), fieldName,
+        return writablePropertyExact((TypeToken<T>) TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
     public static <T, R> WritableProperty<T, R> writablePropertyExact(
-            @NonNull Class<T> type, @NonNull String fieldName) {
-        return writablePropertyExact(type, fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName) {
+        return writablePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> WritableProperty<T, R> writablePropertyExact(
-            @NonNull Class<T> type, @NonNull String fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyExact(TypeToken.of(type), fieldName,
+        return writablePropertyExact(TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
     public static <T, R> WritableProperty<T, R> writablePropertyExact(
-            @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return writablePropertyExact(type, fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName) {
+        return writablePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> WritableProperty<T, R> writablePropertyExact(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<T, R>writableProperty(type, fieldName,
+        return ReflectionUtil.<T, R>writableProperty(type, propertyName,
                         propertyAccessorMethodFormats)
                 .orElseThrow(() -> WritablePropertyNotFoundException
-                        .create(type, fieldName));
+                        .create(type, propertyName));
     }
 
     @NonNull
     public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
-            @NonNull Type type, @NonNull String fieldName) {
-        return writableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+            @NonNull Type type, @NonNull String propertyName) {
+        return writableProperty(type, propertyName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
-            @NonNull Type type, @NonNull String fieldName,
+            @NonNull Type type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writableProperty((TypeToken<T>) TypeToken.of(type), fieldName,
+        return writableProperty((TypeToken<T>) TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
     public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
-            @NonNull Class<T> type, @NonNull String fieldName) {
-        return writableProperty(type, fieldName, DEFAULT_METHOD_NAME_STYLES);
+            @NonNull Class<T> type, @NonNull String propertyName) {
+        return writableProperty(type, propertyName, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
-            @NonNull Class<T> type, @NonNull String fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writableProperty(TypeToken.of(type), fieldName,
+        return writableProperty(TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
     public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
-            @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return writableProperty(type, fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName) {
+        return writableProperty(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return writableProperties(type, propertyAccessorMethodFormats)
                 .stream()
-                .filter(propertyWriter -> propertyWriter.name().equals(fieldName))
+                .filter(propertyWriter -> propertyWriter.name().equals(propertyName))
                 .map(propertyWriter -> (WritableProperty<T, R>) propertyWriter)
                 .findAny();
     }
@@ -1851,100 +1851,100 @@ public class ReflectionUtil {
 
     @NonNull
     public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
-            @NonNull Type type, @NonNull String fieldName) {
-        return accessiblePropertyExact(type, fieldName,
+            @NonNull Type type, @NonNull String propertyName) {
+        return accessiblePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
-            @NonNull Type type, @NonNull String fieldName,
+            @NonNull Type type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyExact((TypeToken<T>) TypeToken.of(type), fieldName,
+        return accessiblePropertyExact((TypeToken<T>) TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
     public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
-            @NonNull Class<T> type, @NonNull String fieldName) {
-        return accessiblePropertyExact(type, fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName) {
+        return accessiblePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
-            @NonNull Class<T> type, @NonNull String fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyExact(TypeToken.of(type), fieldName,
+        return accessiblePropertyExact(TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
     @NonNull
     public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
-            @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return accessiblePropertyExact(type, fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName) {
+        return accessiblePropertyExact(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> AccessibleProperty<T, R> accessiblePropertyExact(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<T, R>accessibleProperty(type, fieldName,
+        return ReflectionUtil.<T, R>accessibleProperty(type, propertyName,
                         propertyAccessorMethodFormats)
                 .orElseThrow(() -> AccessiblePropertyNotFoundException
-                        .create(type, fieldName));
+                        .create(type, propertyName));
     }
 
     @NonNull
     public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
-            @NonNull Type type, @NonNull String fieldName) {
-        return accessibleProperty(type, fieldName,
+            @NonNull Type type, @NonNull String propertyName) {
+        return accessibleProperty(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
-            @NonNull Type type, @NonNull String fieldName,
+            @NonNull Type type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessibleProperty((TypeToken<T>) TypeToken.of(type), fieldName,
+        return accessibleProperty((TypeToken<T>) TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
     public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
-            @NonNull Class<T> type, @NonNull String fieldName) {
-        return accessibleProperty(type, fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName) {
+        return accessibleProperty(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
     public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
-            @NonNull Class<T> type, @NonNull String fieldName,
+            @NonNull Class<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessibleProperty(TypeToken.of(type), fieldName,
+        return accessibleProperty(TypeToken.of(type), propertyName,
                 propertyAccessorMethodFormats);
     }
 
 
     @NonNull
     public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
-            @NonNull TypeToken<T> type, @NonNull String fieldName) {
-        return accessibleProperty(type, fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName) {
+        return accessibleProperty(type, propertyName,
                 DEFAULT_METHOD_NAME_STYLES);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
+            @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return accessibleProperties(type, propertyAccessorMethodFormats)
                 .stream()
-                .filter(propertyWriter -> propertyWriter.name().equals(fieldName))
+                .filter(propertyWriter -> propertyWriter.name().equals(propertyName))
                 .map(propertyWriter -> (AccessibleProperty<T, R>) propertyWriter)
                 .findAny();
     }
