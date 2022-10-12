@@ -2311,7 +2311,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isPropertyReader(@NonNull Field field) {
-        return isPropertyWriter(FieldElement.of(field));
+        return isPropertyWriter(FieldElement.of(field));//todo element.of
     }
 
     /**
