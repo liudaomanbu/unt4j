@@ -248,10 +248,12 @@ public class Constant {
             STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD_PROPERTY_READER = PropertyReader.from(STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, "stringField");
             STRING_FIELD_GETTER_STRING_FIELD_PROPERTY_READER = PropertyReader.from(STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD, "stringField");
             STRING_FIELD_GETTER_OBJECT_PROPERTY_READERS = STRING_FIELD_GETTER_OBJECT_GET_METHODS.stream().map(method -> PropertyReader.from(TypeToken.of(StringFieldGetterObject.class).method(method).returning(String.class), "stringField")).collect(ImmutableSet.toImmutableSet());
+//            STRING_FIELD_GETTER_OBJECT_PROPERTY_READERS = STRING_FIELD_GETTER_OBJECT_GET_METHODS.stream().map(method -> PropertyReader.<StringFieldGetterObject, String>from(method, "stringField")).collect(ImmutableSet.toImmutableSet());
             STRING_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(STRING_FIELD_OBJECT_STRING_FIELD);
             STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD_PROPERTY_WRITER = PropertyWriter.from(STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD, "stringField");
             STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD_PROPERTY_WRITER = PropertyWriter.from(STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD, "stringField");
             STRING_FIELD_SETTER_OBJECT_PROPERTY_WRITERS = STRING_FIELD_SETTER_OBJECT_SET_METHODS.stream().map(method -> PropertyWriter.<StringFieldSetterObject, String>from(TypeToken.of(StringFieldSetterObject.class).method(method), "stringField")).collect(ImmutableSet.toImmutableSet());
+//            STRING_FIELD_SETTER_OBJECT_PROPERTY_WRITERS = STRING_FIELD_SETTER_OBJECT_SET_METHODS.stream().map(method -> PropertyWriter.<StringFieldSetterObject, String>from(method, "stringField")).collect(ImmutableSet.toImmutableSet());
             BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_PROPERTY = ReadableProperty.create(ImmutableSet.of(BOOLEAN_FIELD_GET_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER));
             BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_PROPERTY = ReadableProperty.create(ImmutableSet.of(BOOLEAN_FIELD_IS_METHOD_OBJECT_BOOLEAN_FIELD_PROPERTY_READER));
             CHILDREN_LONG_FIELD_OBJECT_STRING_PROPERTY = AccessibleProperty.create(ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR));

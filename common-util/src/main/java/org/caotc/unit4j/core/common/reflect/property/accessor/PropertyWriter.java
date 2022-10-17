@@ -50,6 +50,7 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Method setMethod,
                                           @NonNull String propertyName) {
+//    return from((Invokable<T, ?>) TypeToken.of(setMethod.getDeclaringClass()).method(setMethod), propertyName);
       return from((Invokable<T, ?>) Invokable.from(setMethod), propertyName);
   }
 

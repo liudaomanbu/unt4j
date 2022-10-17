@@ -23,7 +23,6 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.annotation.CheckForNull;
@@ -35,7 +34,6 @@ import java.lang.reflect.InvocationTargetException;
  * @date 2019-11-29
  * @since 1.0.0
  */
-@ToString(callSuper = false)
 @EqualsAndHashCode(callSuper = true)
 @Getter
 public class InvokableElement<O, P> extends BaseElement {
@@ -133,5 +131,10 @@ public class InvokableElement<O, P> extends BaseElement {
   @NonNull
   public final ImmutableList<TypeToken<? extends Throwable>> exceptionTypes() {
     return invokable.getExceptionTypes();
+  }
+
+  @Override
+  public String toString() {
+    return invokable.toString();
   }
 }

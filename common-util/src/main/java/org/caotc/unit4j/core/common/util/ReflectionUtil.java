@@ -60,8 +60,8 @@ public class ReflectionUtil {
     private static final PropertyAccessorMethodFormat[] DEFAULT_METHOD_NAME_STYLES = PropertyAccessorMethodFormat
             .values();
     private static final Function<PropertyElement<?, ?>, ImmutableList<?>> KEY_FUNCTION = propertyElement -> ImmutableList
-            .of(propertyElement.propertyName(), /*propertyElement.propertyType(),*/ //todo remove?
-                    propertyElement.isStatic());
+            .of(propertyElement.propertyName() /*propertyElement.propertyType(),*/ //todo remove?
+                    /*propertyElement.isStatic()*/);
     private static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_CLASS_TO_WRAPPER_CLASS = ImmutableBiMap.<Class<?>, Class<?>>builder()
             .put(byte.class, Byte.class)
             .put(short.class, Short.class)
@@ -276,7 +276,9 @@ public class ReflectionUtil {
     @NonNull
     public static <T> Stream<Invokable<T, ?>> methodInvokableStreamFromClass(
             @NonNull TypeToken<T> type) {
-        return methodStream(type).map(type::method);
+        return methodStream(type).map(type::method);//todo
+//        return methodStream(type).
+//                map(method -> (Invokable<T, ?>)Invokable.from(method));
     }
 
     @NonNull

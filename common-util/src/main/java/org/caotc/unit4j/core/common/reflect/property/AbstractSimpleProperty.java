@@ -49,8 +49,8 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
      * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前+hashcode比较器
      */
     private static final Comparator<PropertyElement<?, ?>> ORDERING = Comparator.<PropertyElement<?, ?>, AccessLevel>comparing(PropertyElement::accessLevel)
+            .thenComparing((p1, p2) -> p1.declaringType().equals(p2.declaringType()) ? 0 : p1.declaringType().isSubtypeOf(p2.declaringType()) ? 1 : -1)
             .thenComparingInt(p -> p.propertyType().hashCode())
-            .thenComparingInt(p -> p.ownerType().hashCode())
             .thenComparing((p1, p2) -> p1.equals(p2) ? 0 : System.identityHashCode(p1) - System.identityHashCode(p2));//todo property type? sortedset comparator and equals 改成 list?
     @NonNull
     String name;

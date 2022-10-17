@@ -19,9 +19,9 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.ToString;
-import org.caotc.unit4j.core.common.reflect.BaseElement;
 import org.caotc.unit4j.core.common.reflect.Element;
+
+import java.lang.annotation.Annotation;
 
 /**
  * 属性元素抽象类
@@ -32,16 +32,14 @@ import org.caotc.unit4j.core.common.reflect.Element;
  * @date 2019-05-27
  * @since 1.0.0
  */
-@ToString(callSuper = false)
-@EqualsAndHashCode(callSuper = true)
-public abstract class AbstractPropertyElement<O, P> extends BaseElement implements
+@EqualsAndHashCode
+public abstract class AbstractPropertyElement<O, P> implements
         PropertyElement<O, P> {
     @NonNull
     Element element;
 
     protected AbstractPropertyElement(
             @NonNull Element element) {
-        super(element);
         this.element = element;
     }
 
@@ -49,7 +47,13 @@ public abstract class AbstractPropertyElement<O, P> extends BaseElement implemen
     @NonNull
     @Override
     public final TypeToken<O> ownerType() {
-        return (TypeToken<O>) super.ownerType();
+        return (TypeToken<O>) element.ownerType();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public TypeToken<O> declaringType() {
+        return (TypeToken<O>) TypeToken.of(element.getDeclaringClass());
     }
 
     @Override
@@ -61,5 +65,45 @@ public abstract class AbstractPropertyElement<O, P> extends BaseElement implemen
     public @NonNull PropertyElement<O, P> accessible(boolean accessible) {
         element.accessible(accessible);
         return this;
+    }
+
+    @Override
+    public boolean isPublic() {
+        return element.isPublic();
+    }
+
+    @Override
+    public boolean isProtected() {
+        return element.isProtected();
+    }
+
+    @Override
+    public boolean isPackagePrivate() {
+        return element.isPackagePrivate();
+    }
+
+    @Override
+    public boolean isPrivate() {
+        return element.isPrivate();
+    }
+
+    @Override
+    public <T extends Annotation> T getAnnotation(@NonNull Class<T> annotationClass) {
+        return element.getAnnotation(annotationClass);
+    }
+
+    @Override
+    public Annotation[] getAnnotations() {
+        return element.getAnnotations();
+    }
+
+    @Override
+    public Annotation[] getDeclaredAnnotations() {
+        return element.getDeclaredAnnotations();
+    }
+
+    @Override
+    public String toString() {
+        return element.toString();
     }
 }

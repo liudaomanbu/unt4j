@@ -2,9 +2,7 @@ package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
-import lombok.AccessLevel;
 import lombok.NonNull;
-import org.caotc.unit4j.core.exception.NeverHappenException;
 
 import java.lang.reflect.Modifier;
 
@@ -13,7 +11,7 @@ import java.lang.reflect.Modifier;
  * @date 2022-08-25
  * @since 1.0.0
  */
-public interface Member extends java.lang.reflect.Member {
+public interface Member extends java.lang.reflect.Member, WithAccessLevel {
     @NonNull
     default TypeToken<?> ownerType() {
         return TypeToken.of(getDeclaringClass());
@@ -103,30 +101,5 @@ public interface Member extends java.lang.reflect.Member {
      */
     default boolean isTransient() {
         return Modifier.isTransient(getModifiers());
-    }
-
-    /**
-     * 该元素的权限级别
-     *
-     * @return 权限级别
-     * @author caotc
-     * @date 2019-07-14
-     * @since 1.0.0
-     */
-    @NonNull
-    default AccessLevel accessLevel() {
-        if (isPrivate()) {
-            return AccessLevel.PRIVATE;
-        }
-        if (isPackagePrivate()) {
-            return AccessLevel.PACKAGE;
-        }
-        if (isProtected()) {
-            return AccessLevel.PROTECTED;
-        }
-        if (isPublic()) {
-            return AccessLevel.PUBLIC;
-        }
-        throw NeverHappenException.instance();
     }
 }

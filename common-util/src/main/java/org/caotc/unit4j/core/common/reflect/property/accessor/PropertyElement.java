@@ -20,8 +20,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.Element;
+import org.caotc.unit4j.core.common.reflect.AnnotatedElement;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
+import org.caotc.unit4j.core.common.reflect.WithAccessLevel;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -35,7 +36,7 @@ import java.lang.reflect.Field;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyElement<O, P> extends Element {
+public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement {
 
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull Field field) {
@@ -131,6 +132,15 @@ public interface PropertyElement<O, P> extends Element {
         Preconditions.checkArgument(isAccessor(), "it is not a PropertyAccessor");
         return (PropertyAccessor<O, P>) this;
     }
+
+    TypeToken<O> ownerType();//todo 范型
+
+    TypeToken<O> declaringType();//todo 范型
+
+    boolean accessible();
+
+    @NonNull
+    PropertyElement<O, P> accessible(boolean accessible);
 
     boolean basedOnField();
 }

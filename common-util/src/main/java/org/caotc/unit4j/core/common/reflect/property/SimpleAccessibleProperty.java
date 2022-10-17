@@ -18,6 +18,7 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
+@EqualsAndHashCode(callSuper = true)
 public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P> implements AccessibleProperty<O, P> {
 
     public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,

@@ -52,8 +52,8 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Method getMethod,
                                           @NonNull String propertyName) {
-    return from((Invokable<T, R>) TypeToken.of(getMethod.getDeclaringClass()).method(getMethod), propertyName);
-//      return from((Invokable<T, R>) Invokable.from(getMethod), propertyName);
+//    return from((Invokable<T, R>) TypeToken.of(getMethod.getDeclaringClass()).method(getMethod), propertyName);
+    return from((Invokable<T, R>) Invokable.from(getMethod), propertyName);
   }
 
   /**

@@ -2391,7 +2391,7 @@ class ReflectionUtilTest {
     @SneakyThrows
     @Test
     void readerEquals() {
-        Set<PropertyReader<Sub, ?>> result = ReflectionUtil.propertyReaders(Sub.class).stream().filter(r -> r.propertyName().equals("stringField") && !r.basedOnField() && !r.isAbstract()).collect(Collectors.toSet());
+        Set<PropertyReader<Sub, ?>> result = ReflectionUtil.propertyReaders(Sub.class).stream().filter(r -> r.propertyName().equals("stringField") && !r.basedOnField() && r.ownerType().getRawType().equals(Sub.class)).collect(Collectors.toSet());
         Assertions.assertTrue(result.contains(PropertyConstant.SUB_STRING_FIELD_GET_METHOD_READER));
 
 

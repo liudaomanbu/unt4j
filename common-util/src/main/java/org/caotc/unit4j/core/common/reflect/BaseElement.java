@@ -19,7 +19,6 @@ package org.caotc.unit4j.core.common.reflect;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.ToString.Exclude;
 
 import java.lang.annotation.Annotation;
@@ -35,7 +34,6 @@ import java.lang.reflect.*;
  * @see Constructor
  * @since 1.0.0
  */
-@ToString
 @RequiredArgsConstructor
 @EqualsAndHashCode
 public abstract class BaseElement implements Element {
@@ -88,5 +86,10 @@ public abstract class BaseElement implements Element {
   @Override
   public final boolean isSynthetic() {
     return member.isSynthetic();
+  }
+
+  @Override
+  public String toString() {
+    return member.toString();
   }
 }

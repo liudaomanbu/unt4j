@@ -20,7 +20,6 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import lombok.ToString;
 
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
@@ -31,7 +30,6 @@ import java.lang.reflect.Type;
  * @date 2019-11-29
  * @since 1.0.0
  */
-@ToString(callSuper = false)
 @EqualsAndHashCode(callSuper = true)
 public class FieldElement<O, P> extends BaseElement {
 
@@ -123,5 +121,10 @@ public class FieldElement<O, P> extends BaseElement {
   public @NonNull FieldElement<O, P> accessible(boolean accessible) {
     field.setAccessible(accessible);
     return this;
+  }
+
+  @Override
+  public String toString() {
+    return field.toString();
   }
 }
