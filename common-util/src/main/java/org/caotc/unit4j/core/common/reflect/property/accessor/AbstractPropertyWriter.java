@@ -144,7 +144,7 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
      * set方法
      */
     @NonNull
-    InvokableElement<T, ?> setInvokable;
+    InvokableElement<T, ?> invokable;
     /**
      * set方法名称风格
      */
@@ -157,20 +157,20 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
       Preconditions
               .checkArgument(ReflectionUtil.isPropertyWriter(invokable.invokable()), "%s is not a setInvokable",
                       invokable);
-      this.setInvokable = invokable;
+      this.invokable = invokable;
       this.propertyName = propertyName;
     }
 
     @Override
     @SneakyThrows
     public void writeInternal(@NonNull T obj, @NonNull R value) {
-      setInvokable.invoke(obj, value);
+      invokable.invoke(obj, value);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
-      return (TypeToken<? extends R>) setInvokable.parameters().get(0).getType();
+      return (TypeToken<? extends R>) invokable.parameters().get(0).getType();
     }
 
     @Override

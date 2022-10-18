@@ -165,7 +165,7 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     /**
      * get方法
      */
-    @NonNull InvokableElement<T, R> getInvokable;
+    @NonNull InvokableElement<T, R> invokable;
     /**
      * 属性名称
      */
@@ -177,7 +177,7 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
       Preconditions
               .checkArgument(ReflectionUtil.isPropertyReader(invokable.invokable()), "%s is not a getInvokable",
                       invokable);
-      this.getInvokable = invokable;
+      this.invokable = invokable;
       this.propertyName = propertyName;
     }
 
@@ -185,12 +185,12 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     @Override
     @SneakyThrows
     public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable(getInvokable.invoke(object));
+      return Optional.ofNullable(invokable.invoke(object));
     }
 
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
-      return getInvokable.returnType();
+      return invokable.returnType();
     }
 
     @Override

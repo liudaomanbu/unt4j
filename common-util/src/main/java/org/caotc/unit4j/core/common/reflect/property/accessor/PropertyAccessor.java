@@ -148,29 +148,29 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
      * 属性
      */
     @NonNull
-    FieldElement<T, R> fieldElement;
+    FieldElement<T, R> field;
 
-    FieldElementPropertyAccessor(@NonNull FieldElement<T, R> fieldElement) {
-      super(fieldElement);
-      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(fieldElement),
-              "%s is not a PropertyWriter", fieldElement);
-      this.fieldElement = fieldElement;
+    FieldElementPropertyAccessor(@NonNull FieldElement<T, R> field) {
+      super(field);
+      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(field),
+              "%s is not a PropertyWriter", field);
+      this.field = field;
     }
 
     @NonNull
     @Override
     public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable(fieldElement.get(object));
+      return Optional.ofNullable(field.get(object));
     }
 
     @Override
     protected void writeInternal(@NonNull T object, @NonNull R value) {
-      fieldElement.set(object, value);
+      field.set(object, value);
     }
 
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
-      return fieldElement.type();
+      return field.type();
     }
 
     @Override
@@ -180,7 +180,7 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
 
     @Override
     public @NonNull String propertyName() {
-      return fieldElement.getName();
+      return field.getName();
     }
 
   }
