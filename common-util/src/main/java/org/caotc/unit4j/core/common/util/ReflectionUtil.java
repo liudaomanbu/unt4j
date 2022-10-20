@@ -485,7 +485,7 @@ public class ReflectionUtil {
         return getInvokableStreamFromClass(type)
                 .filter(
                         getInvokable -> PropertyAccessorMethodFormat.JAVA_BEAN
-                                .fieldNameFromGetInvokable(getInvokable)
+                                .propertyNameFromPropertyReader(getInvokable)
                                 .equals(fieldName))
                 .findAny();
     }
@@ -682,7 +682,7 @@ public class ReflectionUtil {
                                                                    @NonNull String fieldName) {
         return setInvokableStreamFromClass(type)
                 .filter(setInvokable -> PropertyAccessorMethodFormat.JAVA_BEAN
-                        .fieldNameFromSetInvokable(setInvokable).equals(fieldName));
+                        .propertyNameFromPropertyWriter(setInvokable).equals(fieldName));
     }
 
     //todo beta
@@ -742,7 +742,7 @@ public class ReflectionUtil {
     public Optional<Method> getMethod(@NonNull TypeToken<?> type,
                                       @NonNull String fieldName) {
         return getMethodStream(type)
-                .filter(getMethod -> fieldName.equals(PropertyAccessorMethodFormat.JAVA_BEAN.fieldNameFromGetMethod(getMethod)))
+                .filter(getMethod -> fieldName.equals(PropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyReader(getMethod)))
                 //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
                 // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
                 .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2);
@@ -936,7 +936,7 @@ public class ReflectionUtil {
                                           @NonNull String fieldName) {
         return setMethodStream(type)
                 .filter(setMethod -> fieldName
-                        .equals(PropertyAccessorMethodFormat.JAVA_BEAN.fieldNameFromSetMethod(setMethod)));
+                        .equals(PropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyWriter(setMethod)));
     }
 
     /**
@@ -2037,15 +2037,15 @@ public class ReflectionUtil {
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
 
-        Stream<PropertyElement<T, ?>> propertyElementStream = methodInvokableStreamFromClass(type)
-                .flatMap(invokable -> Arrays.stream(propertyAccessorMethodFormats)
-                        .filter(methodNameStyle -> methodNameStyle.isPropertyWriter(invokable)
-                                || methodNameStyle.isPropertyReader(invokable))
-                        .map(methodNameStyle -> PropertyElement.from(invokable, methodNameStyle.propertyName(invokable))));
+        Stream<PropertyElement<T, ?>> propertyElementStream = methodStream(type)
+                .flatMap(method -> Arrays.stream(propertyAccessorMethodFormats)
+                        .filter(methodNameStyle -> methodNameStyle.isPropertyWriter(method)
+                                || methodNameStyle.isPropertyReader(method))
+                        .map(methodNameStyle -> PropertyElement.from(type, method, methodNameStyle.propertyName(method))));
 
         return Stream
                 .concat(fieldStream(type).filter(field -> isPropertyReader(field) || isPropertyWriter(field))
-                                .map(PropertyElement::from),
+                                .map(field -> PropertyElement.from(type, field)),
                         propertyElementStream);
     }
 
@@ -2328,6 +2328,10 @@ public class ReflectionUtil {
         return !fieldElement.isStatic();
     }
 
+    public static boolean isPropertyReader(@NonNull Method method) {
+        return isPropertyReader(method, DEFAULT_METHOD_NAME_STYLES);
+    }
+
     /**
      * 检查传入方法是否是get方法
      *
@@ -2489,6 +2493,10 @@ public class ReflectionUtil {
      */
     public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
         return isPropertyWriter(invokable, PropertyAccessorMethodFormat.JAVA_BEAN);
+    }
+
+    public static boolean isPropertyElement(@NonNull Field field) {
+        return !FieldElement.of(field).isStatic();
     }
 
     public static boolean isOverride(@NonNull Method method) {

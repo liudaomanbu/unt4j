@@ -16,15 +16,12 @@
 
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
-import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.FieldElement;
-import org.caotc.unit4j.core.common.reflect.InvokableElement;
-import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyReader.InvokablePropertyReader;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
@@ -37,39 +34,42 @@ import java.util.Optional;
  * @since 1.0.0
  */
 public interface PropertyReader<T, R> extends PropertyElement<T, R> {
-
-  /**
-   * 工厂方法
-   *
-   * @param getMethod get方法
-   * @param propertyName 属性名称
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Method getMethod,
+  static <T, R> PropertyReader<T, R> from(@NonNull Type ownerType, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
-//    return from((Invokable<T, R>) TypeToken.of(getMethod.getDeclaringClass()).method(getMethod), propertyName);
-    return from((Invokable<T, R>) Invokable.from(getMethod), propertyName);
+    return PropertyElement.<T, R>from(ownerType, propertyReaderMethod, propertyName).toReader();
+  }
+
+  @NonNull
+  static <T, R> PropertyReader<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method propertyReaderMethod,
+                                          @NonNull String propertyName) {
+    return PropertyElement.<T, R>from(ownerClass, propertyReaderMethod, propertyName).toReader();
   }
 
   /**
    * 工厂方法
    *
-   * @param getInvokable get方法封装的Invokable
-   * @param propertyName 属性名称
+   * @param propertyReaderMethod get方法
+   * @param propertyName         属性名称
    * @return 属性获取器
    * @author caotc
    * @date 2019-06-16
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Invokable<T, R> getInvokable,
+  static <T, R> PropertyReader<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
-    return new InvokablePropertyReader<>(InvokableElement.of(getInvokable), propertyName);
+    return PropertyElement.<T, R>from(ownerType, propertyReaderMethod, propertyName).toReader();
+  }
+
+  @NonNull
+  static <T, R> PropertyReader<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerType, field).toReader();
+  }
+
+  @NonNull
+  static <T, R> PropertyReader<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerClass, field).toReader();
   }
 
   /**
@@ -82,13 +82,8 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Field field) {
-    return from(FieldElement.of(field));
-  }
-
-  @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
-    return PropertyElement.from(fieldElement).toReader();
+  static <T, R> PropertyReader<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerType, field).toReader();
   }
 
   /**

@@ -21,7 +21,6 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
-import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.reflect.InvokableElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
@@ -43,8 +42,7 @@ import java.util.Optional;
 public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyElement<T, R> implements
         PropertyReader<T, R> {
 
-  protected AbstractPropertyReader(
-          @NonNull Element member) {
+  protected AbstractPropertyReader(@NonNull Element member) {
     super(member);
   }
 
@@ -106,51 +104,6 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
   }
 
   /**
-   * {@link Field}实现的属性获取器
-   *
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Value
-  @EqualsAndHashCode(callSuper = true)
-  @ToString(callSuper = false)
-  public static class FieldElementPropertyReader<T, R> extends AbstractPropertyReader<T, R> {
-
-    /**
-     * 属性
-     */
-    @NonNull
-    FieldElement<T, R> fieldElement;
-
-    FieldElementPropertyReader(@NonNull FieldElement<T, R> fieldElement) {
-      super(fieldElement);
-      this.fieldElement = fieldElement;
-    }
-
-    @NonNull
-    @Override
-    public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable(fieldElement.get(object));
-    }
-
-    @Override
-    public @NonNull TypeToken<? extends R> propertyType() {
-      return fieldElement.type();
-    }
-
-    @Override
-    public boolean basedOnField() {
-      return true;
-    }
-
-    @Override
-    public @NonNull String propertyName() {
-      return fieldElement.getName();
-    }
-  }
-
-  /**
    * get{@link Invokable}实现的属性获取器
    *
    * @author caotc
@@ -163,7 +116,7 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
   public static class InvokablePropertyReader<T, R> extends AbstractPropertyReader<T, R> {
 
     /**
-     * get方法
+     * 方法
      */
     @NonNull InvokableElement<T, R> invokable;
     /**
@@ -191,6 +144,11 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     @Override
     public @NonNull TypeToken<? extends R> propertyType() {
       return invokable.returnType();
+    }
+
+    @Override
+    public TypeToken<T> ownerType() {
+      return invokable.ownerType();
     }
 
     @Override

@@ -82,13 +82,6 @@ public class FieldElement<O, P> extends BaseElement {
     return (Class<? super O>) super.getDeclaringClass();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  @NonNull
-  public TypeToken<O> ownerType() {
-    return (TypeToken<O>) TypeToken.of(getDeclaringClass());
-  }
-
   @NonNull
   public AnnotatedType annotatedType() {
     return field.getAnnotatedType();

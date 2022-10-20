@@ -16,16 +16,8 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.core.common.util.model.Sub;
-import org.caotc.unit4j.core.common.util.model.Super;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
 
 /**
  * @author caotc
@@ -37,36 +29,36 @@ class ReadablePropertyTest {
 
   @Test
   void test() throws NoSuchFieldException {
-    FieldElement<Super, Object> superStringField = FieldElement
-            .of(Super.class.getDeclaredField("stringField"));
-    FieldElement<Sub, Object> subStringField = FieldElement
-            .of(Sub.class.getDeclaredField("stringField"));
-    FieldElement<Sub, Object> subNumberField = FieldElement
-            .of(Sub.class.getDeclaredField("numberField"));
-
-    PropertyReader<Super, Object> superStringFieldPropertyReader = PropertyReader
-        .from(superStringField);
-    PropertyReader<Sub, Object> subStringFieldPropertyReader = PropertyReader.from(subStringField);
-    PropertyReader<Sub, Object> subNumberFieldPropertyReader = PropertyReader.from(subNumberField);
-
-    ImmutableList<PropertyReader<? extends Super, Object>> propertyReaders = ImmutableList
-        .of(superStringFieldPropertyReader, subStringFieldPropertyReader);
-
-    ReadableProperty<Super, Object> readableProperty1 = ReadableProperty
-        .create(ImmutableSet.of(superStringFieldPropertyReader));
-
-    ReadableProperty<Sub, Object> readableProperty2 = ReadableProperty
-        .create(ImmutableSet.of(subStringFieldPropertyReader));
-    ReadableProperty<Sub, Object> readableProperty3 = ReadableProperty
-        .create(ImmutableSet.of(subNumberFieldPropertyReader));
-
-    ImmutableSet<ReadableProperty<? super Sub, Object>> of = ImmutableSet
-        .of(readableProperty1, readableProperty2, readableProperty3);
-
-    Sub sub = new Sub();
-    for (ReadableProperty<? super Sub, Object> readableProperty : of) {
-      Optional<Object> value = readableProperty.read(sub);
-      log.debug("property:{},value:{}", readableProperty.name(), value);
-    }
+//    FieldElement<Super, Object> superStringField = FieldElement
+//            .of(Super.class.getDeclaredField("stringField"));
+//    FieldElement<Sub, Object> subStringField = FieldElement
+//            .of(Sub.class.getDeclaredField("stringField"));
+//    FieldElement<Sub, Object> subNumberField = FieldElement
+//            .of(Sub.class.getDeclaredField("numberField"));
+//
+//    PropertyReader<Super, Object> superStringFieldPropertyReader = PropertyReader
+//        .from(superStringField);
+//    PropertyReader<Sub, Object> subStringFieldPropertyReader = PropertyReader.from(subStringField);
+//    PropertyReader<Sub, Object> subNumberFieldPropertyReader = PropertyReader.from(subNumberField);
+//
+//    ImmutableList<PropertyReader<? extends Super, Object>> propertyReaders = ImmutableList
+//        .of(superStringFieldPropertyReader, subStringFieldPropertyReader);
+//
+//    ReadableProperty<Super, Object> readableProperty1 = ReadableProperty
+//        .create(ImmutableSet.of(superStringFieldPropertyReader));
+//
+//    ReadableProperty<Sub, Object> readableProperty2 = ReadableProperty
+//        .create(ImmutableSet.of(subStringFieldPropertyReader));
+//    ReadableProperty<Sub, Object> readableProperty3 = ReadableProperty
+//        .create(ImmutableSet.of(subNumberFieldPropertyReader));
+//
+//    ImmutableSet<ReadableProperty<? super Sub, Object>> of = ImmutableSet
+//        .of(readableProperty1, readableProperty2, readableProperty3);
+//
+//    Sub sub = new Sub();
+//    for (ReadableProperty<? super Sub, Object> readableProperty : of) {
+//      Optional<Object> value = readableProperty.read(sub);
+//      log.debug("property:{},value:{}", readableProperty.name(), value);
+//    }
   }
 }

@@ -17,8 +17,6 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.common.util.model.Sub;
-import org.caotc.unit4j.core.common.util.model.Super;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +29,12 @@ class FieldElementTest {
 
   @Test
   void test() throws NoSuchFieldException {
-    FieldElement<Sub, Object> stringField = FieldElement
-            .of(Super.class.getDeclaredField("stringField"));
-    log.debug("stringField:{}", stringField);
-    log.debug("ownerType:{}", stringField.ownerType());
-
-    Sub object = new Sub();
-    stringField.accessible(true);
-      log.debug("value:{}", stringField.get(object));
+//    FieldElement<Sub, Object> stringField = FieldElement
+//            .of(Super.class.getDeclaredField("stringField"));
+//    log.debug("stringField:{}", stringField);
+//
+//    Sub object = new Sub();
+//    stringField.accessible(true);
+//      log.debug("value:{}", stringField.get(object));
   }
 }

@@ -27,9 +27,12 @@ import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
+ * todo interface
+ *
  * @author caotc
  * @date 2019-11-23
  * @since 1.0.0
@@ -38,6 +41,20 @@ import java.util.Optional;
 @ToString(callSuper = false)
 public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, R> implements
         PropertyReader<T, R>, PropertyWriter<T, R> {
+
+  protected PropertyAccessor(@NonNull Element element) {
+    super(element);
+  }
+
+  @NonNull
+  public static <T, R> PropertyAccessor<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerType, field).toAccessor();
+  }
+
+  @NonNull
+  public static <T, R> PropertyAccessor<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerClass, field).toAccessor();
+  }
 
   /**
    * 工厂方法
@@ -48,28 +65,9 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
    * @date 2019-06-16
    * @since 1.0.0
    */
-  @SuppressWarnings("unchecked")
   @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull Field field) {
-    return from(FieldElement.of(field));
-  }
-
-  /**
-   * @author caotc
-   * @date 2019-12-08
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
-    return new FieldElementPropertyAccessor<>(fieldElement);
-  }
-
-  protected PropertyAccessor(
-          @NonNull Element element) {
-    super(element);
+  public static <T, R> PropertyAccessor<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerType, field).toAccessor();
   }
 
   @Override
@@ -131,7 +129,6 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
     return (PropertyAccessor<T, R1>) this;
   }
 
-
   /**
    * {@link Field}实现的属性获取器
    *
@@ -143,17 +140,19 @@ public abstract class PropertyAccessor<T, R> extends AbstractPropertyElement<T, 
   @EqualsAndHashCode(callSuper = true)
   @ToString(callSuper = false)
   public static class FieldElementPropertyAccessor<T, R> extends PropertyAccessor<T, R> {
-
+    @NonNull
+    TypeToken<T> ownerType;
     /**
      * 属性
      */
     @NonNull
     FieldElement<T, R> field;
 
-    FieldElementPropertyAccessor(@NonNull FieldElement<T, R> field) {
+    FieldElementPropertyAccessor(@NonNull TypeToken<T> ownerType, @NonNull FieldElement<T, R> field) {
       super(field);
       Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(field),
-              "%s is not a PropertyWriter", field);
+              "%s is not a PropertyWriter", field);//todo
+      this.ownerType = ownerType;
       this.field = field;
     }
 

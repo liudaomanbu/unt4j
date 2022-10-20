@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
+ * todo interface
  * get/set方法的命名风格枚举
  *
  * @author caotc
@@ -55,7 +56,7 @@ public enum PropertyAccessorMethodFormat {
 
         @NonNull
         @Override
-        public String getMethodNameFromField(@NonNull Field field) {
+        public String propertyReaderNameFromField(@NonNull Field field) {
             String methodFieldName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, field.getName());
             String prefix =
                     boolean.class.equals(field.getType()) ? IS_METHOD_PREFIX : GET_METHOD_PREFIX;
@@ -63,7 +64,7 @@ public enum PropertyAccessorMethodFormat {
         }
 
         @Override
-        public @NonNull String fieldNameFromGetInvokable(@NonNull Invokable<?, ?> getInvokable) {
+        public @NonNull String propertyNameFromPropertyReader(@NonNull Invokable<?, ?> getInvokable) {
             String prefix = getInvokable.getName().startsWith(GET_METHOD_PREFIX) ? GET_METHOD_PREFIX
                     : IS_METHOD_PREFIX;
             String methodFieldName = getInvokable.getName().replaceFirst(prefix, StringConstant.EMPTY);
@@ -71,13 +72,13 @@ public enum PropertyAccessorMethodFormat {
         }
 
         @Override
-        public @NonNull String setMethodNameFromField(@NonNull Field field) {
+        public @NonNull String PropertyWriterNameFromField(@NonNull Field field) {
             String methodFieldName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, field.getName());
             return StringConstant.EMPTY_JOINER.join(SET_METHOD_PREFIX, methodFieldName);
         }
 
         @Override
-        public @NonNull String fieldNameFromSetInvokable(@NonNull Invokable<?, ?> setInvokable) {
+        public @NonNull String propertyNameFromPropertyWriter(@NonNull Invokable<?, ?> setInvokable) {
             String methodFieldName = setInvokable.getName()
                     .replaceFirst(SET_METHOD_PREFIX, StringConstant.EMPTY);
             return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_CAMEL, methodFieldName);
@@ -102,22 +103,22 @@ public enum PropertyAccessorMethodFormat {
 
         @NonNull
         @Override
-        public String getMethodNameFromField(@NonNull Field field) {
+        public String propertyReaderNameFromField(@NonNull Field field) {
             return field.getName();
         }
 
         @Override
-        public @NonNull String fieldNameFromGetInvokable(@NonNull Invokable<?, ?> getInvokable) {
+        public @NonNull String propertyNameFromPropertyReader(@NonNull Invokable<?, ?> getInvokable) {
             return getInvokable.getName();
         }
 
         @Override
-        public @NonNull String setMethodNameFromField(@NonNull Field field) {
+        public @NonNull String PropertyWriterNameFromField(@NonNull Field field) {
             return field.getName();
         }
 
         @Override
-        public @NonNull String fieldNameFromSetInvokable(@NonNull Invokable<?, ?> setInvokable) {
+        public @NonNull String propertyNameFromPropertyWriter(@NonNull Invokable<?, ?> setInvokable) {
             return setInvokable.getName();
         }
     };
@@ -162,7 +163,7 @@ public enum PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    public boolean isSetMethod(@NonNull Method method) {
+    public boolean isPropertyWriter(@NonNull Method method) {
         return isPropertyWriter(Invokable.from(method));
     }
 
@@ -194,7 +195,7 @@ public enum PropertyAccessorMethodFormat {
      * @since 1.0.0
      */
     @NonNull
-    public abstract String getMethodNameFromField(@NonNull Field field);
+    public abstract String propertyReaderNameFromField(@NonNull Field field);
 
     /**
      * 获取传入get方法的对应的属性名称
@@ -207,8 +208,8 @@ public enum PropertyAccessorMethodFormat {
      * @since 1.0.0
      */
     @NonNull
-    public String fieldNameFromGetMethod(@NonNull Method getMethod) {
-        return fieldNameFromGetInvokable(Invokable.from(getMethod));
+    public String propertyNameFromPropertyReader(@NonNull Method getMethod) {
+        return propertyNameFromPropertyReader(Invokable.from(getMethod));
     }
 
     /**
@@ -222,7 +223,7 @@ public enum PropertyAccessorMethodFormat {
      * @since 1.0.0
      */
     @NonNull
-    public abstract String fieldNameFromGetInvokable(@NonNull Invokable<?, ?> getInvokable);
+    public abstract String propertyNameFromPropertyReader(@NonNull Invokable<?, ?> getInvokable);
 
     /**
      * 获取传入属性的该命名风格的set方法名
@@ -234,7 +235,7 @@ public enum PropertyAccessorMethodFormat {
      * @since 1.0.0
      */
     @NonNull
-    public abstract String setMethodNameFromField(@NonNull Field field);
+    public abstract String PropertyWriterNameFromField(@NonNull Field field);
 
     /**
      * 获取传入set方法的对应的属性名称
@@ -247,8 +248,8 @@ public enum PropertyAccessorMethodFormat {
      * @since 1.0.0
      */
     @NonNull
-    public String fieldNameFromSetMethod(@NonNull Method setMethod) {
-        return fieldNameFromSetInvokable(Invokable.from(setMethod));
+    public String propertyNameFromPropertyWriter(@NonNull Method setMethod) {
+        return propertyNameFromPropertyWriter(Invokable.from(setMethod));
     }
 
     /**
@@ -262,15 +263,20 @@ public enum PropertyAccessorMethodFormat {
      * @since 1.0.0
      */
     @NonNull
-    public abstract String fieldNameFromSetInvokable(@NonNull Invokable<?, ?> setInvokable);
+    public abstract String propertyNameFromPropertyWriter(@NonNull Invokable<?, ?> setInvokable);
+
+    @NonNull
+    public String propertyName(@NonNull Method propertyAccessorMethod) {
+        return propertyName(Invokable.from(propertyAccessorMethod));
+    }
 
     @NonNull
     public String propertyName(@NonNull Invokable<?, ?> propertyAccessorInvokable) {
         if (isPropertyReader(propertyAccessorInvokable)) {
-            return fieldNameFromGetInvokable(propertyAccessorInvokable);
+            return propertyNameFromPropertyReader(propertyAccessorInvokable);
         }
         if (isPropertyWriter(propertyAccessorInvokable)) {
-            return fieldNameFromSetInvokable(propertyAccessorInvokable);
+            return propertyNameFromPropertyWriter(propertyAccessorInvokable);
         }
         throw new IllegalArgumentException(String.format("%s is not a propertyAccessorInvokable", propertyAccessorInvokable));
     }

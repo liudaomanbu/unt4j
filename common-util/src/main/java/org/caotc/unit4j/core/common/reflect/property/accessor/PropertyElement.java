@@ -22,10 +22,13 @@ import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.AnnotatedElement;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
+import org.caotc.unit4j.core.common.reflect.InvokableElement;
 import org.caotc.unit4j.core.common.reflect.WithAccessLevel;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * 属性元素
@@ -37,33 +40,48 @@ import java.lang.reflect.Field;
  * @since 1.0.0
  */
 public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement {
-
+    @SuppressWarnings("unchecked")
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull Field field) {
-        return from(FieldElement.of(field));
+    static <T, R> PropertyElement<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
+        return from((TypeToken<T>) TypeToken.of(ownerType), field);
     }
 
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull FieldElement<T, R> fieldElement) {
-        if (ReflectionUtil.isPropertyWriter(fieldElement)) {
-            return PropertyAccessor.from(fieldElement);
-        }
-        if (ReflectionUtil.isPropertyReader(fieldElement)) {
-            return new AbstractPropertyReader.FieldElementPropertyReader<>(fieldElement);
-        }
-        throw new IllegalArgumentException(String.format("%s is not a PropertyElement", fieldElement));
+    static <T, R> PropertyElement<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
+        return from(TypeToken.of(ownerClass), field);
     }
 
+    //todo from名字修改?
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull Invokable<T, R> invokable,
+    static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
+        Preconditions.checkArgument(ReflectionUtil.isPropertyElement(field), "%s is not a PropertyElement", field);
+        return new PropertyAccessor.FieldElementPropertyAccessor<>(ownerType, FieldElement.of(field));
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    static <T, R> PropertyElement<T, R> from(@NonNull Type ownerType, @NonNull Method method,
                                              @NonNull String propertyName) {
-        if (ReflectionUtil.isPropertyReader(invokable)) {
-            return PropertyReader.from(invokable, propertyName);
+        return from((TypeToken<T>) TypeToken.of(ownerType), method, propertyName);
+    }
+
+    @NonNull
+    static <T, R> PropertyElement<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method method,
+                                             @NonNull String propertyName) {
+        return from(TypeToken.of(ownerClass), method, propertyName);
+    }
+
+    @SuppressWarnings({"unchecked", "UnstableApiUsage"})
+    @NonNull
+    static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method method,
+                                             @NonNull String propertyName) {
+        if (ReflectionUtil.isPropertyReader(method)) {
+            return new AbstractPropertyReader.InvokablePropertyReader<>(InvokableElement.of((Invokable<T, R>) ownerType.method(method)), propertyName);
         }
-        if (ReflectionUtil.isPropertyWriter(invokable)) {
-            return PropertyWriter.from(invokable, propertyName);
+        if (ReflectionUtil.isPropertyWriter(method)) {
+            return new AbstractPropertyWriter.InvokablePropertyWriter<>(InvokableElement.of((Invokable<T, ?>) ownerType.method(method)), propertyName);
         }
-        throw new IllegalArgumentException(String.format("%s is not a PropertyElement", invokable));
+        throw new IllegalArgumentException(String.format("%s is not a PropertyElement", method));
     }
 
     /**

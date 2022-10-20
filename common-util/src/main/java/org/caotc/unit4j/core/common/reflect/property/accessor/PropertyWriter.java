@@ -16,14 +16,12 @@
 
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
-import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.InvokableElement;
-import org.caotc.unit4j.core.common.reflect.property.accessor.AbstractPropertyWriter.InvokablePropertyWriter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  * 属性编写器,可由set{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
@@ -36,38 +34,57 @@ import java.lang.reflect.Method;
  */
 public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
 
-  /**
-   * 工厂方法
-   *
-   * @param setMethod set方法
-   * @param propertyName 属性名称
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @SuppressWarnings("unchecked")
   @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Method setMethod,
+  static <T, R> PropertyWriter<T, R> from(@NonNull Type ownerType, @NonNull Method propertyWriterMethod,
                                           @NonNull String propertyName) {
-//    return from((Invokable<T, ?>) TypeToken.of(setMethod.getDeclaringClass()).method(setMethod), propertyName);
-      return from((Invokable<T, ?>) Invokable.from(setMethod), propertyName);
+    return PropertyElement.<T, R>from(ownerType, propertyWriterMethod, propertyName).toWriter();
+  }
+
+  @NonNull
+  static <T, R> PropertyWriter<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method propertyWriterMethod,
+                                          @NonNull String propertyName) {
+    return PropertyElement.<T, R>from(ownerClass, propertyWriterMethod, propertyName).toWriter();
   }
 
   /**
    * 工厂方法
    *
-   * @param setInvokable set方法
-   * @param propertyName 属性名称
+   * @param propertyWriterMethod set方法
+   * @param propertyName         属性名称
    * @return 属性设置器
    * @author caotc
    * @date 2019-06-16
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Invokable<T, ?> setInvokable,
+  static <T, R> PropertyWriter<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method propertyWriterMethod,
                                           @NonNull String propertyName) {
-      return new InvokablePropertyWriter<>(InvokableElement.of(setInvokable), propertyName);
+    return PropertyElement.<T, R>from(ownerType, propertyWriterMethod, propertyName).toWriter();
+  }
+
+  @NonNull
+  static <T, R> PropertyWriter<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerType, field).toWriter();
+  }
+
+  @NonNull
+  static <T, R> PropertyWriter<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerClass, field).toWriter();
+  }
+
+  /**
+   * 工厂方法
+   *
+   * @param ownerType set方法
+   * @param field     属性名称
+   * @return 属性设置器
+   * @author caotc
+   * @date 2019-06-16
+   * @since 1.0.0
+   */
+  @NonNull
+  static <T, R> PropertyWriter<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
+    return PropertyElement.<T, R>from(ownerType, field).toWriter();
   }
 
   /**

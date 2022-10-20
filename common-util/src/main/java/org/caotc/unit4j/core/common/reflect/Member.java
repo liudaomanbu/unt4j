@@ -12,8 +12,9 @@ import java.lang.reflect.Modifier;
  * @since 1.0.0
  */
 public interface Member extends java.lang.reflect.Member, WithAccessLevel {
+
     @NonNull
-    default TypeToken<?> ownerType() {
+    default TypeToken<?> declaringType() {
         return TypeToken.of(getDeclaringClass());
     }
 

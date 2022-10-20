@@ -56,18 +56,23 @@ public class InvokableElement<O, P> extends BaseElement {
    */
   @NonNull
   public static <O, P> InvokableElement<O, P> of(@NonNull Invokable<O, P> invokable) {
-    return new InvokableElement<>(invokable);
+      return new InvokableElement<>(invokable);
   }
 
-  @NonNull
-  public final TypeToken<? extends P> returnType() {
-    return invokable.getReturnType();
-  }
+    @NonNull
+    public TypeToken<O> ownerType() {
+        return invokable.getOwnerType();
+    }
 
-  @NonNull
-  public final <P1 extends P> InvokableElement<O, P1> returning(Class<P1> returnType) {
-    return returning(TypeToken.of(returnType));
-  }
+    @NonNull
+    public final TypeToken<? extends P> returnType() {
+        return invokable.getReturnType();
+    }
+
+    @NonNull
+    public final <P1 extends P> InvokableElement<O, P1> returning(Class<P1> returnType) {
+        return returning(TypeToken.of(returnType));
+    }
 
   @SuppressWarnings("unchecked")
   @NonNull
@@ -84,13 +89,6 @@ public class InvokableElement<O, P> extends BaseElement {
   @NonNull
   public final Class<? super O> getDeclaringClass() {
     return invokable.getDeclaringClass();
-  }
-
-  @Override
-  @NonNull
-  public TypeToken<O> ownerType() {
-    //todo TypeToken.method 返回的invokable的OwnerType是参数TypeToken
-    return invokable.getOwnerType();
   }
 
   @NonNull

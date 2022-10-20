@@ -164,18 +164,23 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
     @Override
     @SneakyThrows
     public void writeInternal(@NonNull T obj, @NonNull R value) {
-      invokable.invoke(obj, value);
+        invokable.invoke(obj, value);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public @NonNull TypeToken<? extends R> propertyType() {
-      return (TypeToken<? extends R>) invokable.parameters().get(0).getType();
-    }
+      @SuppressWarnings("unchecked")
+      @Override
+      public @NonNull TypeToken<? extends R> propertyType() {
+          return (TypeToken<? extends R>) invokable.parameters().get(0).getType();
+      }
 
-    @Override
-    public boolean basedOnField() {
-      return false;
-    }
+      @Override
+      public TypeToken<T> ownerType() {
+          return invokable.ownerType();
+      }
+
+      @Override
+      public boolean basedOnField() {
+          return false;
+      }
   }
 }

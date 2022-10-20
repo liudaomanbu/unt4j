@@ -17,8 +17,10 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.caotc.unit4j.core.common.reflect.Element;
 
 import java.lang.annotation.Annotation;
@@ -33,22 +35,11 @@ import java.lang.annotation.Annotation;
  * @since 1.0.0
  */
 @EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractPropertyElement<O, P> implements
         PropertyElement<O, P> {
     @NonNull
     Element element;
-
-    protected AbstractPropertyElement(
-            @NonNull Element element) {
-        this.element = element;
-    }
-
-    @SuppressWarnings("unchecked")
-    @NonNull
-    @Override
-    public final TypeToken<O> ownerType() {
-        return (TypeToken<O>) element.ownerType();
-    }
 
     @SuppressWarnings("unchecked")
     @Override
