@@ -1,27 +1,19 @@
 package org.caotc.unit4j.core.convert;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Streams;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.Value;
+import com.google.common.collect.*;
+import lombok.*;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.exception.NeverHappenException;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.Unit;
+
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * {@link Amount}类的选择器,用于在集合中选取目标对象
@@ -43,7 +35,7 @@ public abstract class AmountChooser {
     @Override
     protected @NonNull Amount chooseInternal(@NonNull Stream<Amount> amounts,
         @NonNull Configuration configuration) {
-      return amounts.min(configuration::compare).orElseThrow(NeverHappenException::instance);
+      return amounts.min(configuration::compare).orElseThrow(AssertionError::new);
     }
   };
 
@@ -55,7 +47,7 @@ public abstract class AmountChooser {
     @Override
     protected @NonNull Amount chooseInternal(@NonNull Stream<Amount> amounts,
         @NonNull Configuration configuration) {
-      return amounts.min(configuration::compare).orElseThrow(NeverHappenException::instance);
+      return amounts.min(configuration::compare).orElseThrow(AssertionError::new);
     }
   };
 
@@ -69,12 +61,12 @@ public abstract class AmountChooser {
         @NonNull Configuration configuration) {
       ImmutableList<Amount> amountImmutableList = amounts.collect(ImmutableList.toImmutableList());
       Unit unit = amountImmutableList.stream().findAny().map(Amount::unit)
-          .orElseThrow(NeverHappenException::instance);
+              .orElseThrow(AssertionError::new);
       ImmutableList<AbstractNumber> values = amountImmutableList.stream()
-          .map(data -> data.convertTo(unit, Configuration.defaultInstance()))
-          .map(Amount::value).collect(ImmutableList.toImmutableList());
+              .map(data -> data.convertTo(unit, Configuration.defaultInstance()))
+              .map(Amount::value).collect(ImmutableList.toImmutableList());
       AbstractNumber sum = values.stream().reduce(AbstractNumber::add)
-          .orElseThrow(NeverHappenException::instance);
+              .orElseThrow(AssertionError::new);
       AbstractNumber average = sum.divide(BigInteger.valueOf(values.size()));
       return Amount.create(average, unit);
     }

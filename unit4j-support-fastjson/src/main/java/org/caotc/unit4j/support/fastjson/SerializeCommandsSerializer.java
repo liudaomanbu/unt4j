@@ -23,7 +23,6 @@ import lombok.Value;
 import org.caotc.unit4j.api.annotation.SerializeCommand;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Amount;
-import org.caotc.unit4j.core.exception.NeverHappenException;
 import org.caotc.unit4j.support.common.constant.JsonConstant;
 
 import java.io.IOException;
@@ -65,7 +64,7 @@ public class SerializeCommandsSerializer implements ObjectSerializer {
           case REMOVE_ORIGINAL_FIELD:
               break;
         default:
-          throw NeverHappenException.instance();
+          throw new AssertionError("never happen");
       }
     }
   }

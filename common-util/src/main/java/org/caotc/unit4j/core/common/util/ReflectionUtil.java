@@ -2304,6 +2304,18 @@ public class ReflectionUtil {
                 .filter(PropertyElement::isAccessor).map(PropertyElement::toAccessor);
     }
 
+    public static boolean isPropertyElement(@NonNull Field field) {
+        return !FieldElement.of(field).isStatic();//todo element.of
+    }
+
+    public static boolean isPropertyElement(@NonNull Method method) {
+        return isPropertyReader(method) || isPropertyWriter(method);
+    }
+
+    public static boolean isPropertyElement(@NonNull Method method, @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        return isPropertyReader(method, propertyAccessorMethodFormats) || isPropertyWriter(method, propertyAccessorMethodFormats);
+    }
+
     /**
      * @author caotc
      * @date 2019-12-08
@@ -2313,7 +2325,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isPropertyReader(@NonNull Field field) {
-        return isPropertyWriter(FieldElement.of(field));//todo element.of
+        return isPropertyElement(field);
     }
 
     /**
@@ -2389,7 +2401,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isPropertyWriter(@NonNull Field field) {
-        return isPropertyWriter(FieldElement.of(field));
+        return isPropertyElement(field);
     }
 
     /**
@@ -2493,10 +2505,6 @@ public class ReflectionUtil {
      */
     public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
         return isPropertyWriter(invokable, PropertyAccessorMethodFormat.JAVA_BEAN);
-    }
-
-    public static boolean isPropertyElement(@NonNull Field field) {
-        return !FieldElement.of(field).isStatic();
     }
 
     public static boolean isOverride(@NonNull Method method) {
