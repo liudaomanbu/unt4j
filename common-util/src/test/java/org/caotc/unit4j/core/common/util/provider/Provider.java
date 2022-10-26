@@ -12,6 +12,9 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.util.model.*;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -31,7 +34,7 @@ public class Provider {
     private static final PropertyAccessorMethodFormat[] FLUENT = new PropertyAccessorMethodFormat[]{PropertyAccessorMethodFormat.FLUENT};
 
     static Stream<Class<?>> classes() {
-        return Stream.of(NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class
+        return Stream.concat(primitiveClasses(), Stream.of(Object.class, NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class
                 , ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
                 , PrivateConstructObject.class, ProtectedConstructObject.class, ProtectedConstructChildrenObject.class
                 , MultipleConstructObject.class, StringFieldGetMethodObject.class, StringFieldFluentGetMethodObject.class
@@ -39,7 +42,7 @@ public class Provider {
                 , BooleanFieldIsMethodObject.class, BooleanFieldGetMethodObject.class, StringFieldSetMethodObject.class
                 , StringFieldFluentSetMethodObject.class, StringFieldAndStringFieldSetMethodObject.class
                 , StringFieldChainSetMethodObject.class, StringFieldSetter.class, StringFieldSetterObject.class
-                , DuplicateNumberFieldSetMethodObject.class);
+                , DuplicateNumberFieldSetMethodObject.class));
     }
 
     static Stream<TypeToken<?>> typeTokens() {
@@ -706,5 +709,137 @@ public class Provider {
     static Stream<Arguments> typeTokenAndErrorAccessiblePropertyName() {
         return classAndErrorAccessiblePropertyName()
                 .map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), arguments.get()[1]));
+    }
+
+    static Stream<Field> fields() {
+        return Stream.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD, Constant.FINAL_FIELD_OBJECT_STRING_FIELD
+                , Constant.STATIC_FIELD_OBJECT_STRING_FIELD, Constant.CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD
+                , Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD, Constant.MULTIPLE_FIELD_OBJECT_STRING_FIELD
+                , Constant.MULTIPLE_FIELD_OBJECT_INTEGER_FIELD, Constant.MULTIPLE_FIELD_OBJECT_INT_FIELD
+                , Constant.MULTIPLE_FIELD_OBJECT_BOOLEAN_FIELD, Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_STRING_FIELD
+                , Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD);
+    }
+
+    static Stream<Field> staticFields() {
+        return fields().filter(field -> Modifier.isStatic(field.getModifiers()));
+    }
+
+    static Stream<Field> unstaticFields() {
+        return fields().filter(field -> !Modifier.isStatic(field.getModifiers()));
+    }
+
+    static Stream<Method> propertyElementMethods() {
+        return propertyElementMethodAndPropertyAccessorMethodFormats()
+                .map(arguments -> (Method) arguments.get()[0]);
+    }
+
+    static Stream<Arguments> propertyElementMethodAndPropertyAccessorMethodFormats() {
+        return Stream.concat(propertyReaderMethodAndPropertyAccessorMethodFormats(), propertyWriterMethodAndPropertyAccessorMethodFormats());
+    }
+
+    static Stream<Method> propertyReaderMethods() {
+        return propertyReaderMethodAndPropertyAccessorMethodFormats()
+                .map(arguments -> (Method) arguments.get()[0]);
+    }
+
+    static Stream<Arguments> propertyReaderMethodAndPropertyAccessorMethodFormats() {
+        return Stream.of(Arguments.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.FLUENT)
+                , Arguments.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_IS_BOOLEAN_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.BOOLEAN_FIELD_GET_METHOD_OBJECT_GET_BOOLEAN_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN));
+    }
+
+    static Stream<Method> propertyWriterMethods() {
+        return propertyWriterMethodAndPropertyAccessorMethodFormats()
+                .map(arguments -> (Method) arguments.get()[0]);
+    }
+
+    static Stream<Arguments> propertyWriterMethodAndPropertyAccessorMethodFormats() {
+        return Stream.of(Arguments.of(Constant.STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_FLUENT_SET_METHOD_OBJECT_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.FLUENT)
+                , Arguments.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_SET_NUMBER_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_INT_SET_NUMBER_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN));
+    }
+
+    static Stream<Method> methods() {
+        return classes()
+                .map(Class::getDeclaredMethods)
+                .flatMap(Arrays::stream);
+    }
+
+    static Stream<Method> getMethods() {
+        return propertyReaderMethodAndPropertyAccessorMethodFormats()
+                .filter(arguments -> PropertyAccessorMethodFormat.JAVA_BEAN == arguments.get()[1])
+                .map(arguments -> (Method) arguments.get()[0]);
+    }
+
+    static Stream<Method> setMethods() {
+        return propertyWriterMethodAndPropertyAccessorMethodFormats()
+                .filter(arguments -> PropertyAccessorMethodFormat.JAVA_BEAN == arguments.get()[1])
+                .map(arguments -> (Method) arguments.get()[0]);
+    }
+
+    static Stream<Method> notGetMethods() {
+        return methods().filter(method -> getMethods().noneMatch(method::equals));
+    }
+
+    static Stream<Method> notSetMethods() {
+        return methods().filter(method -> setMethods().noneMatch(method::equals));
+
+    }
+
+    static Stream<Arguments> methodAndSuperMethods() {
+        return Stream.of(Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, Constant.STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD)
+                , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD));
+    }
+
+    static Stream<Arguments> methodAndNotSuperMethods() {
+        return methods().flatMap(method -> methods()
+                        .map(m -> Arguments.of(method, m)))
+                .filter(arguments -> methodAndSuperMethods().noneMatch(a -> Arrays.equals(arguments.get(), a.get())));
+    }
+
+    static Stream<Arguments> methodAndSuperClasss() {
+        return Stream.of(Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, StringFieldGetter.class)
+                , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, StringFieldSetter.class));
+    }
+
+    static Stream<Arguments> methodAndNotSuperClasss() {
+        return methods().flatMap(method -> classes()
+                        .map(clazz -> Arguments.of(method, clazz)))
+                .filter(arguments -> methodAndSuperClasss().noneMatch(a -> Arrays.equals(arguments.get(), a.get())));
+    }
+
+    static Stream<Arguments> methodAndSuperTypeTokens() {
+        return methodAndSuperClasss().map(arguments -> Arguments.of(arguments.get()[0], TypeToken.of((Class<?>) arguments.get()[1])));
+    }
+
+    static Stream<Arguments> methodAndNotSuperTypeTokens() {
+        return methods().flatMap(method -> typeTokens()
+                        .map(type -> Arguments.of(method, type)))
+                .filter(arguments -> methodAndSuperTypeTokens().noneMatch(a -> Arrays.equals(arguments.get(), a.get())));
+    }
+
+    static Stream<Method> overrideMethods() {
+        return methodAndSuperMethods().map(arguments -> (Method) arguments.get()[0]);
+    }
+
+    static Stream<Method> notOverrideMethods() {
+        return methods().filter(method -> overrideMethods().noneMatch(method::equals));
+    }
+
+    static Stream<Class<?>> primitiveClasses() {
+        return Stream.of(byte.class, short.class, int.class, long.class, char.class, boolean.class, float.class, double.class);
+    }
+
+    static Stream<Arguments> classesAndLowestCommonAncestorSets() {
+        return Stream.of(Arguments.of());
     }
 }

@@ -2556,6 +2556,7 @@ public class ReflectionUtil {
     public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
                                      @NonNull Invokable<?, ?> superInvokable) {
         return superInvokable.isOverridable()
+                && !superInvokable.getOwnerType().equals(invokable.getOwnerType())
                 && superInvokable.getOwnerType().isSupertypeOf(invokable.getOwnerType())
                 && MethodSignature.from(superInvokable).equals(MethodSignature.from(invokable));
     }
