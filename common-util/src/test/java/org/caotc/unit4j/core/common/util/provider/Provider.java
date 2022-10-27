@@ -2,6 +2,7 @@ package org.caotc.unit4j.core.common.util.provider;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.util.model.*;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -34,7 +36,7 @@ public class Provider {
     private static final PropertyAccessorMethodFormat[] FLUENT = new PropertyAccessorMethodFormat[]{PropertyAccessorMethodFormat.FLUENT};
 
     static Stream<Class<?>> classes() {
-        return Stream.concat(primitiveClasses(), Stream.of(Object.class, NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class
+        return Stream.of(byte.class, short.class, int.class, long.class, char.class, boolean.class, float.class, double.class, Object.class, NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class
                 , ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
                 , PrivateConstructObject.class, ProtectedConstructObject.class, ProtectedConstructChildrenObject.class
                 , MultipleConstructObject.class, StringFieldGetMethodObject.class, StringFieldFluentGetMethodObject.class
@@ -42,7 +44,7 @@ public class Provider {
                 , BooleanFieldIsMethodObject.class, BooleanFieldGetMethodObject.class, StringFieldSetMethodObject.class
                 , StringFieldFluentSetMethodObject.class, StringFieldAndStringFieldSetMethodObject.class
                 , StringFieldChainSetMethodObject.class, StringFieldSetter.class, StringFieldSetterObject.class
-                , DuplicateNumberFieldSetMethodObject.class));
+                , DuplicateNumberFieldSetMethodObject.class);
     }
 
     static Stream<TypeToken<?>> typeTokens() {
@@ -836,10 +838,32 @@ public class Provider {
     }
 
     static Stream<Class<?>> primitiveClasses() {
-        return Stream.of(byte.class, short.class, int.class, long.class, char.class, boolean.class, float.class, double.class);
+        return classes().filter(Class::isPrimitive);
     }
 
-    static Stream<Arguments> classesAndLowestCommonAncestorSets() {
-        return Stream.of(Arguments.of());
+    static Stream<Class<?>> notPrimitiveClasses() {
+        return classes().filter(clazz -> !clazz.isPrimitive());
+    }
+
+    static Stream<Class<?>> objectSubClasses() {
+        return classes().filter(clazz -> clazz != Object.class && clazz.getSuperclass() == Object.class);
+    }
+
+    static Stream<Arguments> objectSubClassSetAndLowestCommonAncestorSets() {
+        return objectSubClasses().flatMap(clazz -> objectSubClasses().filter(c -> clazz != c).map(c -> ImmutableSet.of(clazz, c))).map(classSet -> Arguments.of(classSet, ImmutableSet.of(TypeToken.of(Object.class))));
+    }
+
+    static Stream<Arguments> ContainPrimitiveClassSetAndLowestCommonAncestorSets() {
+        return notPrimitiveClasses().flatMap(clazz -> primitiveClasses().map(c -> ImmutableSet.of(clazz, c))).map(classSet -> Arguments.of(classSet, ImmutableSet.of()));
+    }
+
+    static Stream<Arguments> classSetAndLowestCommonAncestorSets() {
+        return Streams.concat(objectSubClassSetAndLowestCommonAncestorSets(), ContainPrimitiveClassSetAndLowestCommonAncestorSets(),
+                Stream.of(Arguments.of(ImmutableSet.of(String.class, Integer.class), ImmutableSet.of(TypeToken.of(Serializable.class)))
+                        , Arguments.of(ImmutableSet.of(Integer.class, Long.class), ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(ImmutableSet.of(Byte.class, Short.class, Integer.class, Long.class), ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(ImmutableSet.of(Integer.class, Number.class), ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(ImmutableSet.of(StringFieldGetterObject.class, StringFieldGetter.class), ImmutableSet.of(TypeToken.of(StringFieldGetter.class)))
+                        , Arguments.of(ImmutableSet.of(StringFieldSetterObject.class, StringFieldSetter.class), ImmutableSet.of(TypeToken.of(StringFieldSetter.class)))));
     }
 }
