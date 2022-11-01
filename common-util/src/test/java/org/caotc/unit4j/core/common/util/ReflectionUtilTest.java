@@ -40,7 +40,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -2686,11 +2685,27 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classArrayAndLowestCommonSuperClassSets")
+    void lowestCommonSuperclasses(Class<?>[] classes, Set<Class<?>> lowestCommonAncestors) {
+        Set<Class<?>> result = ReflectionUtil.lowestCommonSuperclasses(classes);
+        log.debug("classes:{},result:{}", classes, result);
+        Assertions.assertEquals(lowestCommonAncestors, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classSetAndLowestCommonSuperClassSets")
+    void lowestCommonSuperclasses(Iterable<Class<?>> classes, Set<Class<?>> lowestCommonAncestors) {
+        Set<Class<?>> result = ReflectionUtil.lowestCommonSuperclasses(classes);
+        log.debug("classes:{},result:{}", classes, result);
+        Assertions.assertEquals(lowestCommonAncestors, result);
+    }
+
+    @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classSetAndLowestCommonAncestorSets")
     void lowestCommonAncestors(Set<Class<?>> classes, Set<TypeToken<?>> lowestCommonAncestors) {
-        List<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(classes.stream().map(TypeToken::of).collect(Collectors.toSet()));
+        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(classes.stream().map(TypeToken::of).collect(Collectors.toSet()));
         log.debug("classes:{},result:{}", classes, result);
-        Assertions.assertIterableEquals(lowestCommonAncestors, result);
+        Assertions.assertEquals(lowestCommonAncestors, result);
     }
 
     @Test
@@ -2714,5 +2729,6 @@ class ReflectionUtilTest {
         log.info("lowestCommonAncestors(Lists.newArrayList(int.class,Integer.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(int.class), TypeToken.of(Integer.class))));
         log.info("lowestCommonAncestors(Lists.newArrayList(Integer.class,Long.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(Integer.class), TypeToken.of(Long.class))));
         log.info("lowestCommonAncestors(Lists.newArrayList(Integer.class,Number.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(Integer.class), TypeToken.of(Number.class))));
+        log.info("lowestCommonAncestors(Lists.newArrayList(StringFieldGetter.class,Number.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(StringFieldGetter.class), TypeToken.of(Number.class))));
     }
 }

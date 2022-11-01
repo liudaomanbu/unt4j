@@ -849,16 +849,30 @@ public class Provider {
         return classes().filter(clazz -> clazz != Object.class && clazz.getSuperclass() == Object.class);
     }
 
-    static Stream<Arguments> objectSubClassSetAndLowestCommonAncestorSets() {
-        return objectSubClasses().flatMap(clazz -> objectSubClasses().filter(c -> clazz != c).map(c -> ImmutableSet.of(clazz, c))).map(classSet -> Arguments.of(classSet, ImmutableSet.of(TypeToken.of(Object.class))));
+    static Stream<Arguments> objectSubClassArrayAndLowestCommonAncestorSets() {
+        return objectSubClasses().flatMap(clazz -> objectSubClasses().filter(c -> clazz != c).map(c -> new Class[]{clazz, c})).map(classSet -> Arguments.of(classSet, ImmutableSet.of(Object.class)));
     }
 
-    static Stream<Arguments> ContainPrimitiveClassSetAndLowestCommonAncestorSets() {
-        return notPrimitiveClasses().flatMap(clazz -> primitiveClasses().map(c -> ImmutableSet.of(clazz, c))).map(classSet -> Arguments.of(classSet, ImmutableSet.of()));
+    static Stream<Arguments> ContainPrimitiveClassArrayAndLowestCommonAncestorSets() {
+        return classes().flatMap(clazz -> primitiveClasses().filter(c -> clazz != c).map(c -> new Class[]{clazz, c})).map(classSet -> Arguments.of(classSet, ImmutableSet.of()));
+    }
+
+    static Stream<Arguments> classArrayAndLowestCommonSuperClassSets() {
+        return Streams.concat(objectSubClassArrayAndLowestCommonAncestorSets(), ContainPrimitiveClassArrayAndLowestCommonAncestorSets(),
+                Stream.of(Arguments.of(new Class[]{String.class, Integer.class}, ImmutableSet.of(Serializable.class, Comparable.class))
+                        , Arguments.of(new Class[]{Integer.class, Long.class}, ImmutableSet.of(Number.class, Comparable.class))
+                        , Arguments.of(new Class[]{Byte.class, Short.class, Integer.class, Long.class}, ImmutableSet.of(Number.class, Comparable.class))
+                        , Arguments.of(new Class[]{Integer.class, Number.class}, ImmutableSet.of(Number.class))
+                        , Arguments.of(new Class[]{StringFieldGetterObject.class, StringFieldGetter.class}, ImmutableSet.of(StringFieldGetter.class))
+                        , Arguments.of(new Class[]{StringFieldSetterObject.class, StringFieldSetter.class}, ImmutableSet.of(StringFieldSetter.class))));
+    }
+
+    static Stream<Arguments> classSetAndLowestCommonSuperClassSets() {
+        return classArrayAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(Arrays.stream((Class[]) arguments.get()[0]).collect(ImmutableSet.toImmutableSet()), arguments.get()[1]));
     }
 
     static Stream<Arguments> classSetAndLowestCommonAncestorSets() {
-        return Streams.concat(objectSubClassSetAndLowestCommonAncestorSets(), ContainPrimitiveClassSetAndLowestCommonAncestorSets(),
+        return Streams.concat(objectSubClassArrayAndLowestCommonAncestorSets(), ContainPrimitiveClassArrayAndLowestCommonAncestorSets(),
                 Stream.of(Arguments.of(ImmutableSet.of(String.class, Integer.class), ImmutableSet.of(TypeToken.of(Serializable.class)))
                         , Arguments.of(ImmutableSet.of(Integer.class, Long.class), ImmutableSet.of(TypeToken.of(Number.class)))
                         , Arguments.of(ImmutableSet.of(Byte.class, Short.class, Integer.class, Long.class), ImmutableSet.of(TypeToken.of(Number.class)))

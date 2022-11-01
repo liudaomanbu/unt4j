@@ -41,6 +41,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1680,7 +1681,7 @@ public class ReflectionUtil {
      * 从传入的类中获取包括所有超类和接口的所有可读属性{@link ReadableProperty}集合
      *
      * @param type                          需要获取可读属性{@link ReadableProperty}的类
-     * @param propertyName                     指定属性名称
+     * @param propertyName                  指定属性名称
      * @param propertyAccessorMethodFormats get方法格式集合
      * @return 所有可读属性 {@link ReadableProperty}集合
      * @author caotc
@@ -1728,9 +1729,9 @@ public class ReflectionUtil {
                     propertyAccessorMethodFormats);
             return transferReadableProperty
                     .flatMap(f -> {
-                        Optional<ReadableProperty<E, R>> result = readablePropertyInternal(
-                                (TypeToken<E>) f.type(), sub.flat(),
-                                propertyAccessorMethodFormats);
+                                Optional<ReadableProperty<E, R>> result = readablePropertyInternal(
+                                        (TypeToken<E>) f.type(), sub.flat(),
+                                        propertyAccessorMethodFormats);
                                 return result.map(f::compose);
                             }
                     );
@@ -2561,79 +2562,40 @@ public class ReflectionUtil {
                 && MethodSignature.from(superInvokable).equals(MethodSignature.from(invokable));
     }
 
-    static Set<Class<?>> getSuperclasses(Class<?> clazz) {
-        final Set<Class<?>> result = new LinkedHashSet<>();
-        final Queue<Class<?>> queue = new ArrayDeque<>();
-        queue.add(clazz);
-        if (clazz.isInterface()) {
-            queue.add(Object.class); // optional
-        }
-        while (!queue.isEmpty()) {
-            Class<?> c = queue.remove();
-            if (result.add(c)) {
-                Class<?> sup = c.getSuperclass();
-                if (sup != null) queue.add(sup);
-                queue.addAll(Arrays.asList(c.getInterfaces()));
-            }
-        }
-        return result;
+    public static Set<Class<?>> lowestCommonSuperclasses(Class<?>... classes) {
+        return lowestCommonSuperclasses(Arrays.stream(classes).collect(ImmutableSet.toImmutableSet()));
     }
 
-    static Set<Class<?>> commonSuperclasses(Iterable<Class<?>> classes) {
-        Iterator<Class<?>> it = classes.iterator();
-        if (!it.hasNext()) {
+    public static Set<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
+        ImmutableSet<? extends TypeToken<?>> types = Streams.stream(classes).map(TypeToken::of).collect(ImmutableSet.toImmutableSet());
+        return lowestCommonAncestors(types, false)
+                .stream().map(TypeToken::getRawType).collect(Collectors.toSet());
+    }
+
+    public static Set<TypeToken<?>> lowestCommonAncestors(TypeToken<?>... types) {
+        return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()), true);
+    }
+
+    public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
+        return lowestCommonAncestors(types, true);
+    }
+
+    public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types, boolean withGenerics) {
+        if (Iterables.isEmpty(types)) {
             return Collections.emptySet();
         }
+
+        BiFunction<TypeToken<?>, TypeToken<?>, Boolean> ancestorPredicate = withGenerics ? TypeToken::isSupertypeOf : (type1, type2) -> type1.getRawType().isAssignableFrom(type2.getRawType());
         // begin with set from first hierarchy
-        Set<Class<?>> result = getSuperclasses(it.next());
-        // remove non-superclasses of remaining
-        while (it.hasNext()) {
-            Class<?> c = it.next();
-            result.removeIf(sup -> !sup.isAssignableFrom(c));
-        }
-        return result;
-    }
-
-    public static List<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
-        Collection<Class<?>> commonSupers = commonSuperclasses(classes);
-        return lowestClasses(commonSupers);
-    }
-
-    static List<Class<?>> lowestClasses(Collection<Class<?>> classes) {
-        final LinkedList<Class<?>> source = new LinkedList<>(classes);
-        final ArrayList<Class<?>> result = new ArrayList<>(classes.size());
-        while (!source.isEmpty()) {
-            Iterator<Class<?>> srcIt = source.iterator();
-            Class<?> c = srcIt.next();
-            srcIt.remove();
-            while (srcIt.hasNext()) {
-                Class<?> c2 = srcIt.next();
-                if (c2.isAssignableFrom(c)) {
-                    srcIt.remove();
-                } else if (c.isAssignableFrom(c2)) {
-                    c = c2;
-                    srcIt.remove();
-                }
-            }
-            result.add(c);
-        }
-        result.trimToSize();
-        return result;
-    }
-
-    public static List<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> classes) {
-        Iterator<? extends TypeToken<?>> it = classes.iterator();
-        if (!it.hasNext()) {
-            return Collections.emptyList();
-        }
-        // begin with set from first hierarchy
-        Set<? extends TypeToken<?>> result = it.next().getTypes();
-        // remove non-superclasses of remaining
-        result = result.stream()
-                .filter(sup -> Streams.stream(classes)
-                        .allMatch(type -> sup.isSupertypeOf(type)))
+        final Set<? extends TypeToken<?>> result = types.iterator().next().getTypes().stream()
+                .filter(sup -> Streams.stream(types).allMatch(type -> ancestorPredicate.apply(sup, type)))
                 .collect(Collectors.toSet());
-        return lowestAncestors(result);
+        return result.stream()
+                .filter(type1 -> result.stream()
+                        .filter(type2 -> !Objects.equals(type1, type2))
+                        .noneMatch(type2 -> ancestorPredicate.apply(type1, type2)))
+                .collect(Collectors.toSet());
+//        return lowestAncestors(result);
     }
 
     static List<TypeToken<?>> lowestAncestors(Collection<? extends TypeToken<?>> classes) {

@@ -106,12 +106,12 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
                     .map(type -> (TypeToken<? extends P>) ReflectionUtil.primitiveTypeToWrapperType(type))
                     .collect(ImmutableSet.toImmutableSet());
         }
-        List<TypeToken<?>> lowestCommonAncestors = ReflectionUtil.lowestCommonAncestors(propertyTypes);
+        Set<TypeToken<?>> lowestCommonAncestors = ReflectionUtil.lowestCommonAncestors(propertyTypes);
 
         Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
                 "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
-        this.type = (TypeToken<? extends P>) lowestCommonAncestors.get(0);//todo
+        this.type = (TypeToken<? extends P>) lowestCommonAncestors.stream().findFirst().get();//todo
         this.fieldExist = Streams.concat(propertyReaders.stream(), propertyWriters.stream()).anyMatch(PropertyElement::basedOnField);
         this.propertyReaders = propertyReaders;
         this.propertyWriters = propertyWriters;
