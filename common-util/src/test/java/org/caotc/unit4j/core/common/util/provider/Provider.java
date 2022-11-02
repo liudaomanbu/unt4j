@@ -849,16 +849,16 @@ public class Provider {
         return classes().filter(clazz -> clazz != Object.class && clazz.getSuperclass() == Object.class);
     }
 
-    static Stream<Arguments> objectSubClassArrayAndLowestCommonAncestorSets() {
+    static Stream<Arguments> objectSubClassArrayAndLowestCommonSuperClassSets() {
         return objectSubClasses().flatMap(clazz -> objectSubClasses().filter(c -> clazz != c).map(c -> new Class[]{clazz, c})).map(classSet -> Arguments.of(classSet, ImmutableSet.of(Object.class)));
     }
 
-    static Stream<Arguments> ContainPrimitiveClassArrayAndLowestCommonAncestorSets() {
+    static Stream<Arguments> ContainPrimitiveClassArrayAndLowestCommonSuperClassSets() {
         return classes().flatMap(clazz -> primitiveClasses().filter(c -> clazz != c).map(c -> new Class[]{clazz, c})).map(classSet -> Arguments.of(classSet, ImmutableSet.of()));
     }
 
     static Stream<Arguments> classArrayAndLowestCommonSuperClassSets() {
-        return Streams.concat(objectSubClassArrayAndLowestCommonAncestorSets(), ContainPrimitiveClassArrayAndLowestCommonAncestorSets(),
+        return Streams.concat(objectSubClassArrayAndLowestCommonSuperClassSets(), ContainPrimitiveClassArrayAndLowestCommonSuperClassSets(),
                 Stream.of(Arguments.of(new Class[]{String.class, Integer.class}, ImmutableSet.of(Serializable.class, Comparable.class))
                         , Arguments.of(new Class[]{Integer.class, Long.class}, ImmutableSet.of(Number.class, Comparable.class))
                         , Arguments.of(new Class[]{Byte.class, Short.class, Integer.class, Long.class}, ImmutableSet.of(Number.class, Comparable.class))
@@ -871,13 +871,51 @@ public class Provider {
         return classArrayAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(Arrays.stream((Class[]) arguments.get()[0]).collect(ImmutableSet.toImmutableSet()), arguments.get()[1]));
     }
 
-    static Stream<Arguments> classSetAndLowestCommonAncestorSets() {
+    static Stream<Arguments> objectSubClassArrayAndLowestCommonAncestorSets() {
+        return objectSubClassArrayAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(arguments.get()[0], ((Collection<Class<?>>) arguments.get()[1]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet())));
+    }
+
+    static Stream<Arguments> ContainPrimitiveClassArrayAndLowestCommonAncestorSets() {
+        return ContainPrimitiveClassArrayAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(arguments.get()[0], ((Collection<Class<?>>) arguments.get()[1]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet())));
+    }
+
+    static Stream<Arguments> classArrayAndLowestCommonAncestorSets() {
         return Streams.concat(objectSubClassArrayAndLowestCommonAncestorSets(), ContainPrimitiveClassArrayAndLowestCommonAncestorSets(),
-                Stream.of(Arguments.of(ImmutableSet.of(String.class, Integer.class), ImmutableSet.of(TypeToken.of(Serializable.class)))
-                        , Arguments.of(ImmutableSet.of(Integer.class, Long.class), ImmutableSet.of(TypeToken.of(Number.class)))
-                        , Arguments.of(ImmutableSet.of(Byte.class, Short.class, Integer.class, Long.class), ImmutableSet.of(TypeToken.of(Number.class)))
-                        , Arguments.of(ImmutableSet.of(Integer.class, Number.class), ImmutableSet.of(TypeToken.of(Number.class)))
-                        , Arguments.of(ImmutableSet.of(StringFieldGetterObject.class, StringFieldGetter.class), ImmutableSet.of(TypeToken.of(StringFieldGetter.class)))
-                        , Arguments.of(ImmutableSet.of(StringFieldSetterObject.class, StringFieldSetter.class), ImmutableSet.of(TypeToken.of(StringFieldSetter.class)))));
+                Stream.of(Arguments.of(new Class[]{String.class, Integer.class}, ImmutableSet.of(TypeToken.of(Serializable.class)))
+                        , Arguments.of(new Class[]{Integer.class, Long.class}, ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(new Class[]{Byte.class, Short.class, Integer.class, Long.class}, ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(new Class[]{Integer.class, Number.class}, ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(new Class[]{StringFieldGetterObject.class, StringFieldGetter.class}, ImmutableSet.of(TypeToken.of(StringFieldGetter.class)))
+                        , Arguments.of(new Class[]{StringFieldSetterObject.class, StringFieldSetter.class}, ImmutableSet.of(TypeToken.of(StringFieldSetter.class)))));
+    }
+
+    static Stream<Arguments> typeTokenArrayAndLowestCommonAncestorSets() {
+        return classArrayAndLowestCommonAncestorSets().map(arguments -> Arguments.of(Arrays.stream((Class<?>[]) arguments.get()[0]).map(TypeToken::of).toArray(TypeToken[]::new), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> typeTokenSetAndLowestCommonAncestorSets() {
+        return classArrayAndLowestCommonAncestorSets().map(arguments -> Arguments.of(Arrays.stream((Class<?>[]) arguments.get()[0]).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()), arguments.get()[1]));
+    }
+
+    static Stream<Arguments> typeTokenSetAndWithGenericsAndLowestCommonAncestorSets() {
+        return Stream.concat(typeTokenSetAndLowestCommonAncestorSets().map(arguments -> Arguments.of(arguments.get()[0], true, arguments.get()[1])),
+                classSetAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(((Collection<Class<?>>) arguments.get()[0]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet())
+                        , false
+                        , ((Collection<Class<?>>) arguments.get()[1]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet()))));
+    }
+
+    static Stream<Arguments> primitiveClassAndWrapperClasses() {
+        return Stream.of(Arguments.of(byte.class, Byte.class)
+                , Arguments.of(short.class, Short.class)
+                , Arguments.of(int.class, Integer.class)
+                , Arguments.of(long.class, Long.class)
+                , Arguments.of(char.class, Character.class)
+                , Arguments.of(boolean.class, Boolean.class)
+                , Arguments.of(float.class, Float.class)
+                , Arguments.of(double.class, Double.class));
+    }
+
+    static Stream<Arguments> primitiveTypeTokenAndWrapperTypeTokens() {
+        return primitiveClassAndWrapperClasses().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), TypeToken.of((Class<?>) arguments.get()[1])));
     }
 }

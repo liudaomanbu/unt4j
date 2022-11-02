@@ -17,22 +17,18 @@
 package org.caotc.unit4j.core.common.util;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.*;
-import org.caotc.unit4j.core.common.util.model.StringFieldGetter;
 import org.caotc.unit4j.core.exception.AccessiblePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.MethodNotFoundException;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -42,7 +38,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 class ReflectionUtilTest {
@@ -2701,34 +2696,75 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classSetAndLowestCommonAncestorSets")
-    void lowestCommonAncestors(Set<Class<?>> classes, Set<TypeToken<?>> lowestCommonAncestors) {
-        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(classes.stream().map(TypeToken::of).collect(Collectors.toSet()));
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classArrayAndLowestCommonAncestorSets")
+    void lowestCommonAncestors(Class<?>[] classes, Set<TypeToken<?>> lowestCommonAncestors) {
+        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(classes);
         log.debug("classes:{},result:{}", classes, result);
         Assertions.assertEquals(lowestCommonAncestors, result);
     }
 
-    @Test
-    @SneakyThrows
-    void aaae() {
-        TypeToken<StringFieldGetter> stringFieldGetterType = TypeToken.of(StringFieldGetter.class);
-        TypeToken<Object> objectType = TypeToken.of(Object.class);
-        log.info("stringFieldGetterType.isSubtypeOf(objectType):{}", stringFieldGetterType.isSubtypeOf(objectType));
-        log.info("objectType.isSubtypeOf(stringFieldGetterType):{}", objectType.isSubtypeOf(stringFieldGetterType));
-        log.info("stringFieldGetterType.isSupertypeOf(objectType):{}", stringFieldGetterType.isSupertypeOf(objectType));
-        log.info("objectType.isSupertypeOf(stringFieldGetterType):{}", objectType.isSupertypeOf(stringFieldGetterType));
-        log.info("StringFieldGetter.class.isAssignableFrom(Object.class):{}", StringFieldGetter.class.isAssignableFrom(Object.class));
-        log.info("Object.class.isAssignableFrom(StringFieldGetter.class):{}", Object.class.isAssignableFrom(StringFieldGetter.class));
-        log.info("TypeToken.of(String.class).getTypes():{}", TypeToken.of(String.class).getTypes());
-        log.info("TypeToken.of(Integer.class).getTypes():{}", TypeToken.of(Integer.class).getTypes());
-        log.info("TypeToken.of(int.class).getTypes():{}", TypeToken.of(int.class).getTypes());
-        log.info("lowestCommonSuperclasses(Lists.newArrayList(String.class,Integer.class)):{}", ReflectionUtil.lowestCommonSuperclasses(Lists.newArrayList(String.class, Integer.class)));
-        log.info("lowestCommonSuperclasses(Lists.newArrayList(int.class,Integer.class)):{}", ReflectionUtil.lowestCommonSuperclasses(Lists.newArrayList(int.class, Integer.class)));
-        log.info("lowestCommonSuperclasses(Lists.newArrayList(Integer.class,Long.class)):{}", ReflectionUtil.lowestCommonSuperclasses(Lists.newArrayList(Integer.class, Long.class)));
-        log.info("lowestCommonAncestors(Lists.newArrayList(String.class,Integer.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(String.class), TypeToken.of(Integer.class))));
-        log.info("lowestCommonAncestors(Lists.newArrayList(int.class,Integer.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(int.class), TypeToken.of(Integer.class))));
-        log.info("lowestCommonAncestors(Lists.newArrayList(Integer.class,Long.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(Integer.class), TypeToken.of(Long.class))));
-        log.info("lowestCommonAncestors(Lists.newArrayList(Integer.class,Number.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(Integer.class), TypeToken.of(Number.class))));
-        log.info("lowestCommonAncestors(Lists.newArrayList(StringFieldGetter.class,Number.class)):{}", ReflectionUtil.lowestCommonAncestors(Lists.newArrayList(TypeToken.of(StringFieldGetter.class), TypeToken.of(Number.class))));
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenArrayAndLowestCommonAncestorSets")
+    void lowestCommonAncestors(TypeToken<?>[] types, Set<TypeToken<?>> lowestCommonAncestors) {
+        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(types);
+        log.debug("types:{},result:{}", types, result);
+        Assertions.assertEquals(lowestCommonAncestors, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenSetAndLowestCommonAncestorSets")
+    void lowestCommonAncestors(Set<TypeToken<?>> types, Set<TypeToken<?>> lowestCommonAncestors) {
+        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(types);
+        log.debug("types:{},result:{}", types, result);
+        Assertions.assertEquals(lowestCommonAncestors, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenSetAndWithGenericsAndLowestCommonAncestorSets")
+    void lowestCommonAncestors(Set<TypeToken<?>> types, boolean withGenerics, Set<TypeToken<?>> lowestCommonAncestors) {
+        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(types, withGenerics);
+        log.debug("types:{},withGenerics:{},result:{}", types, withGenerics, result);
+        if (withGenerics) {
+            Assertions.assertEquals(lowestCommonAncestors, result);
+        } else {
+            Assertions.assertEquals(lowestCommonAncestors.stream().map(TypeToken::getRawType).collect(ImmutableSet.toImmutableSet())
+                    , result.stream().map(TypeToken::getRawType).collect(ImmutableSet.toImmutableSet()));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveClassAndWrapperClasses")
+    void primitiveClassToWrapperClass(Class<?> primitiveClass, Class<?> wrapperClass) {
+        Class<?> result = ReflectionUtil.primitiveClassToWrapperClass(primitiveClass);
+        log.debug("primitiveClass:{},result:{}", primitiveClass, result);
+        Assertions.assertEquals(wrapperClass, result);
+        Assertions.assertEquals(wrapperClass, ReflectionUtil.primitiveClassToWrapperClass(wrapperClass));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveClassAndWrapperClasses")
+    void wrapperClassToPrimitiveClass(Class<?> primitiveClass, Class<?> wrapperClass) {
+        Class<?> result = ReflectionUtil.wrapperClassToPrimitiveClass(wrapperClass);
+        log.debug("wrapperClass:{},result:{}", wrapperClass, result);
+        Assertions.assertEquals(primitiveClass, result);
+        Assertions.assertEquals(primitiveClass, ReflectionUtil.wrapperClassToPrimitiveClass(primitiveClass));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveTypeTokenAndWrapperTypeTokens")
+    void primitiveTypeToWrapperType(TypeToken<?> primitiveType, TypeToken<?> wrapperType) {
+        TypeToken<?> result = ReflectionUtil.primitiveTypeToWrapperType(primitiveType);
+        log.debug("primitiveType:{},result:{}", primitiveType, result);
+        Assertions.assertEquals(wrapperType, result);
+        Assertions.assertEquals(wrapperType, ReflectionUtil.primitiveTypeToWrapperType(wrapperType));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveTypeTokenAndWrapperTypeTokens")
+    void wrapperTypeToPrimitiveType(TypeToken<?> primitiveType, TypeToken<?> wrapperType) {
+        TypeToken<?> result = ReflectionUtil.wrapperTypeToPrimitiveType(wrapperType);
+        log.debug("wrapperType:{},result:{}", wrapperType, result);
+        Assertions.assertEquals(primitiveType, result);
+        Assertions.assertEquals(primitiveType, ReflectionUtil.wrapperTypeToPrimitiveType(primitiveType));
     }
 }

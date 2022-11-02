@@ -2572,6 +2572,10 @@ public class ReflectionUtil {
                 .stream().map(TypeToken::getRawType).collect(Collectors.toSet());
     }
 
+    public static Set<TypeToken<?>> lowestCommonAncestors(Class<?>... classes) {
+        return lowestCommonAncestors(Arrays.stream(classes).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()), true);
+    }
+
     public static Set<TypeToken<?>> lowestCommonAncestors(TypeToken<?>... types) {
         return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()), true);
     }
@@ -2595,29 +2599,6 @@ public class ReflectionUtil {
                         .filter(type2 -> !Objects.equals(type1, type2))
                         .noneMatch(type2 -> ancestorPredicate.apply(type1, type2)))
                 .collect(Collectors.toSet());
-//        return lowestAncestors(result);
-    }
-
-    static List<TypeToken<?>> lowestAncestors(Collection<? extends TypeToken<?>> classes) {
-        final LinkedList<TypeToken<?>> source = new LinkedList<>(classes);
-        final ArrayList<TypeToken<?>> result = new ArrayList<>(classes.size());
-        while (!source.isEmpty()) {
-            Iterator<TypeToken<?>> srcIt = source.iterator();
-            TypeToken<?> c = srcIt.next();
-            srcIt.remove();
-            while (srcIt.hasNext()) {
-                TypeToken<?> c2 = srcIt.next();
-                if (c2.isSupertypeOf(c)) {
-                    srcIt.remove();
-                } else if (c.isSupertypeOf(c2)) {
-                    c = c2;
-                    srcIt.remove();
-                }
-            }
-            result.add(c);
-        }
-        result.trimToSize();
-        return result;
     }
 
     public static Class<?> primitiveClassToWrapperClass(@NonNull Class<?> clazz) {
