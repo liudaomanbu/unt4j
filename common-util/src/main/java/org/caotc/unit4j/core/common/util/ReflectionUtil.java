@@ -40,10 +40,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.function.BiFunction;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 //TODO 将所有方法优化到只有一次流操作
 
@@ -2567,38 +2568,41 @@ public class ReflectionUtil {
     }
 
     public static Set<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
-        ImmutableSet<? extends TypeToken<?>> types = Streams.stream(classes).map(TypeToken::of).collect(ImmutableSet.toImmutableSet());
-        return lowestCommonAncestors(types, false)
-                .stream().map(TypeToken::getRawType).collect(Collectors.toSet());
-    }
-
-    public static Set<TypeToken<?>> lowestCommonAncestors(Class<?>... classes) {
-        return lowestCommonAncestors(Arrays.stream(classes).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()), true);
-    }
-
-    public static Set<TypeToken<?>> lowestCommonAncestors(TypeToken<?>... types) {
-        return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()), true);
-    }
-
-    public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
-        return lowestCommonAncestors(types, true);
-    }
-
-    public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types, boolean withGenerics) {
-        if (Iterables.isEmpty(types)) {
-            return Collections.emptySet();
+        if (Iterables.isEmpty(classes)) {
+            return ImmutableSet.of();
         }
-
-        BiFunction<TypeToken<?>, TypeToken<?>, Boolean> ancestorPredicate = withGenerics ? TypeToken::isSupertypeOf : (type1, type2) -> type1.getRawType().isAssignableFrom(type2.getRawType());
-        // begin with set from first hierarchy
-        final Set<? extends TypeToken<?>> result = types.iterator().next().getTypes().stream()
-                .filter(sup -> Streams.stream(types).allMatch(type -> ancestorPredicate.apply(sup, type)))
-                .collect(Collectors.toSet());
+        final Set<Class<?>> result = TypeToken.of(classes.iterator().next()).getTypes().stream()
+                .map(TypeToken::getRawType)
+                .filter(sup -> Streams.stream(classes).allMatch(sup::isAssignableFrom))
+                .collect(ImmutableSet.toImmutableSet());
         return result.stream()
                 .filter(type1 -> result.stream()
                         .filter(type2 -> !Objects.equals(type1, type2))
-                        .noneMatch(type2 -> ancestorPredicate.apply(type1, type2)))
-                .collect(Collectors.toSet());
+                        .noneMatch(type2 -> type1.isAssignableFrom(type2)))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public static Set<TypeToken<?>> lowestCommonAncestors(Class<?>... classes) {
+        return lowestCommonAncestors(Arrays.stream(classes).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()));
+    }
+
+    public static Set<TypeToken<?>> lowestCommonAncestors(TypeToken<?>... types) {
+        return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()));
+    }
+
+    public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
+        if (Iterables.isEmpty(types)) {
+            return ImmutableSet.of();
+        }
+
+        final Set<? extends TypeToken<?>> result = types.iterator().next().getTypes().stream()
+                .filter(sup -> Streams.stream(types).allMatch(sup::isSupertypeOf))
+                .collect(ImmutableSet.toImmutableSet());
+        return result.stream()
+                .filter(type1 -> result.stream()
+                        .filter(type2 -> !Objects.equals(type1, type2))
+                        .noneMatch(type2 -> type1.isSupertypeOf(type2)))
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     public static Class<?> primitiveClassToWrapperClass(@NonNull Class<?> clazz) {

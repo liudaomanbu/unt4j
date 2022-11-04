@@ -897,13 +897,6 @@ public class Provider {
         return classArrayAndLowestCommonAncestorSets().map(arguments -> Arguments.of(Arrays.stream((Class<?>[]) arguments.get()[0]).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()), arguments.get()[1]));
     }
 
-    static Stream<Arguments> typeTokenSetAndWithGenericsAndLowestCommonAncestorSets() {
-        return Stream.concat(typeTokenSetAndLowestCommonAncestorSets().map(arguments -> Arguments.of(arguments.get()[0], true, arguments.get()[1])),
-                classSetAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(((Collection<Class<?>>) arguments.get()[0]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet())
-                        , false
-                        , ((Collection<Class<?>>) arguments.get()[1]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet()))));
-    }
-
     static Stream<Arguments> primitiveClassAndWrapperClasses() {
         return Stream.of(Arguments.of(byte.class, Byte.class)
                 , Arguments.of(short.class, Short.class)

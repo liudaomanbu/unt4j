@@ -2720,19 +2720,6 @@ class ReflectionUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenSetAndWithGenericsAndLowestCommonAncestorSets")
-    void lowestCommonAncestors(Set<TypeToken<?>> types, boolean withGenerics, Set<TypeToken<?>> lowestCommonAncestors) {
-        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(types, withGenerics);
-        log.debug("types:{},withGenerics:{},result:{}", types, withGenerics, result);
-        if (withGenerics) {
-            Assertions.assertEquals(lowestCommonAncestors, result);
-        } else {
-            Assertions.assertEquals(lowestCommonAncestors.stream().map(TypeToken::getRawType).collect(ImmutableSet.toImmutableSet())
-                    , result.stream().map(TypeToken::getRawType).collect(ImmutableSet.toImmutableSet()));
-        }
-    }
-
-    @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveClassAndWrapperClasses")
     void primitiveClassToWrapperClass(Class<?> primitiveClass, Class<?> wrapperClass) {
         Class<?> result = ReflectionUtil.primitiveClassToWrapperClass(primitiveClass);
