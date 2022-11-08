@@ -36,8 +36,9 @@ public class Provider {
     private static final PropertyAccessorMethodFormat[] FLUENT = new PropertyAccessorMethodFormat[]{PropertyAccessorMethodFormat.FLUENT};
 
     static Stream<Class<?>> classes() {
-        return Stream.of(byte.class, short.class, int.class, long.class, char.class, boolean.class, float.class, double.class, Object.class, NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, StaticFieldObject.class
-                , ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
+        return Stream.of(byte.class, short.class, int.class, long.class, char.class, boolean.class, float.class, double.class
+                , Object.class, NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, GenericFieldGetter.class, IntegerGenericFieldGetter.class
+                , StaticFieldObject.class, ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
                 , PrivateConstructObject.class, ProtectedConstructObject.class, ProtectedConstructChildrenObject.class
                 , MultipleConstructObject.class, StringFieldGetMethodObject.class, StringFieldFluentGetMethodObject.class
                 , StringFieldAndStringFieldGetMethodObject.class, StringFieldGetter.class, StringFieldGetterObject.class
@@ -59,6 +60,8 @@ public class Provider {
                 , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldObject.class, Constant.STRING_FIELD_OBJECT_FIELDS)
                 , Arguments.of(FinalFieldObject.class, Constant.FINAL_FIELD_OBJECT_FIELDS)
+                , Arguments.of(GenericFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(IntegerGenericFieldGetter.class, ImmutableSet.of())
                 , Arguments.of(StaticFieldObject.class, Constant.STATIC_FIELD_OBJECT_FIELDS)
                 , Arguments.of(ChildrenLongFieldObject.class, Constant.CHILDREN_LONG_FIELD_OBJECT_FIELDS)
                 , Arguments.of(ChildrenSameNameFieldObject.class, Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS)
@@ -105,6 +108,8 @@ public class Provider {
         return Stream.of(Arguments.of(NoFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(StringFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(FinalFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(GenericFieldGetter.class, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD))
+                , Arguments.of(IntegerGenericFieldGetter.class, Constant.INTEGER_GENERIC_FIELD_GETTER_METHODS)
                 , Arguments.of(StaticFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(ChildrenLongFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(ChildrenSameNameFieldObject.class, Constant.OBJECT_METHODS)
@@ -138,6 +143,8 @@ public class Provider {
                 , Arguments.of(StringFieldObject.class, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(StaticFieldObject.class, ImmutableSet.of(Constant.STATIC_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(FinalFieldObject.class, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(GenericFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(IntegerGenericFieldGetter.class, ImmutableSet.of(Constant.INTEGER_GENERIC_FIELD_GETTER_CONSTRUCTOR))
                 , Arguments.of(ChildrenLongFieldObject.class, ImmutableSet.of(Constant.CHILDREN_LONG_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(MultipleFieldObject.class, ImmutableSet.of(Constant.MULTIPLE_FIELD_OBJECT_CONSTRUCTOR))
@@ -185,6 +192,8 @@ public class Provider {
                 , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of())
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(FinalFieldObject.class, ImmutableSet.of())
+                , Arguments.of(GenericFieldGetter.class, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD))
+                , Arguments.of(IntegerGenericFieldGetter.class, Constant.INTEGER_GENERIC_FIELD_GETTER_GET_METHODS)
                 , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
                 , Arguments.of(MultipleFieldObject.class, ImmutableSet.of())
                 , Arguments.of(NoFieldObject.class, ImmutableSet.of())
@@ -251,6 +260,8 @@ public class Provider {
                 , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of())
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS)
                 , Arguments.of(FinalFieldObject.class, ImmutableSet.of())
+                , Arguments.of(GenericFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(IntegerGenericFieldGetter.class, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
                 , Arguments.of(MultipleFieldObject.class, ImmutableSet.of())
                 , Arguments.of(NoFieldObject.class, ImmutableSet.of())
@@ -289,6 +300,10 @@ public class Provider {
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
                 , Arguments.of(FinalFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR))
                 , Arguments.of(FinalFieldObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR))
+                , Arguments.of(GenericFieldGetter.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GENERIC_FIELD_PROPERTY_READER))
+                , Arguments.of(GenericFieldGetter.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
+                , Arguments.of(IntegerGenericFieldGetter.class, PropertyAccessorMethodFormat.JAVA_BEAN, Constant.INTEGER_GENERIC_FIELD_GETTER_PROPERTY_READERS)
+                , Arguments.of(IntegerGenericFieldGetter.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
                 , Arguments.of(MultipleFieldObject.class, PropertyAccessorMethodFormat.JAVA_BEAN, Constant.MULTIPLE_FIELD_OBJECT_PROPERTY_ACCESSORS)
@@ -434,6 +449,12 @@ public class Provider {
                 , Arguments.of(FinalFieldObject.class, JAVA_BEAN, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
                 , Arguments.of(FinalFieldObject.class, FLUENT, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
                 , Arguments.of(FinalFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(GenericFieldGetter.class, JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GENERIC_PROPERTY))
+                , Arguments.of(GenericFieldGetter.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(GenericFieldGetter.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GENERIC_PROPERTY))
+                , Arguments.of(IntegerGenericFieldGetter.class, JAVA_BEAN, ImmutableSet.of(Constant.INTEGER_GENERIC_FIELD_GETTER_INTEGER_PROPERTY))
+                , Arguments.of(IntegerGenericFieldGetter.class, FLUENT, ImmutableSet.of())
+                , Arguments.of(IntegerGenericFieldGetter.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.INTEGER_GENERIC_FIELD_GETTER_INTEGER_PROPERTY))
                 , Arguments.of(MultipleConstructObject.class, JAVA_BEAN, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, FLUENT, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of())
@@ -745,7 +766,10 @@ public class Provider {
     }
 
     static Stream<Arguments> propertyReaderMethodAndPropertyAccessorMethodFormats() {
-        return Stream.of(Arguments.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+        return Stream.of(Arguments.of(Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_BRIDGE_GET_GENERIC_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
+                , Arguments.of(Constant.STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
                 , Arguments.of(Constant.STRING_FIELD_FLUENT_GET_METHOD_OBJECT_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.FLUENT)
                 , Arguments.of(Constant.STRING_FIELD_AND_STRING_FIELD_GET_METHOD_OBJECT_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
                 , Arguments.of(Constant.STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD, PropertyAccessorMethodFormat.JAVA_BEAN)
@@ -799,7 +823,9 @@ public class Provider {
 
     static Stream<Arguments> methodAndSuperMethods() {
         return Stream.of(Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, Constant.STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD)
-                , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD));
+                , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD)
+                , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD)
+                , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_BRIDGE_GET_GENERIC_FIELD_METHOD, Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD));
     }
 
     static Stream<Arguments> methodAndNotSuperMethods() {
@@ -809,7 +835,9 @@ public class Provider {
     }
 
     static Stream<Arguments> methodAndSuperClasss() {
-        return Stream.of(Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, StringFieldGetter.class)
+        return Stream.of(Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, GenericFieldGetter.class)
+                , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_BRIDGE_GET_GENERIC_FIELD_METHOD, GenericFieldGetter.class)
+                , Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, StringFieldGetter.class)
                 , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, StringFieldSetter.class));
     }
 
