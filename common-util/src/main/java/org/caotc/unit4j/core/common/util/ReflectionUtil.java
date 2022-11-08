@@ -2040,7 +2040,6 @@ public class ReflectionUtil {
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
 
         Stream<PropertyElement<T, ?>> propertyElementStream = methodStream(type)
-//                .filter(method -> !method.isBridge())//todo 确认增加注释说明
                 .flatMap(method -> Arrays.stream(propertyAccessorMethodFormats)
                         .filter(methodNameStyle -> methodNameStyle.isPropertyWriter(method)
                                 || methodNameStyle.isPropertyReader(method))
