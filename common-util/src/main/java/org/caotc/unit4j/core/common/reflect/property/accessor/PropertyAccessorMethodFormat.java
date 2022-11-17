@@ -16,9 +16,9 @@
 
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
-import com.google.common.reflect.Invokable;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.core.common.reflect.Invokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.constant.StringConstant;
 
@@ -45,7 +45,7 @@ public enum PropertyAccessorMethodFormat {
         @Override
         public boolean propertyReaderNameMatches(@NonNull Invokable<?, ?> invokable) {
             return invokable.getName().startsWith(GET_METHOD_PREFIX)
-                    || (boolean.class.equals(invokable.getReturnType().getRawType()) && invokable.getName()
+                    || (boolean.class.equals(invokable.returnType().getRawType()) && invokable.getName()
                     .startsWith(IS_METHOD_PREFIX));
         }
 
@@ -148,8 +148,8 @@ public enum PropertyAccessorMethodFormat {
     public boolean isPropertyReader(@NonNull Invokable<?, ?> invokable) {
         return !invokable.getDeclaringClass().equals(Object.class)
                 && !invokable.isStatic()
-                && invokable.getParameters().isEmpty()
-                && !invokable.getReturnType().getRawType().equals(void.class)
+                && invokable.parameters().isEmpty()
+                && !invokable.returnType().getRawType().equals(void.class)
                 && propertyReaderNameMatches(invokable)
                 && !ReflectionUtil.isOverride(invokable, Object.class);
     }
@@ -178,9 +178,9 @@ public enum PropertyAccessorMethodFormat {
      */
     public boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable) {
         return !invokable.getDeclaringClass().equals(Object.class)
-                && (invokable.getReturnType().getRawType().equals(void.class) || invokable.getReturnType()
-                .equals(invokable.getOwnerType()))
-                && invokable.getParameters().size() == 1
+                && (invokable.returnType().getRawType().equals(void.class) || invokable.returnType()
+                .equals(invokable.ownerType()))
+                && invokable.parameters().size() == 1
                 && propertyWriterNameMatches(invokable)
                 && !ReflectionUtil.isOverride(invokable, Object.class);
     }

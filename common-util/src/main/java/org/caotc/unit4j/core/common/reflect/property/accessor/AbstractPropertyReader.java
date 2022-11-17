@@ -21,7 +21,7 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
-import org.caotc.unit4j.core.common.reflect.InvokableElement;
+import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -118,17 +118,17 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     /**
      * 方法
      */
-    @NonNull InvokableElement<T, R> invokable;
+    @NonNull GuavaInvokableProxy<T, R> invokable;
     /**
      * 属性名称
      */
     @NonNull String propertyName;
 
-    InvokablePropertyReader(@NonNull InvokableElement<T, R> invokable,
+    InvokablePropertyReader(@NonNull GuavaInvokableProxy<T, R> invokable,
                             @NonNull String propertyName) {
       super(invokable);
       Preconditions
-              .checkArgument(ReflectionUtil.isPropertyReader(invokable.invokable()), "%s is not a getInvokable",
+              .checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a getInvokable",
                       invokable);
       this.invokable = invokable;
       this.propertyName = propertyName;

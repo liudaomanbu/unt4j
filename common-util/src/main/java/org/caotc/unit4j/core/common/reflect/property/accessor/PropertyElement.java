@@ -17,12 +17,11 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
-import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.AnnotatedElement;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
-import org.caotc.unit4j.core.common.reflect.InvokableElement;
+import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
 import org.caotc.unit4j.core.common.reflect.WithAccessLevel;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
@@ -76,10 +75,10 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
     static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method method,
                                              @NonNull String propertyName) {
         if (ReflectionUtil.isPropertyReader(method)) {
-            return new AbstractPropertyReader.InvokablePropertyReader<>(InvokableElement.of((Invokable<T, R>) ownerType.method(method)), propertyName);
+            return new AbstractPropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(method, ownerType), propertyName);
         }
         if (ReflectionUtil.isPropertyWriter(method)) {
-            return new AbstractPropertyWriter.InvokablePropertyWriter<>(InvokableElement.of((Invokable<T, ?>) ownerType.method(method)), propertyName);
+            return new AbstractPropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(method, ownerType), propertyName);
         }
         throw new IllegalArgumentException(String.format("%s is not a PropertyElement", method));
     }

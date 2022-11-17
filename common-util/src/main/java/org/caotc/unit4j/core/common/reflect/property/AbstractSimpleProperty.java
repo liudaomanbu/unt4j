@@ -103,7 +103,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
                 .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
         if (propertyTypes.size() > 1) {
             propertyTypes = propertyTypes.stream()
-                    .map(type -> (TypeToken<? extends P>) ReflectionUtil.primitiveTypeToWrapperType(type))
+                    .map(TypeToken::wrap)
                     .collect(ImmutableSet.toImmutableSet());
         }
         Set<TypeToken<?>> lowestCommonAncestors = ReflectionUtil.lowestCommonAncestors(propertyTypes);

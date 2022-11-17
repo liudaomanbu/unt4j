@@ -8,10 +8,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.caotc.unit4j.core.common.reflect.property.accessor.*;
 import org.caotc.unit4j.core.common.util.model.*;
 import org.junit.jupiter.params.provider.Arguments;
 
@@ -39,16 +36,15 @@ public class Provider {
 
     static Stream<Class<?>> classes() {
         return Stream.of(byte.class, short.class, int.class, long.class, char.class, boolean.class, float.class, double.class
-                , Object.class, NoFieldObject.class, StringFieldObject.class, FinalFieldObject.class, GenericFieldGetter.class
-                , GenericFieldSetter.class, IntegerGenericFieldGetter.class, LongGenericFieldSetter.class
-                , StaticFieldObject.class, ChildrenLongFieldObject.class, ChildrenSameNameFieldObject.class, MultipleFieldObject.class
-                , PrivateConstructObject.class, ProtectedConstructObject.class, ProtectedConstructChildrenObject.class
-                , MultipleConstructObject.class, StringFieldGetMethodObject.class, StringFieldFluentGetMethodObject.class
-                , StringFieldAndStringFieldGetMethodObject.class, StringFieldGetter.class, StringFieldGetterObject.class
-                , BooleanFieldIsMethodObject.class, BooleanFieldGetMethodObject.class, StringFieldSetMethodObject.class
-                , StringFieldFluentSetMethodObject.class, StringFieldAndStringFieldSetMethodObject.class
-                , StringFieldChainSetMethodObject.class, StringFieldSetter.class, StringFieldSetterObject.class
-                , DuplicateNumberFieldSetMethodObject.class);
+                , Object.class, BooleanFieldGetMethodObject.class, BooleanFieldIsMethodObject.class, ChildrenLongFieldObject.class
+                , ChildrenSameNameFieldObject.class, DoubleGenericFieldObject.class, DuplicateNumberFieldSetMethodObject.class
+                , FinalFieldObject.class, GenericFieldGetter.class, GenericFieldObject.class, GenericFieldSetter.class
+                , IntegerGenericFieldGetter.class, LongGenericFieldSetter.class, MultipleConstructObject.class, MultipleFieldObject.class
+                , NoFieldObject.class, PrivateConstructObject.class, ProtectedConstructChildrenObject.class, ProtectedConstructObject.class
+                , StaticFieldObject.class, StringFieldAndStringFieldGetMethodObject.class, StringFieldAndStringFieldSetMethodObject.class
+                , StringFieldChainSetMethodObject.class, StringFieldFluentGetMethodObject.class, StringFieldFluentSetMethodObject.class
+                , StringFieldGetMethodObject.class, StringFieldGetter.class, StringFieldGetterObject.class, StringFieldObject.class
+                , StringFieldSetMethodObject.class, StringFieldSetter.class, StringFieldSetterObject.class);
     }
 
     static Stream<TypeToken<?>> typeTokens() {
@@ -62,8 +58,11 @@ public class Provider {
                 , Arguments.of(ProtectedConstructChildrenObject.class, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldObject.class, Constant.STRING_FIELD_OBJECT_FIELDS)
+                , Arguments.of(DoubleGenericFieldObject.class, Constant.DOUBLE_GENERIC_FIELD_OBJECT_FIELDS)
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(FinalFieldObject.class, Constant.FINAL_FIELD_OBJECT_FIELDS)
                 , Arguments.of(GenericFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(GenericFieldObject.class, Constant.DOUBLE_GENERIC_FIELD_OBJECT_FIELDS)
                 , Arguments.of(GenericFieldSetter.class, ImmutableSet.of())
                 , Arguments.of(IntegerGenericFieldGetter.class, ImmutableSet.of())
                 , Arguments.of(LongGenericFieldSetter.class, ImmutableSet.of())
@@ -83,8 +82,7 @@ public class Provider {
                 , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_STRING_FIELD))
                 , Arguments.of(StringFieldChainSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
-                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of())
-                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of()));
+                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of()));
     }
 
     static Stream<Arguments> typeTokenAndFieldSets() {
@@ -93,7 +91,9 @@ public class Provider {
 
     static Stream<Arguments> classAndFieldNameAndFields() {
         return Stream.of(Arguments.of(StringFieldObject.class, StringFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(DoubleGenericFieldObject.class, DoubleGenericFieldObject.Fields.GENERIC_FIELD, Constant.DOUBLE_GENERIC_FIELD_OBJECT_FIELDS)
                 , Arguments.of(FinalFieldObject.class, FinalFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_FIELD))
+                , Arguments.of(GenericFieldObject.class, GenericFieldObject.Fields.GENERIC_FIELD, ImmutableSet.of(Constant.GENERIC_FIELD_OBJECT_GENERIC_FIELD))
                 , Arguments.of(StaticFieldObject.class, "stringField", ImmutableSet.of(Constant.STATIC_FIELD_OBJECT_STRING_FIELD))
                 , Arguments.of(ChildrenLongFieldObject.class, StringFieldObject.Fields.STRING_FIELD, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD))
                 , Arguments.of(ChildrenLongFieldObject.class, ChildrenLongFieldObject.Fields.LONG_FIELD, ImmutableSet.of(Constant.CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD))
@@ -112,8 +112,11 @@ public class Provider {
     static Stream<Arguments> classAndMethodSets() {
         return Stream.of(Arguments.of(NoFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(StringFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(DoubleGenericFieldObject.class, Constant.OBJECT_METHODS)
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_METHODS)
                 , Arguments.of(FinalFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(GenericFieldGetter.class, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD))
+                , Arguments.of(GenericFieldObject.class, Constant.OBJECT_METHODS)
                 , Arguments.of(GenericFieldSetter.class, ImmutableSet.of(Constant.GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD))
                 , Arguments.of(IntegerGenericFieldGetter.class, Constant.INTEGER_GENERIC_FIELD_GETTER_METHODS)
                 , Arguments.of(LongGenericFieldSetter.class, Constant.LONG_GENERIC_FIELD_SETTER_METHODS)
@@ -137,8 +140,7 @@ public class Provider {
                 , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_METHODS)
                 , Arguments.of(StringFieldChainSetMethodObject.class, Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_METHODS)
                 , Arguments.of(StringFieldSetter.class, ImmutableSet.of(Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD))
-                , Arguments.of(StringFieldSetterObject.class, Constant.STRING_FIELD_SETTER_OBJECT_METHODS)
-                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_METHODS));
+                , Arguments.of(StringFieldSetterObject.class, Constant.STRING_FIELD_SETTER_OBJECT_METHODS));
     }
 
     static Stream<Arguments> typeTokenAndMethodSets() {
@@ -149,8 +151,11 @@ public class Provider {
         return Stream.of(Arguments.of(NoFieldObject.class, ImmutableSet.of(Constant.NO_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(StringFieldObject.class, ImmutableSet.of(Constant.STRING_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(StaticFieldObject.class, ImmutableSet.of(Constant.STATIC_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(DoubleGenericFieldObject.class, ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_CONSTRUCTOR))
+                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(FinalFieldObject.class, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(GenericFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(GenericFieldObject.class, ImmutableSet.of(Constant.GENERIC_FIELD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(GenericFieldSetter.class, ImmutableSet.of())
                 , Arguments.of(IntegerGenericFieldGetter.class, ImmutableSet.of(Constant.INTEGER_GENERIC_FIELD_GETTER_CONSTRUCTOR))
                 , Arguments.of(LongGenericFieldSetter.class, ImmutableSet.of(Constant.LONG_GENERIC_FIELD_SETTER_CONSTRUCTOR))
@@ -173,8 +178,7 @@ public class Provider {
                 , Arguments.of(StringFieldAndStringFieldSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(StringFieldChainSetMethodObject.class, ImmutableSet.of(Constant.STRING_FIELD_CHAIN_SET_METHOD_OBJECT_CONSTRUCTOR))
                 , Arguments.of(StringFieldSetter.class, ImmutableSet.of())
-                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of(Constant.STRING_FIELD_SETTER_OBJECT_CONSTRUCTOR))
-                , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR)));
+                , Arguments.of(StringFieldSetterObject.class, ImmutableSet.of(Constant.STRING_FIELD_SETTER_OBJECT_CONSTRUCTOR)));
     }
 
     static Stream<Arguments> typeTokenAndConstructorSets() {
@@ -201,10 +205,14 @@ public class Provider {
                 , Arguments.of(BooleanFieldIsMethodObject.class, ImmutableSet.of(Constant.BOOLEAN_FIELD_IS_METHOD_OBJECT_IS_BOOLEAN_FIELD_METHOD))
                 , Arguments.of(ChildrenLongFieldObject.class, ImmutableSet.of())
                 , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of())
+                , Arguments.of(DoubleGenericFieldObject.class, ImmutableSet.of())
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, ImmutableSet.of())
                 , Arguments.of(FinalFieldObject.class, ImmutableSet.of())
                 , Arguments.of(GenericFieldGetter.class, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD))
+                , Arguments.of(GenericFieldObject.class, ImmutableSet.of())
+                , Arguments.of(GenericFieldSetter.class, ImmutableSet.of())
                 , Arguments.of(IntegerGenericFieldGetter.class, Constant.INTEGER_GENERIC_FIELD_GETTER_GET_METHODS)
+                , Arguments.of(LongGenericFieldSetter.class, ImmutableSet.of())
                 , Arguments.of(MultipleConstructObject.class, ImmutableSet.of())
                 , Arguments.of(MultipleFieldObject.class, ImmutableSet.of())
                 , Arguments.of(NoFieldObject.class, ImmutableSet.of())
@@ -273,9 +281,11 @@ public class Provider {
                 , Arguments.of(BooleanFieldIsMethodObject.class, ImmutableSet.of())
                 , Arguments.of(ChildrenLongFieldObject.class, ImmutableSet.of())
                 , Arguments.of(ChildrenSameNameFieldObject.class, ImmutableSet.of())
+                , Arguments.of(DoubleGenericFieldObject.class, ImmutableSet.of())
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS)
                 , Arguments.of(FinalFieldObject.class, ImmutableSet.of())
                 , Arguments.of(GenericFieldGetter.class, ImmutableSet.of())
+                , Arguments.of(GenericFieldObject.class, ImmutableSet.of())
                 , Arguments.of(GenericFieldSetter.class, ImmutableSet.of(Constant.GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD))
                 , Arguments.of(IntegerGenericFieldGetter.class, ImmutableSet.of())
                 , Arguments.of(LongGenericFieldSetter.class, Constant.LONG_GENERIC_FIELD_SETTER_SET_METHODS)
@@ -319,6 +329,8 @@ public class Provider {
                 , Arguments.of(TypeToken.of(ChildrenLongFieldObject.class), PropertyAccessorMethodFormat.FLUENT, Constant.CHILDREN_LONG_FIELD_OBJECT_PROPERTY_ACCESSORS)
                 , Arguments.of(TypeToken.of(ChildrenSameNameFieldObject.class), PropertyAccessorMethodFormat.JAVA_BEAN, Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS)
                 , Arguments.of(TypeToken.of(ChildrenSameNameFieldObject.class), PropertyAccessorMethodFormat.FLUENT, Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS)
+                , Arguments.of(TypeToken.of(DoubleGenericFieldObject.class), PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR))
+                , Arguments.of(TypeToken.of(DoubleGenericFieldObject.class), PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR))
                 , Arguments.of(TypeToken.of(DuplicateNumberFieldSetMethodObject.class), PropertyAccessorMethodFormat.JAVA_BEAN, Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS)
                 , Arguments.of(TypeToken.of(DuplicateNumberFieldSetMethodObject.class), PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
                 , Arguments.of(TypeToken.of(FinalFieldObject.class), PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR))
@@ -327,12 +339,18 @@ public class Provider {
                 }, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GENERIC_FIELD_PROPERTY_READER))
                 , Arguments.of(new TypeToken<GenericFieldGetter<Object>>() {
                 }, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
+                , Arguments.of(new TypeToken<GenericFieldObject<Object>>() {
+                }, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR))
+                , Arguments.of(new TypeToken<GenericFieldObject<Object>>() {
+                }, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(Constant.GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR))
                 , Arguments.of(new TypeToken<GenericFieldSetter<Object>>() {
                 }, PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_SETTER_GENERIC_FIELD_PROPERTY_WRITER))
                 , Arguments.of(new TypeToken<GenericFieldSetter<Object>>() {
                 }, PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
                 , Arguments.of(TypeToken.of(GenericFieldGetter.class), PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(PropertyReader.from(GenericFieldGetter.class, Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, "genericField")))
                 , Arguments.of(TypeToken.of(GenericFieldGetter.class), PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
+                , Arguments.of(TypeToken.of(GenericFieldObject.class), PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(PropertyAccessor.from(GenericFieldObject.class, Constant.GENERIC_FIELD_OBJECT_GENERIC_FIELD)))
+                , Arguments.of(TypeToken.of(GenericFieldObject.class), PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of(PropertyAccessor.from(GenericFieldObject.class, Constant.GENERIC_FIELD_OBJECT_GENERIC_FIELD)))
                 , Arguments.of(TypeToken.of(GenericFieldSetter.class), PropertyAccessorMethodFormat.JAVA_BEAN, ImmutableSet.of(PropertyWriter.from(GenericFieldSetter.class, Constant.GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD, "genericField")))
                 , Arguments.of(TypeToken.of(GenericFieldSetter.class), PropertyAccessorMethodFormat.FLUENT, ImmutableSet.of())
                 , Arguments.of(TypeToken.of(IntegerGenericFieldGetter.class), PropertyAccessorMethodFormat.JAVA_BEAN, Constant.INTEGER_GENERIC_FIELD_GETTER_PROPERTY_READERS)
@@ -476,6 +494,9 @@ public class Provider {
                 , Arguments.of(ChildrenSameNameFieldObject.class, JAVA_BEAN, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
                 , Arguments.of(ChildrenSameNameFieldObject.class, FLUENT, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
                 , Arguments.of(ChildrenSameNameFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
+                , Arguments.of(DoubleGenericFieldObject.class, JAVA_BEAN, ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
+                , Arguments.of(DoubleGenericFieldObject.class, FLUENT, ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
+                , Arguments.of(DoubleGenericFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, JAVA_BEAN, ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY))
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, FLUENT, ImmutableSet.of())
                 , Arguments.of(DuplicateNumberFieldSetMethodObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY))
@@ -485,6 +506,9 @@ public class Provider {
                 , Arguments.of(GenericFieldGetter.class, JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GENERIC_PROPERTY))
                 , Arguments.of(GenericFieldGetter.class, FLUENT, ImmutableSet.of())
                 , Arguments.of(GenericFieldGetter.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.GENERIC_FIELD_GETTER_GENERIC_PROPERTY))
+                , Arguments.of(GenericFieldObject.class, JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
+                , Arguments.of(GenericFieldObject.class, FLUENT, ImmutableSet.of(Constant.GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
+                , Arguments.of(GenericFieldObject.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
                 , Arguments.of(GenericFieldSetter.class, JAVA_BEAN, ImmutableSet.of(Constant.GENERIC_FIELD_SETTER_GENERIC_PROPERTY))
                 , Arguments.of(GenericFieldSetter.class, FLUENT, ImmutableSet.of())
                 , Arguments.of(GenericFieldSetter.class, PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.GENERIC_FIELD_SETTER_GENERIC_PROPERTY))
@@ -775,6 +799,7 @@ public class Provider {
 
     static Stream<Field> fields() {
         return Stream.of(Constant.STRING_FIELD_OBJECT_STRING_FIELD, Constant.FINAL_FIELD_OBJECT_STRING_FIELD
+                , Constant.GENERIC_FIELD_OBJECT_GENERIC_FIELD
                 , Constant.STATIC_FIELD_OBJECT_STRING_FIELD, Constant.CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD
                 , Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD, Constant.MULTIPLE_FIELD_OBJECT_STRING_FIELD
                 , Constant.MULTIPLE_FIELD_OBJECT_INTEGER_FIELD, Constant.MULTIPLE_FIELD_OBJECT_INT_FIELD
@@ -937,6 +962,7 @@ public class Provider {
                         , Arguments.of(new Class[]{Integer.class, Long.class}, ImmutableSet.of(Number.class, Comparable.class))
                         , Arguments.of(new Class[]{Byte.class, Short.class, Integer.class, Long.class}, ImmutableSet.of(Number.class, Comparable.class))
                         , Arguments.of(new Class[]{Integer.class, Number.class}, ImmutableSet.of(Number.class))
+                        , Arguments.of(new Class[]{DoubleGenericFieldObject.class, GenericFieldObject.class}, ImmutableSet.of(GenericFieldObject.class))
                         , Arguments.of(new Class[]{IntegerGenericFieldGetter.class, GenericFieldGetter.class}, ImmutableSet.of(GenericFieldGetter.class))
                         , Arguments.of(new Class[]{LongGenericFieldSetter.class, GenericFieldSetter.class}, ImmutableSet.of(GenericFieldSetter.class))
                         , Arguments.of(new Class[]{StringFieldGetterObject.class, StringFieldGetter.class}, ImmutableSet.of(StringFieldGetter.class))
@@ -951,42 +977,47 @@ public class Provider {
         return objectSubClassArrayAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(arguments.get()[0], ((Collection<Class<?>>) arguments.get()[1]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet())));
     }
 
+    static Stream<Arguments> objectSubTypeTokenArrayAndLowestCommonAncestorSets() {
+        return objectSubClassArrayAndLowestCommonAncestorSets().map(arguments -> Arguments.of(Arrays.stream((Class[]) arguments.get()[0]).map(TypeToken::of).toArray(TypeToken[]::new), arguments.get()[1]));
+    }
+
     static Stream<Arguments> ContainPrimitiveClassArrayAndLowestCommonAncestorSets() {
         return ContainPrimitiveClassArrayAndLowestCommonSuperClassSets().map(arguments -> Arguments.of(arguments.get()[0], ((Collection<Class<?>>) arguments.get()[1]).stream().map(TypeToken::of).collect(ImmutableSet.toImmutableSet())));
     }
 
+    static Stream<Arguments> ContainPrimitiveTypeTokenArrayAndLowestCommonAncestorSets() {
+        return ContainPrimitiveClassArrayAndLowestCommonAncestorSets().map(arguments -> Arguments.of(Arrays.stream((Class[]) arguments.get()[0]).map(TypeToken::of).toArray(TypeToken[]::new), arguments.get()[1]));
+    }
+
     static Stream<Arguments> classArrayAndLowestCommonAncestorSets() {
-        return Streams.concat(objectSubClassArrayAndLowestCommonAncestorSets(), ContainPrimitiveClassArrayAndLowestCommonAncestorSets(),
-                Stream.of(Arguments.of(new Class[]{String.class, Integer.class}, ImmutableSet.of(TypeToken.of(Serializable.class)))
-                        , Arguments.of(new Class[]{Integer.class, Long.class}, ImmutableSet.of(TypeToken.of(Number.class)))
-                        , Arguments.of(new Class[]{Byte.class, Short.class, Integer.class, Long.class}, ImmutableSet.of(TypeToken.of(Number.class)))
-                        , Arguments.of(new Class[]{Integer.class, Number.class}, ImmutableSet.of(TypeToken.of(Number.class)))
-                        , Arguments.of(new Class[]{IntegerGenericFieldGetter.class, GenericFieldGetter.class}, ImmutableSet.of(TypeToken.of(GenericFieldGetter.class)))
-                        , Arguments.of(new Class[]{LongGenericFieldSetter.class, GenericFieldSetter.class}, ImmutableSet.of(TypeToken.of(GenericFieldSetter.class)))
-                        , Arguments.of(new Class[]{StringFieldGetterObject.class, StringFieldGetter.class}, ImmutableSet.of(TypeToken.of(StringFieldGetter.class)))
-                        , Arguments.of(new Class[]{StringFieldSetterObject.class, StringFieldSetter.class}, ImmutableSet.of(TypeToken.of(StringFieldSetter.class)))));
+        return typeTokenArrayAndLowestCommonAncestorSets()
+                .filter(arguments -> Arrays.stream((TypeToken<?>[]) arguments.get()[0]).allMatch(type -> type.equals(TypeToken.of(type.getRawType()))))
+                .map(arguments -> Arguments.of(Arrays.stream((TypeToken<?>[]) arguments.get()[0]).map(TypeToken::getRawType).toArray(Class[]::new), arguments.get()[1]));
     }
 
     static Stream<Arguments> typeTokenArrayAndLowestCommonAncestorSets() {
-        return classArrayAndLowestCommonAncestorSets().map(arguments -> Arguments.of(Arrays.stream((Class<?>[]) arguments.get()[0]).map(TypeToken::of).toArray(TypeToken[]::new), arguments.get()[1]));
+        return Streams.concat(objectSubTypeTokenArrayAndLowestCommonAncestorSets(), ContainPrimitiveTypeTokenArrayAndLowestCommonAncestorSets(),
+                Stream.of(Arguments.of(new TypeToken[]{TypeToken.of(String.class), TypeToken.of(Integer.class)}, ImmutableSet.of(TypeToken.of(Serializable.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(Integer.class), TypeToken.of(Long.class)}, ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(Byte.class), TypeToken.of(Short.class), TypeToken.of(Integer.class), TypeToken.of(Long.class)}, ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(Integer.class), TypeToken.of(Number.class)}, ImmutableSet.of(TypeToken.of(Number.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(DoubleGenericFieldObject.class), TypeToken.of(GenericFieldObject.class)}, ImmutableSet.of(TypeToken.of(Object.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(IntegerGenericFieldGetter.class), TypeToken.of(GenericFieldGetter.class)}, ImmutableSet.of(TypeToken.of(Object.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(LongGenericFieldSetter.class), TypeToken.of(GenericFieldSetter.class)}, ImmutableSet.of(TypeToken.of(Object.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(DoubleGenericFieldObject.class), new TypeToken<GenericFieldObject<Double>>() {
+                        }}, ImmutableSet.of(new TypeToken<GenericFieldObject<Double>>() {
+                        }))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(IntegerGenericFieldGetter.class), new TypeToken<GenericFieldGetter<Integer>>() {
+                        }}, ImmutableSet.of(new TypeToken<GenericFieldGetter<Integer>>() {
+                        }))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(LongGenericFieldSetter.class), new TypeToken<GenericFieldSetter<Long>>() {
+                        }}, ImmutableSet.of(new TypeToken<GenericFieldSetter<Long>>() {
+                        }))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(StringFieldGetterObject.class), TypeToken.of(StringFieldGetter.class)}, ImmutableSet.of(TypeToken.of(StringFieldGetter.class)))
+                        , Arguments.of(new TypeToken[]{TypeToken.of(StringFieldSetterObject.class), TypeToken.of(StringFieldSetter.class)}, ImmutableSet.of(TypeToken.of(StringFieldSetter.class)))));
     }
 
     static Stream<Arguments> typeTokenSetAndLowestCommonAncestorSets() {
         return classArrayAndLowestCommonAncestorSets().map(arguments -> Arguments.of(Arrays.stream((Class<?>[]) arguments.get()[0]).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()), arguments.get()[1]));
-    }
-
-    static Stream<Arguments> primitiveClassAndWrapperClasses() {
-        return Stream.of(Arguments.of(byte.class, Byte.class)
-                , Arguments.of(short.class, Short.class)
-                , Arguments.of(int.class, Integer.class)
-                , Arguments.of(long.class, Long.class)
-                , Arguments.of(char.class, Character.class)
-                , Arguments.of(boolean.class, Boolean.class)
-                , Arguments.of(float.class, Float.class)
-                , Arguments.of(double.class, Double.class));
-    }
-
-    static Stream<Arguments> primitiveTypeTokenAndWrapperTypeTokens() {
-        return primitiveClassAndWrapperClasses().map(arguments -> Arguments.of(TypeToken.of((Class<?>) arguments.get()[0]), TypeToken.of((Class<?>) arguments.get()[1])));
     }
 }

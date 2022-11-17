@@ -21,7 +21,7 @@ import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
-import org.caotc.unit4j.core.common.reflect.InvokableElement;
+import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -144,18 +144,18 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
      * set方法
      */
     @NonNull
-    InvokableElement<T, ?> invokable;
+    GuavaInvokableProxy<T, ?> invokable;
     /**
      * set方法名称风格
      */
     @NonNull
     String propertyName;
 
-    InvokablePropertyWriter(@NonNull InvokableElement<T, ?> invokable,
+    InvokablePropertyWriter(@NonNull GuavaInvokableProxy<T, ?> invokable,
                             @NonNull String propertyName) {
       super(invokable);
       Preconditions
-              .checkArgument(ReflectionUtil.isPropertyWriter(invokable.invokable()), "%s is not a setInvokable",
+              .checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a setInvokable",
                       invokable);
       this.invokable = invokable;
       this.propertyName = propertyName;
@@ -170,7 +170,7 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
       @SuppressWarnings("unchecked")
       @Override
       public @NonNull TypeToken<? extends R> propertyType() {
-          return (TypeToken<? extends R>) invokable.parameters().get(0).getType();
+        return (TypeToken<? extends R>) invokable.parameters().get(0).type();
       }
 
       @Override

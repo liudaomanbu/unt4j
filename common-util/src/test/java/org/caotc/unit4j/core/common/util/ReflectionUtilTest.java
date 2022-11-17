@@ -2718,40 +2718,4 @@ class ReflectionUtilTest {
         log.debug("types:{},result:{}", types, result);
         Assertions.assertEquals(lowestCommonAncestors, result);
     }
-
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveClassAndWrapperClasses")
-    void primitiveClassToWrapperClass(Class<?> primitiveClass, Class<?> wrapperClass) {
-        Class<?> result = ReflectionUtil.primitiveClassToWrapperClass(primitiveClass);
-        log.debug("primitiveClass:{},result:{}", primitiveClass, result);
-        Assertions.assertEquals(wrapperClass, result);
-        Assertions.assertEquals(wrapperClass, ReflectionUtil.primitiveClassToWrapperClass(wrapperClass));
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveClassAndWrapperClasses")
-    void wrapperClassToPrimitiveClass(Class<?> primitiveClass, Class<?> wrapperClass) {
-        Class<?> result = ReflectionUtil.wrapperClassToPrimitiveClass(wrapperClass);
-        log.debug("wrapperClass:{},result:{}", wrapperClass, result);
-        Assertions.assertEquals(primitiveClass, result);
-        Assertions.assertEquals(primitiveClass, ReflectionUtil.wrapperClassToPrimitiveClass(primitiveClass));
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveTypeTokenAndWrapperTypeTokens")
-    void primitiveTypeToWrapperType(TypeToken<?> primitiveType, TypeToken<?> wrapperType) {
-        TypeToken<?> result = ReflectionUtil.primitiveTypeToWrapperType(primitiveType);
-        log.debug("primitiveType:{},result:{}", primitiveType, result);
-        Assertions.assertEquals(wrapperType, result);
-        Assertions.assertEquals(wrapperType, ReflectionUtil.primitiveTypeToWrapperType(wrapperType));
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#primitiveTypeTokenAndWrapperTypeTokens")
-    void wrapperTypeToPrimitiveType(TypeToken<?> primitiveType, TypeToken<?> wrapperType) {
-        TypeToken<?> result = ReflectionUtil.wrapperTypeToPrimitiveType(wrapperType);
-        log.debug("wrapperType:{},result:{}", wrapperType, result);
-        Assertions.assertEquals(primitiveType, result);
-        Assertions.assertEquals(primitiveType, ReflectionUtil.wrapperTypeToPrimitiveType(primitiveType));
-    }
 }

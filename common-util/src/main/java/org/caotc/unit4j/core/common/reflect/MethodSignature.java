@@ -17,12 +17,12 @@
 package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.reflect.Invokable;
-import com.google.common.reflect.Parameter;
 import com.google.common.reflect.TypeToken;
-import java.lang.reflect.Method;
 import lombok.NonNull;
 import lombok.Value;
+
+import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * @author caotc
@@ -46,10 +46,29 @@ public class MethodSignature {
   String name;
   @NonNull
   ImmutableList<TypeToken<?>> parameterTypes;
+  @NonNull
+  ImmutableList<Class<?>> parameterRawTypes;
 
   private MethodSignature(@NonNull Invokable<?, ?> invokable) {
     this.name = invokable.getName();
-    this.parameterTypes = invokable.getParameters().stream().map(Parameter::getType)
-        .collect(ImmutableList.toImmutableList());
+    this.parameterTypes = invokable.parameters().stream().map(Parameter::type)
+            .collect(ImmutableList.toImmutableList());
+    this.parameterRawTypes = parameterTypes.stream().map(TypeToken::getRawType)
+            .collect(ImmutableList.toImmutableList());
+  }
+
+  //todo
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    MethodSignature that = (MethodSignature) o;
+    return name.equals(that.name)
+            && (parameterTypes.equals(that.parameterTypes) || parameterRawTypes.equals(that.parameterRawTypes));
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name);
   }
 }

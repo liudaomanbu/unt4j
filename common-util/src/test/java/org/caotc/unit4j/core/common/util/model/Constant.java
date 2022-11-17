@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 public class Constant {
     public static final Field STRING_FIELD_OBJECT_STRING_FIELD;
     public static final Field FINAL_FIELD_OBJECT_STRING_FIELD;
+    public static final Field GENERIC_FIELD_OBJECT_GENERIC_FIELD;
     public static final Field STATIC_FIELD_OBJECT_STRING_FIELD;
     public static final Field CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD;
     public static final Field CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD;
@@ -76,7 +77,10 @@ public class Constant {
     public static final ImmutableSet<Method> STRING_FIELD_SETTER_OBJECT_METHODS;
     public static final ImmutableSet<Method> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_METHODS;
     public static final Constructor<NoFieldObject> NO_FIELD_OBJECT_CONSTRUCTOR;
+    public static final Constructor<DoubleGenericFieldObject> DOUBLE_GENERIC_FIELD_OBJECT_CONSTRUCTOR;
+    public static final Constructor<DuplicateNumberFieldSetMethodObject> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR;
     public static final Constructor<FinalFieldObject> FINAL_FIELD_OBJECT_CONSTRUCTOR;
+    public static final Constructor<GenericFieldObject> GENERIC_FIELD_OBJECT_CONSTRUCTOR;
     public static final Constructor<IntegerGenericFieldGetter> INTEGER_GENERIC_FIELD_GETTER_CONSTRUCTOR;
     public static final Constructor<LongGenericFieldSetter> LONG_GENERIC_FIELD_SETTER_CONSTRUCTOR;
     public static final Constructor<MultipleFieldObject> MULTIPLE_FIELD_OBJECT_CONSTRUCTOR;
@@ -99,10 +103,10 @@ public class Constant {
     public static final Constructor<StringFieldAndStringFieldSetMethodObject> STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR;
     public static final Constructor<StringFieldChainSetMethodObject> STRING_FIELD_CHAIN_SET_METHOD_OBJECT_CONSTRUCTOR;
     public static final Constructor<StringFieldSetterObject> STRING_FIELD_SETTER_OBJECT_CONSTRUCTOR;
-    public static final Constructor<DuplicateNumberFieldSetMethodObject> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR;
     public static final ImmutableSet<Field> STRING_FIELD_OBJECT_FIELDS;
     public static final ImmutableSet<Field> CHILDREN_LONG_FIELD_OBJECT_FIELDS;
     public static final ImmutableSet<Field> CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS;
+    public static final ImmutableSet<Field> DOUBLE_GENERIC_FIELD_OBJECT_FIELDS;
     public static final ImmutableSet<Field> FINAL_FIELD_OBJECT_FIELDS;
     public static final ImmutableSet<Field> STATIC_FIELD_OBJECT_FIELDS;
     public static final ImmutableSet<Field> MULTIPLE_FIELD_OBJECT_FIELDS;
@@ -112,9 +116,11 @@ public class Constant {
     public static final PropertyAccessor<ChildrenLongFieldObject, Long> CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR;
     public static final ImmutableSet<PropertyAccessor<ChildrenLongFieldObject, ?>> CHILDREN_LONG_FIELD_OBJECT_PROPERTY_ACCESSORS;
     public static final ImmutableSet<PropertyAccessor<? super ChildrenSameNameFieldObject, String>> CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS;
+    public static final PropertyAccessor<DoubleGenericFieldObject, Double> DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR;
     public static final ImmutableSet<PropertyWriter<? super DuplicateNumberFieldSetMethodObject, Number>> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS;
     public static final PropertyAccessor<FinalFieldObject, String> FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR;
     public static final PropertyReader<GenericFieldGetter<Object>, Object> GENERIC_FIELD_GETTER_GENERIC_FIELD_PROPERTY_READER;
+    public static final PropertyAccessor<GenericFieldObject<Object>, Object> GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR;
     public static final PropertyWriter<GenericFieldSetter<Object>, Object> GENERIC_FIELD_SETTER_GENERIC_FIELD_PROPERTY_WRITER;
     public static final ImmutableSet<PropertyReader<? super IntegerGenericFieldGetter, Integer>> INTEGER_GENERIC_FIELD_GETTER_PROPERTY_READERS;
     public static final ImmutableSet<PropertyWriter<? super LongGenericFieldSetter, Long>> LONG_GENERIC_FIELD_SETTER_PROPERTY_WRITERS;
@@ -145,9 +151,11 @@ public class Constant {
     public static final AccessibleProperty<ChildrenLongFieldObject, Long> CHILDREN_LONG_FIELD_OBJECT_LONG_PROPERTY;
     public static final ImmutableSet<AccessibleProperty<ChildrenLongFieldObject, ?>> CHILDREN_LONG_FIELD_OBJECT_PROPERTIES;
     public static final AccessibleProperty<ChildrenSameNameFieldObject, String> CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY;
+    public static final WritableProperty<DoubleGenericFieldObject, Double> DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY;
     public static final WritableProperty<DuplicateNumberFieldSetMethodObject, Number> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY;
     public static final AccessibleProperty<FinalFieldObject, String> FINAL_FIELD_OBJECT_STRING_PROPERTY;
     public static final ReadableProperty<GenericFieldGetter<Object>, Object> GENERIC_FIELD_GETTER_GENERIC_PROPERTY;
+    public static final AccessibleProperty<GenericFieldObject<Object>, Object> GENERIC_FIELD_OBJECT_GENERIC_PROPERTY;
     public static final WritableProperty<GenericFieldSetter<Object>, Object> GENERIC_FIELD_SETTER_GENERIC_PROPERTY;
     public static final ReadableProperty<IntegerGenericFieldGetter, Integer> INTEGER_GENERIC_FIELD_GETTER_GENERIC_PROPERTY;
     public static final WritableProperty<LongGenericFieldSetter, Long> LONG_GENERIC_FIELD_SETTER_GENERIC_PROPERTY;
@@ -173,6 +181,7 @@ public class Constant {
         try {
             STRING_FIELD_OBJECT_STRING_FIELD = StringFieldObject.class.getDeclaredField(StringFieldObject.Fields.STRING_FIELD);
             FINAL_FIELD_OBJECT_STRING_FIELD = FinalFieldObject.class.getDeclaredField(FinalFieldObject.Fields.STRING_FIELD);
+            GENERIC_FIELD_OBJECT_GENERIC_FIELD = GenericFieldObject.class.getDeclaredField(GenericFieldObject.Fields.GENERIC_FIELD);
             STATIC_FIELD_OBJECT_STRING_FIELD = StaticFieldObject.class.getDeclaredField("stringField");
             CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD = ChildrenLongFieldObject.class.getDeclaredField(ChildrenLongFieldObject.Fields.LONG_FIELD);
             CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD = ChildrenSameNameFieldObject.class.getDeclaredField(ChildrenSameNameFieldObject.Fields.STRING_FIELD);
@@ -224,7 +233,10 @@ public class Constant {
             STRING_FIELD_SETTER_OBJECT_METHODS = Stream.concat(OBJECT_METHODS.stream(), Stream.of(STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD, STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD)).collect(ImmutableSet.toImmutableSet());
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_METHODS = Stream.concat(OBJECT_METHODS.stream(), DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS.stream()).collect(ImmutableSet.toImmutableSet());
             NO_FIELD_OBJECT_CONSTRUCTOR = NoFieldObject.class.getDeclaredConstructor();
+            DOUBLE_GENERIC_FIELD_OBJECT_CONSTRUCTOR = DoubleGenericFieldObject.class.getDeclaredConstructor();
+            DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR = DuplicateNumberFieldSetMethodObject.class.getDeclaredConstructor();
             FINAL_FIELD_OBJECT_CONSTRUCTOR = FinalFieldObject.class.getDeclaredConstructor();
+            GENERIC_FIELD_OBJECT_CONSTRUCTOR = GenericFieldObject.class.getDeclaredConstructor();
             INTEGER_GENERIC_FIELD_GETTER_CONSTRUCTOR = IntegerGenericFieldGetter.class.getDeclaredConstructor();
             LONG_GENERIC_FIELD_SETTER_CONSTRUCTOR = LongGenericFieldSetter.class.getDeclaredConstructor();
             MULTIPLE_FIELD_OBJECT_CONSTRUCTOR = MultipleFieldObject.class.getDeclaredConstructor();
@@ -248,10 +260,10 @@ public class Constant {
             STRING_FIELD_AND_STRING_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR = StringFieldAndStringFieldSetMethodObject.class.getDeclaredConstructor();
             STRING_FIELD_CHAIN_SET_METHOD_OBJECT_CONSTRUCTOR = StringFieldChainSetMethodObject.class.getDeclaredConstructor();
             STRING_FIELD_SETTER_OBJECT_CONSTRUCTOR = StringFieldSetterObject.class.getDeclaredConstructor();
-            DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_CONSTRUCTOR = DuplicateNumberFieldSetMethodObject.class.getDeclaredConstructor();
             STRING_FIELD_OBJECT_FIELDS = ImmutableSet.of(STRING_FIELD_OBJECT_STRING_FIELD);
             CHILDREN_LONG_FIELD_OBJECT_FIELDS = ImmutableSet.<Field>builder().addAll(STRING_FIELD_OBJECT_FIELDS).add(CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD).build();
             CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS = ImmutableSet.<Field>builder().addAll(STRING_FIELD_OBJECT_FIELDS).add(CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD).build();
+            DOUBLE_GENERIC_FIELD_OBJECT_FIELDS = ImmutableSet.of(GENERIC_FIELD_OBJECT_GENERIC_FIELD);
             FINAL_FIELD_OBJECT_FIELDS = ImmutableSet.of(FINAL_FIELD_OBJECT_STRING_FIELD);
             STATIC_FIELD_OBJECT_FIELDS = ImmutableSet.of(STATIC_FIELD_OBJECT_STRING_FIELD);
             MULTIPLE_FIELD_OBJECT_FIELDS = ImmutableSet.of(MULTIPLE_FIELD_OBJECT_STRING_FIELD, MULTIPLE_FIELD_OBJECT_INTEGER_FIELD, MULTIPLE_FIELD_OBJECT_INT_FIELD, MULTIPLE_FIELD_OBJECT_BOOLEAN_FIELD);
@@ -261,10 +273,13 @@ public class Constant {
             CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(ChildrenLongFieldObject.class, CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD);
             CHILDREN_LONG_FIELD_OBJECT_PROPERTY_ACCESSORS = ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR, CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR);
             CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS = CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS.stream().map(field -> PropertyAccessor.<ChildrenSameNameFieldObject, String>from(TypeToken.of(ChildrenSameNameFieldObject.class), field)).collect(ImmutableSet.toImmutableSet());
+            DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(DoubleGenericFieldObject.class, GENERIC_FIELD_OBJECT_GENERIC_FIELD);
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS = DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS.stream().map(method -> PropertyWriter.<DuplicateNumberFieldSetMethodObject, Number>from(TypeToken.of(DuplicateNumberFieldSetMethodObject.class), method, "numberField")).collect(ImmutableSet.toImmutableSet());
             FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(FinalFieldObject.class, FINAL_FIELD_OBJECT_STRING_FIELD);
             GENERIC_FIELD_GETTER_GENERIC_FIELD_PROPERTY_READER = PropertyReader.from(new TypeToken<GenericFieldGetter<Object>>() {
             }, GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, "genericField");
+            GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(new TypeToken<GenericFieldObject<Object>>() {
+            }, GENERIC_FIELD_OBJECT_GENERIC_FIELD);
             GENERIC_FIELD_SETTER_GENERIC_FIELD_PROPERTY_WRITER = PropertyWriter.from(new TypeToken<GenericFieldSetter<Object>>() {
             }, GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD, "genericField");
             INTEGER_GENERIC_FIELD_GETTER_PROPERTY_READERS = INTEGER_GENERIC_FIELD_GETTER_GET_METHODS.stream().map(method -> PropertyReader.<IntegerGenericFieldGetter, Integer>from(IntegerGenericFieldGetter.class, method, "genericField")).collect(ImmutableSet.toImmutableSet());
@@ -296,9 +311,11 @@ public class Constant {
             CHILDREN_LONG_FIELD_OBJECT_LONG_PROPERTY = AccessibleProperty.create(ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR));
             CHILDREN_LONG_FIELD_OBJECT_PROPERTIES = ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_STRING_PROPERTY, CHILDREN_LONG_FIELD_OBJECT_LONG_PROPERTY);
             CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY = AccessibleProperty.create(CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS);
+            DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY = AccessibleProperty.create(ImmutableSet.of(DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR));
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY = WritableProperty.create(DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS);
             FINAL_FIELD_OBJECT_STRING_PROPERTY = AccessibleProperty.create(ImmutableSet.of(FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR));
             GENERIC_FIELD_GETTER_GENERIC_PROPERTY = ReadableProperty.create(ImmutableSet.of(GENERIC_FIELD_GETTER_GENERIC_FIELD_PROPERTY_READER));
+            GENERIC_FIELD_OBJECT_GENERIC_PROPERTY = AccessibleProperty.create(ImmutableSet.of(GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR));
             GENERIC_FIELD_SETTER_GENERIC_PROPERTY = WritableProperty.create(ImmutableSet.of(GENERIC_FIELD_SETTER_GENERIC_FIELD_PROPERTY_WRITER));
             INTEGER_GENERIC_FIELD_GETTER_GENERIC_PROPERTY = ReadableProperty.create(INTEGER_GENERIC_FIELD_GETTER_PROPERTY_READERS);
             LONG_GENERIC_FIELD_SETTER_GENERIC_PROPERTY = WritableProperty.create(LONG_GENERIC_FIELD_SETTER_PROPERTY_WRITERS);
