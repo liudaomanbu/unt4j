@@ -159,5 +159,5 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
     @NonNull
     PropertyElement<O, P> accessible(boolean accessible);
 
-    boolean basedOnField();
+    boolean basedOnField();//todo remove?
 }

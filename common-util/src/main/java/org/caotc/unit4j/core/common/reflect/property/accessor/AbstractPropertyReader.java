@@ -17,11 +17,10 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
-import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
-import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
+import org.caotc.unit4j.core.common.reflect.Invokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -85,11 +84,11 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
 
   @SuppressWarnings("unchecked")
   @Override
-  @NonNull
-  public final <R1 extends R> PropertyReader<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
+  @NonNull //todo final?
+  public <R1 extends R> PropertyReader<T, R1> propertyType(
+          @NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertyReader is known propertyType %s,not %s ", propertyType(), propertyType);
+            , "PropertyReader is known propertyType %s,not %s ", propertyType(), propertyType);
     return (PropertyReader<T, R1>) this;
   }
 
@@ -118,13 +117,13 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
     /**
      * 方法
      */
-    @NonNull GuavaInvokableProxy<T, R> invokable;
+    @NonNull Invokable<T, R> invokable;
     /**
      * 属性名称
      */
     @NonNull String propertyName;
 
-    InvokablePropertyReader(@NonNull GuavaInvokableProxy<T, R> invokable,
+    InvokablePropertyReader(@NonNull Invokable<T, R> invokable,
                             @NonNull String propertyName) {
       super(invokable);
       Preconditions

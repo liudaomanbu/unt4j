@@ -21,16 +21,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.exception.AnnotationNotFoundException;
 
+import java.lang.annotation.Annotation;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 /**
  * 属性
+ * //todo ownerType转换
  *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型
