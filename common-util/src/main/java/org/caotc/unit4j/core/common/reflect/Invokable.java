@@ -22,10 +22,7 @@ import lombok.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.annotation.CheckForNull;
-import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 
 /**
  * @author caotc
@@ -51,6 +48,8 @@ public interface Invokable<O, R> extends Element {
 
     @NonNull TypeToken<O> ownerType();
 
+//    @NonNull Invokable<O, R> ownedBy(@NonNull TypeToken<O> ownerType);//todo
+
     @NonNull
     TypeToken<? extends R> returnType();
 
@@ -66,7 +65,7 @@ public interface Invokable<O, R> extends Element {
             throw new IllegalArgumentException(
                     "FieldElement is known to return " + returnType() + ", not " + returnType);
         }
-//        invokable.returning(returnType);todo
+//        invokable.returning(returnType);//todo
         return (Invokable<O, R1>) this;
     }
 
@@ -83,10 +82,46 @@ public interface Invokable<O, R> extends Element {
 
     boolean isVarArgs();
 
+    boolean isBridge();
+
+    Executable source();
+
     @NonNull R invoke(@CheckForNull O receiver, @Nullable Object... args)
             throws InvocationTargetException, IllegalAccessException;
 
     @NonNull ImmutableList<Parameter> parameters();
 
+    /**
+     * Returns an array of {@code Type} objects that represent the formal
+     * parameter types, in declaration order, of the executable represented by
+     * this object. Returns an array of length 0 if the
+     * underlying executable takes no parameters.
+     *
+     * <p>If a formal parameter type is a parameterized type,
+     * the {@code Type} object returned for it must accurately reflect
+     * the actual type parameters used in the source code.
+     *
+     * <p>If a formal parameter type is a type variable or a parameterized
+     * type, it is created. Otherwise, it is resolved.
+     *
+     * @return an array of {@code Type}s that represent the formal
+     * parameter types of the underlying executable, in declaration order
+     * @throws GenericSignatureFormatError         if the generic method signature does not conform to the format
+     *                                             specified in
+     *                                             <cite>The Java&trade; Virtual Machine Specification</cite>
+     * @throws TypeNotPresentException             if any of the parameter
+     *                                             types of the underlying executable refers to a non-existent type
+     *                                             declaration
+     * @throws MalformedParameterizedTypeException if any of
+     *                                             the underlying executable's parameter types refer to a parameterized
+     *                                             type that cannot be instantiated for any reason
+     */
+    @NonNull ImmutableList<Type> genericParameterTypes();
+
     @NonNull ImmutableList<TypeToken<? extends Throwable>> exceptionTypes();
+
+//    @NonNull Executable source();//todo
+
+    //todo name
+    boolean isOverrideBy(@NonNull Invokable<?, ?> other);
 }

@@ -912,7 +912,7 @@ public class Provider {
 
     }
 
-    static Stream<Arguments> methodAndSuperMethods() {
+    static Stream<Arguments> methodAndSuperMethods() {//todo
         return Stream.of(Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, Constant.STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD)
                 , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, Constant.STRING_FIELD_SETTER_SET_STRING_FIELD_METHOD)
                 , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, Constant.GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD)
@@ -928,12 +928,9 @@ public class Provider {
     }
 
     static Stream<Arguments> methodAndSuperClasss() {
-        return Stream.of(Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, GenericFieldGetter.class)
-                , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_BRIDGE_GET_GENERIC_FIELD_METHOD, GenericFieldGetter.class)
-                , Arguments.of(Constant.LONG_GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD, GenericFieldSetter.class)
-                , Arguments.of(Constant.LONG_GENERIC_FIELD_SETTER_BRIDGE_SET_GENERIC_FIELD_METHOD, GenericFieldSetter.class)
-                , Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, StringFieldGetter.class)
-                , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, StringFieldSetter.class));
+        return methodAndSuperTypeTokens()
+                .filter(arguments -> TypeToken.of(((TypeToken<?>) arguments.get()[1]).getRawType()).equals(arguments.get()[1]))
+                .map(arguments -> Arguments.of(arguments.get()[0], ((TypeToken<?>) arguments.get()[1]).getRawType()));
     }
 
     static Stream<Arguments> methodAndNotSuperClasss() {
@@ -943,7 +940,16 @@ public class Provider {
     }
 
     static Stream<Arguments> methodAndSuperTypeTokens() {
-        return methodAndSuperClasss().map(arguments -> Arguments.of(arguments.get()[0], TypeToken.of((Class<?>) arguments.get()[1])));
+        return Stream.of(Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, new TypeToken<GenericFieldGetter<Integer>>() {
+                })
+                , Arguments.of(Constant.INTEGER_GENERIC_FIELD_GETTER_BRIDGE_GET_GENERIC_FIELD_METHOD, new TypeToken<GenericFieldGetter<Integer>>() {
+                })
+                , Arguments.of(Constant.LONG_GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD, new TypeToken<GenericFieldSetter<Long>>() {
+                })
+                , Arguments.of(Constant.LONG_GENERIC_FIELD_SETTER_BRIDGE_SET_GENERIC_FIELD_METHOD, new TypeToken<GenericFieldSetter<Long>>() {
+                })
+                , Arguments.of(Constant.STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD, TypeToken.of(StringFieldGetter.class))
+                , Arguments.of(Constant.STRING_FIELD_SETTER_OBJECT_SET_STRING_FIELD_METHOD, TypeToken.of(StringFieldSetter.class)));
     }
 
     static Stream<Arguments> methodAndNotSuperTypeTokens() {

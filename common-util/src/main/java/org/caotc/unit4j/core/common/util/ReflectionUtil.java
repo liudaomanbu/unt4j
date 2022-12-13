@@ -16,6 +16,7 @@
 
 package org.caotc.unit4j.core.common.util;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
@@ -846,29 +847,28 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public Optional<Method> setMethod(@NonNull TypeToken<?> type, @NonNull String fieldName) {
-        ImmutableSet<Method> setMethods = setMethods(type, fieldName);
-//        if (setMethods.size() > 1) {//todo 当有同名set方法并且入参类型不同形成重载时认为这是不同的属性?可能是普通子类重写或泛型重写
-//            ImmutableSet<Class<?>> fieldTypes = setMethods.stream()
-//                    .filter(method->!method.isBridge())//todo
-//                    .map(Method::getParameterTypes)
-//                    .flatMap(Arrays::stream)
-//                    .collect(ImmutableSet.toImmutableSet());
-//            //todo exceptionType定义?
-//            Preconditions.checkArgument(fieldTypes.size() == 1, "set method that named %s is not only,types:%s", fieldName,fieldTypes);
-//        }
+    public Optional<Method> setMethod(@NonNull TypeToken<?> type, @NonNull String propertyName) {
+        ImmutableSet<Method> setMethods = setMethods(type, propertyName).stream()
+                .filter(method -> !method.isBridge())//桥接方法一定有对应更具体类型的方法，因此一定不会被选为最后的方法
+                .collect(ImmutableSet.toImmutableSet());
+        if (setMethods.size() > 1) {//todo 当有同名set方法并且入参类型不同形成重载时认为这是不同的属性?可能是泛型重写的bridge方法
+            //当有多个属性类型时，如果所有类型形成单链条的继承关系，选择最子类
+            ImmutableSet<Class<?>> propertyTypes = setMethods.stream()
+                    .map(Method::getParameterTypes)
+                    .flatMap(Arrays::stream)
+                    .collect(ImmutableSet.toImmutableSet());
+            ImmutableSet<Class<?>> subPropertyTypes = propertyTypes.stream()
+                    .filter(propertyType1 -> propertyTypes.stream().filter(propertyType2 -> !propertyType1.equals(propertyType2)).noneMatch(propertyType1::isAssignableFrom))
+                    .collect(ImmutableSet.toImmutableSet());
+            setMethods = setMethods.stream().filter(setMethod -> subPropertyTypes.contains(setMethod.getParameterTypes()[0]))
+                    .collect(ImmutableSet.toImmutableSet());
+            //todo exceptionType定义?
+            Preconditions.checkArgument(subPropertyTypes.size() == 1, "SetMethod for %s is not only and can't choose,methods:%s", propertyName, setMethods);
+        }
         return setMethods.stream()
-                //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
+                //这些方法必然方法签名相同,有接口方法与父类/接口方法之间平级关系和子类与接口或父类方法的重写关系.
                 // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
-                .reduce((m1, m2) -> {
-                    if (m1.isBridge()) {
-                        return m2;
-                    }
-                    if (m2.isBridge()) {
-                        return m1;
-                    }
-                    return isOverride(m1, m2) ? m1 : m2;
-                });
+                .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2);
     }
 
     @NonNull
@@ -2538,17 +2538,17 @@ public class ReflectionUtil {
     public static boolean isOverride(@NonNull Invokable<?, ?> invokable) {
         return invokable.ownerType().getTypes().stream()
                 .filter(type -> !type.equals(invokable.ownerType()))
-                .anyMatch(superTypeToken -> isOverride(invokable, superTypeToken));
+                .anyMatch(type -> isOverride(invokable, type));
     }
 
     public static boolean isOverride(@NonNull Method method,
                                      @NonNull Type superType) {
-        return isOverride(Invokable.from(method), TypeToken.of(superType));
+        return isOverride(method, TypeToken.of(superType));
     }
 
     public static boolean isOverride(@NonNull Method method,
                                      @NonNull Class<?> superClass) {
-        return isOverride(Invokable.from(method), TypeToken.of(superClass));
+        return isOverride(method, TypeToken.of(superClass));
     }
 
     public static boolean isOverride(@NonNull Method method,
@@ -2566,9 +2566,14 @@ public class ReflectionUtil {
         return isOverride(invokable, TypeToken.of(superClass));
     }
 
+    //todo 仅当前type还是包括super？
     public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
                                      @NonNull TypeToken<?> superTypeToken) {
-        return ReflectionUtil.methodInvokableStreamFromClass(superTypeToken)
+        if (invokable.declaringType().equals(superTypeToken)) {
+            return false;
+        }
+        return Arrays.stream(superTypeToken.getRawType().getDeclaredMethods())
+                .map(method -> Invokable.from(method, superTypeToken))
                 .anyMatch(superMethodInvokable -> isOverride(invokable, superMethodInvokable));
     }
 
@@ -2583,10 +2588,7 @@ public class ReflectionUtil {
 
     public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
                                      @NonNull Invokable<?, ?> superInvokable) {
-        return superInvokable.isOverridable()
-                && !invokable.getDeclaringClass().equals(superInvokable.getDeclaringClass())
-                && invokable.ownerType().isSubtypeOf(superInvokable.ownerType())
-                && MethodSignature.from(superInvokable).equals(MethodSignature.from(invokable));
+        return superInvokable.isOverrideBy(invokable);
     }
 
     public static Set<Class<?>> lowestCommonSuperclasses(Class<?>... classes) {

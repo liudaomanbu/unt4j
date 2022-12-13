@@ -19,6 +19,8 @@ public class GuavaParameterProxy implements Parameter {
     @Delegate
     @NonNull
     com.google.common.reflect.Parameter delegate;
+    @NonNull
+    Invokable<?, ?> declaration;
 
     @Override
     public TypeToken<?> type() {
@@ -27,7 +29,7 @@ public class GuavaParameterProxy implements Parameter {
 
     @Override
     public Invokable<?, ?> declaringInvokable() {
-        return GuavaInvokableProxy.from(delegate.getDeclaringInvokable());
+        return declaration;
     }
 
     @Override

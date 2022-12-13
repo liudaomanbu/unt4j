@@ -51,6 +51,14 @@ public interface Member extends java.lang.reflect.Member, WithAccessLevel {
         return Modifier.isPrivate(getModifiers());
     }
 
+    default boolean isPackageVisible() {
+        return !isPrivate();
+    }
+
+    default boolean isSubclassVisible() {
+        return isPublic() || isProtected();
+    }
+
     /**
      * Returns true if the element is static.
      */

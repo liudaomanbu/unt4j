@@ -17,11 +17,10 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
-import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
-import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
+import org.caotc.unit4j.core.common.reflect.Invokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
@@ -144,14 +143,14 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
      * set方法
      */
     @NonNull
-    GuavaInvokableProxy<T, ?> invokable;
+    Invokable<T, ?> invokable;
     /**
      * set方法名称风格
      */
     @NonNull
     String propertyName;
 
-    InvokablePropertyWriter(@NonNull GuavaInvokableProxy<T, ?> invokable,
+    InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
                             @NonNull String propertyName) {
       super(invokable);
       Preconditions
