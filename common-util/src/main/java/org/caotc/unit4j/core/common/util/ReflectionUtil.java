@@ -24,7 +24,6 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.reflect.Invokable;
-import org.caotc.unit4j.core.common.reflect.MethodSignature;
 import org.caotc.unit4j.core.common.reflect.PropertyName;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
@@ -61,23 +60,6 @@ public class ReflectionUtil {
 
     private static final PropertyAccessorMethodFormat[] DEFAULT_METHOD_NAME_STYLES = PropertyAccessorMethodFormat
             .values();
-    private static final Function<PropertyElement<?, ?>, ImmutableList<?>> KEY_FUNCTION = propertyElement -> ImmutableList
-            .of(propertyElement.propertyName() /*propertyElement.propertyType(),*/ //todo remove?
-                    /*propertyElement.isStatic()*/);
-    private static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_CLASS_TO_WRAPPER_CLASS = ImmutableBiMap.<Class<?>, Class<?>>builder()
-            .put(byte.class, Byte.class)
-            .put(short.class, Short.class)
-            .put(int.class, Integer.class)
-            .put(long.class, Long.class)
-            .put(char.class, Character.class)
-            .put(boolean.class, Boolean.class)
-            .put(float.class, Float.class)
-            .put(double.class, Double.class)
-            .buildOrThrow();
-    private static final ImmutableBiMap<Class<?>, Class<?>> WRAPPER_CLASS_TO_PRIMITIVE_CLASS = PRIMITIVE_CLASS_TO_WRAPPER_CLASS.inverse();
-    private static final ImmutableBiMap<TypeToken<?>, TypeToken<?>> PRIMITIVE_TYPE_TO_WRAPPER_TYPE = PRIMITIVE_CLASS_TO_WRAPPER_CLASS.entrySet().stream()
-            .collect(ImmutableBiMap.toImmutableBiMap(entry -> TypeToken.of(entry.getKey()), entry -> TypeToken.of(entry.getValue())));
-    private static final ImmutableBiMap<TypeToken<?>, TypeToken<?>> WRAPPER_TYPE_TO_PRIMITIVE_TYPE = PRIMITIVE_TYPE_TO_WRAPPER_TYPE.inverse();
 
     @NonNull
     public static ImmutableSet<Field> fields(@NonNull Type type) {
@@ -119,45 +101,39 @@ public class ReflectionUtil {
                 Arrays::stream);
     }
 
-    //todo need?
     @NonNull
-    public static ImmutableSet<FieldElement<?, ?>> fieldElementsFromClass(
+    public static ImmutableSet<FieldElement<?, ?>> fieldElements(
             @NonNull Type type) {
-        return fieldElementStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+        return fieldElementStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo need?
     @NonNull
-    public static <T> ImmutableSet<FieldElement<T, ?>> fieldElementsFromClass(
+    public static <T> ImmutableSet<FieldElement<T, ?>> fieldElements(
             @NonNull Class<T> type) {
-        return fieldElementStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+        return fieldElementStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo need?
     @NonNull
-    public static <T> ImmutableSet<FieldElement<T, ?>> fieldElementsFromClass(
+    public static <T> ImmutableSet<FieldElement<T, ?>> fieldElements(
             @NonNull TypeToken<T> type) {
-        return fieldElementStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+        return fieldElementStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo need?
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<FieldElement<T, ?>> fieldElementStreamFromClass(
+    public static <T> Stream<FieldElement<T, ?>> fieldElementStream(
             @NonNull Type type) {
-        return fieldElementStreamFromClass((TypeToken<T>) TypeToken.of(type));
+        return fieldElementStream((TypeToken<T>) TypeToken.of(type));
     }
 
-    //todo need?
     @NonNull
-    public static <T> Stream<FieldElement<T, ?>> fieldElementStreamFromClass(
+    public static <T> Stream<FieldElement<T, ?>> fieldElementStream(
             @NonNull Class<T> type) {
-        return fieldElementStreamFromClass(TypeToken.of(type));
+        return fieldElementStream(TypeToken.of(type));
     }
 
-    //todo need?
     @NonNull
-    public static <T> Stream<FieldElement<T, ?>> fieldElementStreamFromClass(
+    public static <T> Stream<FieldElement<T, ?>> fieldElementStream(
             @NonNull TypeToken<T> type) {
         return type.getTypes().rawTypes().stream().map(Class::getDeclaredFields).flatMap(
                 Arrays::stream).map(FieldElement::of);
@@ -188,7 +164,6 @@ public class ReflectionUtil {
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo nullable?
     @NonNull
     public static ImmutableSet<Field> fields(@NonNull TypeToken<?> type,
                                              @NonNull String fieldName) {
@@ -237,50 +212,42 @@ public class ReflectionUtil {
                 .flatMap(Arrays::stream);
     }
 
-    //todo Beta
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, ?>> methodInvokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, ?>> methodInvokables(
             @NonNull Type type) {
-        return methodInvokablesFromClass((TypeToken<T>) TypeToken.of(type));
+        return methodInvokables((TypeToken<T>) TypeToken.of(type));
     }
 
-    //todo Beta
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, ?>> methodInvokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, ?>> methodInvokables(
             @NonNull Class<T> type) {
-        return methodInvokablesFromClass(TypeToken.of(type));
+        return methodInvokables(TypeToken.of(type));
     }
 
-    //todo Beta
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, ?>> methodInvokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, ?>> methodInvokables(
             @NonNull TypeToken<T> type) {
-        return methodInvokableStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+        return methodInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo Beta
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<Invokable<T, ?>> methodInvokableStreamFromClass(
+    public static <T> Stream<Invokable<T, ?>> methodInvokableStream(
             @NonNull Type type) {
-        return methodInvokableStreamFromClass((TypeToken<T>) TypeToken.of(type));
+        return methodInvokableStream((TypeToken<T>) TypeToken.of(type));
     }
 
-    //todo Beta
     @NonNull
-    public static <T> Stream<Invokable<T, ?>> methodInvokableStreamFromClass(
+    public static <T> Stream<Invokable<T, ?>> methodInvokableStream(
             @NonNull Class<T> type) {
-        return methodInvokableStreamFromClass(TypeToken.of(type));
+        return methodInvokableStream(TypeToken.of(type));
     }
 
-    //todo Beta
     @NonNull
-    public static <T> Stream<Invokable<T, ?>> methodInvokableStreamFromClass(
+    public static <T> Stream<Invokable<T, ?>> methodInvokableStream(
             @NonNull TypeToken<T> type) {
-        return methodStream(type).map(method -> Invokable.from(method, type));//todo
-//        return methodStream(type).
-//                map(method -> (Invokable<T, ?>)Invokable.from(method));
+        return methodStream(type).map(method -> Invokable.from(method, type));
     }
 
     @NonNull
@@ -318,96 +285,84 @@ public class ReflectionUtil {
                 .map(constructor -> (Constructor<T>) constructor);
     }
 
-    //todo beta
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, T>> constructorInvokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, T>> constructorInvokables(
             @NonNull Type type) {
-        return constructorInvokablesFromClass((TypeToken<T>) TypeToken.of(type));
+        return constructorInvokables((TypeToken<T>) TypeToken.of(type));
     }
 
-    //todo beta
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, T>> constructorInvokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, T>> constructorInvokables(
             @NonNull Class<T> type) {
-        return constructorInvokableStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+        return constructorInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo beta
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, T>> constructorInvokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, T>> constructorInvokables(
             @NonNull TypeToken<T> type) {
-        return constructorInvokableStreamFromClass(type)
+        return constructorInvokableStream(type)
                 .collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo beta
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<Invokable<T, T>> constructorInvokableStreamFromClass(
+    public static <T> Stream<Invokable<T, T>> constructorInvokableStream(
             @NonNull Type type) {
-        return constructorInvokableStreamFromClass((TypeToken<T>) TypeToken.of(type));
+        return constructorInvokableStream((TypeToken<T>) TypeToken.of(type));
     }
 
-    //todo beta
     @NonNull
-    public static <T> Stream<Invokable<T, T>> constructorInvokableStreamFromClass(
+    public static <T> Stream<Invokable<T, T>> constructorInvokableStream(
             @NonNull Class<T> type) {
-        return constructorInvokableStreamFromClass(TypeToken.of(type));
+        return constructorInvokableStream(TypeToken.of(type));
     }
 
-    //todo beta
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<Invokable<T, T>> constructorInvokableStreamFromClass(
+    public static <T> Stream<Invokable<T, T>> constructorInvokableStream(
             @NonNull TypeToken<T> type) {
         return Arrays.stream(type.getRawType().getDeclaredConstructors())
                 .map(constructor -> Invokable.from((Constructor<T>) constructor, type));
     }
 
-    //todo beta
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, ?>> invokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, ?>> invokables(
             @NonNull Type type) {
-        return invokablesFromClass((TypeToken<T>) TypeToken.of(type));
+        return invokables((TypeToken<T>) TypeToken.of(type));
     }
 
-    //todo beta
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, ?>> invokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, ?>> invokables(
             @NonNull Class<T> type) {
-        return invokablesFromClass(TypeToken.of(type));
+        return invokables(TypeToken.of(type));
     }
 
-    //todo beta
     @NonNull
-    public static <T> ImmutableSet<Invokable<T, ?>> invokablesFromClass(
+    public static <T> ImmutableSet<Invokable<T, ?>> invokables(
             @NonNull TypeToken<T> type) {
-        return invokableStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
+        return invokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
-    //todo beta
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <T> Stream<Invokable<T, ?>> invokableStreamFromClass(
+    public static <T> Stream<Invokable<T, ?>> invokableStream(
             @NonNull Type type) {
-        return invokableStreamFromClass((TypeToken<T>) TypeToken.of(type));
+        return invokableStream((TypeToken<T>) TypeToken.of(type));
     }
 
-    //todo beta
     @NonNull
-    public static <T> Stream<Invokable<T, ?>> invokableStreamFromClass(
+    public static <T> Stream<Invokable<T, ?>> invokableStream(
             @NonNull Class<T> type) {
-        return invokableStreamFromClass(TypeToken.of(type));
+        return invokableStream(TypeToken.of(type));
     }
 
-    //todo beta
     @NonNull
-    public static <T> Stream<Invokable<T, ?>> invokableStreamFromClass(
+    public static <T> Stream<Invokable<T, ?>> invokableStream(
             @NonNull TypeToken<T> type) {
-        return Stream.concat(constructorInvokableStreamFromClass(type),
-                methodInvokableStreamFromClass(type));
+        return Stream.concat(constructorInvokableStream(type),
+                methodInvokableStream(type));
     }
 
     @NonNull
@@ -442,99 +397,6 @@ public class ReflectionUtil {
                 .filter(method -> isPropertyReader(method, PropertyAccessorMethodFormat.JAVA_BEAN));
     }
 
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> Invokable<T, ?> getInvokableFromClassExact(@NonNull Type type,
-                                                          @NonNull String fieldName) {
-        return getInvokableFromClassExact((TypeToken<T>) TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Invokable<T, ?> getInvokableFromClassExact(@NonNull Class<T> type,
-                                                          @NonNull String fieldName) {
-        return getInvokableFromClassExact(TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Invokable<T, ?> getInvokableFromClassExact(@NonNull TypeToken<T> type,
-                                                          @NonNull String fieldName) {
-        return getInvokableFromClass(type, fieldName)
-                .orElseThrow(
-                        () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> Optional<Invokable<T, ?>> getInvokableFromClass(@NonNull Type type,
-                                                               @NonNull String fieldName) {
-        return getInvokableFromClass((TypeToken<T>) TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Optional<Invokable<T, ?>> getInvokableFromClass(@NonNull Class<T> type,
-                                                               @NonNull String fieldName) {
-        return getInvokableFromClass(TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Optional<Invokable<T, ?>> getInvokableFromClass(@NonNull TypeToken<T> type,
-                                                               @NonNull String fieldName) {
-        return getInvokableStreamFromClass(type)
-                .filter(
-                        getInvokable -> PropertyAccessorMethodFormat.JAVA_BEAN
-                                .propertyNameFromPropertyReader(getInvokable)
-                                .equals(fieldName))
-                .findAny();
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> getInvokablesFromClass(@NonNull Type type) {
-        return getInvokablesFromClass((TypeToken<T>) TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> getInvokablesFromClass(@NonNull Class<T> type) {
-        return getInvokablesFromClass(TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> getInvokablesFromClass(
-            @NonNull TypeToken<T> type) {
-        return getInvokableStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> getInvokableStreamFromClass(@NonNull Type type) {
-        return getInvokableStreamFromClass((TypeToken<T>) TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> getInvokableStreamFromClass(@NonNull Class<T> type) {
-        return getInvokableStreamFromClass(TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> getInvokableStreamFromClass(
-            @NonNull TypeToken<T> type) {
-        return methodInvokableStreamFromClass(type)
-                .filter(
-                        invokable -> isPropertyReader(invokable, PropertyAccessorMethodFormat.JAVA_BEAN));
-    }
-
     @NonNull
     public ImmutableSet<Method> setMethods(@NonNull Type type) {
         return setMethods(TypeToken.of(type));
@@ -567,149 +429,6 @@ public class ReflectionUtil {
                 .filter(method -> isPropertyWriter(method, PropertyAccessorMethodFormat.JAVA_BEAN));
     }
 
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T, R> Invokable<T, R> setInvokableFromClassExact(@NonNull Type type,
-                                                             @NonNull String fieldName, @NonNull Type parameterType) {
-        return setInvokableFromClassExact((TypeToken<T>) TypeToken.of(type), fieldName,
-                (TypeToken<R>) TypeToken.of(parameterType));
-    }
-
-    //todo beta
-    @NonNull
-    public <T, R> Invokable<T, R> setInvokableFromClassExact(@NonNull Class<T> type,
-                                                             @NonNull String fieldName, @NonNull Class<R> parameterClass) {
-        return setInvokableFromClassExact(TypeToken.of(type), fieldName,
-                TypeToken.of(parameterClass));
-    }
-
-    //todo beta
-    @NonNull
-    public <T, R> Invokable<T, R> setInvokableFromClassExact(@NonNull TypeToken<T> type,
-                                                             @NonNull String fieldName, @NonNull TypeToken<R> parameterTypeToken) {
-        return setInvokableFromClass(type, fieldName, parameterTypeToken)
-                .orElseThrow(() -> MethodNotFoundException
-                        .create(type, fieldName, ImmutableList.of(parameterTypeToken)));
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T, R> Optional<Invokable<T, R>> setInvokableFromClass(@NonNull Type type,
-                                                                  @NonNull String fieldName, @NonNull Type parameterType) {
-        return setInvokableFromClass((TypeToken<T>) TypeToken.of(type), fieldName,
-                (TypeToken<R>) TypeToken.of(parameterType));
-    }
-
-    //todo beta
-    @NonNull
-    public <T, R> Optional<Invokable<T, R>> setInvokableFromClass(@NonNull Class<T> type,
-                                                                  @NonNull String fieldName, @NonNull Class<R> parameterClass) {
-        return setInvokableFromClass(TypeToken.of(type), fieldName, TypeToken.of(parameterClass));
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T, R> Optional<Invokable<T, R>> setInvokableFromClass(@NonNull TypeToken<T> type,
-                                                                  @NonNull String fieldName, @NonNull TypeToken<R> parameterTypeToken) {
-        return setInvokableStreamFromClass(type, fieldName)
-                .filter(setInvokable -> MethodSignature.from(setInvokable).parameterTypes()
-                        .equals(ImmutableList.of(parameterTypeToken)))
-                .findAny()
-                .map(setInvokable -> (Invokable<T, R>) setInvokable);
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> setInvokablesFromClass(@NonNull Type type,
-                                                                    @NonNull String fieldName) {
-        return setInvokablesFromClass((TypeToken<T>) TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> setInvokablesFromClass(@NonNull Class<T> type,
-                                                                    @NonNull String fieldName) {
-        return setInvokablesFromClass(TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> setInvokablesFromClass(@NonNull TypeToken<T> type,
-                                                                    @NonNull String fieldName) {
-        return setInvokableStreamFromClass(type, fieldName)
-                .collect(ImmutableSet.toImmutableSet());
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> setInvokablesFromClass(@NonNull Type type) {
-        return setInvokablesFromClass((TypeToken<T>) TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> setInvokablesFromClass(@NonNull Class<T> type) {
-        return setInvokablesFromClass(TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> ImmutableSet<Invokable<T, ?>> setInvokablesFromClass(
-            @NonNull TypeToken<T> type) {
-        return setInvokableStreamFromClass(type).collect(ImmutableSet.toImmutableSet());
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> setInvokableStreamFromClass(@NonNull Type type,
-                                                                   @NonNull String fieldName) {
-        return setInvokableStreamFromClass((TypeToken<T>) TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> setInvokableStreamFromClass(@NonNull Class<T> type,
-                                                                   @NonNull String fieldName) {
-        return setInvokableStreamFromClass(TypeToken.of(type), fieldName);
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> setInvokableStreamFromClass(@NonNull TypeToken<T> type,
-                                                                   @NonNull String fieldName) {
-        return setInvokableStreamFromClass(type)
-                .filter(setInvokable -> PropertyAccessorMethodFormat.JAVA_BEAN
-                        .propertyNameFromPropertyWriter(setInvokable).equals(fieldName));
-    }
-
-    //todo beta
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> setInvokableStreamFromClass(@NonNull Type type) {
-        return setInvokableStreamFromClass((TypeToken<T>) TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> setInvokableStreamFromClass(@NonNull Class<T> type) {
-        return setInvokableStreamFromClass(TypeToken.of(type));
-    }
-
-    //todo beta
-    @NonNull
-    public <T> Stream<Invokable<T, ?>> setInvokableStreamFromClass(
-            @NonNull TypeToken<T> type) {
-        return methodInvokableStreamFromClass(type)
-                .filter(
-                        invokable -> isPropertyWriter(invokable, PropertyAccessorMethodFormat.JAVA_BEAN));
-    }
-
     @NonNull
     public Method getMethodExact(@NonNull Type type,
                                  @NonNull String fieldName) {
@@ -726,7 +445,7 @@ public class ReflectionUtil {
     public Method getMethodExact(@NonNull TypeToken<?> type,
                                  @NonNull String fieldName) {
         return getMethod(type, fieldName).orElseThrow(
-                () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
+                () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));//todo method name
     }
 
     @NonNull
@@ -746,18 +465,12 @@ public class ReflectionUtil {
                                       @NonNull String fieldName) {
         return getMethodStream(type)
                 .filter(getMethod -> fieldName.equals(PropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyReader(getMethod)))
-                //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
-                // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
-                //todo bridge方法也会签名相同
-                .reduce((m1, m2) -> {
-                    if (m1.isBridge()) {
-                        return m2;
-                    }
-                    if (m2.isBridge()) {
-                        return m1;
-                    }
-                    return isOverride(m1, m2) ? m1 : m2;
-                });
+                .filter(method -> !method.isBridge())
+                /*
+                  这些方法必然签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
+                  平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
+                 */
+                .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2);
     }
 
     @NonNull
@@ -833,7 +546,7 @@ public class ReflectionUtil {
                                  @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
         return setMethod(type, fieldName, fieldType)
                 .orElseThrow(
-                        () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of()));
+                        () -> MethodNotFoundException.create(type, fieldName, ImmutableList.of(fieldType)));//todo method name
     }
 
     @NonNull
@@ -851,19 +564,19 @@ public class ReflectionUtil {
         ImmutableSet<Method> setMethods = setMethods(type, propertyName).stream()
                 .filter(method -> !method.isBridge())//桥接方法一定有对应更具体类型的方法，因此一定不会被选为最后的方法
                 .collect(ImmutableSet.toImmutableSet());
-        if (setMethods.size() > 1) {//todo 当有同名set方法并且入参类型不同形成重载时认为这是不同的属性?可能是泛型重写的bridge方法
-            //当有多个属性类型时，如果所有类型形成单链条的继承关系，选择最子类
+        if (setMethods.size() > 1) {
             ImmutableSet<Class<?>> propertyTypes = setMethods.stream()
                     .map(Method::getParameterTypes)
                     .flatMap(Arrays::stream)
                     .collect(ImmutableSet.toImmutableSet());
+            //当有多个属性类型时，如果所有类型形成单链条的继承关系，选择最子类
             ImmutableSet<Class<?>> subPropertyTypes = propertyTypes.stream()
                     .filter(propertyType1 -> propertyTypes.stream().filter(propertyType2 -> !propertyType1.equals(propertyType2)).noneMatch(propertyType1::isAssignableFrom))
                     .collect(ImmutableSet.toImmutableSet());
             setMethods = setMethods.stream().filter(setMethod -> subPropertyTypes.contains(setMethod.getParameterTypes()[0]))
                     .collect(ImmutableSet.toImmutableSet());
             //todo exceptionType定义?
-            Preconditions.checkArgument(subPropertyTypes.size() == 1, "SetMethod for %s is not only and can't choose,methods:%s", propertyName, setMethods);
+            Preconditions.checkState(subPropertyTypes.size() == 1, "SetMethod for %s is not only and can't choose,methods:%s", propertyName, setMethods);
         }
         return setMethods.stream()
                 //这些方法必然方法签名相同,有接口方法与父类/接口方法之间平级关系和子类与接口或父类方法的重写关系.
@@ -914,12 +627,7 @@ public class ReflectionUtil {
     @NonNull
     public Optional<Method> setMethod(@NonNull TypeToken<?> type, @NonNull String fieldName, @NonNull TypeToken<?> fieldType) {
         return setMethodStream(type, fieldName)
-                //todo TypeToken equals?
-                .filter(setMethod -> {
-                    boolean result = TypeToken.of(setMethod.getGenericParameterTypes()[0]).equals(fieldType) || TypeToken.of(setMethod.getParameterTypes()[0]).equals(fieldType);
-                    log.debug("type:{},fieldName:{},fieldType:{},parameterType:{},genericParameterTypes:{},result:{}", type, fieldName, fieldType, TypeToken.of(setMethod.getParameterTypes()[0]), TypeToken.of(setMethod.getGenericParameterTypes()[0]), result);
-                    return result;
-                })
+                .filter(setMethod -> TypeToken.of(setMethod.getGenericParameterTypes()[0]).equals(fieldType) || TypeToken.of(setMethod.getParameterTypes()[0]).equals(fieldType))
                 //这些方法必然方法签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
                 // 平级关系时保留哪个均可,最终一定会跟子类重写方法进行判定,返回子类重写方法
                 .reduce((m1, m2) -> isOverride(m1, m2) ? m1 : m2);
@@ -960,8 +668,7 @@ public class ReflectionUtil {
     public Stream<Method> setMethodStream(@NonNull TypeToken<?> type,
                                           @NonNull String fieldName) {
         return setMethodStream(type)
-                .filter(setMethod -> fieldName
-                        .equals(PropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyWriter(setMethod)));
+                .filter(setMethod -> fieldName.equals(PropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyWriter(setMethod)));
     }
 
     /**
@@ -1066,12 +773,11 @@ public class ReflectionUtil {
             @NonNull TypeToken<T> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
 
-        ImmutableListMultimap<@NonNull ImmutableList<?>, PropertyElement<T, ?>> signatureToPropertyElements =
+        ImmutableListMultimap<String, PropertyElement<T, ?>> propertyNameToPropertyElements =
                 propertyElementStream(type, propertyAccessorMethodFormats)
-                        .collect(ImmutableListMultimap
-                                .toImmutableListMultimap(KEY_FUNCTION, Function.identity()));
+                        .collect(ImmutableListMultimap.toImmutableListMultimap(PropertyElement::propertyName, Function.identity()));
 
-        return signatureToPropertyElements.asMap().values().stream()
+        return propertyNameToPropertyElements.asMap().values().stream()
                 .map(propertyElements -> propertyElements.stream().map(o -> (PropertyElement<T, ?>) o))
                 .map(Property::create);
     }
@@ -1753,9 +1459,13 @@ public class ReflectionUtil {
                     propertyAccessorMethodFormats);
             return transferReadableProperty
                     .flatMap(f -> {
-                                Optional<ReadableProperty<E, R>> result = readablePropertyInternal(
-                                        (TypeToken<E>) f.type(), sub.flat(),
+                                Optional<? extends ReadableProperty<? extends E, R>> result = readablePropertyInternal(
+                                        f.type(), sub.flat(),
                                         propertyAccessorMethodFormats);
+//                        Optional<ReadableProperty<E, R>> result = readablePropertyInternal(
+//                                        (TypeToken<E>) f.type(), sub.flat(),
+//                                        propertyAccessorMethodFormats);
+//                                return result.map(f::compose);
                                 return result.map(f::compose);
                             }
                     );

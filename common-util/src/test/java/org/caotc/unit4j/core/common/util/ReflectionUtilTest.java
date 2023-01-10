@@ -479,19 +479,19 @@ class ReflectionUtilTest {
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndDuplicateSetMethodFieldNames")
     void setMethodExactWithDuplicateSetMethodFieldName(Type type, String duplicateSetMethodFieldName) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethodExact(type, duplicateSetMethodFieldName));
+        Assertions.assertThrows(IllegalStateException.class, () -> ReflectionUtil.setMethodExact(type, duplicateSetMethodFieldName));
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndDuplicateSetMethodFieldNames")
     void setMethodExactWithDuplicateSetMethodFieldName(Class<?> clazz, String duplicateSetMethodFieldName) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethodExact(clazz, duplicateSetMethodFieldName));
+        Assertions.assertThrows(IllegalStateException.class, () -> ReflectionUtil.setMethodExact(clazz, duplicateSetMethodFieldName));
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndDuplicateSetMethodFieldNames")
     void setMethodExactWithDuplicateSetMethodFieldName(TypeToken<?> type, String duplicateSetMethodFieldName) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethodExact(type, duplicateSetMethodFieldName));
+        Assertions.assertThrows(IllegalStateException.class, () -> ReflectionUtil.setMethodExact(type, duplicateSetMethodFieldName));
     }
 
     @ParameterizedTest
@@ -758,19 +758,19 @@ class ReflectionUtilTest {
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndDuplicateSetMethodFieldNames")
     void setMethodWithDuplicateSetMethodFieldName(Type type, String duplicateSetMethodFieldName) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethod(type, duplicateSetMethodFieldName));
+        Assertions.assertThrows(IllegalStateException.class, () -> ReflectionUtil.setMethod(type, duplicateSetMethodFieldName));
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndDuplicateSetMethodFieldNames")
     void setMethodWithDuplicateSetMethodFieldName(Class<?> clazz, String duplicateSetMethodFieldName) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethod(clazz, duplicateSetMethodFieldName));
+        Assertions.assertThrows(IllegalStateException.class, () -> ReflectionUtil.setMethod(clazz, duplicateSetMethodFieldName));
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenAndDuplicateSetMethodFieldNames")
     void setMethodWithDuplicateSetMethodFieldName(TypeToken<?> type, String duplicateSetMethodFieldName) {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.setMethod(type, duplicateSetMethodFieldName));
+        Assertions.assertThrows(IllegalStateException.class, () -> ReflectionUtil.setMethod(type, duplicateSetMethodFieldName));
     }
 
     @ParameterizedTest

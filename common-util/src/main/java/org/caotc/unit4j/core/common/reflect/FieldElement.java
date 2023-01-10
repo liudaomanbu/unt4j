@@ -70,7 +70,7 @@ public class FieldElement<O, P> extends BaseElement {
   public final <P1 extends P> FieldElement<O, P1> type(TypeToken<P1> returnType) {
     if (!returnType.isSupertypeOf(type())) {
       throw new IllegalArgumentException(
-          "FieldElement is known to return " + type() + ", not " + returnType);
+              "FieldElement is known is " + type() + ", not " + returnType);
     }
     return (FieldElement<O, P1>) this;
   }
