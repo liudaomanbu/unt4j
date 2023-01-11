@@ -1444,7 +1444,6 @@ public class ReflectionUtil {
     }
 
     //todo 待优化
-    @SuppressWarnings("unchecked")
     @NonNull
     private static <T, R, E> Optional<ReadableProperty<T, R>> readablePropertyInternalCompose(
             @NonNull TypeToken<T> type, @NonNull String fieldName,
