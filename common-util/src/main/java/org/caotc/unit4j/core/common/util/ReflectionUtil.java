@@ -1458,16 +1458,9 @@ public class ReflectionUtil {
                     firstTierPropertyName,
                     propertyAccessorMethodFormats);
             return transferReadableProperty
-                    .flatMap(f -> {
-                                Optional<? extends ReadableProperty<? extends E, R>> result = readablePropertyInternal(
-                                        f.type(), sub.flat(),
-                                        propertyAccessorMethodFormats);
-//                        Optional<ReadableProperty<E, R>> result = readablePropertyInternal(
-//                                        (TypeToken<E>) f.type(), sub.flat(),
-//                                        propertyAccessorMethodFormats);
-//                                return result.map(f::compose);
-                                return result.map(f::compose);
-                            }
+                    .flatMap(f -> ReflectionUtil.<E, R>readablePropertyInternal(
+                            f.type(), sub.flat(),
+                            propertyAccessorMethodFormats).map(f::compose)
                     );
         }
         return readablePropertyInternal(type,

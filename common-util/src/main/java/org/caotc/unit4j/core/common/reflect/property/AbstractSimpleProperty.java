@@ -55,7 +55,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @NonNull
     String name;
     @NonNull
-    TypeToken<? extends P> type;
+    TypeToken<P> type;
     boolean fieldExist;
     @NonNull
     protected ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders;
@@ -111,7 +111,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
                 "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
-        this.type = (TypeToken<? extends P>) lowestCommonAncestors.stream().findFirst().get();//todo
+        this.type = (TypeToken<P>) lowestCommonAncestors.stream().findFirst().get();//todo
         this.fieldExist = Streams.concat(propertyReaders.stream(), propertyWriters.stream()).anyMatch(PropertyElement::basedOnField);
         this.propertyReaders = propertyReaders;
         this.propertyWriters = propertyWriters;
@@ -125,7 +125,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
 
     @NonNull
     @Override
-    public final TypeToken<? extends P> type() {
+    public final TypeToken<P> type() {
         return type;
     }
 

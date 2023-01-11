@@ -37,7 +37,7 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     @NonNull
     String name;
     @NonNull
-    TypeToken<? extends P> type;
+    TypeToken<P> type;
     boolean fieldExist;
     @NonNull
     protected ReadableProperty<O, T> targetReadableProperty;
@@ -61,7 +61,7 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
 
     @NonNull
     @Override
-    public final TypeToken<? extends P> type() {
+    public final TypeToken<P> type() {
         return type;
     }
 
