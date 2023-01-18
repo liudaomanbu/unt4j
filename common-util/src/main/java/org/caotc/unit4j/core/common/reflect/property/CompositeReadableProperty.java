@@ -47,10 +47,10 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
    * @since 1.0.0
    */
   @NonNull
-  protected static <T, R, E> ReadableProperty<T, R> create(
+  static <T, R, E> ReadableProperty<T, R> create(
           @NonNull ReadableProperty<T, E> targetReadableProperty,
           @NonNull ReadableProperty<E, R> delegate) {
-      return new CompositeReadableProperty<>(targetReadableProperty, delegate);
+    return new CompositeReadableProperty<>(targetReadableProperty, delegate);
   }
 
   private CompositeReadableProperty(

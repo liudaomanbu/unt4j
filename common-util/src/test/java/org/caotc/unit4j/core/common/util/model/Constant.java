@@ -9,6 +9,7 @@ import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -29,6 +30,7 @@ public class Constant {
     public static final Field STATIC_FIELD_OBJECT_STRING_FIELD;
     public static final Field CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD;
     public static final Field CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD;
+    public static final Field COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD;
     public static final Field MULTIPLE_FIELD_OBJECT_STRING_FIELD;
     public static final Field MULTIPLE_FIELD_OBJECT_INTEGER_FIELD;
     public static final Field MULTIPLE_FIELD_OBJECT_INT_FIELD;
@@ -116,6 +118,7 @@ public class Constant {
     public static final PropertyAccessor<ChildrenLongFieldObject, Long> CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR;
     public static final ImmutableSet<PropertyAccessor<ChildrenLongFieldObject, ?>> CHILDREN_LONG_FIELD_OBJECT_PROPERTY_ACCESSORS;
     public static final ImmutableSet<PropertyAccessor<? super ChildrenSameNameFieldObject, String>> CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS;
+    public static final PropertyAccessor<CompositeFieldObject, CompositeFieldObject.Internal> COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD_PROPERTY_ACCESSOR;
     public static final PropertyAccessor<DoubleGenericFieldObject, Double> DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR;
     public static final ImmutableSet<PropertyWriter<? super DuplicateNumberFieldSetMethodObject, Number>> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS;
     public static final PropertyAccessor<FinalFieldObject, String> FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR;
@@ -151,6 +154,8 @@ public class Constant {
     public static final AccessibleProperty<ChildrenLongFieldObject, Long> CHILDREN_LONG_FIELD_OBJECT_LONG_PROPERTY;
     public static final ImmutableSet<AccessibleProperty<ChildrenLongFieldObject, ?>> CHILDREN_LONG_FIELD_OBJECT_PROPERTIES;
     public static final AccessibleProperty<ChildrenSameNameFieldObject, String> CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY;
+    public static final AccessibleProperty<CompositeFieldObject, CompositeFieldObject.Internal> COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY;
+    public static final AccessibleProperty<CompositeFieldObject, Integer> COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY;
     public static final WritableProperty<DoubleGenericFieldObject, Double> DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY;
     public static final WritableProperty<DuplicateNumberFieldSetMethodObject, Number> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY;
     public static final AccessibleProperty<FinalFieldObject, String> FINAL_FIELD_OBJECT_STRING_PROPERTY;
@@ -185,6 +190,7 @@ public class Constant {
             STATIC_FIELD_OBJECT_STRING_FIELD = StaticFieldObject.class.getDeclaredField("stringField");
             CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD = ChildrenLongFieldObject.class.getDeclaredField(ChildrenLongFieldObject.Fields.LONG_FIELD);
             CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_FIELD = ChildrenSameNameFieldObject.class.getDeclaredField(ChildrenSameNameFieldObject.Fields.STRING_FIELD);
+            COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD = CompositeFieldObject.class.getDeclaredField(CompositeFieldObject.Fields.INTERNAL);
             MULTIPLE_FIELD_OBJECT_STRING_FIELD = MultipleFieldObject.class.getDeclaredField(MultipleFieldObject.Fields.STRING_FIELD);
             MULTIPLE_FIELD_OBJECT_INTEGER_FIELD = MultipleFieldObject.class.getDeclaredField(MultipleFieldObject.Fields.INTEGER_FIELD);
             MULTIPLE_FIELD_OBJECT_INT_FIELD = MultipleFieldObject.class.getDeclaredField(MultipleFieldObject.Fields.INT_FIELD);
@@ -273,6 +279,7 @@ public class Constant {
             CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(ChildrenLongFieldObject.class, CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD);
             CHILDREN_LONG_FIELD_OBJECT_PROPERTY_ACCESSORS = ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR, CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR);
             CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS = CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS.stream().map(field -> PropertyAccessor.<ChildrenSameNameFieldObject, String>from(TypeToken.of(ChildrenSameNameFieldObject.class), field)).collect(ImmutableSet.toImmutableSet());
+            COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(CompositeFieldObject.class, COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD);
             DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(DoubleGenericFieldObject.class, GENERIC_FIELD_OBJECT_GENERIC_FIELD);
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS = DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS.stream().map(method -> PropertyWriter.<DuplicateNumberFieldSetMethodObject, Number>from(TypeToken.of(DuplicateNumberFieldSetMethodObject.class), method, "numberField")).collect(ImmutableSet.toImmutableSet());
             FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(FinalFieldObject.class, FINAL_FIELD_OBJECT_STRING_FIELD);
@@ -311,6 +318,8 @@ public class Constant {
             CHILDREN_LONG_FIELD_OBJECT_LONG_PROPERTY = AccessibleProperty.create(ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR));
             CHILDREN_LONG_FIELD_OBJECT_PROPERTIES = ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_STRING_PROPERTY, CHILDREN_LONG_FIELD_OBJECT_LONG_PROPERTY);
             CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY = AccessibleProperty.create(CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS);
+            COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY = AccessibleProperty.create(ImmutableSet.of(COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD_PROPERTY_ACCESSOR));
+            COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY = COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY.compose(ReflectionUtil.accessiblePropertyExact(CompositeFieldObject.Internal.class, CompositeFieldObject.Internal.Fields.VALUE));
             DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY = AccessibleProperty.create(ImmutableSet.of(DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR));
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY = WritableProperty.create(DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS);
             FINAL_FIELD_OBJECT_STRING_PROPERTY = AccessibleProperty.create(ImmutableSet.of(FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR));

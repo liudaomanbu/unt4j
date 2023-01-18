@@ -37,9 +37,6 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     @NonNull
     String name;
     @NonNull
-    TypeToken<P> type;
-    boolean fieldExist;
-    @NonNull
     protected ReadableProperty<O, T> targetReadableProperty;
     @NonNull
     protected D delegate;
@@ -47,8 +44,6 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> targetReadableProperty,
                                         @NonNull D delegate) {
         this.name = targetReadableProperty.name() + "." + delegate.name();
-        this.type = delegate.type();
-        this.fieldExist = delegate.fieldExist();
         this.targetReadableProperty = targetReadableProperty;
         this.delegate = delegate;
     }
@@ -62,12 +57,12 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     @NonNull
     @Override
     public final TypeToken<P> type() {
-        return type;
+        return delegate.type();
     }
 
     @Override
     public final boolean fieldExist() {
-        return fieldExist;
+        return delegate.fieldExist();
     }
 
     @Override
@@ -81,4 +76,5 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
             @NonNull Class<X> annotationClass) {
         return delegate.annotations(annotationClass);
     }
+
 }

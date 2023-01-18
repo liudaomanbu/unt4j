@@ -61,9 +61,10 @@ public class PropertyName {
     return new PropertyName(propertyNames().subList(0, 1));
   }
 
-  public boolean complex() {
-    return propertyNames().size() != 1;
-  }
+    //todo 名字形容词?
+    public boolean complex() {
+        return propertyNames().size() != 1;
+    }
 
   @NonNull
   public PropertyName sub(int fromIndex) {

@@ -48,9 +48,9 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
    * @since 1.0.0
    */
   @NonNull
-  protected static <T, R, E> CompositeWritableProperty<T, R, E> create(
-      @NonNull ReadableProperty<T, E> targetReadableProperty,
-      @NonNull WritableProperty<E, R> delegate) {
+  static <T, R, E> CompositeWritableProperty<T, R, E> create(
+          @NonNull ReadableProperty<T, E> targetReadableProperty,
+          @NonNull WritableProperty<E, R> delegate) {
     return new CompositeWritableProperty<T, R, E>(targetReadableProperty, delegate);
   }
 

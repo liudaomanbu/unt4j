@@ -18,12 +18,13 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
+
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 可读取属性
@@ -125,6 +126,9 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    */
   @NonNull
   default <S> ReadableProperty<O, S> compose(ReadableProperty<P, S> readableProperty) {
+    if (readableProperty.accessible()) {
+      return compose(readableProperty.toAccessible());
+    }
     return CompositeReadableProperty.create(this, readableProperty);
   }
 
@@ -140,6 +144,9 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    */
   @NonNull
   default <S> WritableProperty<O, S> compose(WritableProperty<P, S> writableProperty) {
+    if (writableProperty.accessible()) {
+      return compose(writableProperty.toAccessible());
+    }
     return CompositeWritableProperty.create(this, writableProperty);
   }
 

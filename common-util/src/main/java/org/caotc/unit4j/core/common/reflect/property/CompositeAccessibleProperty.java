@@ -37,7 +37,7 @@ public class CompositeAccessibleProperty<O, P, T> extends
         AbstractCompositeProperty<O, P, T, AccessibleProperty<T, P>> implements
         AccessibleProperty<O, P> {
 
-  protected CompositeAccessibleProperty(
+  CompositeAccessibleProperty(
           @NonNull ReadableProperty<O, T> targetReadableProperty,
           @NonNull AccessibleProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
