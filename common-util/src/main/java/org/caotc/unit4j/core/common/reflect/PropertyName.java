@@ -36,48 +36,69 @@ import lombok.Value;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PropertyName {
 
-  private static final String SEPARATOR = ".";
-  private static final Splitter SPLITTER = Splitter.on(SEPARATOR).omitEmptyStrings().trimResults();
-  private static final Joiner JOINER = Joiner.on(SEPARATOR);
+    private static final String SEPARATOR = ".";
+    private static final Splitter SPLITTER = Splitter.on(SEPARATOR).omitEmptyStrings().trimResults();
+    private static final Joiner JOINER = Joiner.on(SEPARATOR);
+    @NonNull
+    ImmutableList<String> propertyNames;
 
-  @NonNull
-  public static PropertyName from(@NotNull String propertyName) {
-    return create(Streams.stream(SPLITTER.split(propertyName))
-        .collect(ImmutableList.toImmutableList()));
-  }
+    @NonNull
+    public static PropertyName from(@NotNull String propertyName) {
+        return create(Streams.stream(SPLITTER.split(propertyName))
+                .collect(ImmutableList.toImmutableList()));
+    }
 
-  @NonNull
-  public static PropertyName create(@NotNull ImmutableList<String> propertyNames) {
-    Preconditions.checkArgument(!propertyNames.isEmpty(), "propertyName can not be empty");
-    //TODO 检查每个属性名格式
-    return new PropertyName(propertyNames);
-  }
+    @NonNull
+    public static PropertyName create(@NotNull ImmutableList<String> propertyNames) {
+        Preconditions.checkArgument(!propertyNames.isEmpty(), "propertyName can not be empty");
+        //TODO 检查每个属性名格式
+        return new PropertyName(propertyNames);
+    }
 
-  @NonNull
-  ImmutableList<String> propertyNames;
+    @NonNull
+    public PropertyName firstTier() {
+        return sub(0, 1);
+    }
 
-  @NonNull
-  public PropertyName firstTier() {
-    return new PropertyName(propertyNames().subList(0, 1));
-  }
+    @NonNull
+    public PropertyName lastTier() {
+        return sub(propertyNames().size() - 1);
+    }
+
+    @NonNull
+    public PropertyName removeFirstTier() {
+        return sub(1);
+    }
+
+    @NonNull
+    public PropertyName removeLastTier() {
+        return sub(0, propertyNames().size() - 1);
+    }
+
+    public int tierSize() {
+        return propertyNames().size();
+    }
 
     //todo 名字形容词?
     public boolean complex() {
         return propertyNames().size() != 1;
     }
 
-  @NonNull
-  public PropertyName sub(int fromIndex) {
-    return sub(fromIndex, propertyNames().size());
-  }
+    @NonNull
+    public PropertyName sub(int fromIndex) {
+        return sub(fromIndex, propertyNames().size());
+    }
 
-  @NonNull
-  public PropertyName sub(int fromIndex, int toIndex) {
-    return new PropertyName(propertyNames().subList(fromIndex, toIndex));
-  }
+    @NonNull
+    public PropertyName sub(int fromIndex, int toIndex) {
+        if (fromIndex == 0 && toIndex == propertyNames().size()) {
+            return this;
+        }
+        return new PropertyName(propertyNames().subList(fromIndex, toIndex));
+    }
 
-  @NonNull
-  public String flat() {
-    return JOINER.join(propertyNames());
-  }
+    @NonNull
+    public String flat() {
+        return JOINER.join(propertyNames());
+    }
 }

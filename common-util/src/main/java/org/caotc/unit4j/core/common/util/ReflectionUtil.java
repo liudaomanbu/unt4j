@@ -1440,41 +1440,24 @@ public class ReflectionUtil {
     public static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyInternalCompose(type, propertyName, propertyAccessorMethodFormats);
-    }
-
-    //todo 待优化
-    @NonNull
-    private static <T, R, E> Optional<ReadableProperty<T, R>> readablePropertyInternalCompose(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
-            @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        PropertyName propertyName = PropertyName.from(fieldName);
-        String firstTierPropertyName = propertyName.firstTier().flat();
-        if (propertyName.complex()) {
-            PropertyName sub = propertyName.sub(1);
-            Optional<ReadableProperty<T, E>> transferReadableProperty = readablePropertyInternal(
-                    type,
-                    firstTierPropertyName,
-                    propertyAccessorMethodFormats);
-            return transferReadableProperty
-                    .flatMap(f -> ReflectionUtil.<E, R>readablePropertyInternal(
-                            f.type(), sub.flat(),
-                            propertyAccessorMethodFormats).map(f::compose)
-                    );
-        }
-        return readablePropertyInternal(type,
-                firstTierPropertyName,
-                propertyAccessorMethodFormats);
+        return readableProperty(type, PropertyName.from(propertyName), propertyAccessorMethodFormats);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    private static <T, R> Optional<ReadableProperty<T, R>> readablePropertyInternal(
-            @NonNull TypeToken<T> type, @NonNull String fieldName,
+    private static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
+            @NonNull TypeToken<T> type, @NonNull PropertyName propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        if (propertyName.complex()) {
+            return readableProperty(type, propertyName.firstTier(), propertyAccessorMethodFormats)
+                    .flatMap(transferProperty -> ReflectionUtil.<Object, R>readableProperty(
+                            transferProperty.type(), propertyName.removeFirstTier(),
+                            propertyAccessorMethodFormats).map(transferProperty::compose)
+                    );
+        }
         return readableProperties(type, propertyAccessorMethodFormats)
                 .stream()
-                .filter(propertyGetter -> propertyGetter.name().equals(fieldName))
+                .filter(propertyGetter -> propertyGetter.name().equals(propertyName.flat()))
                 .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
                 .findAny();
     }
@@ -1570,6 +1553,12 @@ public class ReflectionUtil {
     public static <T, R> Optional<WritableProperty<T, R>> writableProperty(
             @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        PropertyName name = PropertyName.from(propertyName);
+        if (name.complex()) {
+            return readableProperty(type, name.removeLastTier(), propertyAccessorMethodFormats)
+                    .flatMap(transferProperty -> ReflectionUtil.<Object, R>writableProperty(transferProperty.type(), name.lastTier().flat(), propertyAccessorMethodFormats)
+                            .map(transferProperty::compose));//todo Object or E?
+        }
         return writableProperties(type, propertyAccessorMethodFormats)
                 .stream()
                 .filter(propertyWriter -> propertyWriter.name().equals(propertyName))
@@ -1671,6 +1660,12 @@ public class ReflectionUtil {
     public static <T, R> Optional<AccessibleProperty<T, R>> accessibleProperty(
             @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
+        PropertyName name = PropertyName.from(propertyName);
+        if (name.complex()) {
+            return readableProperty(type, name.removeLastTier(), propertyAccessorMethodFormats)
+                    .flatMap(transferProperty -> ReflectionUtil.<Object, R>accessibleProperty(transferProperty.type(), name.lastTier().flat(), propertyAccessorMethodFormats)
+                            .map(targetProperty -> transferProperty.compose(targetProperty)));//todo Object or E?
+        }
         return accessibleProperties(type, propertyAccessorMethodFormats)
                 .stream()
                 .filter(propertyWriter -> propertyWriter.name().equals(propertyName))

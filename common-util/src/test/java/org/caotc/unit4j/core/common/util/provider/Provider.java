@@ -502,9 +502,6 @@ public class Provider {
                 , Arguments.of(TypeToken.of(ChildrenSameNameFieldObject.class), JAVA_BEAN, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
                 , Arguments.of(TypeToken.of(ChildrenSameNameFieldObject.class), FLUENT, ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
                 , Arguments.of(TypeToken.of(ChildrenSameNameFieldObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY))
-                , Arguments.of(TypeToken.of(CompositeFieldObject.class), JAVA_BEAN, ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY, Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
-                , Arguments.of(TypeToken.of(CompositeFieldObject.class), FLUENT, ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY, Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
-                , Arguments.of(TypeToken.of(CompositeFieldObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY, Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
                 , Arguments.of(TypeToken.of(DoubleGenericFieldObject.class), JAVA_BEAN, ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
                 , Arguments.of(TypeToken.of(DoubleGenericFieldObject.class), FLUENT, ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
                 , Arguments.of(TypeToken.of(DoubleGenericFieldObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY))
@@ -606,6 +603,17 @@ public class Provider {
                 , Arguments.of(TypeToken.of(StringFieldSetterObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.STRING_FIELD_SETTER_OBJECT_STRING_PROPERTY)));
     }
 
+    static Stream<Arguments> classAndPropertyAccessorMethodFormatArrayAndCompositePropertySets() {
+        return typeTokenAndPropertyAccessorMethodFormatArrayAndCompositePropertySets()
+                .map(arguments -> Arguments.of(((TypeToken<?>) arguments.get()[0]).getRawType(), arguments.get()[1], arguments.get()[2]));
+    }
+
+    static Stream<Arguments> typeTokenAndPropertyAccessorMethodFormatArrayAndCompositePropertySets() {
+        return Stream.of(Arguments.of(TypeToken.of(CompositeFieldObject.class), JAVA_BEAN, ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
+                , Arguments.of(TypeToken.of(CompositeFieldObject.class), FLUENT, ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
+                , Arguments.of(TypeToken.of(CompositeFieldObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY)));
+    }
+
     static Stream<Arguments> classAndPropertySets() {
         return typeTokenAndPropertySets()
                 .filter(arguments -> arguments.get()[0].equals(TypeToken.of(((TypeToken<?>) arguments.get()[0]).getRawType())))
@@ -679,7 +687,7 @@ public class Provider {
     }
 
     static Stream<Arguments> classAndPropertyNameAndPropertyAccessorMethodFormatArrayAndPropertys() {
-        return classAndPropertyAccessorMethodFormatArrayAndPropertySets()
+        return Stream.concat(classAndPropertyAccessorMethodFormatArrayAndPropertySets(), classAndPropertyAccessorMethodFormatArrayAndCompositePropertySets())
                 .flatMap(arguments -> ((Collection<Property<?, ?>>) arguments.get()[2]).stream()
                         .map(property -> Arguments.of(arguments.get()[0], property.name(), arguments.get()[1], property)));
     }
