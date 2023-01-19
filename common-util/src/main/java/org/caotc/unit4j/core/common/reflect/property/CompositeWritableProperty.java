@@ -62,7 +62,7 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
 
   @Override
   public @NonNull CompositeWritableProperty<O, P, T> write(@NonNull O target, @NonNull P value) {
-    targetReadableProperty.read(target)
+    transferProperty.read(target)
             .ifPresent(actualTarget -> delegate.write(actualTarget, value));
     return this;
   }

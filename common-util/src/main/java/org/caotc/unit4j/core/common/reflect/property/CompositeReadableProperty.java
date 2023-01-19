@@ -61,7 +61,7 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
 
   @Override
   public @NonNull Optional<P> read(@NonNull O target) {
-    return targetReadableProperty.read(target).flatMap(delegate::read);
+    return transferProperty.read(target).flatMap(delegate::read);
   }
 
   @Override

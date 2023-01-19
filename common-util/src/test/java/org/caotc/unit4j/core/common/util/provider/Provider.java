@@ -611,7 +611,13 @@ public class Provider {
     static Stream<Arguments> typeTokenAndPropertyAccessorMethodFormatArrayAndCompositePropertySets() {
         return Stream.of(Arguments.of(TypeToken.of(CompositeFieldObject.class), JAVA_BEAN, ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
                 , Arguments.of(TypeToken.of(CompositeFieldObject.class), FLUENT, ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
-                , Arguments.of(TypeToken.of(CompositeFieldObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY)));
+                , Arguments.of(TypeToken.of(CompositeFieldObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY))
+                , Arguments.of(TypeToken.of(CompositeGetterObject.class), JAVA_BEAN, ImmutableSet.of(Constant.COMPOSITE_GETTER_OBJECT_INTERNAL_INTEGER_PROPERTY))
+                , Arguments.of(TypeToken.of(CompositeGetterObject.class), FLUENT, ImmutableSet.of())
+                , Arguments.of(TypeToken.of(CompositeGetterObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_GETTER_OBJECT_INTERNAL_INTEGER_PROPERTY))
+                , Arguments.of(TypeToken.of(CompositeSetterObject.class), JAVA_BEAN, ImmutableSet.of(Constant.COMPOSITE_SETTER_OBJECT_INTERNAL_INTEGER_PROPERTY))
+                , Arguments.of(TypeToken.of(CompositeSetterObject.class), FLUENT, ImmutableSet.of())
+                , Arguments.of(TypeToken.of(CompositeSetterObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_SETTER_OBJECT_INTERNAL_INTEGER_PROPERTY)));
     }
 
     static Stream<Arguments> classAndPropertySets() {

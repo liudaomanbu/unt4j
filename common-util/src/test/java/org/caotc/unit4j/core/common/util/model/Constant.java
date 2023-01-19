@@ -58,6 +58,8 @@ public class Constant {
     public static final Method STRING_FIELD_CHAIN_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD;
     public static final Method DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_SET_NUMBER_FIELD_METHOD;
     public static final Method DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_INT_SET_NUMBER_FIELD_METHOD;
+    public static final Method COMPOSITE_GETTER_OBJECT_GET_INTERNAL_METHOD;
+    public static final Method COMPOSITE_SETTER_OBJECT_GET_INTERNAL_METHOD;
     public static final ImmutableSet<Method> INTEGER_GENERIC_FIELD_GETTER_GET_METHODS;
     public static final ImmutableSet<Method> LONG_GENERIC_FIELD_SETTER_SET_METHODS;
     public static final ImmutableSet<Method> STRING_FIELD_GETTER_OBJECT_GET_METHODS;
@@ -119,6 +121,8 @@ public class Constant {
     public static final ImmutableSet<PropertyAccessor<ChildrenLongFieldObject, ?>> CHILDREN_LONG_FIELD_OBJECT_PROPERTY_ACCESSORS;
     public static final ImmutableSet<PropertyAccessor<? super ChildrenSameNameFieldObject, String>> CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS;
     public static final PropertyAccessor<CompositeFieldObject, CompositeFieldObject.Internal> COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD_PROPERTY_ACCESSOR;
+    public static final PropertyReader<CompositeGetterObject, CompositeGetterObject.Internal> COMPOSITE_GETTER_OBJECT_INTERNAL_PROPERTY_READER;
+    public static final PropertyReader<CompositeSetterObject, CompositeSetterObject.Internal> COMPOSITE_SETTER_OBJECT_INTERNAL_PROPERTY_READER;
     public static final PropertyAccessor<DoubleGenericFieldObject, Double> DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR;
     public static final ImmutableSet<PropertyWriter<? super DuplicateNumberFieldSetMethodObject, Number>> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS;
     public static final PropertyAccessor<FinalFieldObject, String> FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR;
@@ -156,6 +160,10 @@ public class Constant {
     public static final AccessibleProperty<ChildrenSameNameFieldObject, String> CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY;
     public static final AccessibleProperty<CompositeFieldObject, CompositeFieldObject.Internal> COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY;
     public static final AccessibleProperty<CompositeFieldObject, Integer> COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY;
+    public static final ReadableProperty<CompositeGetterObject, CompositeGetterObject.Internal> COMPOSITE_GETTER_OBJECT_INTERNAL_PROPERTY;
+    public static final ReadableProperty<CompositeGetterObject, Integer> COMPOSITE_GETTER_OBJECT_INTERNAL_INTEGER_PROPERTY;
+    public static final ReadableProperty<CompositeSetterObject, CompositeSetterObject.Internal> COMPOSITE_SETTER_OBJECT_INTERNAL_PROPERTY;
+    public static final WritableProperty<CompositeSetterObject, Integer> COMPOSITE_SETTER_OBJECT_INTERNAL_INTEGER_PROPERTY;
     public static final WritableProperty<DoubleGenericFieldObject, Double> DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY;
     public static final WritableProperty<DuplicateNumberFieldSetMethodObject, Number> DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY;
     public static final AccessibleProperty<FinalFieldObject, String> FINAL_FIELD_OBJECT_STRING_PROPERTY;
@@ -218,6 +226,8 @@ public class Constant {
             STRING_FIELD_CHAIN_SET_METHOD_OBJECT_SET_STRING_FIELD_METHOD = StringFieldChainSetMethodObject.class.getDeclaredMethod("setStringField", String.class);
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_SET_NUMBER_FIELD_METHOD = DuplicateNumberFieldSetMethodObject.class.getDeclaredMethod("setNumberField", Number.class);
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_INT_SET_NUMBER_FIELD_METHOD = DuplicateNumberFieldSetMethodObject.class.getDeclaredMethod("setNumberField", int.class);
+            COMPOSITE_GETTER_OBJECT_GET_INTERNAL_METHOD = CompositeGetterObject.class.getDeclaredMethod("getInternal");
+            COMPOSITE_SETTER_OBJECT_GET_INTERNAL_METHOD = CompositeSetterObject.class.getDeclaredMethod("getInternal");
             INTEGER_GENERIC_FIELD_GETTER_GET_METHODS = ImmutableSet.of(GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, INTEGER_GENERIC_FIELD_GETTER_GET_GENERIC_FIELD_METHOD, INTEGER_GENERIC_FIELD_GETTER_BRIDGE_GET_GENERIC_FIELD_METHOD);
             LONG_GENERIC_FIELD_SETTER_SET_METHODS = ImmutableSet.of(GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD, LONG_GENERIC_FIELD_SETTER_SET_GENERIC_FIELD_METHOD, LONG_GENERIC_FIELD_SETTER_BRIDGE_SET_GENERIC_FIELD_METHOD);
             STRING_FIELD_GETTER_OBJECT_GET_METHODS = ImmutableSet.of(STRING_FIELD_GETTER_GET_STRING_FIELD_METHOD, STRING_FIELD_GETTER_OBJECT_GET_STRING_FIELD_METHOD);
@@ -280,6 +290,8 @@ public class Constant {
             CHILDREN_LONG_FIELD_OBJECT_PROPERTY_ACCESSORS = ImmutableSet.of(CHILDREN_LONG_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR, CHILDREN_LONG_FIELD_OBJECT_LONG_FIELD_PROPERTY_ACCESSOR);
             CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS = CHILDREN_SAME_NAME_FIELD_OBJECT_FIELDS.stream().map(field -> PropertyAccessor.<ChildrenSameNameFieldObject, String>from(TypeToken.of(ChildrenSameNameFieldObject.class), field)).collect(ImmutableSet.toImmutableSet());
             COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(CompositeFieldObject.class, COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD);
+            COMPOSITE_GETTER_OBJECT_INTERNAL_PROPERTY_READER = PropertyReader.from(CompositeGetterObject.class, COMPOSITE_GETTER_OBJECT_GET_INTERNAL_METHOD, "internal");
+            COMPOSITE_SETTER_OBJECT_INTERNAL_PROPERTY_READER = PropertyReader.from(CompositeSetterObject.class, COMPOSITE_SETTER_OBJECT_GET_INTERNAL_METHOD, "internal");
             DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(DoubleGenericFieldObject.class, GENERIC_FIELD_OBJECT_GENERIC_FIELD);
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS = DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_SET_METHODS.stream().map(method -> PropertyWriter.<DuplicateNumberFieldSetMethodObject, Number>from(TypeToken.of(DuplicateNumberFieldSetMethodObject.class), method, "numberField")).collect(ImmutableSet.toImmutableSet());
             FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR = PropertyAccessor.from(FinalFieldObject.class, FINAL_FIELD_OBJECT_STRING_FIELD);
@@ -320,6 +332,10 @@ public class Constant {
             CHILDREN_SAME_NAME_FIELD_OBJECT_STRING_PROPERTY = AccessibleProperty.create(CHILDREN_SAME_NAME_FIELD_OBJECT_PROPERTY_ACCESSORS);
             COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY = AccessibleProperty.create(ImmutableSet.of(COMPOSITE_FIELD_OBJECT_INTERNAL_FIELD_PROPERTY_ACCESSOR));
             COMPOSITE_FIELD_OBJECT_INTERNAL_INTEGER_PROPERTY = COMPOSITE_FIELD_OBJECT_INTERNAL_PROPERTY.compose(ReflectionUtil.accessiblePropertyExact(CompositeFieldObject.Internal.class, CompositeFieldObject.Internal.Fields.VALUE));
+            COMPOSITE_GETTER_OBJECT_INTERNAL_PROPERTY = ReadableProperty.create(ImmutableSet.of(COMPOSITE_GETTER_OBJECT_INTERNAL_PROPERTY_READER));
+            COMPOSITE_GETTER_OBJECT_INTERNAL_INTEGER_PROPERTY = COMPOSITE_GETTER_OBJECT_INTERNAL_PROPERTY.compose(ReflectionUtil.readablePropertyExact(CompositeGetterObject.Internal.class, "value"));
+            COMPOSITE_SETTER_OBJECT_INTERNAL_PROPERTY = ReadableProperty.create(ImmutableSet.of(COMPOSITE_SETTER_OBJECT_INTERNAL_PROPERTY_READER));
+            COMPOSITE_SETTER_OBJECT_INTERNAL_INTEGER_PROPERTY = COMPOSITE_SETTER_OBJECT_INTERNAL_PROPERTY.compose(ReflectionUtil.writablePropertyExact(CompositeSetterObject.Internal.class, "value"));
             DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_PROPERTY = AccessibleProperty.create(ImmutableSet.of(DOUBLE_GENERIC_FIELD_OBJECT_GENERIC_FIELD_PROPERTY_ACCESSOR));
             DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_NUMBER_PROPERTY = WritableProperty.create(DUPLICATE_NUMBER_FIELD_SET_METHOD_OBJECT_PROPERTY_WRITERS);
             FINAL_FIELD_OBJECT_STRING_PROPERTY = AccessibleProperty.create(ImmutableSet.of(FINAL_FIELD_OBJECT_STRING_FIELD_PROPERTY_ACCESSOR));

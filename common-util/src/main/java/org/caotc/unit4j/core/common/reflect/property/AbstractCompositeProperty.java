@@ -37,14 +37,14 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     @NonNull
     String name;
     @NonNull
-    protected ReadableProperty<O, T> targetReadableProperty;
+    protected ReadableProperty<O, T> transferProperty;
     @NonNull
     protected D delegate;
 
-    protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> targetReadableProperty,
+    protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
                                         @NonNull D delegate) {
-        this.name = targetReadableProperty.name() + "." + delegate.name();
-        this.targetReadableProperty = targetReadableProperty;
+        this.name = transferProperty.name() + "." + delegate.name();
+        this.transferProperty = transferProperty;
         this.delegate = delegate;
     }
 

@@ -55,12 +55,12 @@ public class CompositeAccessibleProperty<O, P, T> extends
 
   @Override
   public @NonNull Optional<P> read(@NonNull O target) {
-    return targetReadableProperty.read(target).flatMap(delegate::read);
+    return transferProperty.read(target).flatMap(delegate::read);
   }
 
   @Override
   public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-    targetReadableProperty.read(target)
+    transferProperty.read(target)
             .ifPresent(actualTarget -> delegate.write(actualTarget, value));
     return this;
   }
