@@ -617,7 +617,10 @@ public class Provider {
                 , Arguments.of(TypeToken.of(CompositeGetterObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_GETTER_OBJECT_INTERNAL_INTEGER_PROPERTY))
                 , Arguments.of(TypeToken.of(CompositeSetterObject.class), JAVA_BEAN, ImmutableSet.of(Constant.COMPOSITE_SETTER_OBJECT_INTERNAL_INTEGER_PROPERTY))
                 , Arguments.of(TypeToken.of(CompositeSetterObject.class), FLUENT, ImmutableSet.of())
-                , Arguments.of(TypeToken.of(CompositeSetterObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_SETTER_OBJECT_INTERNAL_INTEGER_PROPERTY)));
+                , Arguments.of(TypeToken.of(CompositeSetterObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.COMPOSITE_SETTER_OBJECT_INTERNAL_INTEGER_PROPERTY))
+                , Arguments.of(TypeToken.of(MultipleCompositeObject.class), JAVA_BEAN, ImmutableSet.of(Constant.MULTIPLE_COMPOSITE_OBJECT_MULTIPLE_INTERNAL_PROPERTY))
+                , Arguments.of(TypeToken.of(MultipleCompositeObject.class), FLUENT, ImmutableSet.of())
+                , Arguments.of(TypeToken.of(MultipleCompositeObject.class), PropertyAccessorMethodFormat.values(), ImmutableSet.of(Constant.MULTIPLE_COMPOSITE_OBJECT_MULTIPLE_INTERNAL_PROPERTY)));
     }
 
     static Stream<Arguments> classAndPropertySets() {

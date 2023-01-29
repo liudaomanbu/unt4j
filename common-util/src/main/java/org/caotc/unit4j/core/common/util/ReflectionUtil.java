@@ -1449,9 +1449,9 @@ public class ReflectionUtil {
             @NonNull TypeToken<T> type, @NonNull PropertyName propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         if (propertyName.complex()) {
-            return readableProperty(type, propertyName.firstTier(), propertyAccessorMethodFormats)
+            return readableProperty(type, propertyName.removeLastTier(), propertyAccessorMethodFormats)
                     .flatMap(transferProperty -> ReflectionUtil.<Object, R>readableProperty(
-                            transferProperty.type(), propertyName.removeFirstTier(),
+                            transferProperty.type(), propertyName.lastTier(),
                             propertyAccessorMethodFormats).map(transferProperty::compose)
                     );
         }
