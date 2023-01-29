@@ -84,8 +84,8 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
 
   @SuppressWarnings("unchecked")
   @Override
-  @NonNull //todo final?
-  public <R1 extends R> PropertyReader<T, R1> propertyType(
+  @NonNull
+  public final <R1 extends R> PropertyReader<T, R1> propertyType(
           @NonNull TypeToken<R1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
             , "PropertyReader is known propertyType %s,not %s ", propertyType(), propertyType);

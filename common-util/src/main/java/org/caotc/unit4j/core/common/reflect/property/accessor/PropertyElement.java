@@ -51,10 +51,11 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
     }
 
     //todo from名字修改?
+    //todo PropertyElement调用PropertyAccessor还是PropertyAccessor调用PropertyElement？
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
         Preconditions.checkArgument(ReflectionUtil.isPropertyElement(field), "%s is not a PropertyElement", field);
-        return new PropertyAccessor.FieldElementPropertyAccessor<>(ownerType, FieldElement.of(field));
+        return new AbstractPropertyAccessor.FieldElementPropertyAccessor<>(ownerType, FieldElement.of(field));
     }
 
     @SuppressWarnings("unchecked")
