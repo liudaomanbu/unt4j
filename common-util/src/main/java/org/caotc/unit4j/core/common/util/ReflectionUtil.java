@@ -58,7 +58,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class ReflectionUtil {
 
-    private static final PropertyAccessorMethodFormat[] DEFAULT_METHOD_NAME_STYLES = PropertyAccessorMethodFormat
+    private static final PropertyAccessorMethodFormat[] DEFAULT_METHOD_NAME_STYLES = DefaultPropertyAccessorMethodFormat
             .values();
 
     @NonNull
@@ -394,7 +394,7 @@ public class ReflectionUtil {
     @NonNull
     public Stream<Method> getMethodStream(@NonNull TypeToken<?> type) {
         return methodStream(type)
-                .filter(method -> isPropertyReader(method, PropertyAccessorMethodFormat.JAVA_BEAN));
+                .filter(method -> isPropertyReader(method, DefaultPropertyAccessorMethodFormat.JAVA_BEAN));
     }
 
     @NonNull
@@ -426,7 +426,7 @@ public class ReflectionUtil {
     @NonNull
     public Stream<Method> setMethodStream(@NonNull TypeToken<?> type) {
         return methodStream(type)
-                .filter(method -> isPropertyWriter(method, PropertyAccessorMethodFormat.JAVA_BEAN));
+                .filter(method -> isPropertyWriter(method, DefaultPropertyAccessorMethodFormat.JAVA_BEAN));
     }
 
     @NonNull
@@ -464,7 +464,7 @@ public class ReflectionUtil {
     public Optional<Method> getMethod(@NonNull TypeToken<?> type,
                                       @NonNull String fieldName) {
         return getMethodStream(type)
-                .filter(getMethod -> fieldName.equals(PropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyReader(getMethod)))
+                .filter(getMethod -> fieldName.equals(DefaultPropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyReader(getMethod)))
                 .filter(method -> !method.isBridge())
                 /*
                   这些方法必然签名相同,有接口方法与父类方法之间平级关系和子类与接口或父类方法的重写关系.
@@ -668,7 +668,7 @@ public class ReflectionUtil {
     public Stream<Method> setMethodStream(@NonNull TypeToken<?> type,
                                           @NonNull String fieldName) {
         return setMethodStream(type)
-                .filter(setMethod -> fieldName.equals(PropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyWriter(setMethod)));
+                .filter(setMethod -> fieldName.equals(DefaultPropertyAccessorMethodFormat.JAVA_BEAN.propertyNameFromPropertyWriter(setMethod)));
     }
 
     /**
@@ -1417,7 +1417,7 @@ public class ReflectionUtil {
      * @author caotc
      * @date 2019-05-10
      * @apiNote 如果只想要获取JavaBean规范的get方法, {@code methodNameStyles}参数使用{@link
-     * PropertyAccessorMethodFormat#JAVA_BEAN}
+     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN}
      * @since 1.0.0
      */
     @NonNull
@@ -2075,7 +2075,7 @@ public class ReflectionUtil {
      * @date 2019-05-23
      * @apiNote 这里所指的get方法并不是专指JavaBean规范的get方法, 而是所有获取属性的方法, 符合任意{@link
      * PropertyAccessorMethodFormat}检查即视为get方法. 所以如果只想要判断是否是JavaBean规范的get方法请使用 {@link
-     * PropertyAccessorMethodFormat#JAVA_BEAN#isGetMethod(Method)}
+     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isGetMethod(Method)}
      * @since 1.0.0
      */
     public static boolean isPropertyReader(@NonNull Method method,
@@ -2102,7 +2102,7 @@ public class ReflectionUtil {
      * @date 2019-05-23
      * @apiNote 这里所指的get方法并不是专指JavaBean规范的get方法, 而是所有获取属性的方法, 符合任意{@link
      * PropertyAccessorMethodFormat}检查即视为get方法. 所以如果只想要判断是否是JavaBean规范的get方法请使用 {@link
-     * PropertyAccessorMethodFormat#JAVA_BEAN#isPropertyReader(Invokable)}
+     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isPropertyReader(Invokable)}
      * @since 1.0.0
      */
     public static boolean isPropertyReader(@NonNull Invokable<?, ?> invokable,
@@ -2156,7 +2156,7 @@ public class ReflectionUtil {
      * @date 2019-05-23
      * @apiNote 这里所指的set方法并不是专指JavaBean规范的set方法, 而是所有获取属性的方法, 符合任意{@link
      * PropertyAccessorMethodFormat}检查即视为set方法. 所以如果只想要判断是否是JavaBean规范的set方法请使用 {@link
-     * PropertyAccessorMethodFormat#JAVA_BEAN#isPropertyWriter(Method)}
+     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isPropertyWriter(Method)}
      * @since 1.0.0
      */
     public static boolean isPropertyWriter(@NonNull Method method,
@@ -2183,7 +2183,7 @@ public class ReflectionUtil {
      * @date 2019-05-23
      * @apiNote 这里所指的set方法并不是专指JavaBean规范的set方法, 而是所有获取属性的方法, 符合任意{@link
      * PropertyAccessorMethodFormat}检查即视为set方法. 所以如果只想要判断是否是JavaBean规范的set方法请使用 {@link
-     * PropertyAccessorMethodFormat#JAVA_BEAN#isPropertyWriter(Invokable)}
+     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isPropertyWriter(Invokable)}
      * @since 1.0.0
      */
     public static boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable,
@@ -2207,7 +2207,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
-        return isPropertyReader(invokable, PropertyAccessorMethodFormat.JAVA_BEAN);
+        return isPropertyReader(invokable, DefaultPropertyAccessorMethodFormat.JAVA_BEAN);
     }
 
     /**
@@ -2225,7 +2225,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
-        return isPropertyWriter(invokable, PropertyAccessorMethodFormat.JAVA_BEAN);
+        return isPropertyWriter(invokable, DefaultPropertyAccessorMethodFormat.JAVA_BEAN);
     }
 
     public static boolean isOverride(@NonNull Method method) {
