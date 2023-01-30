@@ -61,11 +61,6 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     }
 
     @Override
-    public final boolean fieldExist() {
-        return delegate.fieldExist();
-    }
-
-    @Override
     public final @NonNull <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass) {
         return delegate.annotation(annotationClass);

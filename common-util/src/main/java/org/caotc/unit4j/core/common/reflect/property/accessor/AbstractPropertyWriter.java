@@ -174,10 +174,5 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
       public TypeToken<T> ownerType() {
           return invokable.ownerType();
       }
-
-      @Override
-      public boolean basedOnField() {
-          return false;
-      }
   }
 }

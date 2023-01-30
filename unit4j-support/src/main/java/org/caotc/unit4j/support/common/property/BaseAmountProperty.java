@@ -19,13 +19,7 @@ package org.caotc.unit4j.support.common.property;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import java.lang.annotation.Annotation;
-import java.util.Optional;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 import org.caotc.unit4j.api.annotation.WithUnit;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
@@ -34,6 +28,9 @@ import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.common.util.AmountUtil;
+
+import java.lang.annotation.Annotation;
+import java.util.Optional;
 
 /**
  * @author caotc
@@ -77,11 +74,6 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
     //noinspection unchecked
     return (Property<O, P1>) this;
   }
-
-    @Override
-    public boolean fieldExist() {
-        return delegate.fieldExist();
-    }
 
     @Override
     public boolean readable() {

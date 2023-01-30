@@ -148,10 +148,5 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
       return invokable.ownerType();
     }
 
-    @Override
-    public boolean basedOnField() {
-      return false;
-    }
-
   }
 }

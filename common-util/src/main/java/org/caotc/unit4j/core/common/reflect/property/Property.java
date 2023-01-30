@@ -123,8 +123,6 @@ public interface Property<O, P> {
     return (Property<O, P1>) this;
   }
 
-  boolean fieldExist();
-
   boolean readable();
 
   boolean writable();

@@ -171,12 +171,6 @@ public abstract class AbstractPropertyAccessor<T, R> extends AbstractPropertyEle
     public @NonNull TypeToken<? extends R> propertyType() {
       return field.type();
     }
-
-    @Override
-    public boolean basedOnField() {
-      return true;
-    }
-
     @Override
     public @NonNull String propertyName() {
       return field.getName();
