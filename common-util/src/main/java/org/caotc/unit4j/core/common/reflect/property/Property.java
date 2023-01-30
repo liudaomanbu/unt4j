@@ -81,8 +81,6 @@ public interface Property<O, P> {
   /**
    * 获取属性类型
    *
-   * todo typeToken泛型应该是必定P还是? extends P
-   *
    * @return 属性类型
    * @author caotc
    * @date 2019-11-22

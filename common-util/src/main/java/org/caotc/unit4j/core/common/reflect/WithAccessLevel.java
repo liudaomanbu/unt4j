@@ -1,7 +1,7 @@
 package org.caotc.unit4j.core.common.reflect;
 
-import lombok.AccessLevel;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.base.AccessLevel;
 
 /**
  * @author caotc
