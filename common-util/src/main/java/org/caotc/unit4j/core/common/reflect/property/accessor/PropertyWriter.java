@@ -18,6 +18,7 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -34,16 +35,17 @@ import java.lang.reflect.Type;
  */
 public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
 
+  @SuppressWarnings("unchecked")
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Type ownerType, @NonNull Method propertyWriterMethod,
                                           @NonNull String propertyName) {
-    return PropertyElement.<T, R>from(ownerType, propertyWriterMethod, propertyName).toWriter();
+    return from((TypeToken<T>) TypeToken.of(ownerType), propertyWriterMethod, propertyName);
   }
 
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method propertyWriterMethod,
                                           @NonNull String propertyName) {
-    return PropertyElement.<T, R>from(ownerClass, propertyWriterMethod, propertyName).toWriter();
+    return from(TypeToken.of(ownerClass), propertyWriterMethod, propertyName);
   }
 
   /**
@@ -59,17 +61,17 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method propertyWriterMethod,
                                           @NonNull String propertyName) {
-    return PropertyElement.<T, R>from(ownerType, propertyWriterMethod, propertyName).toWriter();
+    return new AbstractPropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(propertyWriterMethod, ownerType), propertyName);
   }
 
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerType, field).toWriter();
+    return PropertyAccessor.<T, R>from(ownerType, field).toWriter();
   }
 
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerClass, field).toWriter();
+    return PropertyAccessor.<T, R>from(ownerClass, field).toWriter();
   }
 
   /**
@@ -84,7 +86,7 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
    */
   @NonNull
   static <T, R> PropertyWriter<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerType, field).toWriter();
+    return PropertyAccessor.<T, R>from(ownerType, field).toWriter();
   }
 
   /**

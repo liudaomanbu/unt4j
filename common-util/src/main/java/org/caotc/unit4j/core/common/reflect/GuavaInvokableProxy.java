@@ -126,7 +126,6 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, P> extends Ba
         return invokable.isVarArgs();
     }
 
-    @NonNull
     public final P invoke(@CheckForNull O receiver, @Nullable Object... args)
             throws InvocationTargetException, IllegalAccessException {
         return invokable.invoke(receiver, args);

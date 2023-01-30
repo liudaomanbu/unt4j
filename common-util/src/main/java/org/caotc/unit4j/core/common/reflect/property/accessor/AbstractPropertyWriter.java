@@ -153,9 +153,7 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
     InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
                             @NonNull String propertyName) {
       super(invokable);
-      Preconditions
-              .checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a setInvokable",
-                      invokable);
+      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a PropertyWriter", invokable);
       this.invokable = invokable;
       this.propertyName = propertyName;
     }

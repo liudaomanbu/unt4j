@@ -86,7 +86,7 @@ public interface Invokable<O, R> extends Element {
 
     Executable source();
 
-    @NonNull R invoke(@CheckForNull O receiver, @Nullable Object... args)
+    R invoke(@CheckForNull O receiver, @Nullable Object... args)
             throws InvocationTargetException, IllegalAccessException;
 
     @NonNull ImmutableList<Parameter> parameters();

@@ -18,6 +18,7 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -34,16 +35,17 @@ import java.util.Optional;
  * @since 1.0.0
  */
 public interface PropertyReader<T, R> extends PropertyElement<T, R> {
+  @SuppressWarnings("unchecked")
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Type ownerType, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
-    return PropertyElement.<T, R>from(ownerType, propertyReaderMethod, propertyName).toReader();
+    return from((TypeToken<T>) TypeToken.of(ownerType), propertyReaderMethod, propertyName);
   }
 
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
-    return PropertyElement.<T, R>from(ownerClass, propertyReaderMethod, propertyName).toReader();
+    return from(TypeToken.of(ownerClass), propertyReaderMethod, propertyName);
   }
 
   /**
@@ -59,17 +61,17 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
-    return PropertyElement.<T, R>from(ownerType, propertyReaderMethod, propertyName).toReader();
+    return new AbstractPropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(propertyReaderMethod, ownerType), propertyName);
   }
 
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerType, field).toReader();
+    return PropertyAccessor.<T, R>from(ownerType, field).toReader();
   }
 
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerClass, field).toReader();
+    return PropertyAccessor.<T, R>from(ownerClass, field).toReader();
   }
 
   /**
@@ -83,7 +85,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    */
   @NonNull
   static <T, R> PropertyReader<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerType, field).toReader();
+    return PropertyAccessor.<T, R>from(ownerType, field).toReader();
   }
 
   /**

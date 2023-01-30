@@ -20,8 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.AnnotatedElement;
-import org.caotc.unit4j.core.common.reflect.FieldElement;
-import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
 import org.caotc.unit4j.core.common.reflect.WithAccessLevel;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
@@ -39,23 +37,20 @@ import java.lang.reflect.Type;
  * @since 1.0.0
  */
 public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement {
-    @SuppressWarnings("unchecked")
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
-        return from((TypeToken<T>) TypeToken.of(ownerType), field);
+        return PropertyAccessor.from(ownerType, field);
     }
 
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
-        return from(TypeToken.of(ownerClass), field);
+        return PropertyAccessor.from(ownerClass, field);
     }
 
     //todo from名字修改?
-    //todo PropertyElement调用PropertyAccessor还是PropertyAccessor调用PropertyElement？
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
-        Preconditions.checkArgument(ReflectionUtil.isPropertyElement(field), "%s is not a PropertyElement", field);
-        return new AbstractPropertyAccessor.FieldElementPropertyAccessor<>(ownerType, FieldElement.of(field));
+        return PropertyAccessor.from(ownerType, field);
     }
 
     @SuppressWarnings("unchecked")
@@ -71,15 +66,14 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
         return from(TypeToken.of(ownerClass), method, propertyName);
     }
 
-    @SuppressWarnings({"unchecked", "UnstableApiUsage"})
     @NonNull
     static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method method,
                                              @NonNull String propertyName) {
         if (ReflectionUtil.isPropertyReader(method)) {
-            return new AbstractPropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(method, ownerType), propertyName);
+            return PropertyReader.from(ownerType, method, propertyName);
         }
         if (ReflectionUtil.isPropertyWriter(method)) {
-            return new AbstractPropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(method, ownerType), propertyName);
+            return PropertyWriter.from(ownerType, method, propertyName);
         }
         throw new IllegalArgumentException(String.format("%s is not a PropertyElement", method));
     }
