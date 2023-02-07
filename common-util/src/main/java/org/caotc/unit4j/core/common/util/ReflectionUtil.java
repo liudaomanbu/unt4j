@@ -39,16 +39,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 //TODO 将所有方法优化到只有一次流操作
 //TODO cache和热加载修改类对象
+
 /**
  * 反射工具类
+ * todo 范型字母
  *
  * @author caotc
  * @date 2019-05-10
@@ -2315,6 +2314,7 @@ public class ReflectionUtil {
         return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()));
     }
 
+    //todo 返回值集合是否不可变检查
     public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
         if (Iterables.isEmpty(types)) {
             return ImmutableSet.of();
@@ -2328,5 +2328,21 @@ public class ReflectionUtil {
                         .filter(type2 -> !Objects.equals(type1, type2))
                         .noneMatch(type2 -> type1.isSupertypeOf(type2)))
                 .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public static TypeToken<?> unwrapContainer(TypeToken<?> type) {
+        if (type.isArray()) {
+            return type.getComponentType();
+        }
+        if (List.class.equals(type.getRawType())) {
+            return type.resolveType(List.class.getTypeParameters()[0]);
+        }
+        if (Set.class.equals(type.getRawType())) {
+            return type.resolveType(Set.class.getTypeParameters()[0]);
+        }
+        if (Collection.class.equals(type.getRawType())) {
+            return type.resolveType(Collection.class.getTypeParameters()[0]);
+        }
+        return type;
     }
 }

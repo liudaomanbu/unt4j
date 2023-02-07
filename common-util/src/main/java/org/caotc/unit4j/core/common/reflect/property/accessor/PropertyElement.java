@@ -29,7 +29,7 @@ import java.lang.reflect.Type;
 
 /**
  * 属性元素
- * todo 所有类的范型字母
+ * todo 范型字母
  *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型

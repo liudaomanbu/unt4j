@@ -24,6 +24,7 @@ import java.util.Optional;
 
 /**
  * 可读取属性
+ * todo 范型字母
  *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型

@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
+ * todo 范型字母
+ *
  * @author caotc
  * @date 2022-11-22
  * @since 1.0.0

@@ -10,6 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 /**
+ * todo 范型字母
+ *
  * @author caotc
  * @date 2023-01-29
  * @since 1.0.0

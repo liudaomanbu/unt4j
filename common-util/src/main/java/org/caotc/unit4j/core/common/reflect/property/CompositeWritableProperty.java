@@ -24,6 +24,7 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
 /**
  * 可写属性
+ * todo 范型字母
  *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型

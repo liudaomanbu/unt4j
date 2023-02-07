@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 /**
+ * todo 范型字母
+ *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型
  * @author caotc

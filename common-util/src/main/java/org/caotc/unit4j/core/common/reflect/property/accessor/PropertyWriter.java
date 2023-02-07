@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 
 /**
  * 属性编写器,可由set{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
+ * todo 范型字母
  *
  * @param <T> 拥有该属性的类
  * @param <R> 属性类型

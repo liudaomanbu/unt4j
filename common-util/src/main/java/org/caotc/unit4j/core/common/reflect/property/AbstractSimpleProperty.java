@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 /**
  * 简单属性抽象类
  * todo 补充说明各种异常情况的注释,如父类和子类同名field时会被认为是相同属性
+ * todo 范型字母
  *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型
@@ -54,17 +55,21 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
             .<PropertyElement<?, ?>, AccessLevel>comparing(PropertyElement::accessLevel)
             //其次比较在哪个类定义,子类优先,与父类和子类有同名field定义时的处理方式保持一致
             .thenComparing((p1, p2) -> p1.declaringType().equals(p2.declaringType()) ? 0 : p1.declaringType().isSubtypeOf(p2.declaringType()) ? -1 : 1)
-            //最后比较属性类型,子类优先.因为是同一个属性的前提,子类拥有更具体的信息.
+            //最后比较属性类型,子类优先.因为是同一个属性的前提,认为子类拥有更具体的信息.
             .thenComparing((p1, p2) -> {
                 if (p1.propertyType().equals(p2.propertyType())) {
                     return 0;
                 }
                 TypeToken<?> propertyType1 = p1.propertyType();
                 TypeToken<?> propertyType2 = p2.propertyType();
-                //当propertyType1和propertyType2都是数组时,拆至非数组元素,以元素处理
-                while (propertyType1.isArray() && propertyType2.isArray()) {
-                    propertyType1 = propertyType1.getComponentType();
-                    propertyType2 = propertyType2.getComponentType();
+
+                //当propertyType1和propertyType2都是数组或容器时,拆至非数组容器元素,以元素处理
+                while ((propertyType1.isArray() && propertyType2.isArray())
+                        || (List.class.equals(propertyType1.getRawType()) && List.class.equals(propertyType2.getRawType()))
+                        || (Set.class.equals(propertyType1.getRawType()) && Set.class.equals(propertyType2.getRawType()))
+                        || (Collection.class.equals(propertyType1.getRawType()) && Collection.class.equals(propertyType2.getRawType()))) {
+                    propertyType1 = ReflectionUtil.unwrapContainer(propertyType1);
+                    propertyType2 = ReflectionUtil.unwrapContainer(propertyType2);
                 }
 
                 TypeToken<?> propertyTypeWarp1 = propertyType1.wrap();
@@ -80,12 +85,9 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
                 if (propertyTypeWarp2.isSubtypeOf(propertyTypeWarp1)) {
                     return 1;
                 }
-
-                //todo 集合类型处理?
-                //属性类型可能存在平级关系,理论上hashCode存在重复可能,直接使用内存地址
-                return System.identityHashCode(p1.propertyType()) - System.identityHashCode(p2.propertyType());
+                return 0;
             })
-            //非排序用,区分元素,否则在sortedSet中会认为AccessLevel和declaringType相同时就是相等的元素.理论上hashCode存在重复可能,直接使用内存地址
+            //非排序用,区分元素,否则在sortedSet中会认为是相等的元素.理论上hashCode存在重复可能,直接使用内存地址
             .thenComparing((p1, p2) -> p1.equals(p2) ? 0 : System.identityHashCode(p1) - System.identityHashCode(p2));
     @NonNull
     String name;
@@ -120,20 +122,26 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
             .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
     }
 
-    protected AbstractSimpleProperty(
-        @NonNull ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters) {
+    private AbstractSimpleProperty(
+            @NonNull ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders,
+            @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters) {
         //属性读取器集合不能为空
         Preconditions
                 .checkArgument(!propertyReaders.isEmpty() || !propertyWriters.isEmpty(),
                         "propertyReaders and propertyWriters can't be all empty");
         //属性只能有一个
-        ImmutableSet<@NonNull String> propertyNames = Streams
+        ImmutableSet<String> propertyNames = Streams
                 .concat(propertyReaders.stream(), propertyWriters.stream())
                 .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
-        //todo check declaringTypes
         Preconditions.checkArgument(propertyNames.size() == 1,
                 "propertyReaders and propertyWriters not belong to a common property.propertyNames:%s", propertyNames);
+        //ownerType只能有一个
+        ImmutableSet<TypeToken<? super O>> ownerTypes = Streams
+                .concat(propertyReaders.stream(), propertyWriters.stream())
+                .map(PropertyElement::ownerType).collect(ImmutableSet.toImmutableSet());
+        Preconditions.checkArgument(ownerTypes.size() == 1,
+                "propertyReaders and propertyWriters not belong to a common property.ownerTypes:%s", ownerTypes);
+
         ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = Streams
                 .concat(propertyReaders.stream(), propertyWriters.stream())
                 .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
@@ -144,10 +152,11 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         }
         Set<TypeToken<?>> lowestCommonAncestors = ReflectionUtil.lowestCommonAncestors(propertyTypes);
 
-        Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
-                "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
+        //todo
+//        Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
+//                "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
-        this.type = (TypeToken<P>) lowestCommonAncestors.stream().findFirst().get();//todo 保证代码使用时一定不会出错，公共祖先多个时用object？取优先级最高的element类型？
+        this.type = (TypeToken<P>) lowestCommonAncestors.stream().findFirst().orElse(TypeToken.of(Object.class));//todo 保证代码使用时一定不会出错，公共祖先多个时用object？取优先级最高的element类型？
         this.propertyReaders = propertyReaders;
         this.propertyWriters = propertyWriters;
     }

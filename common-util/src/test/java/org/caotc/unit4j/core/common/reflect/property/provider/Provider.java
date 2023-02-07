@@ -1,12 +1,16 @@
 package org.caotc.unit4j.core.common.reflect.property.provider;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.property.model.*;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -24,6 +28,8 @@ public class Provider {
         Integer[] valueWarpArray = new Integer[]{value};
         int[][] valueMultipleArray = new int[][]{{value}};
         Integer[][] valueWarpMultipleArray = new Integer[][]{{value}};
+        List<Integer> valueList = ImmutableList.of(value);
+        Set<Integer> valueSet = ImmutableSet.of(value);
         return Stream.of(Arguments.of(ReflectionUtil.readablePropertyExact(MultipleAccessLevelPropertyElementObject.class, "value"), new MultipleAccessLevelPropertyElementObject(value), value)
                 , Arguments.of(ReflectionUtil.readablePropertyExact(MultipleDeclaringTypePropertyElementObject.class, "value"), new MultipleDeclaringTypePropertyElementObject(value), value)
                 , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeSuperPropertyElementObject.class, "value"), new MultiplePropertyTypeSuperPropertyElementObject(value), value)
@@ -34,6 +40,10 @@ public class Provider {
                 , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeArrayPrimitiveAndWarpPropertyElementObject.class, "value"), new MultiplePropertyTypeArrayPrimitiveAndWarpPropertyElementObject(valueArray), valueArray)
                 , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeMultipleArraySuperPropertyElementObject.class, "value"), new MultiplePropertyTypeMultipleArraySuperPropertyElementObject(valueWarpMultipleArray), valueWarpMultipleArray)
                 , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeMultipleArrayPrimitiveAndWarpSuperPropertyElementObject.class, "value"), new MultiplePropertyTypeMultipleArrayPrimitiveAndWarpSuperPropertyElementObject(valueMultipleArray), valueMultipleArray)
-                , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeMultipleArrayPrimitiveAndWarpPropertyElementObject.class, "value"), new MultiplePropertyTypeMultipleArrayPrimitiveAndWarpPropertyElementObject(valueMultipleArray), valueMultipleArray));
+                , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeMultipleArrayPrimitiveAndWarpPropertyElementObject.class, "value"), new MultiplePropertyTypeMultipleArrayPrimitiveAndWarpPropertyElementObject(valueMultipleArray), valueMultipleArray)
+                , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeListSuperPropertyElementObject.class, "value"), new MultiplePropertyTypeListSuperPropertyElementObject(valueList), valueList)
+                , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeSetSuperPropertyElementObject.class, "value"), new MultiplePropertyTypeSetSuperPropertyElementObject(valueSet), valueSet)
+                , Arguments.of(ReflectionUtil.readablePropertyExact(MultiplePropertyTypeCollectionSuperPropertyElementObject.class, "value"), new MultiplePropertyTypeCollectionSuperPropertyElementObject(valueList), valueList)
+        );
     }
 }

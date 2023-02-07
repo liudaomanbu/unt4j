@@ -19,15 +19,17 @@ package org.caotc.unit4j.core.common.reflect.property;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.reflect.TypeToken;
-import java.util.Iterator;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
+import java.util.Iterator;
+import java.util.stream.Stream;
+
 /**
  * 可写属性
+ * todo 范型字母
  *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型
