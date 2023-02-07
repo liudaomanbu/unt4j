@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 
 /**
  * 简单属性抽象类
+ * todo 补充说明各种异常情况的注释,如父类和子类同名field时会被认为是相同属性
  *
  * @param <O> 拥有该属性的类
  * @param <P> 属性类型
@@ -46,21 +47,57 @@ import java.util.stream.Stream;
 @ToString
 public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     /**
-     * 权限级别元素排序器,{@link AccessLevel#PUBLIC}最前+hashcode比较器
+     * {@link PropertyElement}排序器
      */
-    private static final Comparator<PropertyElement<?, ?>> ORDERING = Comparator.<PropertyElement<?, ?>, AccessLevel>comparing(PropertyElement::accessLevel)
-            .thenComparing((p1, p2) -> p1.declaringType().equals(p2.declaringType()) ? 0 : p1.declaringType().isSubtypeOf(p2.declaringType()) ? 1 : -1)
-            .thenComparingInt(p -> p.propertyType().hashCode())
-            .thenComparing((p1, p2) -> p1.equals(p2) ? 0 : System.identityHashCode(p1) - System.identityHashCode(p2));//todo property type? sortedset comparator and equals 改成 list?
+    private static final Comparator<PropertyElement<?, ?>> ORDERING = Comparator
+            //优先比较权限修饰符
+            .<PropertyElement<?, ?>, AccessLevel>comparing(PropertyElement::accessLevel)
+            //其次比较在哪个类定义,子类优先,与父类和子类有同名field定义时的处理方式保持一致
+            .thenComparing((p1, p2) -> p1.declaringType().equals(p2.declaringType()) ? 0 : p1.declaringType().isSubtypeOf(p2.declaringType()) ? -1 : 1)
+            //最后比较属性类型,子类优先.因为是同一个属性的前提,子类拥有更具体的信息.
+            .thenComparing((p1, p2) -> {
+                if (p1.propertyType().equals(p2.propertyType())) {
+                    return 0;
+                }
+                TypeToken<?> propertyType1 = p1.propertyType();
+                TypeToken<?> propertyType2 = p2.propertyType();
+                //当propertyType1和propertyType2都是数组时,拆至非数组元素,以元素处理
+                while (propertyType1.isArray() && propertyType2.isArray()) {
+                    propertyType1 = propertyType1.getComponentType();
+                    propertyType2 = propertyType2.getComponentType();
+                }
+
+                TypeToken<?> propertyTypeWarp1 = propertyType1.wrap();
+                TypeToken<?> propertyTypeWarp2 = propertyType2.wrap();
+                //两者是对应的基本类型和包装类
+                if (propertyTypeWarp1.equals(propertyTypeWarp2)) {
+                    return propertyType1.isPrimitive() ? -1 : 1;
+                }
+                //之后把基本类型当作包装类对待
+                if (propertyTypeWarp1.isSubtypeOf(propertyTypeWarp2)) {
+                    return -1;
+                }
+                if (propertyTypeWarp2.isSubtypeOf(propertyTypeWarp1)) {
+                    return 1;
+                }
+
+                //todo 集合类型处理?
+                //属性类型可能存在平级关系,理论上hashCode存在重复可能,直接使用内存地址
+                return System.identityHashCode(p1.propertyType()) - System.identityHashCode(p2.propertyType());
+            })
+            //非排序用,区分元素,否则在sortedSet中会认为AccessLevel和declaringType相同时就是相等的元素.理论上hashCode存在重复可能,直接使用内存地址
+            .thenComparing((p1, p2) -> p1.equals(p2) ? 0 : System.identityHashCode(p1) - System.identityHashCode(p2));
     @NonNull
     String name;
     @NonNull
     TypeToken<P> type;
+    //todo 排除已被重写的方法？
     @NonNull
     protected ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders;
     @NonNull
     protected ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters;
 
+    //todo accesstors
     protected AbstractSimpleProperty(
             @NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,
             @NonNull Iterable<? extends PropertyWriter<? super O, P>> propertyWriters) {
@@ -110,7 +147,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
                 "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
-        this.type = (TypeToken<P>) lowestCommonAncestors.stream().findFirst().get();//todo
+        this.type = (TypeToken<P>) lowestCommonAncestors.stream().findFirst().get();//todo 保证代码使用时一定不会出错，公共祖先多个时用object？取优先级最高的element类型？
         this.propertyReaders = propertyReaders;
         this.propertyWriters = propertyWriters;
     }

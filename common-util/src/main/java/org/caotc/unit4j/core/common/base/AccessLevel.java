@@ -2,6 +2,7 @@ package org.caotc.unit4j.core.common.base;
 
 /**
  * todo 移到reflect包？
+ * todo compare逻辑
  *
  * @author caotc
  * @date 2023-01-30
@@ -9,4 +10,5 @@ package org.caotc.unit4j.core.common.base;
  */
 public enum AccessLevel {
     PUBLIC, MODULE, PROTECTED, PACKAGE, PRIVATE;
+
 }

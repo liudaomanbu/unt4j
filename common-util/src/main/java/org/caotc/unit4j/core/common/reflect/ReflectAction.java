@@ -20,13 +20,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.Singular;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.lang.reflect.Method;
@@ -36,6 +30,8 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
+ * todo remove
+ *
  * @author caotc
  * @date 2019-12-26
  * @since 1.0.0
