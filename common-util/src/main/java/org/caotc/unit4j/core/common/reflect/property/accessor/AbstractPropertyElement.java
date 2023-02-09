@@ -44,8 +44,8 @@ public abstract class AbstractPropertyElement<O, P> implements
 
     @SuppressWarnings("unchecked")
     @Override
-    public TypeToken<O> declaringType() {
-        return (TypeToken<O>) TypeToken.of(element.getDeclaringClass());
+    public TypeToken<? super O> declaringType() {
+        return (TypeToken<? super O>) TypeToken.of(element.getDeclaringClass());
     }
 
     @Override

@@ -148,7 +148,7 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
 
     TypeToken<O> ownerType();//todo 范型
 
-    TypeToken<O> declaringType();//todo 范型
+    TypeToken<? super O> declaringType();//todo 范型
 
     boolean accessible();
 

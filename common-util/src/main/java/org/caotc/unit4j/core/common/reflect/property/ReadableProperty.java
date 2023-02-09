@@ -50,7 +50,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    */
   @NonNull
   static <T, R> ReadableProperty<T, R> create(
-      @NonNull Iterable<PropertyReader<? super T, R>> propertyReaders) {
+          @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
     return new SimpleReadableProperty<>(propertyReaders);
   }
 
@@ -65,7 +65,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    */
   @NonNull
   static <T, R> ReadableProperty<T, R> create(
-      @NonNull Iterator<PropertyReader<? super T, R>> propertyReaders) {
+          @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
     return new SimpleReadableProperty<>(propertyReaders);
   }
 
@@ -80,7 +80,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    */
   @NonNull
   static <T, R> ReadableProperty<T, R> create(
-      @NonNull Stream<PropertyReader<? super T, R>> propertyReaders) {
+          @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
     return new SimpleReadableProperty<>(propertyReaders);
   }
 

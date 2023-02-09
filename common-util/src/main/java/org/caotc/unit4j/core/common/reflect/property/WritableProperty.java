@@ -48,9 +48,9 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> WritableProperty<T, R> create(
-        @NonNull Iterable<PropertyWriter<? super T, R>> propertyWriters) {
+            @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
 
-      return new SimpleWritableProperty<>(propertyWriters);
+        return new SimpleWritableProperty<>(propertyWriters);
     }
 
     /**
@@ -64,8 +64,8 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> WritableProperty<T, R> create(
-        @NonNull Iterator<PropertyWriter<? super T, R>> propertyWriters) {
-      return new SimpleWritableProperty<>(propertyWriters);
+            @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
+        return new SimpleWritableProperty<>(propertyWriters);
     }
 
     /**
@@ -79,8 +79,8 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> WritableProperty<T, R> create(
-        @NonNull Stream<PropertyWriter<? super T, R>> propertyWriters) {
-      return new SimpleWritableProperty<>(propertyWriters);
+            @NonNull Stream<PropertyWriter<T, R>> propertyWriters) {
+        return new SimpleWritableProperty<>(propertyWriters);
     }
 
   @Override

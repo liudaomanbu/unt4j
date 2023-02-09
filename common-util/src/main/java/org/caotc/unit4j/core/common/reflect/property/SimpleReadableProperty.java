@@ -42,22 +42,22 @@ public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P> i
         ReadableProperty<O, P> {
 
     protected SimpleReadableProperty(
-        @NonNull Iterable<PropertyReader<? super O, P>> propertyElements) {
+            @NonNull Iterable<PropertyReader<O, P>> propertyElements) {
         super(propertyElements, ImmutableSortedSet.of());
     }
 
     protected SimpleReadableProperty(
-        @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders) {
-        super(propertyReaders, ImmutableSortedSet.<PropertyWriter<? super O, P>>of().iterator());
+            @NonNull Iterator<PropertyReader<O, P>> propertyReaders) {
+        super(propertyReaders, ImmutableSortedSet.<PropertyWriter<O, P>>of().iterator());
     }
 
     protected SimpleReadableProperty(
-        @NonNull Stream<PropertyReader<? super O, P>> propertyReaders) {
+            @NonNull Stream<PropertyReader<O, P>> propertyReaders) {
         super(propertyReaders, Stream.empty());
     }
 
     protected SimpleReadableProperty(
-        @NonNull ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders) {
+            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders) {
         super(propertyReaders, ImmutableSortedSet.of());
     }
 

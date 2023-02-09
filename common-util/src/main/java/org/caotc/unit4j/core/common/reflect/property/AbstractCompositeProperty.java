@@ -34,7 +34,7 @@ import java.util.Optional;
  */
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P>> implements Property<O, P> {
+public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P>> implements Property<O, P> {//todo D?
 
     @NonNull
     String name;
@@ -60,6 +60,11 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     @Override
     public final TypeToken<P> type() {
         return delegate.type();
+    }
+
+    @Override
+    public TypeToken<O> ownerType() {
+        return transferProperty.ownerType();
     }
 
     @Override

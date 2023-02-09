@@ -60,17 +60,22 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
         return TypeToken.of(Amount.class);
     }
 
-  @Override
-  @NonNull
-  public <P1 extends Amount> Property<O, P1> type(@NonNull Class<P1> propertyType) {
-    return type(TypeToken.of(propertyType));
-  }
+    @Override
+    public TypeToken<O> ownerType() {
+        return delegate.ownerType();
+    }
 
-  @Override
-  @NonNull
-  public <P1 extends Amount> Property<O, P1> type(@NonNull TypeToken<P1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-        , "Property is known type %s,not %s ", type(), propertyType);
+    @Override
+    @NonNull
+    public <P1 extends Amount> Property<O, P1> type(@NonNull Class<P1> propertyType) {
+        return type(TypeToken.of(propertyType));
+    }
+
+    @Override
+    @NonNull
+    public <P1 extends Amount> Property<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+                , "Property is known type %s,not %s ", type(), propertyType);
     //noinspection unchecked
     return (Property<O, P1>) this;
   }

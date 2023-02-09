@@ -91,40 +91,42 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
             .thenComparing((p1, p2) -> p1.equals(p2) ? 0 : System.identityHashCode(p1) - System.identityHashCode(p2));
     @NonNull
     String name;
-    @NonNull
-    TypeToken<P> type;
     //todo 排除已被重写的方法？
     @NonNull
-    protected ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders;
+    protected ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
     @NonNull
-    protected ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters;
+    protected ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters;
+    @NonNull
+    TypeToken<O> ownerType;
+    @NonNull
+    TypeToken<P> type;
 
     //todo accesstors
     protected AbstractSimpleProperty(
-            @NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,
-            @NonNull Iterable<? extends PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
+            @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
         this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
                 ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
     }
 
     protected AbstractSimpleProperty(
-        @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Iterator<PropertyReader<O, P>> propertyReaders,
+            @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
         this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
-            ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
+                ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
     }
 
     protected AbstractSimpleProperty(
-        @NonNull Stream<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Stream<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Stream<PropertyReader<O, P>> propertyReaders,
+            @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
         this(propertyReaders
-            .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)), propertyWriters
-            .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
+                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)), propertyWriters
+                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
     }
 
     private AbstractSimpleProperty(
-            @NonNull ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders,
-            @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders,
+            @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters) {
         //属性读取器集合不能为空
         Preconditions
                 .checkArgument(!propertyReaders.isEmpty() || !propertyWriters.isEmpty(),
@@ -136,9 +138,9 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         Preconditions.checkArgument(propertyNames.size() == 1,
                 "propertyReaders and propertyWriters not belong to a common property.propertyNames:%s", propertyNames);
         //ownerType只能有一个
-        ImmutableSet<TypeToken<? super O>> ownerTypes = Streams
-                .concat(propertyReaders.stream(), propertyWriters.stream())
-                .map(PropertyElement::ownerType).collect(ImmutableSet.toImmutableSet());
+        ImmutableSet<TypeToken<O>> ownerTypes = Streams.concat(propertyReaders.stream(), propertyWriters.stream())
+                .map(PropertyElement::ownerType)
+                .collect(ImmutableSet.toImmutableSet());
         Preconditions.checkArgument(ownerTypes.size() == 1,
                 "propertyReaders and propertyWriters not belong to a common property.ownerTypes:%s", ownerTypes);
 
@@ -156,6 +158,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
 //        Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
 //                "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
+        this.ownerType = Iterables.getOnlyElement(ownerTypes);
         this.type = (TypeToken<P>) lowestCommonAncestors.stream().findFirst().orElse(TypeToken.of(Object.class));//todo 保证代码使用时一定不会出错，公共祖先多个时用object？取优先级最高的element类型？
         this.propertyReaders = propertyReaders;
         this.propertyWriters = propertyWriters;
@@ -171,6 +174,11 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @Override
     public final TypeToken<P> type() {
         return type;
+    }
+
+    @Override
+    public final TypeToken<O> ownerType() {
+        return ownerType;
     }
 
     @NonNull

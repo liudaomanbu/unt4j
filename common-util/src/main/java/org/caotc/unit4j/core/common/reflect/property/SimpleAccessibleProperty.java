@@ -39,29 +39,29 @@ import java.util.stream.Stream;
 @EqualsAndHashCode(callSuper = true)
 public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P> implements AccessibleProperty<O, P> {
 
-    public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,
-                                    @NonNull Iterable<? extends PropertyWriter<? super O, P>> propertyWriters) {
+    public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
+                                    @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
-    public SimpleAccessibleProperty(@NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
-                                    @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
+    public SimpleAccessibleProperty(@NonNull Iterator<PropertyReader<O, P>> propertyReaders,
+                                    @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
-    public SimpleAccessibleProperty(@NonNull Stream<PropertyReader<? super O, P>> propertyReaders,
-                                    @NonNull Stream<PropertyWriter<? super O, P>> propertyWriters) {
+    public SimpleAccessibleProperty(@NonNull Stream<PropertyReader<O, P>> propertyReaders,
+                                    @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
     public SimpleAccessibleProperty(
-        @NonNull ImmutableSortedSet<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders,
+            @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
         Preconditions
-            .checkArgument(!propertyReaders.isEmpty(), "propertyReaders can't be empty");
+                .checkArgument(!propertyReaders.isEmpty(), "propertyReaders can't be empty");
         Preconditions
-            .checkArgument(!propertyWriters.isEmpty(), "propertyWriters can't be empty");
+                .checkArgument(!propertyWriters.isEmpty(), "propertyWriters can't be empty");
     }
 
     @Override

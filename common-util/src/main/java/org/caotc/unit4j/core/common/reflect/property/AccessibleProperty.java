@@ -42,28 +42,28 @@ public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterable<? extends PropertyAccessor<? super O, P>> propertyAccessors) {
+            @NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
         return new SimpleAccessibleProperty<>(propertyAccessors, propertyAccessors);
     }
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterable<? extends PropertyReader<? super O, P>> propertyReaders,
-            @NonNull Iterable<? extends PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
+            @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterator<PropertyReader<? super O, P>> propertyReaders,
-            @NonNull Iterator<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Iterator<PropertyReader<O, P>> propertyReaders,
+            @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 
     @NonNull
     static <O, P> SimpleAccessibleProperty<O, P> create(
-        @NonNull Stream<PropertyReader<? super O, P>> propertyReaders,
-        @NonNull Stream<PropertyWriter<? super O, P>> propertyWriters) {
+            @NonNull Stream<PropertyReader<O, P>> propertyReaders,
+            @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
         return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
     }
 

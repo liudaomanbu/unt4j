@@ -44,22 +44,22 @@ public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> i
         WritableProperty<O, P> {
 
   protected SimpleWritableProperty(
-      @NonNull Iterable<PropertyWriter<? super O, P>> propertyElements) {
+          @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
     super(ImmutableSortedSet.of(), propertyElements);
   }
 
   protected SimpleWritableProperty(
-      @NonNull Iterator<PropertyWriter<? super O, P>> propertyElements) {
-    super(ImmutableSortedSet.<PropertyReader<? super O, P>>of().iterator(), propertyElements);
+          @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
+    super(ImmutableSortedSet.<PropertyReader<O, P>>of().iterator(), propertyElements);
   }
 
   protected SimpleWritableProperty(
-      @NonNull Stream<PropertyWriter<? super O, P>> propertyElements) {
+          @NonNull Stream<PropertyWriter<O, P>> propertyElements) {
     super(Stream.empty(), propertyElements);
   }
 
   protected SimpleWritableProperty(
-      @NonNull ImmutableSortedSet<PropertyWriter<? super O, P>> propertyElements) {
+          @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyElements) {
     super(ImmutableSortedSet.of(), propertyElements);
   }
 

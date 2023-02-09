@@ -90,6 +90,8 @@ public interface Property<O, P> {
   @NonNull
   TypeToken<P> type();
 
+  TypeToken<O> ownerType();
+
   /**
    * 设置属性类型
    *
