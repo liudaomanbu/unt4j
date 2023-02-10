@@ -29,46 +29,45 @@ import java.lang.reflect.Type;
 
 /**
  * 属性元素
- * todo 范型字母
  *
- * @param <O> 拥有该属性的类
- * @param <P> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-05-27
  * @since 1.0.0
  */
 public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement {
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
+    static <O, P> PropertyElement<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
         return PropertyAccessor.from(ownerType, field);
     }
 
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
+    static <O, P> PropertyElement<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
         return PropertyAccessor.from(ownerClass, field);
     }
 
     //todo from名字修改?
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
+    static <O, P> PropertyElement<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
         return PropertyAccessor.from(ownerType, field);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull Type ownerType, @NonNull Method method,
+    static <O, P> PropertyElement<O, P> from(@NonNull Type ownerType, @NonNull Method method,
                                              @NonNull String propertyName) {
-        return from((TypeToken<T>) TypeToken.of(ownerType), method, propertyName);
+        return from((TypeToken<O>) TypeToken.of(ownerType), method, propertyName);
     }
 
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method method,
+    static <O, P> PropertyElement<O, P> from(@NonNull Class<O> ownerClass, @NonNull Method method,
                                              @NonNull String propertyName) {
         return from(TypeToken.of(ownerClass), method, propertyName);
     }
 
     @NonNull
-    static <T, R> PropertyElement<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method method,
+    static <O, P> PropertyElement<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method method,
                                              @NonNull String propertyName) {
         if (ReflectionUtil.isPropertyReader(method)) {
             return PropertyReader.from(ownerType, method, propertyName);
@@ -99,7 +98,7 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
      * @since 1.0.0
      */
     @NonNull
-    TypeToken<? extends P> propertyType();
+    TypeToken<? extends P> propertyType();//todo 泛型
 
     /**
      * 设置属性类型
@@ -146,9 +145,9 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
         return (PropertyAccessor<O, P>) this;
     }
 
-    TypeToken<O> ownerType();//todo 范型
+    TypeToken<O> ownerType();
 
-    TypeToken<? super O> declaringType();//todo 范型
+    TypeToken<? super O> declaringType();
 
     boolean accessible();
 

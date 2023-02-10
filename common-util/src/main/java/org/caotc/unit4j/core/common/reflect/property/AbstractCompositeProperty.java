@@ -26,8 +26,9 @@ import java.lang.annotation.Annotation;
 import java.util.Optional;
 
 /**
- * todo 范型字母
- *
+ * @param <O> owner type
+ * @param <P> property type
+ * @param <T> target type
  * @author caotc
  * @date 2019-11-28
  * @since 1.0.0

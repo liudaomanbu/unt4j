@@ -26,19 +26,20 @@ import javax.annotation.CheckForNull;
 import java.lang.reflect.*;
 
 /**
- * todo 范型字母
- *
+ * @param <S> source type
+ * @param <O> owner type
+ * @param <R> return type
  * @author caotc
  * @date 2019-11-29
  * @since 1.0.0
  */
 @SuppressWarnings("UnstableApiUsage")
 @EqualsAndHashCode(callSuper = true)
-public abstract class GuavaInvokableProxy<S extends Executable, O, P> extends BaseInvokable<S, O, P> implements Invokable<O, P> {
+public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends BaseInvokable<S, O, R> implements Invokable<O, R> {
     @NonNull
-    com.google.common.reflect.Invokable<O, P> invokable;
+    com.google.common.reflect.Invokable<O, R> invokable;
 
-    GuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, P> delegate, @NonNull S source) {
+    GuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, R> delegate, @NonNull S source) {
         super(source);
         this.invokable = delegate;
     }
@@ -71,18 +72,18 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, P> extends Ba
     }
 
     @NonNull
-    public final TypeToken<? extends P> returnType() {
+    public final TypeToken<? extends R> returnType() {
         return invokable.getReturnType();
     }
 
     @NonNull
-    public final <P1 extends P> Invokable<O, P1> returning(Class<P1> returnType) {
+    public final <P1 extends R> Invokable<O, P1> returning(Class<P1> returnType) {
         return returning(TypeToken.of(returnType));
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public final <P1 extends P> Invokable<O, P1> returning(TypeToken<P1> returnType) {
+    public final <P1 extends R> Invokable<O, P1> returning(TypeToken<P1> returnType) {
         if (!returnType.isSupertypeOf(returnType())) {
             throw new IllegalArgumentException(
                     "FieldElement is known to return " + returnType() + ", not " + returnType);
@@ -115,7 +116,7 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, P> extends Ba
     }
 
     @Override
-    public @NonNull Invokable<O, P> accessible(boolean accessible) {
+    public @NonNull Invokable<O, R> accessible(boolean accessible) {
         invokable.setAccessible(accessible);
         return this;
     }
@@ -128,7 +129,7 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, P> extends Ba
         return invokable.isVarArgs();
     }
 
-    public final P invoke(@CheckForNull O receiver, @Nullable Object... args)
+    public final R invoke(@CheckForNull O receiver, @Nullable Object... args)
             throws InvocationTargetException, IllegalAccessException {
         return invokable.invoke(receiver, args);
     }

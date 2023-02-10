@@ -23,46 +23,41 @@ import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.Invokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * 属性获取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
- * todo 范型字母
- *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-05-27
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = false)
-public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyElement<T, R> implements
-        PropertyReader<T, R> {
+public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyElement<O, P> implements
+        PropertyReader<O, P> {
 
-  protected AbstractPropertyReader(@NonNull Element member) {
-    super(member);
-  }
-
-  /**
-   * 从传入的对象中获取该属性的值
-   *
-   * @param object 对象
-   * @return 对象中该属性的值
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  public final Optional<R> read(@NonNull T object) {
-    if (!accessible()) {
-      accessible(true);
+    protected AbstractPropertyReader(@NonNull Element member) {
+        super(member);
     }
-    return readInternal(object);
-  }
+
+    /**
+     * 从传入的对象中获取该属性的值
+     *
+     * @param object 对象
+     * @return 对象中该属性的值
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull
+    public final Optional<P> read(@NonNull O object) {
+        if (!accessible()) {
+            accessible(true);
+        }
+        return readInternal(object);
+    }
 
   /**
    * 从传入的对象中获取该属性的值
@@ -74,26 +69,26 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
    * @since 1.0.0
    */
   @NonNull
-  protected abstract Optional<R> readInternal(@NonNull T object);
+  protected abstract Optional<P> readInternal(@NonNull O object);
 
-  @Override
-  @NonNull
-  public final <R1 extends R> PropertyReader<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return propertyType(TypeToken.of(propertyType));
-  }
+    @Override
+    @NonNull
+    public final <P1 extends P> PropertyReader<O, P1> propertyType(
+            @NonNull Class<P1> propertyType) {
+        return propertyType(TypeToken.of(propertyType));
+    }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  @NonNull
-  public final <R1 extends R> PropertyReader<T, R1> propertyType(
-          @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-            , "PropertyReader is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (PropertyReader<T, R1>) this;
-  }
+    @SuppressWarnings("unchecked")
+    @Override
+    @NonNull
+    public final <P1 extends P> PropertyReader<O, P1> propertyType(
+            @NonNull TypeToken<P1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+                , "PropertyReader is known propertyType %s,not %s ", propertyType(), propertyType);
+        return (PropertyReader<O, P1>) this;
+    }
 
-  @Override
+    @Override
   public final boolean isReader() {
     return true;
   }
@@ -113,40 +108,40 @@ public abstract class AbstractPropertyReader<T, R> extends AbstractPropertyEleme
   @Value
   @EqualsAndHashCode(callSuper = true)
   @ToString(callSuper = false)
-  public static class InvokablePropertyReader<T, R> extends AbstractPropertyReader<T, R> {
+  public static class InvokablePropertyReader<O, P> extends AbstractPropertyReader<O, P> {
 
-    /**
-     * 方法
-     */
-    @NonNull Invokable<T, R> invokable;
-    /**
-     * 属性名称
-     */
-    @NonNull String propertyName;
+      /**
+       * 方法
+       */
+      @NonNull Invokable<O, P> invokable;
+      /**
+       * 属性名称
+       */
+      @NonNull String propertyName;
 
-    InvokablePropertyReader(@NonNull Invokable<T, R> invokable,
-                            @NonNull String propertyName) {
-      super(invokable);
-      Preconditions.checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a PropertyReader", invokable);
-      this.invokable = invokable;
-      this.propertyName = propertyName;
-    }
+      InvokablePropertyReader(@NonNull Invokable<O, P> invokable,
+                              @NonNull String propertyName) {
+          super(invokable);
+          Preconditions.checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a PropertyReader", invokable);
+          this.invokable = invokable;
+          this.propertyName = propertyName;
+      }
 
-    @NonNull
-    @Override
-    @SneakyThrows
-    public Optional<R> readInternal(@NonNull T object) {
-      return Optional.ofNullable(invokable.invoke(object));
-    }
+      @NonNull
+      @Override
+      @SneakyThrows
+      public Optional<P> readInternal(@NonNull O object) {
+          return Optional.ofNullable(invokable.invoke(object));
+      }
 
-    @Override
-    public @NonNull TypeToken<? extends R> propertyType() {
-      return invokable.returnType();
-    }
+      @Override
+      public @NonNull TypeToken<? extends P> propertyType() {
+          return invokable.returnType();
+      }
 
-    @Override
-    public TypeToken<T> ownerType() {
-      return invokable.ownerType();
+      @Override
+      public TypeToken<O> ownerType() {
+          return invokable.ownerType();
     }
 
   }

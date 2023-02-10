@@ -27,10 +27,9 @@ import java.lang.annotation.Annotation;
 
 /**
  * 属性元素抽象类
- * todo 范型字母
  *
- * @param <O> 拥有该属性的类
- * @param <P> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-05-27
  * @since 1.0.0

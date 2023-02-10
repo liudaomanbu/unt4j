@@ -26,25 +26,22 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
- * 属性读取器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
- * todo 范型字母
- *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyReader<T, R> extends PropertyElement<T, R> {
+public interface PropertyReader<O, P> extends PropertyElement<O, P> {
   @SuppressWarnings("unchecked")
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Type ownerType, @NonNull Method propertyReaderMethod,
+  static <O, P> PropertyReader<O, P> from(@NonNull Type ownerType, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
-    return from((TypeToken<T>) TypeToken.of(ownerType), propertyReaderMethod, propertyName);
+    return from((TypeToken<O>) TypeToken.of(ownerType), propertyReaderMethod, propertyName);
   }
 
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method propertyReaderMethod,
+  static <O, P> PropertyReader<O, P> from(@NonNull Class<O> ownerClass, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
     return from(TypeToken.of(ownerClass), propertyReaderMethod, propertyName);
   }
@@ -60,19 +57,19 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method propertyReaderMethod,
+  static <O, P> PropertyReader<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
     return new AbstractPropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(propertyReaderMethod, ownerType), propertyName);
   }
 
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
-    return PropertyAccessor.<T, R>from(ownerType, field).toReader();
+  static <O, P> PropertyReader<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
+    return PropertyAccessor.<O, P>from(ownerType, field).toReader();
   }
 
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
-    return PropertyAccessor.<T, R>from(ownerClass, field).toReader();
+  static <O, P> PropertyReader<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
+    return PropertyAccessor.<O, P>from(ownerClass, field).toReader();
   }
 
   /**
@@ -85,8 +82,8 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyReader<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
-    return PropertyAccessor.<T, R>from(ownerType, field).toReader();
+  static <O, P> PropertyReader<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
+    return PropertyAccessor.<O, P>from(ownerType, field).toReader();
   }
 
   /**
@@ -99,7 +96,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  Optional<R> read(@NonNull T object);
+  Optional<P> read(@NonNull O object);
 
   /**
    * 设置属性类型
@@ -111,7 +108,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * @since 1.0.0
    */
   @Override
-  @NonNull <R1 extends R> PropertyReader<T, R1> propertyType(@NonNull Class<R1> propertyType);
+  @NonNull <P1 extends P> PropertyReader<O, P1> propertyType(@NonNull Class<P1> propertyType);
 
   /**
    * 设置属性类型
@@ -123,7 +120,7 @@ public interface PropertyReader<T, R> extends PropertyElement<T, R> {
    * @since 1.0.0
    */
   @Override
-  @NonNull <R1 extends R> PropertyReader<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+  @NonNull <P1 extends P> PropertyReader<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
 
   @Override
   default boolean isReader() {

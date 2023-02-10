@@ -29,8 +29,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * todo 范型字母
- *
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-11-28
  * @since 1.0.0

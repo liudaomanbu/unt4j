@@ -26,8 +26,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 /**
- * todo 范型字母
- *
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-11-29
  * @since 1.0.0

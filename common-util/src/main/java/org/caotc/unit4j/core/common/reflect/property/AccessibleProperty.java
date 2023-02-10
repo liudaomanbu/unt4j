@@ -27,10 +27,8 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 /**
- * todo 范型字母
- *
- * @param <O> 拥有该属性的类
- * @param <P> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-11-22
  * @see ReadableProperty

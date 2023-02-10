@@ -25,29 +25,26 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
- * 属性编写器,可由set{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
- * todo 范型字母
- *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
+public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
 
-  @SuppressWarnings("unchecked")
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Type ownerType, @NonNull Method propertyWriterMethod,
-                                          @NonNull String propertyName) {
-    return from((TypeToken<T>) TypeToken.of(ownerType), propertyWriterMethod, propertyName);
-  }
+    @SuppressWarnings("unchecked")
+    @NonNull
+    static <O, P> PropertyWriter<O, P> from(@NonNull Type ownerType, @NonNull Method propertyWriterMethod,
+                                            @NonNull String propertyName) {
+        return from((TypeToken<O>) TypeToken.of(ownerType), propertyWriterMethod, propertyName);
+    }
 
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Class<T> ownerClass, @NonNull Method propertyWriterMethod,
-                                          @NonNull String propertyName) {
-    return from(TypeToken.of(ownerClass), propertyWriterMethod, propertyName);
-  }
+    @NonNull
+    static <O, P> PropertyWriter<O, P> from(@NonNull Class<O> ownerClass, @NonNull Method propertyWriterMethod,
+                                            @NonNull String propertyName) {
+        return from(TypeToken.of(ownerClass), propertyWriterMethod, propertyName);
+    }
 
   /**
    * 工厂方法
@@ -60,75 +57,75 @@ public interface PropertyWriter<T, R> extends PropertyElement<T, R> {
    * @since 1.0.0
    */
   @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Method propertyWriterMethod,
+  static <O, P> PropertyWriter<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyWriterMethod,
                                           @NonNull String propertyName) {
-    return new AbstractPropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(propertyWriterMethod, ownerType), propertyName);
+      return new AbstractPropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(propertyWriterMethod, ownerType), propertyName);
   }
 
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
-    return PropertyAccessor.<T, R>from(ownerType, field).toWriter();
-  }
+    @NonNull
+    static <O, P> PropertyWriter<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
+        return PropertyAccessor.<O, P>from(ownerType, field).toWriter();
+    }
 
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
-    return PropertyAccessor.<T, R>from(ownerClass, field).toWriter();
-  }
+    @NonNull
+    static <O, P> PropertyWriter<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
+        return PropertyAccessor.<O, P>from(ownerClass, field).toWriter();
+    }
 
-  /**
-   * 工厂方法
-   *
-   * @param ownerType set方法
-   * @param field     属性名称
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> PropertyWriter<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
-    return PropertyAccessor.<T, R>from(ownerType, field).toWriter();
-  }
+    /**
+     * 工厂方法
+     *
+     * @param ownerType set方法
+     * @param field     属性名称
+     * @return 属性设置器
+     * @author caotc
+     * @date 2019-06-16
+     * @since 1.0.0
+     */
+    @NonNull
+    static <O, P> PropertyWriter<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
+        return PropertyAccessor.<O, P>from(ownerType, field).toWriter();
+    }
 
-  /**
-   * 给传入对象的该属性设置传入的值
-   *
-   * @param object 设置属性值的对象
-   * @param value 设置的属性值
-   * @return this
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @NonNull
-  PropertyWriter<T, R> write(@NonNull T object, @NonNull R value);
+    /**
+     * 给传入对象的该属性设置传入的值
+     *
+     * @param object 设置属性值的对象
+     * @param value 设置的属性值
+     * @return this
+     * @author caotc
+     * @date 2019-05-28
+     * @since 1.0.0
+     */
+    @NonNull
+    PropertyWriter<O, P> write(@NonNull O object, @NonNull P value);
 
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull <R1 extends R> PropertyWriter<T, R1> propertyType(@NonNull Class<R1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull <P1 extends P> PropertyWriter<O, P1> propertyType(@NonNull Class<P1> propertyType);
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull <R1 extends R> PropertyWriter<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull <P1 extends P> PropertyWriter<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
 
-  @Override
+    @Override
   default boolean isWriter() {
     return true;
   }

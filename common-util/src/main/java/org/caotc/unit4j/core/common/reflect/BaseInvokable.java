@@ -14,8 +14,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * todo 范型字母
- *
+ * @param <S> source type
+ * @param <O> owner type
+ * @param <R> return type
  * @author caotc
  * @date 2022-11-22
  * @since 1.0.0
@@ -23,7 +24,7 @@ import java.util.Objects;
 @EqualsAndHashCode(callSuper = true)
 @Getter
 public abstract class BaseInvokable<S extends Executable, O, R> extends BaseElement implements Invokable<O, R> {
-    S source;
+    S source;//todo 范型
 
     BaseInvokable(@NonNull S source) {
         super(source);

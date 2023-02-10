@@ -23,48 +23,42 @@ import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.Invokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 /**
- * 属性设置器,可由get{@link Method}或者{@link Field}的包装实现,可以以统一的方式使用
- * todo 范型字母
- *
- * @param <T> 拥有该属性的类
- * @param <R> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-05-27
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = false)
-public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyElement<T, R> implements
-        PropertyWriter<T, R> {
+public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyElement<O, P> implements
+        PropertyWriter<O, P> {
 
-  protected AbstractPropertyWriter(
-          @NonNull Element element) {
-    super(element);
-  }
-
-  /**
-   * 给传入对象的该属性设置传入的值
-   *
-   * @param object 设置属性值的对象
-   * @param value 设置的属性值
-   * @return {@code this}
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  public final AbstractPropertyWriter<T, R> write(@NonNull T object, @NonNull R value) {
-    if (!accessible()) {
-      accessible(true);
+    protected AbstractPropertyWriter(
+            @NonNull Element element) {
+        super(element);
     }
-    writeInternal(object, value);
-    return this;
-  }
+
+    /**
+     * 给传入对象的该属性设置传入的值
+     *
+     * @param object 设置属性值的对象
+     * @param value 设置的属性值
+     * @return {@code this}
+     * @author caotc
+     * @date 2019-05-28
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull
+    public final AbstractPropertyWriter<O, P> write(@NonNull O object, @NonNull P value) {
+        if (!accessible()) {
+            accessible(true);
+        }
+        writeInternal(object, value);
+        return this;
+    }
 
   /**
    * 给传入对象的该属性设置传入的值
@@ -75,9 +69,9 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
    * @date 2019-05-28
    * @since 1.0.0
    */
-  protected abstract void writeInternal(@NonNull T object, @NonNull R value);
+  protected abstract void writeInternal(@NonNull O object, @NonNull P value);
 
-  /**
+    /**
    * 属性名称
    *
    * @return 属性名称
@@ -99,26 +93,26 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
    */
   @Override
   @NonNull
-  public abstract TypeToken<? extends R> propertyType();
+  public abstract TypeToken<? extends P> propertyType();
 
-  @Override
-  @NonNull
-  public final <R1 extends R> PropertyWriter<T, R1> propertyType(
-      @NonNull Class<R1> propertyType) {
-    return propertyType(TypeToken.of(propertyType));
-  }
+    @Override
+    @NonNull
+    public final <P1 extends P> PropertyWriter<O, P1> propertyType(
+            @NonNull Class<P1> propertyType) {
+        return propertyType(TypeToken.of(propertyType));
+    }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  @NonNull
-  public final <R1 extends R> PropertyWriter<T, R1> propertyType(
-      @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
-        , "PropertyWriter is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (PropertyWriter<T, R1>) this;
-  }
+    @SuppressWarnings("unchecked")
+    @Override
+    @NonNull
+    public final <P1 extends P> PropertyWriter<O, P1> propertyType(
+            @NonNull TypeToken<P1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
+                , "PropertyWriter is known propertyType %s,not %s ", propertyType(), propertyType);
+        return (PropertyWriter<O, P1>) this;
+    }
 
-  @Override
+    @Override
   public final boolean isReader() {
     return false;
   }
@@ -138,41 +132,41 @@ public abstract class AbstractPropertyWriter<T, R> extends AbstractPropertyEleme
   @Value
   @EqualsAndHashCode(callSuper = true)
   @ToString(callSuper = false)
-  public static class InvokablePropertyWriter<T, R> extends AbstractPropertyWriter<T, R> {
+  public static class InvokablePropertyWriter<O, P> extends AbstractPropertyWriter<O, P> {
 
-    /**
-     * set方法
-     */
-    @NonNull
-    Invokable<T, ?> invokable;
-    /**
-     * set方法名称风格
-     */
-    @NonNull
-    String propertyName;
+      /**
+       * set方法
+       */
+      @NonNull
+      Invokable<O, ?> invokable;
+      /**
+       * set方法名称风格
+       */
+      @NonNull
+      String propertyName;
 
-    InvokablePropertyWriter(@NonNull Invokable<T, ?> invokable,
-                            @NonNull String propertyName) {
-      super(invokable);
-      Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a PropertyWriter", invokable);
-      this.invokable = invokable;
-      this.propertyName = propertyName;
-    }
-
-    @Override
-    @SneakyThrows
-    public void writeInternal(@NonNull T obj, @NonNull R value) {
-        invokable.invoke(obj, value);
-    }
-
-      @SuppressWarnings("unchecked")
-      @Override
-      public @NonNull TypeToken<? extends R> propertyType() {
-        return (TypeToken<? extends R>) invokable.parameters().get(0).type();
+      InvokablePropertyWriter(@NonNull Invokable<O, ?> invokable,
+                              @NonNull String propertyName) {
+          super(invokable);
+          Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a PropertyWriter", invokable);
+          this.invokable = invokable;
+          this.propertyName = propertyName;
       }
 
       @Override
-      public TypeToken<T> ownerType() {
+      @SneakyThrows
+      public void writeInternal(@NonNull O obj, @NonNull P value) {
+          invokable.invoke(obj, value);
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public @NonNull TypeToken<? extends P> propertyType() {
+          return (TypeToken<? extends P>) invokable.parameters().get(0).type();
+      }
+
+      @Override
+      public TypeToken<O> ownerType() {
           return invokable.ownerType();
       }
   }

@@ -23,11 +23,9 @@ import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
 /**
- * 可写属性
- * todo 范型字母
- *
- * @param <O> 拥有该属性的类
- * @param <P> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
+ * @param <T> target type
  * @author caotc
  * @date 2019-05-27
  * @see WritableProperty
@@ -49,10 +47,10 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
    * @since 1.0.0
    */
   @NonNull
-  static <T, R, E> CompositeWritableProperty<T, R, E> create(
-          @NonNull ReadableProperty<T, E> targetReadableProperty,
-          @NonNull WritableProperty<E, R> delegate) {
-    return new CompositeWritableProperty<T, R, E>(targetReadableProperty, delegate);
+  static <O, P, T> CompositeWritableProperty<O, P, T> create(
+          @NonNull ReadableProperty<O, T> targetReadableProperty,
+          @NonNull WritableProperty<T, P> delegate) {
+    return new CompositeWritableProperty<>(targetReadableProperty, delegate);
   }
 
   private CompositeWritableProperty(

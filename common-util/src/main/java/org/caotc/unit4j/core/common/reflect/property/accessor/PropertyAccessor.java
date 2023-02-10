@@ -10,21 +10,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 /**
- * todo 范型字母
- *
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2023-01-29
  * @since 1.0.0
  */
-public interface PropertyAccessor<T, R> extends PropertyReader<T, R>, PropertyWriter<T, R> {
+public interface PropertyAccessor<O, P> extends PropertyReader<O, P>, PropertyWriter<O, P> {
     @SuppressWarnings("unchecked")
     @NonNull
-    static <T, R> PropertyAccessor<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
-        return from((TypeToken<T>) TypeToken.of(ownerType), field);
+    static <O, P> PropertyAccessor<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
+        return from((TypeToken<O>) TypeToken.of(ownerType), field);
     }
 
     @NonNull
-    static <T, R> PropertyAccessor<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
+    static <O, P> PropertyAccessor<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
         return from(TypeToken.of(ownerClass), field);
     }
 
@@ -38,17 +38,17 @@ public interface PropertyAccessor<T, R> extends PropertyReader<T, R>, PropertyWr
      * @since 1.0.0
      */
     @NonNull
-    static <T, R> PropertyAccessor<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
+    static <O, P> PropertyAccessor<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
         Preconditions.checkArgument(ReflectionUtil.isPropertyElement(field), "%s is not a PropertyElement", field);
         return new AbstractPropertyAccessor.FieldElementPropertyAccessor<>(ownerType, FieldElement.of(field));
     }
 
     @Override
-    @NonNull <R1 extends R> PropertyAccessor<T, R1> propertyType(@NonNull Class<R1> propertyType);
+    @NonNull <P1 extends P> PropertyAccessor<O, P1> propertyType(@NonNull Class<P1> propertyType);
 
     @Override
-    @NonNull <R1 extends R> PropertyAccessor<T, R1> propertyType(@NonNull TypeToken<R1> propertyType);
+    @NonNull <P1 extends P> PropertyAccessor<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
 
     @Override
-    @NonNull PropertyAccessor<T, R> write(@NonNull T object, @NonNull R value);
+    @NonNull PropertyAccessor<O, P> write(@NonNull O object, @NonNull P value);
 }

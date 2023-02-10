@@ -36,10 +36,9 @@ import java.util.stream.Stream;
 /**
  * 简单属性抽象类
  * todo 补充说明各种异常情况的注释,如父类和子类同名field时会被认为是相同属性
- * todo 范型字母
  *
- * @param <O> 拥有该属性的类
- * @param <P> 属性类型
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-11-28
  * @since 1.0.0

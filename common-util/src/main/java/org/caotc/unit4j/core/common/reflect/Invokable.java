@@ -25,8 +25,8 @@ import javax.annotation.CheckForNull;
 import java.lang.reflect.*;
 
 /**
- * todo 范型字母
- *
+ * @param <O> owner type
+ * @param <R> return type
  * @author caotc
  * @date 2019-11-29
  * @since 1.0.0

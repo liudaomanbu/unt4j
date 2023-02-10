@@ -31,29 +31,29 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
- * todo 范型字母
- *
+ * @param <O> owner type
+ * @param <P> property type
  * @author caotc
  * @date 2019-11-23
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = false)
-public abstract class AbstractPropertyAccessor<T, R> extends AbstractPropertyElement<T, R> implements
-        PropertyAccessor<T, R> {
+public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyElement<O, P> implements
+        PropertyAccessor<O, P> {
 
   protected AbstractPropertyAccessor(@NonNull Element element) {
     super(element);
   }
 
   @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull Type ownerType, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerType, field).toAccessor();
+  public static <O, P> PropertyAccessor<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
+    return PropertyElement.<O, P>from(ownerType, field).toAccessor();
   }
 
   @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull Class<T> ownerClass, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerClass, field).toAccessor();
+  public static <O, P> PropertyAccessor<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
+    return PropertyElement.<O, P>from(ownerClass, field).toAccessor();
   }
 
   /**
@@ -66,13 +66,13 @@ public abstract class AbstractPropertyAccessor<T, R> extends AbstractPropertyEle
    * @since 1.0.0
    */
   @NonNull
-  public static <T, R> PropertyAccessor<T, R> from(@NonNull TypeToken<T> ownerType, @NonNull Field field) {
-    return PropertyElement.<T, R>from(ownerType, field).toAccessor();
+  public static <O, P> PropertyAccessor<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
+    return PropertyElement.<O, P>from(ownerType, field).toAccessor();
   }
 
   @Override
   @NonNull
-  public final Optional<R> read(@NonNull T object) {
+  public final Optional<P> read(@NonNull O object) {
     if (!accessible()) {
       accessible(true);
     }
@@ -89,11 +89,11 @@ public abstract class AbstractPropertyAccessor<T, R> extends AbstractPropertyEle
    * @since 1.0.0
    */
   @NonNull
-  protected abstract Optional<R> readInternal(@NonNull T object);
+  protected abstract Optional<P> readInternal(@NonNull O object);
 
   @Override
   @NonNull
-  public final PropertyAccessor<T, R> write(@NonNull T object, @NonNull R value) {
+  public final PropertyAccessor<O, P> write(@NonNull O object, @NonNull P value) {
     if (!accessible()) {
       accessible(true);
     }
@@ -110,23 +110,23 @@ public abstract class AbstractPropertyAccessor<T, R> extends AbstractPropertyEle
    * @date 2019-05-28
    * @since 1.0.0
    */
-  protected abstract void writeInternal(@NonNull T object, @NonNull R value);
+  protected abstract void writeInternal(@NonNull O object, @NonNull P value);
 
   @Override
   @NonNull
-  public final <R1 extends R> PropertyAccessor<T, R1> propertyType(
-          @NonNull Class<R1> propertyType) {
+  public final <P1 extends P> PropertyAccessor<O, P1> propertyType(
+          @NonNull Class<P1> propertyType) {
     return propertyType(TypeToken.of(propertyType));
   }
 
   @SuppressWarnings("unchecked")
   @Override
   @NonNull
-  public final <R1 extends R> PropertyAccessor<T, R1> propertyType(
-          @NonNull TypeToken<R1> propertyType) {
+  public final <P1 extends P> PropertyAccessor<O, P1> propertyType(
+          @NonNull TypeToken<P1> propertyType) {
     Preconditions.checkArgument(propertyType.isSupertypeOf(propertyType())
             , "PropertyAccessor is known propertyType %s,not %s ", propertyType(), propertyType);
-    return (PropertyAccessor<T, R1>) this;
+    return (PropertyAccessor<O, P1>) this;
   }
 
   /**
@@ -139,16 +139,16 @@ public abstract class AbstractPropertyAccessor<T, R> extends AbstractPropertyEle
   @Value
   @EqualsAndHashCode(callSuper = true)
   @ToString(callSuper = false)
-  public static class FieldElementPropertyAccessor<T, R> extends AbstractPropertyAccessor<T, R> {
+  public static class FieldElementPropertyAccessor<O, P> extends AbstractPropertyAccessor<O, P> {
     @NonNull
-    TypeToken<T> ownerType;
+    TypeToken<O> ownerType;
     /**
      * 属性
      */
     @NonNull
-    FieldElement<T, R> field;
+    FieldElement<O, P> field;
 
-    FieldElementPropertyAccessor(@NonNull TypeToken<T> ownerType, @NonNull FieldElement<T, R> field) {
+    FieldElementPropertyAccessor(@NonNull TypeToken<O> ownerType, @NonNull FieldElement<O, P> field) {
       super(field);
       Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(field), "%s is not a PropertyWriter", field);
       Preconditions.checkArgument(ReflectionUtil.isPropertyReader(field), "%s is not a PropertyReader", field);
@@ -158,19 +158,20 @@ public abstract class AbstractPropertyAccessor<T, R> extends AbstractPropertyEle
 
     @NonNull
     @Override
-    public Optional<R> readInternal(@NonNull T object) {
+    public Optional<P> readInternal(@NonNull O object) {
       return Optional.ofNullable(field.get(object));
     }
 
     @Override
-    protected void writeInternal(@NonNull T object, @NonNull R value) {
+    protected void writeInternal(@NonNull O object, @NonNull P value) {
       field.set(object, value);
     }
 
     @Override
-    public @NonNull TypeToken<? extends R> propertyType() {
+    public @NonNull TypeToken<? extends P> propertyType() {
       return field.type();
     }
+
     @Override
     public @NonNull String propertyName() {
       return field.getName();
