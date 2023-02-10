@@ -31,7 +31,6 @@ public interface WithAccessLevel {
 
     /**
      * 该元素的权限级别
-     * //todo lombok强依赖？
      *
      * @return 权限级别
      * @author caotc
