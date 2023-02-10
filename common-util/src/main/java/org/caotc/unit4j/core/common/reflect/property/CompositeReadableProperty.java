@@ -25,14 +25,14 @@ import java.util.Optional;
 /**
  * @param <O> owner type
  * @param <P> property type
- * @param <T> target type
+ * @param <T> transfer type
  * @author caotc
  * @date 2019-05-27
  * @see PropertyReader
  * @since 1.0.0
  */
 @Value
-public class CompositeReadableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T, ReadableProperty<T, P>> implements
+public class CompositeReadableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T> implements
         ReadableProperty<O, P> {
 
   /**
@@ -60,7 +60,7 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
 
   @Override
   public @NonNull Optional<P> read(@NonNull O target) {
-    return transferProperty.read(target).flatMap(delegate::read);
+    return transferProperty().read(target).flatMap(target().toReadable()::read);
   }
 
   @Override

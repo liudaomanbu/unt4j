@@ -25,7 +25,7 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 /**
  * @param <O> owner type
  * @param <P> property type
- * @param <T> target type
+ * @param <T> transfer type
  * @author caotc
  * @date 2019-05-27
  * @see WritableProperty
@@ -33,7 +33,7 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
  * @since 1.0.0
  */
 @Value
-public class CompositeWritableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T, WritableProperty<T, P>> implements
+public class CompositeWritableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T> implements
         WritableProperty<O, P> {
 
   /**
@@ -61,8 +61,8 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
 
   @Override
   public @NonNull CompositeWritableProperty<O, P, T> write(@NonNull O target, @NonNull P value) {
-    transferProperty.read(target)
-            .ifPresent(actualTarget -> delegate.write(actualTarget, value));
+    transferProperty().read(target)
+            .ifPresent(actualTarget -> target().toWritable().write(actualTarget, value));
     return this;
   }
 

@@ -25,7 +25,7 @@ import java.util.Optional;
 /**
  * @param <O> owner type
  * @param <P> property type
- * @param <T> target type
+ * @param <T> transfer type
  * @author caotc
  * @date 2019-05-27
  * @see PropertyReader
@@ -33,7 +33,7 @@ import java.util.Optional;
  */
 @Value
 public class CompositeAccessibleProperty<O, P, T> extends
-        AbstractCompositeProperty<O, P, T, AccessibleProperty<T, P>> implements
+        AbstractCompositeProperty<O, P, T> implements
         AccessibleProperty<O, P> {
 
   CompositeAccessibleProperty(
@@ -43,24 +43,14 @@ public class CompositeAccessibleProperty<O, P, T> extends
   }
 
   @Override
-  public boolean readable() {
-    return delegate.readable();
-  }
-
-  @Override
-  public boolean writable() {
-    return delegate.writable();
-  }
-
-  @Override
   public @NonNull Optional<P> read(@NonNull O target) {
-    return transferProperty.read(target).flatMap(delegate::read);
+    return transferProperty().read(target).flatMap(target().toAccessible()::read);
   }
 
   @Override
   public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-    transferProperty.read(target)
-            .ifPresent(actualTarget -> delegate.write(actualTarget, value));
+    transferProperty().read(target)
+            .ifPresent(actualTarget -> target().toAccessible().write(actualTarget, value));
     return this;
   }
 

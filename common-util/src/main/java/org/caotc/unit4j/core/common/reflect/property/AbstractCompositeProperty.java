@@ -18,9 +18,7 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
@@ -28,27 +26,28 @@ import java.util.Optional;
 /**
  * @param <O> owner type
  * @param <P> property type
- * @param <T> target type
+ * @param <T> transfer type
  * @author caotc
  * @date 2019-11-28
  * @since 1.0.0
  */
+@Getter(AccessLevel.PROTECTED)
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P>> implements Property<O, P> {//todo D?
+public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, P> {
 
     @NonNull
     String name;
     @NonNull
-    protected ReadableProperty<O, T> transferProperty;
+    ReadableProperty<O, T> transferProperty;
     @NonNull
-    protected D delegate;
+    Property<T, P> target;
 
     protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
-                                        @NonNull D delegate) {
-        this.name = transferProperty.name() + "." + delegate.name();
+                                        @NonNull Property<T, P> target) {
+        this.name = transferProperty.name() + "." + target.name();
         this.transferProperty = transferProperty;
-        this.delegate = delegate;
+        this.target = target;
     }
 
     @NonNull
@@ -60,24 +59,24 @@ public abstract class AbstractCompositeProperty<O, P, T, D extends Property<T, P
     @NonNull
     @Override
     public final TypeToken<P> type() {
-        return delegate.type();
+        return target().type();
     }
 
     @Override
     public TypeToken<O> ownerType() {
-        return transferProperty.ownerType();
+        return transferProperty().ownerType();
     }
 
     @Override
     public final @NonNull <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass) {
-        return delegate.annotation(annotationClass);
+        return target().annotation(annotationClass);
     }
 
     @Override
     public final @NonNull <X extends Annotation> ImmutableList<X> annotations(
             @NonNull Class<X> annotationClass) {
-        return delegate.annotations(annotationClass);
+        return target().annotations(annotationClass);
     }
 
 }
