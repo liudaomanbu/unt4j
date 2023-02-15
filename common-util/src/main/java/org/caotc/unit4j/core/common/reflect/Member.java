@@ -14,8 +14,16 @@ import java.lang.reflect.Modifier;
 public interface Member extends java.lang.reflect.Member, WithAccessLevel {
 
     @NonNull
+    default Class<?> getDeclaringClass() {
+        return declaringClass();
+    }
+
+    @NonNull
+    Class<?> declaringClass();
+
+    @NonNull
     default TypeToken<?> declaringType() {
-        return TypeToken.of(getDeclaringClass());
+        return TypeToken.of(declaringClass());
     }
 
     @NonNull

@@ -2284,7 +2284,7 @@ public class ReflectionUtil {
 
     public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
                                      @NonNull Invokable<?, ?> superInvokable) {
-        return superInvokable.isOverrideBy(invokable);
+        return superInvokable.isOverridden(invokable);
     }
 
     public static Set<Class<?>> lowestCommonSuperclasses(Class<?>... classes) {

@@ -67,15 +67,13 @@ public interface Invokable<O, R> extends Element {
             throw new IllegalArgumentException(
                     "FieldElement is known to return " + returnType() + ", not " + returnType);
         }
-//        invokable.returning(returnType);//todo
         return (Invokable<O, R1>) this;
     }
 
     @Override
-    @NonNull Class<? super O> getDeclaringClass();
+    @NonNull Class<? super O> declaringClass();
 
     @NonNull AnnotatedType annotatedReturnType();
-
 
     @Override
     @NonNull Invokable<O, R> accessible(boolean accessible);
@@ -122,8 +120,9 @@ public interface Invokable<O, R> extends Element {
 
     @NonNull ImmutableList<TypeToken<? extends Throwable>> exceptionTypes();
 
-//    @NonNull Executable source();//todo
+    boolean isOverridden(@NonNull Invokable<?, ?> other);
 
-    //todo name
-    boolean isOverrideBy(@NonNull Invokable<?, ?> other);
+    default boolean isOverriding(@NonNull Invokable<?, ?> other) {
+        return other.isOverridden(this);
+    }
 }

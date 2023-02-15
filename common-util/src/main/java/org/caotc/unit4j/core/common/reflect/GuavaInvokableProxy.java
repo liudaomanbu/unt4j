@@ -55,7 +55,7 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends Ba
         return new ConstructorGuavaInvokableProxy<>(com.google.common.reflect.Invokable.from(constructor), constructor);
     }
 
-    @SuppressWarnings("unchecked")//todo Invokable.returning?
+    @SuppressWarnings("unchecked")
     @NonNull
     public static <O, P> Invokable<O, P> from(@NonNull Method method, @NonNull TypeToken<O> owner) {
         return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O, P>) owner.method(method), method);
@@ -94,7 +94,7 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends Ba
 
     @Override
     @NonNull
-    public final Class<? super O> getDeclaringClass() {
+    public final Class<? super O> declaringClass() {
         return invokable.getDeclaringClass();
     }
 

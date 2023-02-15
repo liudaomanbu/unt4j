@@ -24,7 +24,7 @@ import java.util.Objects;
 @EqualsAndHashCode(callSuper = true)
 @Getter
 public abstract class BaseInvokable<S extends Executable, O, R> extends BaseElement implements Invokable<O, R> {
-    S source;//todo 范型
+    S source;
 
     BaseInvokable(@NonNull S source) {
         super(source);
@@ -33,7 +33,7 @@ public abstract class BaseInvokable<S extends Executable, O, R> extends BaseElem
 
     @Override
     @NonNull
-    public abstract Class<? super O> getDeclaringClass();
+    public abstract Class<? super O> declaringClass();
 
     @Override
     public @NonNull ImmutableList<Type> genericParameterTypes() {
@@ -41,38 +41,41 @@ public abstract class BaseInvokable<S extends Executable, O, R> extends BaseElem
     }
 
     @Override
-    public boolean isOverrideBy(@NonNull Invokable<?, ?> other) {
-        if (source().equals(other.source())
-                || declaringType().equals(other.declaringType())
-                || !(ownerType().isSupertypeOf(other.ownerType())//todo
-                && Objects.equals(getName(), other.getName())
-                && isOverridableIn(other.getDeclaringClass())
-                && accessLevel().compareTo(other.accessLevel()) <= 0)) {//todo accessLevel defined
+    public boolean isOverridden(@NonNull Invokable<?, ?> other) {
+        //same method can't override
+        if (Objects.equals(source(), other.source())
+                //same declaring type can't override
+                || Objects.equals(declaringType(), other.declaringType())
+                || !Objects.equals(getName(), other.getName())
+                //overriding method must give more or equal access than the overridden method
+                || accessLevel().isMore(other.accessLevel())
+                || !ownerType().isSupertypeOf(other.ownerType())
+                || !isOverridableIn(other.declaringType())) {
             return false;
         }
 
         if (isBridge()) {
             //bridge invokable source must be method
             Invokable<O, ?> bridgedInvokable = Invokable.from(BridgeMethodResolver.findBridgedMethod((Method) source()), ownerType());
-            return bridgedInvokable.isOverrideBy(other);//todo 确认BridgeMethodResolver.isVisibilityBridgeMethodPair的case
+            return bridgedInvokable.isOverridden(other);//todo 确认BridgeMethodResolver.isVisibilityBridgeMethodPair的case
         }
         if (other.isBridge()) {
             //bridge invokable source must be method
             other = Invokable.from(BridgeMethodResolver.findBridgedMethod((Method) other.source()), other.ownerType());
-            return isOverrideBy(other);
+            return isOverridden(other);
         }
 
         return isReturnTypeTheSameAs(other) &&
                 areParametersTheSameAs(other);
     }
 
-    boolean isOverridableIn(Class<?> cls) {
+    boolean isOverridableIn(TypeToken<?> type) {
         if (!isOverridable()) return false;
         if (!isSubclassVisible()) return false;
-        if (!getDeclaringClass().isAssignableFrom(cls)) return false;//todo
+        if (!declaringType().isSupertypeOf(type)) return false;
 
         if (isPublic()) return true;
-        if (isPackageVisible() && cls.getPackage() == getDeclaringClass().getPackage()) return true;
+        if (isPackageVisible() && type.getRawType().getPackage() == declaringClass().getPackage()) return true;
 
         return false;
     }

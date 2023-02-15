@@ -68,8 +68,9 @@ public abstract class BaseElement implements Element {
     return annotatedElement.getDeclaredAnnotations();
   }
 
+  @NonNull
   @Override
-  public Class<?> getDeclaringClass() {
+  public Class<?> declaringClass() {
     return member.getDeclaringClass();
   }
 
