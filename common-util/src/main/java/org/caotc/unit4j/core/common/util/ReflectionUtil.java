@@ -1447,7 +1447,7 @@ public class ReflectionUtil {
     private static <T, R> Optional<ReadableProperty<T, R>> readableProperty(
             @NonNull TypeToken<T> type, @NonNull PropertyName propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        if (propertyName.complex()) {
+        if (propertyName.composite()) {
             return readableProperty(type, propertyName.removeLastTier(), propertyAccessorMethodFormats)
                     .flatMap(transferProperty -> ReflectionUtil.<Object, R>readableProperty(
                             transferProperty.type(), propertyName.lastTier(),
@@ -1460,7 +1460,6 @@ public class ReflectionUtil {
                 .map(propertyGetter -> (ReadableProperty<T, R>) propertyGetter)
                 .findAny();
     }
-
 
     @NonNull
     public static <T, R> WritableProperty<T, R> writablePropertyExact(
@@ -1553,7 +1552,7 @@ public class ReflectionUtil {
             @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         PropertyName name = PropertyName.from(propertyName);
-        if (name.complex()) {
+        if (name.composite()) {
             return readableProperty(type, name.removeLastTier(), propertyAccessorMethodFormats)
                     .flatMap(transferProperty -> ReflectionUtil.<Object, R>writableProperty(transferProperty.type(), name.lastTier().flat(), propertyAccessorMethodFormats)
                             .map(transferProperty::compose));//todo Object or E?
@@ -1660,7 +1659,7 @@ public class ReflectionUtil {
             @NonNull TypeToken<T> type, @NonNull String propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         PropertyName name = PropertyName.from(propertyName);
-        if (name.complex()) {
+        if (name.composite()) {
             return readableProperty(type, name.removeLastTier(), propertyAccessorMethodFormats)
                     .flatMap(transferProperty -> ReflectionUtil.<Object, R>accessibleProperty(transferProperty.type(), name.lastTier().flat(), propertyAccessorMethodFormats)
                             .map(targetProperty -> transferProperty.compose(targetProperty)));//todo Object or E?

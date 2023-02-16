@@ -21,11 +21,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
-import com.sun.istack.internal.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author caotc
@@ -33,7 +33,6 @@ import lombok.Value;
  * @since 1.0.0
  */
 @Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PropertyName {
 
     private static final String SEPARATOR = ".";
@@ -42,17 +41,35 @@ public class PropertyName {
     @NonNull
     ImmutableList<String> propertyNames;
 
+    private PropertyName(@NonNull ImmutableList<String> propertyNames) {
+        Preconditions.checkArgument(!propertyNames.isEmpty(), "propertyNames can not be empty");
+        this.propertyNames = propertyNames;
+    }
+
     @NonNull
-    public static PropertyName from(@NotNull String propertyName) {
+    public static PropertyName from(@NonNull String propertyName) {
         return create(Streams.stream(SPLITTER.split(propertyName))
                 .collect(ImmutableList.toImmutableList()));
     }
 
     @NonNull
-    public static PropertyName create(@NotNull ImmutableList<String> propertyNames) {
-        Preconditions.checkArgument(!propertyNames.isEmpty(), "propertyName can not be empty");
-        //TODO 检查每个属性名格式
-        return new PropertyName(propertyNames);
+    public static PropertyName create(@NonNull Collection<String> propertyNames) {
+        return new PropertyName(ImmutableList.copyOf(propertyNames));
+    }
+
+    @NonNull
+    public static PropertyName create(@NonNull Iterable<String> propertyNames) {
+        return new PropertyName(ImmutableList.copyOf(propertyNames));
+    }
+
+    @NonNull
+    public static PropertyName create(@NonNull Iterator<String> propertyNames) {
+        return new PropertyName(ImmutableList.copyOf(propertyNames));
+    }
+
+    @NonNull
+    public static PropertyName create(@NonNull String... propertyNames) {
+        return new PropertyName(ImmutableList.copyOf(propertyNames));
     }
 
     @NonNull
@@ -79,8 +96,7 @@ public class PropertyName {
         return propertyNames().size();
     }
 
-    //todo 名字形容词?
-    public boolean complex() {
+    public boolean composite() {
         return propertyNames().size() != 1;
     }
 

@@ -120,9 +120,22 @@ public interface Invokable<O, R> extends Element {
 
     @NonNull ImmutableList<TypeToken<? extends Throwable>> exceptionTypes();
 
+    /**
+     * this Invokable is overridable in type.
+     * owner type generic make no difference.
+     *
+     * @param type type
+     * @return is overridable in type
+     */
+    boolean isOverridableIn(@NonNull TypeToken<?> type);
+
     boolean isOverridden(@NonNull Invokable<?, ?> other);
 
     default boolean isOverriding(@NonNull Invokable<?, ?> other) {
         return other.isOverridden(this);
     }
+
+    boolean isConstruct();
+
+    boolean isMethod();
 }

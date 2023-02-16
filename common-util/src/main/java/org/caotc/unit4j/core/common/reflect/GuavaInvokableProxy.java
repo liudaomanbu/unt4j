@@ -155,6 +155,16 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
     public boolean isBridge() {
         return source().isBridge();
     }
+
+    @Override
+    public boolean isConstruct() {
+        return false;
+    }
+
+    @Override
+    public boolean isMethod() {
+        return true;
+    }
 }
 
 @SuppressWarnings("UnstableApiUsage")
@@ -165,6 +175,16 @@ class ConstructorGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Construct
 
     @Override
     public boolean isBridge() {
+        return false;
+    }
+
+    @Override
+    public boolean isConstruct() {
+        return true;
+    }
+
+    @Override
+    public boolean isMethod() {
         return false;
     }
 }

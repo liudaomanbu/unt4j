@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.common.reflect.property.model;
+package org.caotc.unit4j.core.common.reflect.model;
 
 /**
  * @author caotc
@@ -13,6 +13,12 @@ public class BridgeSampleTwo {
     }
 
     public static class B extends A<String> {
+        public String getT(String args) {
+            return args;
+        }
+    }
+
+    public static class C extends B {
         public String getT(String args) {
             return args;
         }

@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.common.util.model;
+package org.caotc.unit4j.core.common.util.provider;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
@@ -10,6 +10,7 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
+import org.caotc.unit4j.core.common.util.model.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

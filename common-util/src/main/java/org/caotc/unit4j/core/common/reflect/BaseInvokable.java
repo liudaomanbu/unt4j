@@ -42,8 +42,10 @@ public abstract class BaseInvokable<S extends Executable, O, R> extends BaseElem
 
     @Override
     public boolean isOverridden(@NonNull Invokable<?, ?> other) {
-        //same method can't override
-        if (Objects.equals(source(), other.source())
+        if (isConstruct()
+                || other.isConstruct()
+                //same method can't override
+                || Objects.equals(source(), other.source())
                 //same declaring type can't override
                 || Objects.equals(declaringType(), other.declaringType())
                 || !Objects.equals(getName(), other.getName())
@@ -54,22 +56,22 @@ public abstract class BaseInvokable<S extends Executable, O, R> extends BaseElem
             return false;
         }
 
-        if (isBridge()) {
+        if (isBridge() || other.isBridge()) {
+            Invokable<?, ?> bridgeInvokable = isBridge() ? this : other;
             //bridge invokable source must be method
-            Invokable<O, ?> bridgedInvokable = Invokable.from(BridgeMethodResolver.findBridgedMethod((Method) source()), ownerType());
-            return bridgedInvokable.isOverridden(other);//todo 确认BridgeMethodResolver.isVisibilityBridgeMethodPair的case
-        }
-        if (other.isBridge()) {
-            //bridge invokable source must be method
-            other = Invokable.from(BridgeMethodResolver.findBridgedMethod((Method) other.source()), other.ownerType());
-            return isOverridden(other);
+            Method bridgedMethod = BridgeMethodResolver.findBridgedMethod((Method) bridgeInvokable.source());
+            //visibility bridge method is overriding
+            if (BridgeMethodResolver.isVisibilityBridgeMethodPair((Method) bridgeInvokable.source(), bridgedMethod)) {
+                return true;
+            }
+            Invokable<?, ?> bridgedInvokable = Invokable.from(bridgedMethod, bridgeInvokable.ownerType());
+            return isBridge() ? bridgedInvokable.isOverridden(other) : isOverridden(bridgedInvokable);
         }
 
-        return isReturnTypeTheSameAs(other) &&
-                areParametersTheSameAs(other);
+        return isReturnTypeTheSameAs(other) && areParametersTheSameAs(other);
     }
 
-    boolean isOverridableIn(TypeToken<?> type) {
+    public boolean isOverridableIn(@NonNull TypeToken<?> type) {
         if (!isOverridable()) return false;
         if (!isSubclassVisible()) return false;
         if (!declaringType().isSupertypeOf(type)) return false;
@@ -90,11 +92,5 @@ public abstract class BaseInvokable<S extends Executable, O, R> extends BaseElem
         return other.returnType().equals(returnType());
     }
 
-    boolean isAccessMoreRestrictiveThan(Member other) {
-        return accessLevel().compareTo(other.accessLevel()) < 0;
-    }
 
-    boolean isAccessLessRestrictiveThan(Member other) {
-        return accessLevel().compareTo(other.accessLevel()) > 0;
-    }
 }

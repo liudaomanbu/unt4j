@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.common.reflect.property.model;
+package org.caotc.unit4j.core.common.reflect.model;
 
 /**
  * @author caotc
@@ -11,11 +11,11 @@ public class BridgeSampleThree {
         }
     }
 
-    public static class C extends A {
+    public static class B extends A {
 
     }
 
-    public static class D extends A {
+    public static class C extends B {
         public void foo() {
         }
     }
