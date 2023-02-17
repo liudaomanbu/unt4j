@@ -63,7 +63,7 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
     }
 
     @Override
-    public TypeToken<O> ownerType() {
+    public @NonNull TypeToken<O> ownerType() {
         return transferProperty().ownerType();
     }
 

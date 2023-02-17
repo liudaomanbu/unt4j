@@ -89,6 +89,7 @@ public interface Property<O, P> {
   @NonNull
   TypeToken<P> type();
 
+  @NonNull
   TypeToken<O> ownerType();
 
   /**

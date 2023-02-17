@@ -61,7 +61,7 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
     }
 
     @Override
-    public TypeToken<O> ownerType() {
+    public @NonNull TypeToken<O> ownerType() {
         return delegate.ownerType();
     }
 

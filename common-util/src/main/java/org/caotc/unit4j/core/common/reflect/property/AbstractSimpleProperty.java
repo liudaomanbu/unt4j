@@ -176,7 +176,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     }
 
     @Override
-    public final TypeToken<O> ownerType() {
+    public final @NonNull TypeToken<O> ownerType() {
         return ownerType;
     }
 
