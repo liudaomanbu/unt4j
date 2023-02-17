@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
-class BaseInvokableTest {
+class MethodGuavaInvokableProxyTest {
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.reflect.provider.Provider#overriddenInvokableAndOverridingInvokable")

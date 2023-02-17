@@ -50,7 +50,7 @@ public interface Invokable<O, R> extends Element {
     @NonNull
     TypeToken<O> ownerType();
 
-    //todo 范型确认
+    //todo guava Invokable returnType为? extends R,但是ownerType为O
     @NonNull
     TypeToken<? extends R> returnType();
 

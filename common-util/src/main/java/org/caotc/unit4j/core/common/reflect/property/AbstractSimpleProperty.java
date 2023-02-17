@@ -173,6 +173,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @Override
     public final TypeToken<P> type() {
         return type;
+//        return propertyWriters.first().propertyType();
     }
 
     @Override

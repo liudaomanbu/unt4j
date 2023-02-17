@@ -163,6 +163,7 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
             throw new IllegalArgumentException(
                     "FieldElement is known to return " + returnType() + ", not " + returnType);
         }
+        //todo 确认returning是只能由子类到父类还是只能由父类到子类,是否影响returnType的范型
         invokable().returning(returnType);
         return (MethodInvokable<O, P1>) this;
     }
