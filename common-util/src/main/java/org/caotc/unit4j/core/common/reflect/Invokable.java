@@ -56,10 +56,6 @@ public interface Invokable<O, R> extends Element {
     @NonNull
     TypeToken<? extends R> returnType();
 
-    //todo declaringType
-    @Override
-    @NonNull Class<? super O> declaringClass();
-
     @NonNull AnnotatedType annotatedReturnType();
 
     @Override
