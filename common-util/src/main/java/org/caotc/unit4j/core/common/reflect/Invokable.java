@@ -50,7 +50,12 @@ public interface Invokable<O, R> extends Element {
 
     @NonNull TypeToken<O> ownerType();
 
-//    @NonNull Invokable<O, R> ownedBy(@NonNull TypeToken<O> ownerType);//todo
+    default boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+        return isMethod() && declaringType().isSupertypeOf(newOwnerType);
+    }
+
+    //todo 是否分成methodInvokable和ConstructorInvokable
+    @NonNull <O1> Invokable<O1, R> ownBy(@NonNull TypeToken<O1> ownerType);
 
     @NonNull
     TypeToken<? extends R> returnType();

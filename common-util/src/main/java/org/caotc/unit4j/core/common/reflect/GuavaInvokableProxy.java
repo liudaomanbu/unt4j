@@ -18,7 +18,9 @@ package org.caotc.unit4j.core.common.reflect;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,6 +36,7 @@ import java.lang.reflect.*;
  * @since 1.0.0
  */
 @SuppressWarnings("UnstableApiUsage")
+@Getter(AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends BaseInvokable<S, O, R> implements Invokable<O, R> {
     @NonNull
@@ -151,6 +154,15 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
         super(delegate, source);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public @NonNull <O1> Invokable<O1, P> ownBy(@NonNull TypeToken<O1> newOwnerType) {
+        if (canOwnBy(newOwnerType)) {
+            return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O1, P>) newOwnerType.method(source()), source());
+        }
+        throw new IllegalArgumentException(String.format("%s can not own by %s", source(), newOwnerType));
+    }
+
     @Override
     public boolean isBridge() {
         return source().isBridge();
@@ -171,6 +183,11 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
 class ConstructorGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Constructor<O>, O, P> {
     ConstructorGuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, P> delegate, @NonNull Constructor<O> source) {
         super(delegate, source);
+    }
+
+    @Override
+    public @NonNull <O1> Invokable<O1, P> ownBy(@NonNull TypeToken<O1> newOwnerType) {
+        throw new IllegalArgumentException(String.format("%s can not own by %s", source(), newOwnerType));
     }
 
     @Override
