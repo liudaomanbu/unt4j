@@ -2,6 +2,7 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.Invokable;
+import org.caotc.unit4j.core.common.reflect.MethodInvokable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -34,7 +35,7 @@ public interface PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    boolean isPropertyReader(@NonNull Invokable<?, ?> invokable);
+    boolean isPropertyReader(@NonNull MethodInvokable<?, ?> invokable);
 
     /**
      * 检查传入方法是否是属于该命名风格的set方法
@@ -58,7 +59,7 @@ public interface PropertyAccessorMethodFormat {
      * @date 2019-05-23
      * @since 1.0.0
      */
-    boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable);
+    boolean isPropertyWriter(@NonNull MethodInvokable<?, ?> invokable);
 
     /**
      * 获取传入属性的该命名风格的get方法名
@@ -142,7 +143,7 @@ public interface PropertyAccessorMethodFormat {
     }
 
     @NonNull
-    default String propertyName(@NonNull Invokable<?, ?> propertyAccessorInvokable) {
+    default String propertyName(@NonNull MethodInvokable<?, ?> propertyAccessorInvokable) {
         if (isPropertyReader(propertyAccessorInvokable)) {
             return propertyNameFromPropertyReader(propertyAccessorInvokable);
         }

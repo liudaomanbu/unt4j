@@ -23,9 +23,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.springframework.core.BridgeMethodResolver;
 
 import javax.annotation.CheckForNull;
 import java.lang.reflect.*;
+import java.util.Objects;
 
 /**
  * @param <S> source type
@@ -36,36 +38,40 @@ import java.lang.reflect.*;
  * @since 1.0.0
  */
 @SuppressWarnings("UnstableApiUsage")
-@Getter(AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
-public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends BaseInvokable<S, O, R> implements Invokable<O, R> {
+public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends BaseElement implements Invokable<O, R> {
+    @Getter(AccessLevel.PROTECTED)
     @NonNull
     com.google.common.reflect.Invokable<O, R> invokable;
+    @Getter
+    @NonNull
+    S source;
 
     GuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, R> delegate, @NonNull S source) {
         super(source);
         this.invokable = delegate;
+        this.source = source;
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <O, P> Invokable<O, P> from(@NonNull Method method) {
+    public static <O, P> MethodInvokable<O, P> from(@NonNull Method method) {
         return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O, P>) com.google.common.reflect.Invokable.from(method), method);
     }
 
     @NonNull
-    public static <O> Invokable<O, O> from(@NonNull Constructor<O> constructor) {
+    public static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor) {
         return new ConstructorGuavaInvokableProxy<>(com.google.common.reflect.Invokable.from(constructor), constructor);
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <O, P> Invokable<O, P> from(@NonNull Method method, @NonNull TypeToken<O> owner) {
+    public static <O, P> MethodInvokable<O, P> from(@NonNull Method method, @NonNull TypeToken<O> owner) {
         return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O, P>) owner.method(method), method);
     }
 
     @NonNull
-    public static <O> Invokable<O, O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
+    public static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
         return new ConstructorGuavaInvokableProxy<>(owner.constructor(constructor), constructor);
     }
 
@@ -77,22 +83,6 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends Ba
     @NonNull
     public final TypeToken<? extends R> returnType() {
         return invokable.getReturnType();
-    }
-
-    @NonNull
-    public final <P1 extends R> Invokable<O, P1> returning(Class<P1> returnType) {
-        return returning(TypeToken.of(returnType));
-    }
-
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public final <P1 extends R> Invokable<O, P1> returning(TypeToken<P1> returnType) {
-        if (!returnType.isSupertypeOf(returnType())) {
-            throw new IllegalArgumentException(
-                    "FieldElement is known to return " + returnType() + ", not " + returnType);
-        }
-        invokable.returning(returnType);
-        return (Invokable<O, P1>) this;
     }
 
     @Override
@@ -149,14 +139,37 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends Ba
 }
 
 @SuppressWarnings("UnstableApiUsage")
-class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> {
+class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> implements MethodInvokable<O, P> {
     MethodGuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, P> delegate, @NonNull Method source) {
         super(delegate, source);
     }
 
+    @NonNull
+    @Override
+    public MethodInvokable<O, P> accessible(boolean accessible) {
+        super.accessible(accessible);
+        return this;
+    }
+
+    @NonNull
+    public <P1 extends P> MethodInvokable<O, P1> returning(Class<P1> returnType) {
+        return returning(TypeToken.of(returnType));
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    public <P1 extends P> MethodInvokable<O, P1> returning(TypeToken<P1> returnType) {
+        if (!returnType.isSupertypeOf(returnType())) {
+            throw new IllegalArgumentException(
+                    "FieldElement is known to return " + returnType() + ", not " + returnType);
+        }
+        invokable().returning(returnType);
+        return (MethodInvokable<O, P1>) this;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public @NonNull <O1> Invokable<O1, P> ownBy(@NonNull TypeToken<O1> newOwnerType) {
+    public @NonNull <O1> MethodInvokable<O1, P> ownBy(@NonNull TypeToken<O1> newOwnerType) {
         if (canOwnBy(newOwnerType)) {
             return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O1, P>) newOwnerType.method(source()), source());
         }
@@ -168,26 +181,56 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
         return source().isBridge();
     }
 
-    @Override
-    public boolean isConstruct() {
-        return false;
+    public boolean isOverridden(@NonNull MethodInvokable<?, ?> other) {
+        //same method can't override
+        if (Objects.equals(source(), other.source())
+                //same declaring type can't override
+                || Objects.equals(declaringType(), other.declaringType())
+                || !Objects.equals(getName(), other.getName())
+                //overriding method must give more or equal access than the overridden method
+                || accessLevel().isMore(other.accessLevel())
+                || !ownerType().isSupertypeOf(other.ownerType())
+                || !isOverridableIn(other.declaringType())) {
+            return false;
+        }
+
+        if (isBridge() || other.isBridge()) {
+            MethodInvokable<?, ?> bridgeInvokable = isBridge() ? this : other;
+            //bridge invokable source must be method
+            Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(bridgeInvokable.source());
+            //visibility bridge method is overriding
+            if (BridgeMethodResolver.isVisibilityBridgeMethodPair(bridgeInvokable.source(), bridgedMethod)) {
+                return true;
+            }
+            MethodInvokable<?, ?> bridgedInvokable = Invokable.from(bridgedMethod, bridgeInvokable.ownerType());
+            return isBridge() ? bridgedInvokable.isOverridden(other) : isOverridden(bridgedInvokable);
+        }
+
+        return isReturnTypeTheSameAs(other) && areParametersTheSameAs(other);
     }
 
-    @Override
-    public boolean isMethod() {
-        return true;
+    boolean areParametersTheSameAs(Invokable<?, ?> other) {
+        ImmutableList<TypeToken<?>> myPrmTypes = parameters().stream().map(Parameter::type).collect(ImmutableList.toImmutableList());
+        ImmutableList<TypeToken<?>> otherPrmTypes = other.parameters().stream().map(Parameter::type).collect(ImmutableList.toImmutableList());
+        return myPrmTypes.equals(otherPrmTypes);
+    }
+
+    boolean isReturnTypeTheSameAs(Invokable<?, ?> other) {
+        return other.returnType().equals(returnType());
     }
 }
 
 @SuppressWarnings("UnstableApiUsage")
-class ConstructorGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Constructor<O>, O, P> {
-    ConstructorGuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, P> delegate, @NonNull Constructor<O> source) {
+class ConstructorGuavaInvokableProxy<O> extends GuavaInvokableProxy<Constructor<O>, O, O> implements ConstructInvokable<O> {
+    ConstructorGuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, O> delegate, @NonNull Constructor<O> source) {
         super(delegate, source);
     }
 
+    @NonNull
     @Override
-    public @NonNull <O1> Invokable<O1, P> ownBy(@NonNull TypeToken<O1> newOwnerType) {
-        throw new IllegalArgumentException(String.format("%s can not own by %s", source(), newOwnerType));
+    public ConstructInvokable<O> accessible(boolean accessible) {
+        super.accessible(accessible);
+        return this;
     }
 
     @Override
@@ -195,13 +238,4 @@ class ConstructorGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Construct
         return false;
     }
 
-    @Override
-    public boolean isConstruct() {
-        return true;
-    }
-
-    @Override
-    public boolean isMethod() {
-        return false;
-    }
 }

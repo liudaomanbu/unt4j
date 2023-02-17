@@ -24,6 +24,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.reflect.Invokable;
+import org.caotc.unit4j.core.common.reflect.MethodInvokable;
 import org.caotc.unit4j.core.common.reflect.PropertyName;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
@@ -2086,7 +2087,7 @@ public class ReflectionUtil {
      * @date 2019-12-08
      * @since 1.0.0
      */
-    public static boolean isPropertyReader(@NonNull Invokable<?, ?> invokable) {
+    public static boolean isPropertyReader(@NonNull MethodInvokable<?, ?> invokable) {
         return isPropertyReader(invokable, DEFAULT_METHOD_NAME_STYLES);
     }
 
@@ -2100,10 +2101,10 @@ public class ReflectionUtil {
      * @date 2019-05-23
      * @apiNote 这里所指的get方法并不是专指JavaBean规范的get方法, 而是所有获取属性的方法, 符合任意{@link
      * PropertyAccessorMethodFormat}检查即视为get方法. 所以如果只想要判断是否是JavaBean规范的get方法请使用 {@link
-     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isPropertyReader(Invokable)}
+     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isPropertyReader(MethodInvokable)}
      * @since 1.0.0
      */
-    public static boolean isPropertyReader(@NonNull Invokable<?, ?> invokable,
+    public static boolean isPropertyReader(@NonNull MethodInvokable<?, ?> invokable,
                                            @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return Arrays.stream(propertyAccessorMethodFormats)
                 .anyMatch(
@@ -2167,7 +2168,7 @@ public class ReflectionUtil {
      * @date 2019-12-05
      * @since 1.0.0
      */
-    public static boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable) {
+    public static boolean isPropertyWriter(@NonNull MethodInvokable<?, ?> invokable) {
         return isPropertyWriter(invokable, DEFAULT_METHOD_NAME_STYLES);
     }
 
@@ -2181,10 +2182,10 @@ public class ReflectionUtil {
      * @date 2019-05-23
      * @apiNote 这里所指的set方法并不是专指JavaBean规范的set方法, 而是所有获取属性的方法, 符合任意{@link
      * PropertyAccessorMethodFormat}检查即视为set方法. 所以如果只想要判断是否是JavaBean规范的set方法请使用 {@link
-     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isPropertyWriter(Invokable)}
+     * DefaultPropertyAccessorMethodFormat#JAVA_BEAN#isPropertyWriter(MethodInvokable)}
      * @since 1.0.0
      */
-    public static boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable,
+    public static boolean isPropertyWriter(@NonNull MethodInvokable<?, ?> invokable,
                                            @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return Arrays.stream(propertyAccessorMethodFormats)
                 .anyMatch(methodNameStyle -> methodNameStyle.isPropertyWriter(invokable));
@@ -2196,7 +2197,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isGetMethod(@NonNull Method method) {
-        return isGetInvokable(Invokable.from(method));
+        return isGetMethod(Invokable.from(method));
     }
 
     /**
@@ -2204,7 +2205,7 @@ public class ReflectionUtil {
      * @date 2019-12-08
      * @since 1.0.0
      */
-    public static boolean isGetInvokable(@NonNull Invokable<?, ?> invokable) {
+    public static boolean isGetMethod(@NonNull MethodInvokable<?, ?> invokable) {
         return isPropertyReader(invokable, DefaultPropertyAccessorMethodFormat.JAVA_BEAN);
     }
 
@@ -2214,7 +2215,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     public static boolean isSetMethod(@NonNull Method method) {
-        return isSetInvokable(Invokable.from(method));
+        return isSetMethod(Invokable.from(method));
     }
 
     /**
@@ -2222,7 +2223,7 @@ public class ReflectionUtil {
      * @date 2019-12-08
      * @since 1.0.0
      */
-    public static boolean isSetInvokable(@NonNull Invokable<?, ?> invokable) {
+    public static boolean isSetMethod(@NonNull MethodInvokable<?, ?> invokable) {
         return isPropertyWriter(invokable, DefaultPropertyAccessorMethodFormat.JAVA_BEAN);
     }
 
@@ -2230,7 +2231,7 @@ public class ReflectionUtil {
         return isOverride(Invokable.from(method));
     }
 
-    public static boolean isOverride(@NonNull Invokable<?, ?> invokable) {
+    public static boolean isOverride(@NonNull MethodInvokable<?, ?> invokable) {
         return invokable.ownerType().getTypes().stream()
                 .filter(type -> !type.equals(invokable.ownerType()))
                 .anyMatch(type -> isOverride(invokable, type));
@@ -2251,18 +2252,18 @@ public class ReflectionUtil {
         return isOverride(Invokable.from(method), superTypeToken);
     }
 
-    public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
+    public static boolean isOverride(@NonNull MethodInvokable<?, ?> invokable,
                                      @NonNull Type superType) {
         return isOverride(invokable, TypeToken.of(superType));
     }
 
-    public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
+    public static boolean isOverride(@NonNull MethodInvokable<?, ?> invokable,
                                      @NonNull Class<?> superClass) {
         return isOverride(invokable, TypeToken.of(superClass));
     }
 
     //todo 仅当前type还是包括super？
-    public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
+    public static boolean isOverride(@NonNull MethodInvokable<?, ?> invokable,
                                      @NonNull TypeToken<?> superTypeToken) {
         if (invokable.declaringType().equals(superTypeToken)) {
             return false;
@@ -2281,8 +2282,8 @@ public class ReflectionUtil {
         return false;
     }
 
-    public static boolean isOverride(@NonNull Invokable<?, ?> invokable,
-                                     @NonNull Invokable<?, ?> superInvokable) {
+    public static boolean isOverride(@NonNull MethodInvokable<?, ?> invokable,
+                                     @NonNull MethodInvokable<?, ?> superInvokable) {
         return superInvokable.isOverridden(invokable);
     }
 

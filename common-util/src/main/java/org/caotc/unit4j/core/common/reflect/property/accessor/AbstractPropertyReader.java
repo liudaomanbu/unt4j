@@ -21,6 +21,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.Invokable;
+import org.caotc.unit4j.core.common.reflect.MethodInvokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.util.Optional;
@@ -113,13 +114,13 @@ public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyEleme
       /**
        * 方法
        */
-      @NonNull Invokable<O, P> invokable;
+      @NonNull MethodInvokable<O, P> invokable;
       /**
        * 属性名称
        */
       @NonNull String propertyName;
 
-      InvokablePropertyReader(@NonNull Invokable<O, P> invokable,
+      InvokablePropertyReader(@NonNull MethodInvokable<O, P> invokable,
                               @NonNull String propertyName) {
           super(invokable);
           Preconditions.checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a PropertyReader", invokable);

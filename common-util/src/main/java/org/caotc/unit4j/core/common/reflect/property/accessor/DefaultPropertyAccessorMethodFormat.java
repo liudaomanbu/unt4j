@@ -19,6 +19,7 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.Invokable;
+import org.caotc.unit4j.core.common.reflect.MethodInvokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.constant.StringConstant;
 
@@ -130,7 +131,7 @@ public enum DefaultPropertyAccessorMethodFormat implements PropertyAccessorMetho
      * @date 2019-05-23
      * @since 1.0.0
      */
-    public boolean isPropertyReader(@NonNull Invokable<?, ?> invokable) {
+    public boolean isPropertyReader(@NonNull MethodInvokable<?, ?> invokable) {
         return !invokable.getDeclaringClass().equals(Object.class)
                 && !invokable.isStatic()
                 && invokable.parameters().isEmpty()
@@ -148,7 +149,7 @@ public enum DefaultPropertyAccessorMethodFormat implements PropertyAccessorMetho
      * @date 2019-05-23
      * @since 1.0.0
      */
-    public boolean isPropertyWriter(@NonNull Invokable<?, ?> invokable) {
+    public boolean isPropertyWriter(@NonNull MethodInvokable<?, ?> invokable) {
         return !invokable.getDeclaringClass().equals(Object.class)
                 && (invokable.returnType().getRawType().equals(void.class) || invokable.returnType()
                 .equals(invokable.ownerType()))

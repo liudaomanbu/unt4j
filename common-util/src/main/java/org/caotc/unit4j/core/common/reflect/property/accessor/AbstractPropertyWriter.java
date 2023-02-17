@@ -21,6 +21,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.Invokable;
+import org.caotc.unit4j.core.common.reflect.MethodInvokable;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 /**
@@ -138,14 +139,14 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
        * set方法
        */
       @NonNull
-      Invokable<O, ?> invokable;
+      MethodInvokable<O, ?> invokable;
       /**
        * set方法名称风格
        */
       @NonNull
       String propertyName;
 
-      InvokablePropertyWriter(@NonNull Invokable<O, ?> invokable,
+      InvokablePropertyWriter(@NonNull MethodInvokable<O, ?> invokable,
                               @NonNull String propertyName) {
           super(invokable);
           Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a PropertyWriter", invokable);

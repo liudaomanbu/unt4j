@@ -23,6 +23,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.annotation.CheckForNull;
 import java.lang.reflect.*;
+import java.util.Arrays;
 
 /**
  * @param <O> owner type
@@ -32,56 +33,38 @@ import java.lang.reflect.*;
  * @since 1.0.0
  */
 public interface Invokable<O, R> extends Element {
-    static <O, R> Invokable<O, R> from(@NonNull Method method) {
-        return GuavaInvokableProxy.from(method);
+    static <O, R> MethodInvokable<O, R> from(@NonNull Method method) {
+        return MethodInvokable.from(method);
     }
 
-    static <O> Invokable<O, O> from(@NonNull Constructor<O> constructor) {
-        return GuavaInvokableProxy.from(constructor);
+    static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor) {
+        return ConstructInvokable.from(constructor);
     }
 
-    static <O, R> Invokable<O, R> from(@NonNull Method method, @NonNull TypeToken<O> owner) {
-        return GuavaInvokableProxy.from(method, owner);
+    static <O, R> MethodInvokable<O, R> from(@NonNull Method method, @NonNull TypeToken<O> owner) {
+        return MethodInvokable.from(method, owner);
     }
 
-    static <O> Invokable<O, O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
-        return GuavaInvokableProxy.from(constructor, owner);
+    static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
+        return ConstructInvokable.from(constructor, owner);
     }
 
-    @NonNull TypeToken<O> ownerType();
+    @NonNull
+    TypeToken<O> ownerType();
 
-    default boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
-        return isMethod() && declaringType().isSupertypeOf(newOwnerType);
-    }
-
-    //todo 是否分成methodInvokable和ConstructorInvokable
-    @NonNull <O1> Invokable<O1, R> ownBy(@NonNull TypeToken<O1> ownerType);
-
+    //todo 范型确认
     @NonNull
     TypeToken<? extends R> returnType();
 
-    @NonNull
-    default <R1 extends R> Invokable<O, R1> returning(Class<R1> returnType) {
-        return returning(TypeToken.of(returnType));
-    }
-
-    @SuppressWarnings("unchecked")
-    @NonNull
-    default <R1 extends R> Invokable<O, R1> returning(TypeToken<R1> returnType) {
-        if (!returnType.isSupertypeOf(returnType())) {
-            throw new IllegalArgumentException(
-                    "FieldElement is known to return " + returnType() + ", not " + returnType);
-        }
-        return (Invokable<O, R1>) this;
-    }
-
+    //todo declaringType
     @Override
     @NonNull Class<? super O> declaringClass();
 
     @NonNull AnnotatedType annotatedReturnType();
 
     @Override
-    @NonNull Invokable<O, R> accessible(boolean accessible);
+    @NonNull
+    Invokable<O, R> accessible(boolean accessible);
 
     boolean isOverridable();
 
@@ -89,8 +72,10 @@ public interface Invokable<O, R> extends Element {
 
     boolean isBridge();
 
+    @NonNull
     Executable source();
 
+    //todo 注解
     R invoke(@CheckForNull O receiver, @Nullable Object... args)
             throws InvocationTargetException, IllegalAccessException;
 
@@ -121,7 +106,10 @@ public interface Invokable<O, R> extends Element {
      *                                             the underlying executable's parameter types refer to a parameterized
      *                                             type that cannot be instantiated for any reason
      */
-    @NonNull ImmutableList<Type> genericParameterTypes();
+    @NonNull
+    default ImmutableList<Type> genericParameterTypes() {
+        return Arrays.stream(source().getGenericParameterTypes()).collect(ImmutableList.toImmutableList());
+    }
 
     @NonNull ImmutableList<TypeToken<? extends Throwable>> exceptionTypes();
 
@@ -132,15 +120,14 @@ public interface Invokable<O, R> extends Element {
      * @param type type
      * @return is overridable in type
      */
-    boolean isOverridableIn(@NonNull TypeToken<?> type);
+    default boolean isOverridableIn(@NonNull TypeToken<?> type) {
+        if (!isOverridable()) return false;
+        if (!isSubclassVisible()) return false;
+        if (!declaringType().isSupertypeOf(type)) return false;
 
-    boolean isOverridden(@NonNull Invokable<?, ?> other);
+        if (isPublic()) return true;
+        if (isPackageVisible() && type.getRawType().getPackage() == declaringClass().getPackage()) return true;
 
-    default boolean isOverriding(@NonNull Invokable<?, ?> other) {
-        return other.isOverridden(this);
+        return false;
     }
-
-    boolean isConstruct();
-
-    boolean isMethod();
 }
