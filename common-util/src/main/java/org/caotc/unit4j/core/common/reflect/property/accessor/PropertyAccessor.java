@@ -51,4 +51,7 @@ public interface PropertyAccessor<O, P> extends PropertyReader<O, P>, PropertyWr
 
     @Override
     @NonNull PropertyAccessor<O, P> write(@NonNull O object, @NonNull P value);
+
+    @Override
+    @NonNull <O1> PropertyAccessor<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
 }

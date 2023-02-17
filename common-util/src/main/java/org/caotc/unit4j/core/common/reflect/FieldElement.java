@@ -109,17 +109,28 @@ public class FieldElement<O, P> extends BaseElement {
 
   @Override
   public boolean accessible() {
-    return field.isAccessible();
+      return field.isAccessible();
   }
 
-  @Override
-  public @NonNull FieldElement<O, P> accessible(boolean accessible) {
-    field.setAccessible(accessible);
-    return this;
-  }
+    @Override
+    public @NonNull FieldElement<O, P> accessible(boolean accessible) {
+        field.setAccessible(accessible);
+        return this;
+    }
 
-  @Override
-  public String toString() {
-    return field.toString();
-  }
+    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+        return declaringType().isSupertypeOf(newOwnerType);
+    }
+
+    //todo owner保存
+    @SuppressWarnings("unchecked")
+    @NonNull
+    public <O1> FieldElement<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+        return (FieldElement<O1, P>) this;
+    }
+
+    @Override
+    public String toString() {
+        return field.toString();
+    }
 }

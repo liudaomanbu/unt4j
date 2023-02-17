@@ -16,6 +16,7 @@
 
 package org.caotc.unit4j.core.common.reflect.property;
 
+import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
@@ -36,10 +37,14 @@ public class CompositeAccessibleProperty<O, P, T> extends
         AbstractCompositeProperty<O, P, T> implements
         AccessibleProperty<O, P> {
 
+  @NonNull
+  AccessibleProperty<T, P> target;
+
   CompositeAccessibleProperty(
           @NonNull ReadableProperty<O, T> targetReadableProperty,
           @NonNull AccessibleProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
+    this.target = delegate;
   }
 
   @Override
@@ -52,6 +57,11 @@ public class CompositeAccessibleProperty<O, P, T> extends
     transferProperty().read(target)
             .ifPresent(actualTarget -> target().toAccessible().write(actualTarget, value));
     return this;
+  }
+
+  @Override
+  public @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+    return new CompositeAccessibleProperty<>(transferProperty().ownBy(ownerType), target());
   }
 
 }

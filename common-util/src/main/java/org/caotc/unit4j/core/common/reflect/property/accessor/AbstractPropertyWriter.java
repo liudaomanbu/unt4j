@@ -139,7 +139,7 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
        * set方法
        */
       @NonNull
-      MethodInvokable<O, ?> invokable;
+      MethodInvokable<O, ?> invokable;//todo 变量名
       /**
        * set方法名称风格
        */
@@ -169,6 +169,11 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
       @Override
       public TypeToken<O> ownerType() {
           return invokable.ownerType();
+      }
+
+      @Override
+      public @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+          return new InvokablePropertyWriter<>(invokable().ownBy(ownerType), propertyName());
       }
   }
 }

@@ -48,12 +48,22 @@ public class WritableAmountProperty<O, P> extends BaseAmountProperty<O, P, Writa
     return type(TypeToken.of(propertyType));
   }
 
-  @Override
-  @NonNull
-  public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-        , "Property is known type %s,not %s ", type(), propertyType);
-    //noinspection unchecked
-    return (WritableProperty<O, P1>) this;
-  }
+    @Override
+    @NonNull
+    public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+                , "Property is known type %s,not %s ", type(), propertyType);
+        //noinspection unchecked
+        return (WritableProperty<O, P1>) this;
+    }
+
+    @Override
+    public @NonNull <O1> WritableProperty<O1, Amount> ownBy(@NonNull TypeToken<O1> ownerType) {
+        return null;
+    }
+
+    @Override
+    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+        return false;
+    }
 }

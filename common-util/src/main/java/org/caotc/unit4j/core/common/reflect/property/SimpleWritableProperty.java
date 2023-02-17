@@ -77,6 +77,11 @@ public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> i
   }
 
   @Override
+  public @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+    return new SimpleWritableProperty<>(propertyWriters.stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
+  }
+
+  @Override
   public boolean readable() {
     return false;
   }

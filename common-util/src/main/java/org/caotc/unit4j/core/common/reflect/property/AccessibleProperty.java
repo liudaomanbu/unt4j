@@ -102,4 +102,7 @@ public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
         //noinspection unchecked
         return (AccessibleProperty<O, P1>) this;
     }
+
+    @Override
+    @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
 }

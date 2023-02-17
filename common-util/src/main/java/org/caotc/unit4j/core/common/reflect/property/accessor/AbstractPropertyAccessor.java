@@ -173,6 +173,11 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
     }
 
     @Override
+    public @NonNull <O1> PropertyAccessor<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+      return new FieldElementPropertyAccessor<>(ownerType, field().ownBy(ownerType));
+    }
+
+    @Override
     public @NonNull String propertyName() {
       return field.getName();
     }

@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 
 /**
  * 属性
- * //todo ownerType转换
  *
  * @param <O> owner type
  * @param <P> property type
@@ -123,6 +122,11 @@ public interface Property<O, P> {
     //noinspection unchecked
     return (Property<O, P1>) this;
   }
+
+  boolean canOwnBy(@NonNull TypeToken<?> newOwnerType);
+
+  //todo ownerType转换
+  @NonNull <O1> Property<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
 
   boolean readable();
 

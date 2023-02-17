@@ -122,9 +122,11 @@ public interface PropertyReader<O, P> extends PropertyElement<O, P> {
   @Override
   @NonNull <P1 extends P> PropertyReader<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
 
-  @Override
-  default boolean isReader() {
-    return true;
-  }
+    @Override
+    default boolean isReader() {
+        return true;
+    }
 
+    @Override
+    @NonNull <O1> PropertyReader<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
 }

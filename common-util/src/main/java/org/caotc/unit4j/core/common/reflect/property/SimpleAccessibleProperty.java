@@ -18,6 +18,7 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
@@ -78,6 +79,12 @@ public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P>
     public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
         propertyWriters.first().write(target, value);
         return this;
+    }
+
+    @Override
+    public @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+        return new SimpleAccessibleProperty<>(propertyReaders.stream().map(propertyReader -> propertyReader.ownBy(ownerType))
+                , propertyWriters.stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
     }
 
     @Override

@@ -91,6 +91,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @NonNull
     String name;
     //todo 排除已被重写的方法？
+    //todo 子类使用get方法
     @NonNull
     protected ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
     @NonNull
@@ -179,6 +180,12 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @Override
     public final @NonNull TypeToken<O> ownerType() {
         return ownerType;
+    }
+
+    @Override
+    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+        return propertyWriters.stream().allMatch(propertyWriter -> propertyWriter.canOwnBy(newOwnerType))
+                && propertyReaders.stream().allMatch(propertyReader -> propertyReader.canOwnBy(newOwnerType));
     }
 
     @NonNull

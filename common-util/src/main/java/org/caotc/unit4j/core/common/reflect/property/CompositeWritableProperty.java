@@ -53,10 +53,14 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
     return new CompositeWritableProperty<>(targetReadableProperty, delegate);
   }
 
+  @NonNull
+  WritableProperty<T, P> target;
+
   private CompositeWritableProperty(
           @NonNull ReadableProperty<O, T> targetReadableProperty,
           @NonNull WritableProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
+    this.target = delegate;
   }
 
   @Override
@@ -76,8 +80,12 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
   }
 
   @Override
+  public @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+    return new CompositeWritableProperty<>(transferProperty().ownBy(ownerType), target());
+  }
+
+  @Override
   public boolean readable() {
     return false;
   }
-
 }

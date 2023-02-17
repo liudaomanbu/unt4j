@@ -126,7 +126,10 @@ public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
     @NonNull <P1 extends P> PropertyWriter<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
 
     @Override
-  default boolean isWriter() {
-    return true;
-  }
+    default boolean isWriter() {
+        return true;
+    }
+
+    @Override
+    @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
 }

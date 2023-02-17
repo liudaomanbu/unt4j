@@ -18,12 +18,13 @@ package org.caotc.unit4j.support.common.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
+
+import java.util.Optional;
 
 /**
  * @author caotc
@@ -53,12 +54,22 @@ public class ReadableAmountProperty<O, P> extends BaseAmountProperty<O, P, Reada
     return type(TypeToken.of(propertyType));
   }
 
-  @Override
-  @NonNull
-  public <P1 extends Amount> ReadableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-        , "Property is known type %s,not %s ", type(), propertyType);
-    //noinspection unchecked
-    return (ReadableProperty<O, P1>) this;
-  }
+    @Override
+    @NonNull
+    public <P1 extends Amount> ReadableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+                , "Property is known type %s,not %s ", type(), propertyType);
+        //noinspection unchecked
+        return (ReadableProperty<O, P1>) this;
+    }
+
+    @Override
+    public @NonNull <O1> ReadableProperty<O1, Amount> ownBy(@NonNull TypeToken<O1> ownerType) {
+        return null;
+    }
+
+    @Override
+    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+        return false;
+    }
 }

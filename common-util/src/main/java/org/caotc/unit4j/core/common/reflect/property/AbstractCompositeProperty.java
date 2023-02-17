@@ -68,6 +68,11 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
     }
 
     @Override
+    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+        return transferProperty.canOwnBy(newOwnerType);
+    }
+
+    @Override
     public final @NonNull <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass) {
         return target().annotation(annotationClass);
@@ -79,4 +84,7 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
         return target().annotations(annotationClass);
     }
 
+    //todo 命名
+    @NonNull
+    protected abstract Property<T, P> target();
 }

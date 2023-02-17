@@ -129,6 +129,9 @@ public interface WritableProperty<O, P> extends Property<O, P> {
         Preconditions.checkArgument(propertyType.isSupertypeOf(type())
                 , "WritableProperty is known type %s,not %s ", type(), propertyType);
         //noinspection unchecked
-    return (WritableProperty<O, P1>) this;
-  }
+        return (WritableProperty<O, P1>) this;
+    }
+
+    @Override
+    @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
 }

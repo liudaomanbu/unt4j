@@ -17,6 +17,7 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
@@ -67,6 +68,12 @@ public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P> i
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
+    }
+
+    @Override
+    public @NonNull <O1> ReadableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+        return new SimpleReadableProperty<>(propertyReaders.stream()
+                .map(propertyReader -> propertyReader.ownBy(ownerType)));
     }
 
     @Override
