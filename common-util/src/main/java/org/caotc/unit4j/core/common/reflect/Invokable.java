@@ -19,9 +19,7 @@ package org.caotc.unit4j.core.common.reflect;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.CheckForNull;
 import java.lang.reflect.*;
 import java.util.Arrays;
 
@@ -56,7 +54,8 @@ public interface Invokable<O, R> extends Element {
     @NonNull
     TypeToken<? extends R> returnType();
 
-    @NonNull AnnotatedType annotatedReturnType();
+    @NonNull
+    AnnotatedType annotatedReturnType();
 
     @Override
     @NonNull
@@ -71,11 +70,11 @@ public interface Invokable<O, R> extends Element {
     @NonNull
     Executable source();
 
-    //todo 注解
-    R invoke(@CheckForNull O receiver, @Nullable Object... args)
+    R invoke(@NonNull O receiver, Object... args)
             throws InvocationTargetException, IllegalAccessException;
 
-    @NonNull ImmutableList<Parameter> parameters();
+    @NonNull
+    ImmutableList<Parameter> parameters();
 
     /**
      * Returns an array of {@code Type} objects that represent the formal
@@ -107,7 +106,8 @@ public interface Invokable<O, R> extends Element {
         return Arrays.stream(source().getGenericParameterTypes()).collect(ImmutableList.toImmutableList());
     }
 
-    @NonNull ImmutableList<TypeToken<? extends Throwable>> exceptionTypes();
+    @NonNull
+    ImmutableList<TypeToken<? extends Throwable>> exceptionTypes();
 
     /**
      * this Invokable is overridable in type.
