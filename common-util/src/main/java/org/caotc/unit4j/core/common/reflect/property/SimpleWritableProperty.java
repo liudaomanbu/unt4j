@@ -63,7 +63,7 @@ public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> i
     @Override
     public @NonNull SimpleWritableProperty<O, P> write(@NonNull O target, @NonNull P value) {
         //property writers should write to a same property
-        propertyWriters.first().write(target, value);
+        propertyWriters().first().write(target, value);
         return this;
     }
 
@@ -78,7 +78,7 @@ public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> i
 
     @Override
     public @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-        return new SimpleWritableProperty<>(propertyWriters.stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
+        return new SimpleWritableProperty<>(propertyWriters().stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
     }
 
     @Override

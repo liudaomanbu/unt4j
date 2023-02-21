@@ -63,7 +63,7 @@ public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P> i
 
     @Override
     public @NonNull Optional<P> read(@NonNull O target) {
-        return propertyReaders.stream()
+        return propertyReaders().stream()
                 .map(propertyGetter -> propertyGetter.read(target))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -72,7 +72,7 @@ public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P> i
 
     @Override
     public @NonNull <O1> ReadableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-        return new SimpleReadableProperty<>(propertyReaders.stream()
+        return new SimpleReadableProperty<>(propertyReaders().stream()
                 .map(propertyReader -> propertyReader.ownBy(ownerType)));
     }
 

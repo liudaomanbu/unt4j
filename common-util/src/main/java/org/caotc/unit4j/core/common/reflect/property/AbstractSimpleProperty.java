@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import org.caotc.unit4j.core.common.base.AccessLevel;
@@ -45,6 +46,7 @@ import java.util.stream.Stream;
  */
 @EqualsAndHashCode
 @ToString
+@Getter(lombok.AccessLevel.PROTECTED)
 public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     /**
      * {@link PropertyElement}排序器
@@ -88,14 +90,16 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
             })
             //非排序用,区分元素,否则在sortedSet中会认为是相等的元素.理论上hashCode存在重复可能,直接使用内存地址
             .thenComparing((p1, p2) -> p1.equals(p2) ? 0 : System.identityHashCode(p1) - System.identityHashCode(p2));
+    @Getter(lombok.AccessLevel.PUBLIC)
     @NonNull
     String name;
     //todo 排除已被重写的方法？
     //todo 子类使用get方法
     @NonNull
-    protected ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
+    ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
     @NonNull
-    protected ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters;
+    ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters;
+    @Getter(lombok.AccessLevel.PUBLIC)
     @NonNull
     TypeToken<O> ownerType;
 
@@ -147,39 +151,28 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         this.propertyWriters = propertyWriters;
     }
 
-    @NonNull
-    @Override
-    public final String name() {
-        return name;
-    }
-
     @SuppressWarnings("unchecked")
     @NonNull
     @Override
     public final TypeToken<P> type() {
         //todo 范型
-        if (!propertyWriters.isEmpty()) {
-            return (TypeToken<P>) propertyWriters.first().propertyType();
+        if (!propertyWriters().isEmpty()) {
+            return (TypeToken<P>) propertyWriters().first().propertyType();
         }
-        return (TypeToken<P>) propertyReaders.first().propertyType();
-    }
-
-    @Override
-    public final @NonNull TypeToken<O> ownerType() {
-        return ownerType;
+        return (TypeToken<P>) propertyReaders().first().propertyType();
     }
 
     @Override
     public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
-        return propertyWriters.stream().allMatch(propertyWriter -> propertyWriter.canOwnBy(newOwnerType))
-                && propertyReaders.stream().allMatch(propertyReader -> propertyReader.canOwnBy(newOwnerType));
+        return propertyWriters().stream().allMatch(propertyWriter -> propertyWriter.canOwnBy(newOwnerType))
+                && propertyReaders().stream().allMatch(propertyReader -> propertyReader.canOwnBy(newOwnerType));
     }
 
     @NonNull
     @Override
     public final <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass) {
-        return Streams.concat(propertyReaders.stream(), propertyWriters.stream())
+        return Streams.concat(propertyReaders().stream(), propertyWriters().stream())
                 .map(propertyElement -> AnnotatedElementUtils.findMergedAnnotation(propertyElement, annotationClass))
                 .filter(Objects::nonNull)
                 .findFirst();
@@ -189,7 +182,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @Override
     public final <X extends Annotation> ImmutableList<X> annotations(
             @NonNull Class<X> annotationClass) {
-        return Streams.concat(propertyReaders.stream(), propertyWriters.stream())
+        return Streams.concat(propertyReaders().stream(), propertyWriters().stream())
                 .map(propertyGetter -> AnnotatedElementUtils.findAllMergedAnnotations(propertyGetter, annotationClass))
                 .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
     }

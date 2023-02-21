@@ -77,19 +77,19 @@ public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P>
 
     @Override
     public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-        propertyWriters.first().write(target, value);
+        propertyWriters().first().write(target, value);
         return this;
     }
 
     @Override
     public @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-        return new SimpleAccessibleProperty<>(propertyReaders.stream().map(propertyReader -> propertyReader.ownBy(ownerType))
-                , propertyWriters.stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
+        return new SimpleAccessibleProperty<>(propertyReaders().stream().map(propertyReader -> propertyReader.ownBy(ownerType))
+                , propertyWriters().stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
     }
 
     @Override
     public @NonNull Optional<P> read(@NonNull O target) {
-        return propertyReaders.stream().map(propertyGetter -> propertyGetter.read(target))
+        return propertyReaders().stream().map(propertyGetter -> propertyGetter.read(target))
                 .filter(Optional::isPresent).map(Optional::get).findFirst();
     }
 
