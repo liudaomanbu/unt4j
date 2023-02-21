@@ -114,24 +114,35 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
     }
 
     @Override
-  public final boolean isReader() {
-    return false;
-  }
+    public final boolean isReader() {
+        return false;
+    }
 
-  @Override
-  public final boolean isWriter() {
-    return true;
-  }
+    @Override
+    public final boolean isWriter() {
+        return true;
+    }
 
-  /**
-   * set{@link Invokable}实现的属性设置器
-   *
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Value
-  @EqualsAndHashCode(callSuper = true)
+    @Override
+    public @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+        if (!canOwnBy(ownerType)) {
+            throw new IllegalArgumentException(String.format("%s is can not own by %s", this, ownerType));
+        }
+        return ownByInternal(ownerType);
+    }
+
+    @NonNull
+    protected abstract <O1> PropertyWriter<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType);
+
+    /**
+     * set{@link Invokable}实现的属性设置器
+     *
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @Value
+    @EqualsAndHashCode(callSuper = true)
   @ToString(callSuper = false)
   public static class InvokablePropertyWriter<O, P> extends AbstractPropertyWriter<O, P> {
 
@@ -166,14 +177,19 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
           return (TypeToken<? extends P>) invokable.parameters().get(0).type();
       }
 
-      @Override
-      public TypeToken<O> ownerType() {
-          return invokable.ownerType();
-      }
+        @Override
+        public TypeToken<O> ownerType() {
+            return invokable.ownerType();
+        }
 
-      @Override
-      public @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-          return new InvokablePropertyWriter<>(invokable().ownBy(ownerType), propertyName());
-      }
+        @Override
+        public @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+            return new InvokablePropertyWriter<>(invokable().ownBy(ownerType), propertyName());
+        }
+
+        @Override
+        protected @NonNull <O1> PropertyWriter<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
+            return new InvokablePropertyWriter<>(invokable().ownBy(ownerType), propertyName());
+        }
   }
 }

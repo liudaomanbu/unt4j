@@ -6,7 +6,6 @@ import lombok.NonNull;
 
 /**
  * todo 移到reflect包？
- * todo compare逻辑
  *
  * @author caotc
  * @date 2023-01-30

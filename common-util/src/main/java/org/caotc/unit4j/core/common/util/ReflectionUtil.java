@@ -17,7 +17,9 @@
 package org.caotc.unit4j.core.common.util;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -40,7 +42,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 //TODO 将所有方法优化到只有一次流操作
@@ -99,44 +102,6 @@ public class ReflectionUtil {
     public static Stream<Field> fieldStream(@NonNull TypeToken<?> type) {
         return type.getTypes().rawTypes().stream().map(Class::getDeclaredFields).flatMap(
                 Arrays::stream);
-    }
-
-    @NonNull
-    public static ImmutableSet<FieldElement<?, ?>> fieldElements(
-            @NonNull Type type) {
-        return fieldElementStream(type).collect(ImmutableSet.toImmutableSet());
-    }
-
-    @NonNull
-    public static <T> ImmutableSet<FieldElement<T, ?>> fieldElements(
-            @NonNull Class<T> type) {
-        return fieldElementStream(type).collect(ImmutableSet.toImmutableSet());
-    }
-
-    @NonNull
-    public static <T> ImmutableSet<FieldElement<T, ?>> fieldElements(
-            @NonNull TypeToken<T> type) {
-        return fieldElementStream(type).collect(ImmutableSet.toImmutableSet());
-    }
-
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public static <T> Stream<FieldElement<T, ?>> fieldElementStream(
-            @NonNull Type type) {
-        return fieldElementStream((TypeToken<T>) TypeToken.of(type));
-    }
-
-    @NonNull
-    public static <T> Stream<FieldElement<T, ?>> fieldElementStream(
-            @NonNull Class<T> type) {
-        return fieldElementStream(TypeToken.of(type));
-    }
-
-    @NonNull
-    public static <T> Stream<FieldElement<T, ?>> fieldElementStream(
-            @NonNull TypeToken<T> type) {
-        return type.getTypes().rawTypes().stream().map(Class::getDeclaredFields).flatMap(
-                Arrays::stream).map(FieldElement::of);
     }
 
     @NonNull
@@ -2056,7 +2021,7 @@ public class ReflectionUtil {
      * @apiNote 非static的final属性只有在值为固定值时会因为编译器优化导致get方法无法读取到修改后的值
      * @since 1.0.0
      */
-    public static boolean isPropertyReader(@NonNull FieldElement<?, ?> fieldElement) {
+    public static boolean isPropertyReader(@NonNull FieldElement fieldElement) {
         return !fieldElement.isStatic();
     }
 
@@ -2132,7 +2097,7 @@ public class ReflectionUtil {
      * @apiNote 非static的final属性只有在值为固定值时会因为编译器优化导致get方法无法读取到修改后的值
      * @since 1.0.0
      */
-    public static boolean isPropertyWriter(@NonNull FieldElement<?, ?> fieldElement) {
+    public static boolean isPropertyWriter(@NonNull FieldElement fieldElement) {
         return !fieldElement.isStatic();
     }
 
@@ -2287,62 +2252,5 @@ public class ReflectionUtil {
         return superInvokable.isOverridden(invokable);
     }
 
-    public static Set<Class<?>> lowestCommonSuperclasses(Class<?>... classes) {
-        return lowestCommonSuperclasses(Arrays.stream(classes).collect(ImmutableSet.toImmutableSet()));
-    }
 
-    public static Set<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
-        if (Iterables.isEmpty(classes)) {
-            return ImmutableSet.of();
-        }
-        final Set<Class<?>> result = TypeToken.of(classes.iterator().next()).getTypes().stream()
-                .map(TypeToken::getRawType)
-                .filter(sup -> Streams.stream(classes).allMatch(sup::isAssignableFrom))
-                .collect(ImmutableSet.toImmutableSet());
-        return result.stream()
-                .filter(type1 -> result.stream()
-                        .filter(type2 -> !Objects.equals(type1, type2))
-                        .noneMatch(type2 -> type1.isAssignableFrom(type2)))
-                .collect(ImmutableSet.toImmutableSet());
-    }
-
-    public static Set<TypeToken<?>> lowestCommonAncestors(Class<?>... classes) {
-        return lowestCommonAncestors(Arrays.stream(classes).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()));
-    }
-
-    public static Set<TypeToken<?>> lowestCommonAncestors(TypeToken<?>... types) {
-        return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()));
-    }
-
-    //todo 返回值集合是否不可变检查
-    public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
-        if (Iterables.isEmpty(types)) {
-            return ImmutableSet.of();
-        }
-
-        final Set<? extends TypeToken<?>> result = types.iterator().next().getTypes().stream()
-                .filter(sup -> Streams.stream(types).allMatch(sup::isSupertypeOf))
-                .collect(ImmutableSet.toImmutableSet());
-        return result.stream()
-                .filter(type1 -> result.stream()
-                        .filter(type2 -> !Objects.equals(type1, type2))
-                        .noneMatch(type2 -> type1.isSupertypeOf(type2)))
-                .collect(ImmutableSet.toImmutableSet());
-    }
-
-    public static TypeToken<?> unwrapContainer(TypeToken<?> type) {
-        if (type.isArray()) {
-            return type.getComponentType();
-        }
-        if (List.class.equals(type.getRawType())) {
-            return type.resolveType(List.class.getTypeParameters()[0]);
-        }
-        if (Set.class.equals(type.getRawType())) {
-            return type.resolveType(Set.class.getTypeParameters()[0]);
-        }
-        if (Collection.class.equals(type.getRawType())) {
-            return type.resolveType(Collection.class.getTypeParameters()[0]);
-        }
-        return type;
-    }
 }

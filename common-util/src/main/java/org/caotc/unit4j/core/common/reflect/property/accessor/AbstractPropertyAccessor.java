@@ -129,6 +129,17 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
     return (PropertyAccessor<O, P1>) this;
   }
 
+  @Override
+  public @NonNull <O1> PropertyAccessor<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+    if (!canOwnBy(ownerType)) {
+      throw new IllegalArgumentException(String.format("%s is can not own by %s", this, ownerType));
+    }
+    return ownByInternal(ownerType);
+  }
+
+  @NonNull
+  protected abstract <O1> PropertyAccessor<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType);
+
   /**
    * {@link Field}实现的属性获取器
    *
@@ -146,9 +157,9 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
      * 属性
      */
     @NonNull
-    FieldElement<O, P> field;
+    FieldElement field;
 
-    FieldElementPropertyAccessor(@NonNull TypeToken<O> ownerType, @NonNull FieldElement<O, P> field) {
+    FieldElementPropertyAccessor(@NonNull TypeToken<O> ownerType, @NonNull FieldElement field) {
       super(field);
       Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(field), "%s is not a PropertyWriter", field);
       Preconditions.checkArgument(ReflectionUtil.isPropertyReader(field), "%s is not a PropertyReader", field);
@@ -156,10 +167,12 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
       this.field = field;
     }
 
+
+    @SuppressWarnings("unchecked")
     @NonNull
     @Override
     public Optional<P> readInternal(@NonNull O object) {
-      return Optional.ofNullable(field.get(object));
+      return Optional.ofNullable((P) field.get(object));
     }
 
     @Override
@@ -167,14 +180,17 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
       field.set(object, value);
     }
 
+
+    @SuppressWarnings("unchecked")
     @Override
-    public @NonNull TypeToken<? extends P> propertyType() {
-      return field.type();
+    @NonNull
+    public TypeToken<? extends P> propertyType() {
+      return (TypeToken<? extends P>) ownerType().resolveType(field().genericType());
     }
 
     @Override
-    public @NonNull <O1> PropertyAccessor<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-      return new FieldElementPropertyAccessor<>(ownerType, field().ownBy(ownerType));
+    protected @NonNull <O1> PropertyAccessor<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
+      return new FieldElementPropertyAccessor<>(ownerType, field());
     }
 
     @Override

@@ -125,7 +125,6 @@ public interface Property<O, P> {
 
   boolean canOwnBy(@NonNull TypeToken<?> newOwnerType);
 
-  //todo ownerType转换
   @NonNull <O1> Property<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
 
   boolean readable();

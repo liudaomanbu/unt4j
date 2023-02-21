@@ -163,7 +163,6 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
             throw new IllegalArgumentException(
                     "FieldElement is known to return " + returnType() + ", not " + returnType);
         }
-        //todo 确认returning是只能由子类到父类还是只能由父类到子类,是否影响returnType的范型
         invokable().returning(returnType);
         return (MethodInvokable<O, P1>) this;
     }
@@ -171,10 +170,10 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
     @SuppressWarnings("unchecked")
     @Override
     public @NonNull <O1> MethodInvokable<O1, P> ownBy(@NonNull TypeToken<O1> newOwnerType) {
-        if (canOwnBy(newOwnerType)) {
-            return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O1, P>) newOwnerType.method(source()), source());
+        if (!canOwnBy(newOwnerType)) {
+            throw new IllegalArgumentException(String.format("%s can not own by %s", source(), newOwnerType));
         }
-        throw new IllegalArgumentException(String.format("%s can not own by %s", source(), newOwnerType));
+        return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O1, P>) newOwnerType.method(source()), source());
     }
 
     @Override

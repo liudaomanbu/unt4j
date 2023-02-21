@@ -2679,43 +2679,5 @@ class ReflectionUtilTest {
         Assertions.assertFalse(result);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classArrayAndLowestCommonSuperClassSets")
-    void lowestCommonSuperclasses(Class<?>[] classes, Set<Class<?>> lowestCommonAncestors) {
-        Set<Class<?>> result = ReflectionUtil.lowestCommonSuperclasses(classes);
-        log.debug("classes:{},result:{}", classes, result);
-        Assertions.assertEquals(lowestCommonAncestors, result);
-    }
 
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classSetAndLowestCommonSuperClassSets")
-    void lowestCommonSuperclasses(Iterable<Class<?>> classes, Set<Class<?>> lowestCommonAncestors) {
-        Set<Class<?>> result = ReflectionUtil.lowestCommonSuperclasses(classes);
-        log.debug("classes:{},result:{}", classes, result);
-        Assertions.assertEquals(lowestCommonAncestors, result);
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classArrayAndLowestCommonAncestorSets")
-    void lowestCommonAncestors(Class<?>[] classes, Set<TypeToken<?>> lowestCommonAncestors) {
-        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(classes);
-        log.debug("classes:{},result:{}", classes, result);
-        Assertions.assertEquals(lowestCommonAncestors, result);
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenArrayAndLowestCommonAncestorSets")
-    void lowestCommonAncestors(TypeToken<?>[] types, Set<TypeToken<?>> lowestCommonAncestors) {
-        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(types);
-        log.debug("types:{},result:{}", types, result);
-        Assertions.assertEquals(lowestCommonAncestors, result);
-    }
-
-    @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#typeTokenSetAndLowestCommonAncestorSets")
-    void lowestCommonAncestors(Set<TypeToken<?>> types, Set<TypeToken<?>> lowestCommonAncestors) {
-        Set<TypeToken<?>> result = ReflectionUtil.lowestCommonAncestors(types);
-        log.debug("types:{},result:{}", types, result);
-        Assertions.assertEquals(lowestCommonAncestors, result);
-    }
 }

@@ -60,17 +60,17 @@ public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyEleme
         return readInternal(object);
     }
 
-  /**
-   * 从传入的对象中获取该属性的值
-   *
-   * @param object 对象
-   * @return 对象中该属性的值
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  protected abstract Optional<P> readInternal(@NonNull O object);
+    /**
+     * 从传入的对象中获取该属性的值
+     *
+     * @param object 对象
+     * @return 对象中该属性的值
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @NonNull
+    protected abstract Optional<P> readInternal(@NonNull O object);
 
     @Override
     @NonNull
@@ -90,64 +90,75 @@ public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyEleme
     }
 
     @Override
-  public final boolean isReader() {
-    return true;
-  }
+    public final boolean isReader() {
+        return true;
+    }
 
-  @Override
-  public final boolean isWriter() {
-    return false;
-  }
+    @Override
+    public final boolean isWriter() {
+        return false;
+    }
 
-  /**
-   * get{@link Invokable}实现的属性获取器
-   *
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Value
-  @EqualsAndHashCode(callSuper = true)
-  @ToString(callSuper = false)
-  public static class InvokablePropertyReader<O, P> extends AbstractPropertyReader<O, P> {
+    @Override
+    public @NonNull <O1> PropertyReader<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+        if (!canOwnBy(ownerType)) {
+            throw new IllegalArgumentException(String.format("%s is can not own by %s", this, ownerType));
+        }
+        return ownByInternal(ownerType);
+    }
 
-      /**
-       * 方法
-       */
-      @NonNull MethodInvokable<O, P> invokable;
-      /**
-       * 属性名称
-       */
-      @NonNull String propertyName;
+    @NonNull
+    protected abstract <O1> PropertyReader<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType);
 
-      InvokablePropertyReader(@NonNull MethodInvokable<O, P> invokable,
-                              @NonNull String propertyName) {
-          super(invokable);
-          Preconditions.checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a PropertyReader", invokable);
-          this.invokable = invokable;
-          this.propertyName = propertyName;
-      }
+    /**
+     * get{@link Invokable}实现的属性获取器
+     *
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @Value
+    @EqualsAndHashCode(callSuper = true)
+    @ToString(callSuper = false)
+    public static class InvokablePropertyReader<O, P> extends AbstractPropertyReader<O, P> {
 
-      @NonNull
-      @Override
-      @SneakyThrows
-      public Optional<P> readInternal(@NonNull O object) {
-          return Optional.ofNullable(invokable.invoke(object));
-      }
+        /**
+         * 方法
+         */
+        @NonNull MethodInvokable<O, P> invokable;
+        /**
+         * 属性名称
+         */
+        @NonNull String propertyName;
 
-      @Override
-      public @NonNull TypeToken<? extends P> propertyType() {
-          return invokable.returnType();
-      }
+        InvokablePropertyReader(@NonNull MethodInvokable<O, P> invokable,
+                                @NonNull String propertyName) {
+            super(invokable);
+            Preconditions.checkArgument(ReflectionUtil.isPropertyReader(invokable), "%s is not a PropertyReader", invokable);
+            this.invokable = invokable;
+            this.propertyName = propertyName;
+        }
 
-      @Override
-      public TypeToken<O> ownerType() {
-          return invokable.ownerType();
-      }
+        @NonNull
+        @Override
+        @SneakyThrows
+        public Optional<P> readInternal(@NonNull O object) {
+            return Optional.ofNullable(invokable.invoke(object));
+        }
 
-      @Override
-      public @NonNull <O1> PropertyReader<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-          return new InvokablePropertyReader<>(invokable().ownBy(ownerType), propertyName());
-      }
-  }
+        @Override
+        public @NonNull TypeToken<? extends P> propertyType() {
+            return invokable.returnType();
+        }
+
+        @Override
+        public TypeToken<O> ownerType() {
+            return invokable.ownerType();
+        }
+
+        @Override
+        protected @NonNull <O1> PropertyReader<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
+            return new InvokablePropertyReader<>(invokable().ownBy(ownerType), propertyName());
+        }
+    }
 }

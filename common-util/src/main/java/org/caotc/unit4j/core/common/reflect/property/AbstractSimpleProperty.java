@@ -26,7 +26,7 @@ import org.caotc.unit4j.core.common.base.AccessLevel;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
-import org.caotc.unit4j.core.common.util.ReflectionUtil;
+import org.caotc.unit4j.core.common.util.ClassUtil;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
@@ -67,8 +67,8 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
                         || (List.class.equals(propertyType1.getRawType()) && List.class.equals(propertyType2.getRawType()))
                         || (Set.class.equals(propertyType1.getRawType()) && Set.class.equals(propertyType2.getRawType()))
                         || (Collection.class.equals(propertyType1.getRawType()) && Collection.class.equals(propertyType2.getRawType()))) {
-                    propertyType1 = ReflectionUtil.unwrapContainer(propertyType1);
-                    propertyType2 = ReflectionUtil.unwrapContainer(propertyType2);
+                    propertyType1 = ClassUtil.unwrapContainer(propertyType1);
+                    propertyType2 = ClassUtil.unwrapContainer(propertyType2);
                 }
 
                 TypeToken<?> propertyTypeWarp1 = propertyType1.wrap();
@@ -98,8 +98,6 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     protected ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters;
     @NonNull
     TypeToken<O> ownerType;
-    @NonNull
-    TypeToken<P> type;
 
     //todo accesstors
     protected AbstractSimpleProperty(
@@ -143,23 +141,8 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
                 .collect(ImmutableSet.toImmutableSet());
         Preconditions.checkArgument(ownerTypes.size() == 1,
                 "propertyReaders and propertyWriters not belong to a common property.ownerTypes:%s", ownerTypes);
-
-        ImmutableSet<? extends TypeToken<? extends P>> propertyTypes = Streams
-                .concat(propertyReaders.stream(), propertyWriters.stream())
-                .map(PropertyElement::propertyType).collect(ImmutableSet.toImmutableSet());
-        if (propertyTypes.size() > 1) {
-            propertyTypes = propertyTypes.stream()
-                    .map(TypeToken::wrap)
-                    .collect(ImmutableSet.toImmutableSet());
-        }
-        Set<TypeToken<?>> lowestCommonAncestors = ReflectionUtil.lowestCommonAncestors(propertyTypes);
-
-        //todo
-//        Preconditions.checkArgument(!lowestCommonAncestors.isEmpty(),
-//                "lowestCommonAncestors is empty.propertyTypes:%s", propertyTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
         this.ownerType = Iterables.getOnlyElement(ownerTypes);
-        this.type = (TypeToken<P>) lowestCommonAncestors.stream().findFirst().orElse(TypeToken.of(Object.class));//todo 保证代码使用时一定不会出错，公共祖先多个时用object？取优先级最高的element类型？
         this.propertyReaders = propertyReaders;
         this.propertyWriters = propertyWriters;
     }
@@ -170,11 +153,15 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         return name;
     }
 
+    @SuppressWarnings("unchecked")
     @NonNull
     @Override
     public final TypeToken<P> type() {
-        return type;
-//        return propertyWriters.first().propertyType();
+        //todo 范型
+        if (!propertyWriters.isEmpty()) {
+            return (TypeToken<P>) propertyWriters.first().propertyType();
+        }
+        return (TypeToken<P>) propertyReaders.first().propertyType();
     }
 
     @Override

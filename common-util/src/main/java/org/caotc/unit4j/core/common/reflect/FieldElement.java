@@ -16,7 +16,6 @@
 
 package org.caotc.unit4j.core.common.reflect;
 
-import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -26,107 +25,65 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 /**
- * @param <O> owner type
- * @param <P> property type
  * @author caotc
  * @date 2019-11-29
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
-public class FieldElement<O, P> extends BaseElement {
+public class FieldElement extends BaseElement {
 
-  /**
-   * @author caotc
-   * @date 2019-12-08
-   * @implNote
-   * @implSpec
-   * @apiNote
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <O, P> FieldElement<O, P> of(@NonNull Field field) {
-    return new FieldElement<>(field);
-  }
+    Field field;
 
-  Field field;
-
-  private FieldElement(
-      @NonNull Field field) {
-    super(field);
-    this.field = field;
-  }
-
-  @SuppressWarnings("unchecked")
-  @NonNull
-  public final TypeToken<? extends P> type() {
-    return (TypeToken<? extends P>) TypeToken.of(genericReturnType());
-  }
-
-  @NonNull
-  public final <P1 extends P> FieldElement<O, P1> type(Class<P1> returnType) {
-    return type(TypeToken.of(returnType));
-  }
-
-  @SuppressWarnings("unchecked")
-  @NonNull
-  public final <P1 extends P> FieldElement<O, P1> type(TypeToken<P1> returnType) {
-    if (!returnType.isSupertypeOf(type())) {
-      throw new IllegalArgumentException(
-              "FieldElement is known is " + type() + ", not " + returnType);
+    private FieldElement(
+            @NonNull Field field) {
+        super(field);
+        this.field = field;
     }
-    return (FieldElement<O, P1>) this;
-  }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  @NonNull
-  public final Class<? super O> getDeclaringClass() {
-    return (Class<? super O>) super.getDeclaringClass();
-  }
+    /**
+     * @author caotc
+     * @date 2019-12-08
+     * @implNote
+     * @implSpec
+     * @apiNote
+     * @since 1.0.0
+     */
+    @NonNull
+    public static FieldElement of(@NonNull Field field) {
+        return new FieldElement(field);
+    }
 
-  @NonNull
-  public AnnotatedType annotatedType() {
-    return field.getAnnotatedType();
-  }
+    @NonNull
+    public AnnotatedType annotatedType() {
+        return field.getAnnotatedType();
+    }
 
-  @NonNull
-  Type genericReturnType() {
-    return field.getGenericType();
-  }
+    @NonNull
+    public Type genericType() {
+        return field.getGenericType();
+    }
 
-  @SneakyThrows
-  @NonNull
-  public FieldElement<O, P> set(O obj, P value) {
-    field.set(obj, value);
-    return this;
-  }
-
-  @SuppressWarnings("unchecked")
-  @SneakyThrows
-  public P get(O obj) {
-    return (P) field.get(obj);
-  }
-
-  @Override
-  public boolean accessible() {
-      return field.isAccessible();
-  }
-
-    @Override
-    public @NonNull FieldElement<O, P> accessible(boolean accessible) {
-        field.setAccessible(accessible);
+    @SneakyThrows
+    @NonNull
+    public FieldElement set(Object obj, Object value) {
+        field.set(obj, value);
         return this;
     }
 
-    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
-        return declaringType().isSupertypeOf(newOwnerType);
+    @SneakyThrows
+    public Object get(Object obj) {
+        return field.get(obj);
     }
 
-    //todo owner保存
-    @SuppressWarnings("unchecked")
-    @NonNull
-    public <O1> FieldElement<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-        return (FieldElement<O1, P>) this;
+    @Override
+    public boolean accessible() {
+        return field.isAccessible();
+    }
+
+    @Override
+    public @NonNull FieldElement accessible(boolean accessible) {
+        field.setAccessible(accessible);
+        return this;
     }
 
     @Override

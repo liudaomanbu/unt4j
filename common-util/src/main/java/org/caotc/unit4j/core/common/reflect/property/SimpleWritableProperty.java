@@ -40,49 +40,49 @@ import java.util.stream.Stream;
 public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> implements
         WritableProperty<O, P> {
 
-  protected SimpleWritableProperty(
-          @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
-    super(ImmutableSortedSet.of(), propertyElements);
-  }
+    protected SimpleWritableProperty(
+            @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
+        super(ImmutableSortedSet.of(), propertyElements);
+    }
 
-  protected SimpleWritableProperty(
-          @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
-    super(ImmutableSortedSet.<PropertyReader<O, P>>of().iterator(), propertyElements);
-  }
+    protected SimpleWritableProperty(
+            @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
+        super(ImmutableSortedSet.<PropertyReader<O, P>>of().iterator(), propertyElements);
+    }
 
-  protected SimpleWritableProperty(
-          @NonNull Stream<PropertyWriter<O, P>> propertyElements) {
-    super(Stream.empty(), propertyElements);
-  }
+    protected SimpleWritableProperty(
+            @NonNull Stream<PropertyWriter<O, P>> propertyElements) {
+        super(Stream.empty(), propertyElements);
+    }
 
-  protected SimpleWritableProperty(
-          @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyElements) {
-    super(ImmutableSortedSet.of(), propertyElements);
-  }
+    protected SimpleWritableProperty(
+            @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyElements) {
+        super(ImmutableSortedSet.of(), propertyElements);
+    }
 
-  @Override
-  public @NonNull SimpleWritableProperty<O, P> write(@NonNull O target, @NonNull P value) {
-        //TODO 是否只用first
-      propertyWriters.first().write(target, value);
-    return this;
-  }
+    @Override
+    public @NonNull SimpleWritableProperty<O, P> write(@NonNull O target, @NonNull P value) {
+        //property writers should write to a same property
+        propertyWriters.first().write(target, value);
+        return this;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends P> SimpleWritableProperty<O, R1> type(
-          @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-            , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
-    return (SimpleWritableProperty<O, R1>) this;
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public @NonNull <R1 extends P> SimpleWritableProperty<O, R1> type(
+            @NonNull TypeToken<R1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+                , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
+        return (SimpleWritableProperty<O, R1>) this;
+    }
 
-  @Override
-  public @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    return new SimpleWritableProperty<>(propertyWriters.stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
-  }
+    @Override
+    public @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
+        return new SimpleWritableProperty<>(propertyWriters.stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
+    }
 
-  @Override
-  public boolean readable() {
-    return false;
-  }
+    @Override
+    public boolean readable() {
+        return false;
+    }
 }
