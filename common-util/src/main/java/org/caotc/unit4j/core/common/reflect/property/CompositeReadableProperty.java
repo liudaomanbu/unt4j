@@ -54,23 +54,23 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
   }
 
   @NonNull
-  ReadableProperty<T, P> target;
+  ReadableProperty<T, P> delegate;
 
   private CompositeReadableProperty(
           @NonNull ReadableProperty<O, T> targetReadableProperty,
           @NonNull ReadableProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
-    this.target = delegate;
+    this.delegate = delegate;
   }
 
   @Override
   public @NonNull Optional<P> read(@NonNull O target) {
-    return transferProperty().read(target).flatMap(target().toReadable()::read);
+    return transferProperty().read(target).flatMap(delegate().toReadable()::read);
   }
 
   @Override
   public @NonNull <O1> ReadableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeReadableProperty<>(transferProperty().ownBy(ownerType), target());
+    return new CompositeReadableProperty<>(transferProperty().ownBy(ownerType), delegate());
   }
 
   @Override

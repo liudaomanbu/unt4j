@@ -54,19 +54,19 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
   }
 
   @NonNull
-  WritableProperty<T, P> target;
+  WritableProperty<T, P> delegate;
 
   private CompositeWritableProperty(
           @NonNull ReadableProperty<O, T> targetReadableProperty,
           @NonNull WritableProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
-    this.target = delegate;
+    this.delegate = delegate;
   }
 
   @Override
   public @NonNull CompositeWritableProperty<O, P, T> write(@NonNull O target, @NonNull P value) {
     transferProperty().read(target)
-            .ifPresent(actualTarget -> target().toWritable().write(actualTarget, value));
+            .ifPresent(actualTarget -> delegate().toWritable().write(actualTarget, value));
     return this;
   }
 
@@ -81,7 +81,7 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
 
   @Override
   public @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeWritableProperty<>(transferProperty().ownBy(ownerType), target());
+    return new CompositeWritableProperty<>(transferProperty().ownBy(ownerType), delegate());
   }
 
   @Override

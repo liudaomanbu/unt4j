@@ -38,30 +38,30 @@ public class CompositeAccessibleProperty<O, P, T> extends
         AccessibleProperty<O, P> {
 
   @NonNull
-  AccessibleProperty<T, P> target;
+  AccessibleProperty<T, P> delegate;
 
   CompositeAccessibleProperty(
           @NonNull ReadableProperty<O, T> targetReadableProperty,
           @NonNull AccessibleProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
-    this.target = delegate;
+    this.delegate = delegate;
   }
 
   @Override
   public @NonNull Optional<P> read(@NonNull O target) {
-    return transferProperty().read(target).flatMap(target().toAccessible()::read);
+    return transferProperty().read(target).flatMap(delegate().toAccessible()::read);
   }
 
   @Override
   public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
     transferProperty().read(target)
-            .ifPresent(actualTarget -> target().toAccessible().write(actualTarget, value));
+            .ifPresent(actualTarget -> delegate().toAccessible().write(actualTarget, value));
     return this;
   }
 
   @Override
   public @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeAccessibleProperty<>(transferProperty().ownBy(ownerType), target());
+    return new CompositeAccessibleProperty<>(transferProperty().ownBy(ownerType), delegate());
   }
 
 }

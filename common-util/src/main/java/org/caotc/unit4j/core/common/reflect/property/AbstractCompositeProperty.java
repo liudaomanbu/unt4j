@@ -40,14 +40,11 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
     String name;
     @NonNull
     ReadableProperty<O, T> transferProperty;
-    @NonNull
-    Property<T, P> target;
 
     protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
-                                        @NonNull Property<T, P> target) {
-        this.name = transferProperty.name() + "." + target.name();
+                                        @NonNull Property<T, P> delegate) {
+        this.name = transferProperty.name() + "." + delegate.name();
         this.transferProperty = transferProperty;
-        this.target = target;
     }
 
     @NonNull
@@ -59,7 +56,7 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
     @NonNull
     @Override
     public final TypeToken<P> type() {
-        return target().type();
+        return delegate().type();
     }
 
     @Override
@@ -75,16 +72,16 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
     @Override
     public final @NonNull <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass) {
-        return target().annotation(annotationClass);
+        return delegate().annotation(annotationClass);
     }
 
     @Override
     public final @NonNull <X extends Annotation> ImmutableList<X> annotations(
             @NonNull Class<X> annotationClass) {
-        return target().annotations(annotationClass);
+        return delegate().annotations(annotationClass);
     }
 
     //todo 命名
     @NonNull
-    protected abstract Property<T, P> target();
+    protected abstract Property<T, P> delegate();
 }

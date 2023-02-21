@@ -22,6 +22,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
@@ -39,6 +40,10 @@ import java.util.stream.Stream;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P> implements AccessibleProperty<O, P> {
+
+    public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
+        super(propertyAccessors);
+    }
 
     public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
                                     @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {

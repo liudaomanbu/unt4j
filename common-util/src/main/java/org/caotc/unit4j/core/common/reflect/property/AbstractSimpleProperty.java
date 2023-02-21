@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import org.caotc.unit4j.core.common.base.AccessLevel;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
@@ -36,7 +37,8 @@ import java.util.stream.Stream;
 
 /**
  * 简单属性抽象类
- * todo 补充说明各种异常情况的注释,如父类和子类同名field时会被认为是相同属性
+ * 同一个{@link #ownerType}的同名属性就认为是同一个属性.
+ * 但是在java中这种假设并非百分百成立,比如super class的private field和sub class的field可以同名,但是这两个field其实并非是同一个属性.
  *
  * @param <O> owner type
  * @param <P> property type
@@ -102,7 +104,12 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @NonNull
     TypeToken<O> ownerType;
 
-    //todo accesstors
+    protected AbstractSimpleProperty(
+            @NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
+        this(ImmutableSortedSet.copyOf(ORDERING, propertyAccessors),
+                ImmutableSortedSet.copyOf(ORDERING, propertyAccessors));
+    }
+
     protected AbstractSimpleProperty(
             @NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
             @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
