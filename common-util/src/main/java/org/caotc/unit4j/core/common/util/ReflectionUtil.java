@@ -1990,7 +1990,7 @@ public class ReflectionUtil {
     }
 
     public static boolean isPropertyElement(@NonNull Field field) {
-        return !FieldElement.of(field).isStatic();//todo element.of
+        return !FieldElement.of(field).isStatic();
     }
 
     public static boolean isPropertyElement(@NonNull Method method) {
