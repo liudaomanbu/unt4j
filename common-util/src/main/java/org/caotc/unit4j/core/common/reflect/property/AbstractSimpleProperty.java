@@ -94,7 +94,6 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @NonNull
     String name;
     //todo 排除已被重写的方法？
-    //todo 子类使用get方法
     @NonNull
     ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
     @NonNull
