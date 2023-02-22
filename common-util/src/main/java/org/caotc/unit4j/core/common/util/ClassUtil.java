@@ -2,11 +2,13 @@ package org.caotc.unit4j.core.common.util;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author caotc
@@ -21,7 +23,7 @@ public class ClassUtil {
 
     public static Set<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
         if (Iterables.isEmpty(classes)) {
-            return ImmutableSet.of();
+            return Sets.newHashSet();
         }
         final Set<Class<?>> result = TypeToken.of(classes.iterator().next()).getTypes().stream()
                 .map(TypeToken::getRawType)
@@ -31,7 +33,7 @@ public class ClassUtil {
                 .filter(type1 -> result.stream()
                         .filter(type2 -> !Objects.equals(type1, type2))
                         .noneMatch(type2 -> type1.isAssignableFrom(type2)))
-                .collect(ImmutableSet.toImmutableSet());
+                .collect(Collectors.toSet());
     }
 
     public static Set<TypeToken<?>> lowestCommonAncestors(Class<?>... classes) {
@@ -42,10 +44,10 @@ public class ClassUtil {
         return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()));
     }
 
-    //todo 返回值集合是否不可变检查
+
     public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
         if (Iterables.isEmpty(types)) {
-            return ImmutableSet.of();
+            return Sets.newHashSet();
         }
 
         final Set<? extends TypeToken<?>> result = types.iterator().next().getTypes().stream()
@@ -55,7 +57,7 @@ public class ClassUtil {
                 .filter(type1 -> result.stream()
                         .filter(type2 -> !Objects.equals(type1, type2))
                         .noneMatch(type2 -> type1.isSupertypeOf(type2)))
-                .collect(ImmutableSet.toImmutableSet());
+                .collect(Collectors.toSet());
     }
 
     public static TypeToken<?> unwrapContainer(TypeToken<?> type) {

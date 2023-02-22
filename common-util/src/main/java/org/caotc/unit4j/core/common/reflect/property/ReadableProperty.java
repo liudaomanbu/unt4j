@@ -113,6 +113,20 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
             .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
   }
 
+  @NonNull
+  default <S> Property<O, S> compose(Property<P, S> property) {
+    if (property.accessible()) {
+      return compose(property.toAccessible());
+    }
+    if (property.readable()) {
+      return compose(property.toReadable());
+    }
+    if (property.writable()) {
+      return compose(property.toWritable());
+    }
+    throw new AssertionError();
+  }
+
   /**
    * compose two {@link ReadableProperty} to a {@link ReadableProperty}
    *

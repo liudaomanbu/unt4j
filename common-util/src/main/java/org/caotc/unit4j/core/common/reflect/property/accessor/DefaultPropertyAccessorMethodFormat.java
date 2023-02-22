@@ -137,7 +137,7 @@ public enum DefaultPropertyAccessorMethodFormat implements PropertyAccessorMetho
                 && invokable.parameters().isEmpty()
                 && !invokable.returnType().getRawType().equals(void.class)
                 && propertyReaderNameMatches(invokable)
-                && !ReflectionUtil.isOverride(invokable, Object.class);
+                && !ReflectionUtil.isOverridden(invokable, Object.class);
     }
 
     /**
@@ -155,7 +155,7 @@ public enum DefaultPropertyAccessorMethodFormat implements PropertyAccessorMetho
                 .equals(invokable.ownerType()))
                 && invokable.parameters().size() == 1
                 && propertyWriterNameMatches(invokable)
-                && !ReflectionUtil.isOverride(invokable, Object.class);
+                && !ReflectionUtil.isOverridden(invokable, Object.class);
     }
 
     /**
