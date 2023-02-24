@@ -54,5 +54,4 @@ public interface MethodInvokable<O, R> extends Invokable<O, R> {
     default boolean isOverriding(@NonNull MethodInvokable<?, ?> other) {
         return other.isOverridden(this);
     }
-
 }

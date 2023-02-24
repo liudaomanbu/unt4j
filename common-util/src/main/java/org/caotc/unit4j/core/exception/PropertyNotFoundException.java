@@ -20,6 +20,9 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.Property;
+
+import java.lang.reflect.Type;
 
 /**
  * {@link Property}不存在异常
@@ -31,39 +34,68 @@ import lombok.NonNull;
  */
 @Getter
 @EqualsAndHashCode
-public abstract class PropertyNotFoundException extends IllegalArgumentException {
+public class PropertyNotFoundException extends IllegalArgumentException {
+    /**
+     * 类
+     */
+    @NonNull
+    TypeToken<?> typeToken;
+    /**
+     * 属性名称
+     */
+    @NonNull
+    String propertyName;
+    @Getter(lazy = true)
+    String message = messageInternal();
 
-  /**
-   * 类
-   */
-  @NonNull
-  TypeToken<?> typeToken;
-  /**
-   * 属性名称
-   */
-  @NonNull
-  String propertyName;
-  @Getter(lazy = true)
-  String message = messageInternal();
+    protected PropertyNotFoundException(@NonNull TypeToken<?> typeToken,
+                                        @NonNull String propertyName) {
+        this.propertyName = propertyName;
+        this.typeToken = typeToken;
+    }
 
-  protected PropertyNotFoundException(@NonNull TypeToken<?> typeToken,
-      @NonNull String propertyName) {
-    this.propertyName = propertyName;
-    this.typeToken = typeToken;
-  }
+    @NonNull
+    public static PropertyNotFoundException create(@NonNull Type type,
+                                                   @NonNull String propertyName) {
+        return new PropertyNotFoundException(TypeToken.of(type), propertyName);
+    }
 
-  @NonNull
-  protected abstract String messageInternal();
+    @NonNull
+    public static PropertyNotFoundException create(@NonNull Class<?> clazz,
+                                                   @NonNull String propertyName) {
+        return new PropertyNotFoundException(TypeToken.of(clazz), propertyName);
+    }
 
-  /**
-   * Returns the detail message string of this throwable.
-   *
-   * @return the detail message string of this {@code Throwable} instance (which may be {@code
-   * null}).
-   */
-  @Override
-  public final String getMessage() {
-    return message();
-  }
+    /**
+     * 工厂方法
+     *
+     * @param propertyName 属性名称
+     * @param typeToken    类
+     * @return {@link ReadablePropertyNotFoundException}
+     * @author caotc
+     * @date 2019-05-25
+     * @since 1.0.0
+     */
+    @NonNull
+    public static PropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
+                                                   @NonNull String propertyName) {
+        return new PropertyNotFoundException(typeToken, propertyName);
+    }
+
+    @NonNull
+    protected String messageInternal() {
+        return String.format("%s not found the Property named %s", typeToken(), propertyName());
+    }
+
+    /**
+     * Returns the detail message string of this throwable.
+     *
+     * @return the detail message string of this {@code Throwable} instance (which may be {@code
+     * null}).
+     */
+    @Override
+    public final String getMessage() {
+        return message();
+    }
 
 }

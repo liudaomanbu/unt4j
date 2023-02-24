@@ -69,7 +69,7 @@ public class WritablePropertyNotFoundException extends PropertyNotFoundException
   }
 
   @Override
-  protected String messageInternal() {
-    return String.format("%s not found the WritableProperty named %s", typeToken(), propertyName());
+  protected @NonNull String messageInternal() {
+      return String.format("%s not found the WritableProperty named %s", typeToken(), propertyName());
   }
 }

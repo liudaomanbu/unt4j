@@ -81,7 +81,6 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
         return delegate().annotations(annotationClass);
     }
 
-    //todo 命名
     @NonNull
     protected abstract Property<T, P> delegate();
 }

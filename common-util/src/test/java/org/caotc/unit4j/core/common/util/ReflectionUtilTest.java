@@ -187,8 +187,8 @@ class ReflectionUtilTest {
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.util.provider.Provider#classAndConstructorSets")
-    void constructors(Type type, Set<Constructor<?>> constructors) {
-        Set<Constructor<?>> result = ReflectionUtil.constructors(type);
+    <T> void constructors(Type type, Set<Constructor<T>> constructors) {
+        Set<Constructor<T>> result = ReflectionUtil.constructors(type);
         log.debug("type:{},result:{}", type, result);
         Assertions.assertEquals(constructors, result);
     }

@@ -26,11 +26,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.core.BridgeMethodResolver;
 
 import javax.annotation.CheckForNull;
-import java.lang.reflect.*;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * @param <S> source type
  * @param <O> owner type
  * @param <R> return type
  * @author caotc
@@ -39,18 +41,14 @@ import java.util.Objects;
  */
 @SuppressWarnings("UnstableApiUsage")
 @EqualsAndHashCode(callSuper = true)
-public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends BaseElement implements Invokable<O, R> {
+public abstract class GuavaInvokableProxy<O, R> extends BaseElement implements Invokable<O, R> {
     @Getter(AccessLevel.PROTECTED)
     @NonNull
     com.google.common.reflect.Invokable<O, R> invokable;
-    @Getter
-    @NonNull
-    S source;
 
-    GuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, R> delegate, @NonNull S source) {
-        super(source);
+    GuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, R> delegate) {
+        super(delegate);
         this.invokable = delegate;
-        this.source = source;
     }
 
     @SuppressWarnings("unchecked")
@@ -60,7 +58,7 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends Ba
     }
 
     @NonNull
-    public static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor) {
+    public static <O> ConstructorInvokable<O> from(@NonNull Constructor<O> constructor) {
         return new ConstructorGuavaInvokableProxy<>(com.google.common.reflect.Invokable.from(constructor), constructor);
     }
 
@@ -71,7 +69,7 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends Ba
     }
 
     @NonNull
-    public static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
+    public static <O> ConstructorInvokable<O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
         return new ConstructorGuavaInvokableProxy<>(owner.constructor(constructor), constructor);
     }
 
@@ -138,10 +136,15 @@ public abstract class GuavaInvokableProxy<S extends Executable, O, R> extends Ba
     }
 }
 
+@Getter
 @SuppressWarnings("UnstableApiUsage")
-class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> implements MethodInvokable<O, P> {
+class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<O, P> implements MethodInvokable<O, P> {
+    @NonNull
+    Method source;
+
     MethodGuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, P> delegate, @NonNull Method source) {
-        super(delegate, source);
+        super(delegate);
+        this.source = source;
     }
 
     @NonNull
@@ -220,15 +223,20 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<Method, O, P> 
     }
 }
 
+@Getter
 @SuppressWarnings("UnstableApiUsage")
-class ConstructorGuavaInvokableProxy<O> extends GuavaInvokableProxy<Constructor<O>, O, O> implements ConstructInvokable<O> {
+class ConstructorGuavaInvokableProxy<O> extends GuavaInvokableProxy<O, O> implements ConstructorInvokable<O> {
+    @NonNull
+    Constructor<O> source;
+
     ConstructorGuavaInvokableProxy(@NonNull com.google.common.reflect.Invokable<O, O> delegate, @NonNull Constructor<O> source) {
-        super(delegate, source);
+        super(delegate);
+        this.source = source;
     }
 
     @NonNull
     @Override
-    public ConstructInvokable<O> accessible(boolean accessible) {
+    public ConstructorInvokable<O> accessible(boolean accessible) {
         super.accessible(accessible);
         return this;
     }

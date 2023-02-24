@@ -161,7 +161,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @NonNull
     @Override
     public final TypeToken<P> type() {
-        //todo 范型
+        //todo 泛型
         if (!propertyWriters().isEmpty()) {
             return (TypeToken<P>) propertyWriters().first().propertyType();
         }

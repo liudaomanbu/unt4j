@@ -69,8 +69,8 @@ public class AccessiblePropertyNotFoundException extends PropertyNotFoundExcepti
   }
 
   @Override
-  protected String messageInternal() {
-    return String
-        .format("%s not found the AccessibleProperty named %s", typeToken(), propertyName());
+  protected @NonNull String messageInternal() {
+      return String
+              .format("%s not found the AccessibleProperty named %s", typeToken(), propertyName());
   }
 }

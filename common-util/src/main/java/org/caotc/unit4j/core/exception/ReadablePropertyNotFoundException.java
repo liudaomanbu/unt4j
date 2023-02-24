@@ -20,6 +20,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 
 import java.lang.reflect.Type;
 
@@ -68,8 +69,8 @@ public class ReadablePropertyNotFoundException extends PropertyNotFoundException
     super(typeToken, propertyName);
   }
 
-  @Override
-  protected String messageInternal() {
-    return String.format("%s not found the ReadableProperty named %s", typeToken(), propertyName());
-  }
+    @Override
+    protected @NonNull String messageInternal() {
+        return String.format("%s not found the ReadableProperty named %s", typeToken(), propertyName());
+    }
 }

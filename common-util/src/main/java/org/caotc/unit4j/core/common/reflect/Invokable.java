@@ -35,16 +35,16 @@ public interface Invokable<O, R> extends Element {
         return MethodInvokable.from(method);
     }
 
-    static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor) {
-        return ConstructInvokable.from(constructor);
+    static <O> ConstructorInvokable<O> from(@NonNull Constructor<O> constructor) {
+        return ConstructorInvokable.from(constructor);
     }
 
     static <O, R> MethodInvokable<O, R> from(@NonNull Method method, @NonNull TypeToken<O> owner) {
         return MethodInvokable.from(method, owner);
     }
 
-    static <O> ConstructInvokable<O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
-        return ConstructInvokable.from(constructor, owner);
+    static <O> ConstructorInvokable<O> from(@NonNull Constructor<O> constructor, @NonNull TypeToken<O> owner) {
+        return ConstructorInvokable.from(constructor, owner);
     }
 
     @NonNull

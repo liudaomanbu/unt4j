@@ -100,12 +100,20 @@ public class AmountUtil {
               .map(AmountUtil::warp);
   }
 
-  @NonNull
+    @NonNull
     public static <T> Stream<WritableProperty<T, Amount>> writableAmountPropertyStreamFromClass(
             @NonNull Class<T> type) {
-      return ReflectionUtil.writablePropertyStream(type)
-              .filter(AmountUtil::isAmountProperty)
-              .map(AmountUtil::warp);
+        return ReflectionUtil.writablePropertyStream(type)
+                .filter(AmountUtil::isAmountProperty)
+                .map(AmountUtil::warp);
+    }
+
+    @NonNull
+    public static <T> Stream<AccessibleProperty<T, Amount>> accessibleAmountPropertyStreamFromClass(
+            @NonNull Class<T> type) {
+        return ReflectionUtil.accessiblePropertyStream(type)
+                .filter(AmountUtil::isAmountProperty)
+                .map(AmountUtil::warp);
     }
 
     @NonNull
