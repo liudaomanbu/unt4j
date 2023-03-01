@@ -47,7 +47,6 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
         return PropertyAccessor.from(ownerClass, field);
     }
 
-    //todo from名字修改?
     @NonNull
     static <O, P> PropertyElement<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
         return PropertyAccessor.from(ownerType, field);

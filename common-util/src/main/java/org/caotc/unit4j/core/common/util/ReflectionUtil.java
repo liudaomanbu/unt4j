@@ -37,6 +37,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -172,38 +173,38 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<MethodInvokable<O, ?>> methodInvokables(
+    public static <O> Set<MethodInvokable<O, Object>> methodInvokables(
             @NonNull Type type) {
         return ReflectionUtil.<O>methodInvokableStream(type).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<MethodInvokable<O, ?>> methodInvokables(
+    public static <O> Set<MethodInvokable<O, Object>> methodInvokables(
             @NonNull Class<O> type) {
         return methodInvokableStream(type).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<MethodInvokable<O, ?>> methodInvokables(
+    public static <O> Set<MethodInvokable<O, Object>> methodInvokables(
             @NonNull TypeToken<O> type) {
         return methodInvokableStream(type).collect(Collectors.toSet());
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <O> Stream<MethodInvokable<O, ?>> methodInvokableStream(
+    public static <O> Stream<MethodInvokable<O, Object>> methodInvokableStream(
             @NonNull Type type) {
         return methodInvokableStream((TypeToken<O>) TypeToken.of(type));
     }
 
     @NonNull
-    public static <O> Stream<MethodInvokable<O, ?>> methodInvokableStream(
+    public static <O> Stream<MethodInvokable<O, Object>> methodInvokableStream(
             @NonNull Class<O> type) {
         return methodInvokableStream(TypeToken.of(type));
     }
 
     @NonNull
-    public static <O> Stream<MethodInvokable<O, ?>> methodInvokableStream(
+    public static <O> Stream<MethodInvokable<O, Object>> methodInvokableStream(
             @NonNull TypeToken<O> type) {
         return methodStream(type).map(method -> Invokable.from(method, type));
     }
@@ -633,13 +634,13 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull O object) {
         return propertyStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyStream(object.getClass(),
@@ -657,7 +658,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull Type type) {
         return propertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -675,7 +676,7 @@ public class ReflectionUtil {
      */
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream((TypeToken<O>) TypeToken.of(type),
@@ -693,7 +694,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull Class<O> type) {
         return propertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -710,7 +711,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(TypeToken.of(type), propertyAccessorMethodFormats);
@@ -727,7 +728,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull TypeToken<O> type) {
         return propertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -744,78 +745,78 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<Property<O, ?>> propertyStream(
+    public static <O> Stream<Property<O, Object>> propertyStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
 
-        ImmutableListMultimap<String, PropertyElement<O, ?>> propertyNameToPropertyElements =
+        ImmutableListMultimap<String, PropertyElement<O, Object>> propertyNameToPropertyElements =
                 propertyElementStream(type, propertyAccessorMethodFormats)
                         .collect(ImmutableListMultimap.toImmutableListMultimap(PropertyElement::propertyName, Function.identity()));
         //todo propertyType和returning是否应该放弃P1 extends P的约束,propertyStream是否应该返回<O,Object>
         return propertyNameToPropertyElements.asMap().values().stream()
-                .map(propertyElements -> propertyElements.stream().map(o -> o))
+                .map(Collection::stream)
                 .map(Property::create);
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull O object) {
         return properties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull Type type) {
         return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull Class<O> type) {
         return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull TypeToken<O> type) {
         return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, ?>> properties(
+    public static <O> Set<Property<O, Object>> properties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull O object) {
         return readablePropertyStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.propertyStream(object, propertyAccessorMethodFormats)
@@ -834,7 +835,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull Type type) {
         return readablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -851,7 +852,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyStream(type, propertyAccessorMethodFormats)
@@ -870,7 +871,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull Class<O> type) {
         return readablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -887,7 +888,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats)
@@ -906,7 +907,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull TypeToken<O> type) {
         return readablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -923,7 +924,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<ReadableProperty<O, ?>> readablePropertyStream(
+    public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats)
@@ -932,26 +933,26 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull O object) {
         return readableProperties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.readablePropertyStream(object, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull Type type) {
         return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>readablePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
@@ -959,13 +960,13 @@ public class ReflectionUtil {
 
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull Class<O> type) {
         return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return readablePropertyStream(type, propertyAccessorMethodFormats)
@@ -973,26 +974,26 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull TypeToken<O> type) {
         return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, ?>> readableProperties(
+    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return readablePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull O object) {
         return writablePropertyStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.propertyStream(object, propertyAccessorMethodFormats)
@@ -1011,7 +1012,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull Type type) {
         return writablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -1028,7 +1029,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyStream(type, propertyAccessorMethodFormats)
@@ -1047,7 +1048,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull Class<O> type) {
         return writablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -1064,7 +1065,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats)
@@ -1083,7 +1084,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull TypeToken<O> type) {
         return writablePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -1100,7 +1101,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<WritableProperty<O, ?>> writablePropertyStream(
+    public static <O> Stream<WritableProperty<O, Object>> writablePropertyStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats)
@@ -1109,26 +1110,26 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull O object) {
         return writableProperties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.writablePropertyStream(object, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull Type type) {
         return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>writablePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
@@ -1136,13 +1137,13 @@ public class ReflectionUtil {
 
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull Class<O> type) {
         return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return writablePropertyStream(type, propertyAccessorMethodFormats)
@@ -1151,13 +1152,13 @@ public class ReflectionUtil {
 
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull TypeToken<O> type) {
         return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, ?>> writableProperties(
+    public static <O> Set<WritableProperty<O, Object>> writableProperties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return writablePropertyStream(type, propertyAccessorMethodFormats)
@@ -1175,7 +1176,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull O object) {
         return accessiblePropertyStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -1192,7 +1193,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyStream(object.getClass(), propertyAccessorMethodFormats)
@@ -1211,7 +1212,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull Type type) {
         return accessiblePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -1228,7 +1229,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyStream(type, propertyAccessorMethodFormats)
@@ -1247,7 +1248,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull Class<O> type) {
         return accessiblePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -1264,7 +1265,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats)
@@ -1283,7 +1284,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull TypeToken<O> type) {
         return accessiblePropertyStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
@@ -1300,7 +1301,7 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static <O> Stream<AccessibleProperty<O, ?>> accessiblePropertyStream(
+    public static <O> Stream<AccessibleProperty<O, Object>> accessiblePropertyStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyStream(type, propertyAccessorMethodFormats)
@@ -1309,52 +1310,52 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull O object) {
         return accessibleProperties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.accessiblePropertyStream(object, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Type type) {
         return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Class<O> type) {
         return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull TypeToken<O> type) {
         return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, ?>> accessibleProperties(
+    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return accessiblePropertyStream(type, propertyAccessorMethodFormats)
@@ -1909,79 +1910,79 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(@NonNull O object) {
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull O object) {
         return propertyElements(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(@NonNull Type type) {
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull Type type) {
         return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(@NonNull Class<O> type) {
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull Class<O> type) {
         return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(@NonNull TypeToken<O> type) {
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull TypeToken<O> type) {
         return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyElementStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyElementStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, ?>> propertyElements(
+    public static <O> Set<PropertyElement<O, Object>> propertyElements(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull O object) {
         return propertyElementStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull Type type) {
         return propertyElementStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull Class<O> type) {
         return propertyElementStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull TypeToken<O> type) {
         return propertyElementStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyElementStream(object.getClass(),
@@ -1990,7 +1991,7 @@ public class ReflectionUtil {
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream((TypeToken<O>) TypeToken.of(type),
@@ -1998,7 +1999,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(TypeToken.of(type), propertyAccessorMethodFormats);
@@ -2006,11 +2007,11 @@ public class ReflectionUtil {
 
     //todo fluent风格的属性方法应该永远存在
     @NonNull
-    public static <O> Stream<PropertyElement<O, ?>> propertyElementStream(
+    public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
 
-        Stream<PropertyElement<O, ?>> propertyElementStream = methodStream(type)
+        Stream<PropertyElement<O, Object>> propertyElementStream = methodStream(type)
                 .flatMap(method -> Arrays.stream(propertyAccessorMethodFormats)
                         .filter(methodNameStyle -> methodNameStyle.isPropertyWriter(method)
                                 || methodNameStyle.isPropertyReader(method))
@@ -2022,83 +2023,83 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull O object) {
         return propertyReaders(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull Type type) {
         return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull Class<O> type) {
         return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull TypeToken<O> type) {
         return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyReaderStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyReaderStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyReaderStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, ?>> propertyReaders(
+    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyReaderStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull O object) {
         return propertyReaderStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull Type type) {
         return propertyReaderStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull Class<O> type) {
         return propertyReaderStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull TypeToken<O> type) {
         return propertyReaderStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.propertyElementStream(object, propertyAccessorMethodFormats)
@@ -2107,7 +2108,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyElementStream(type, propertyAccessorMethodFormats)
@@ -2116,14 +2117,14 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyReaderStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
     @NonNull
-    public static <O> Stream<PropertyReader<O, ?>> propertyReaderStream(
+    public static <O> Stream<PropertyReader<O, Object>> propertyReaderStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(type, propertyAccessorMethodFormats)
@@ -2132,83 +2133,83 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull O object) {
         return propertyWriters(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Type type) {
         return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Class<O> type) {
         return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull TypeToken<O> type) {
         return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyWriterStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyWriterStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyWriterStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, ?>> propertyWriters(
+    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyWriterStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull O object) {
         return propertyWriterStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull Type type) {
         return propertyWriterStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull Class<O> type) {
         return propertyWriterStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull TypeToken<O> type) {
         return propertyWriterStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.propertyElementStream(object, propertyAccessorMethodFormats)
@@ -2217,7 +2218,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyElementStream(type, propertyAccessorMethodFormats)
@@ -2226,7 +2227,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(type, propertyAccessorMethodFormats)
@@ -2235,7 +2236,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyWriter<O, ?>> propertyWriterStream(
+    public static <O> Stream<PropertyWriter<O, Object>> propertyWriterStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(type, propertyAccessorMethodFormats)
@@ -2244,83 +2245,83 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull O object) {
         return propertyAccessors(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Type type) {
         return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Class<O> type) {
         return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull TypeToken<O> type) {
         return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyAccessorStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyAccessorStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyAccessorStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, ?>> propertyAccessors(
+    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyAccessorStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull O object) {
         return propertyAccessorStream(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull Type type) {
         return propertyAccessorStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull Class<O> type) {
         return propertyAccessorStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull TypeToken<O> type) {
         return propertyAccessorStream(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.propertyElementStream(object, propertyAccessorMethodFormats)
@@ -2329,7 +2330,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return ReflectionUtil.<O>propertyElementStream(type, propertyAccessorMethodFormats)
@@ -2338,7 +2339,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(type, propertyAccessorMethodFormats)
@@ -2347,7 +2348,7 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Stream<PropertyAccessor<O, ?>> propertyAccessorStream(
+    public static <O> Stream<PropertyAccessor<O, Object>> propertyAccessorStream(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         return propertyElementStream(type, propertyAccessorMethodFormats)

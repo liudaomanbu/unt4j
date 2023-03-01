@@ -150,12 +150,12 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
        * set方法
        */
       @NonNull
-      MethodInvokable<O, ?> invokable;//todo 变量名
-      /**
-       * set方法名称风格
-       */
-      @NonNull
-      String propertyName;
+      MethodInvokable<O, ?> invokable;
+        /**
+         * set方法名称风格
+         */
+        @NonNull
+        String propertyName;
 
       InvokablePropertyWriter(@NonNull MethodInvokable<O, ?> invokable,
                               @NonNull String propertyName) {
