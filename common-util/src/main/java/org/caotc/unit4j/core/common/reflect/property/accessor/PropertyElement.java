@@ -153,9 +153,17 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
     @NonNull
     PropertyElement<O, P> accessible(boolean accessible);
 
-    default boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+    default boolean checkOwnerType(@NonNull Class<?> newOwnerType) {
+        return checkOwnerType(TypeToken.of(newOwnerType));
+    }
+
+    default boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
         return declaringType().isSupertypeOf(newOwnerType);
     }
 
-    @NonNull <O1> PropertyElement<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+    default @NonNull <O1> PropertyElement<O1, P> ownerType(@NonNull Class<O1> newOwnerType) {
+        return ownerType(TypeToken.of(newOwnerType));
+    }
+
+    @NonNull <O1> PropertyElement<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType);
 }

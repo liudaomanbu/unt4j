@@ -52,6 +52,10 @@ public interface PropertyAccessor<O, P> extends PropertyReader<O, P>, PropertyWr
     @Override
     @NonNull PropertyAccessor<O, P> write(@NonNull O object, @NonNull P value);
 
+    default @NonNull <O1> PropertyAccessor<O1, P> ownerType(@NonNull Class<O1> newOwnerType) {
+        return this.ownerType(TypeToken.of(newOwnerType));
+    }
+
     @Override
-    @NonNull <O1> PropertyAccessor<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+    @NonNull <O1> PropertyAccessor<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType);
 }

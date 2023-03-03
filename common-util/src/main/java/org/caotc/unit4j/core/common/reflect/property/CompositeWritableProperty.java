@@ -36,6 +36,16 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 public class CompositeWritableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T> implements
         WritableProperty<O, P> {
 
+  private CompositeWritableProperty(
+          @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
+          @NonNull WritableProperty<T, P> delegate) {
+    super(targetReadableProperty, delegate);
+    this.delegate = delegate;
+  }
+
+  @NonNull
+  WritableProperty<T, P> delegate;
+
   /**
    * static constructor
    *
@@ -48,19 +58,9 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
    */
   @NonNull
   static <O, P, T> CompositeWritableProperty<O, P, T> create(
-          @NonNull ReadableProperty<O, T> targetReadableProperty,
+          @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
           @NonNull WritableProperty<T, P> delegate) {
     return new CompositeWritableProperty<>(targetReadableProperty, delegate);
-  }
-
-  @NonNull
-  WritableProperty<T, P> delegate;
-
-  private CompositeWritableProperty(
-          @NonNull ReadableProperty<O, T> targetReadableProperty,
-          @NonNull WritableProperty<T, P> delegate) {
-    super(targetReadableProperty, delegate);
-    this.delegate = delegate;
   }
 
   @Override
@@ -80,8 +80,8 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
   }
 
   @Override
-  public @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeWritableProperty<>(transferProperty().ownBy(ownerType), delegate());
+  public @NonNull <O1> WritableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+    return new CompositeWritableProperty<>(transferProperty().ownerType(ownerType), delegate());
   }
 
   @Override

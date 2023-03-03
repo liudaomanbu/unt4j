@@ -103,6 +103,10 @@ public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
         return (AccessibleProperty<O, P1>) this;
     }
 
+    default @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull Class<O1> ownerType) {
+        return this.ownerType(TypeToken.of(ownerType));
+    }
+
     @Override
-    @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+    @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType);
 }

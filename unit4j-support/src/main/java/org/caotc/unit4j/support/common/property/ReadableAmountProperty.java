@@ -64,12 +64,12 @@ public class ReadableAmountProperty<O, P> extends BaseAmountProperty<O, P, Reada
     }
 
     @Override
-    public @NonNull <O1> ReadableProperty<O1, Amount> ownBy(@NonNull TypeToken<O1> ownerType) {
+    public @NonNull <O1> ReadableProperty<O1, Amount> ownerType(@NonNull TypeToken<O1> ownerType) {
         return null;
     }
 
     @Override
-    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
         return false;
     }
 }

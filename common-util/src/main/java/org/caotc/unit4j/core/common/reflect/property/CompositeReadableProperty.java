@@ -36,45 +36,52 @@ import java.util.Optional;
 public class CompositeReadableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T> implements
         ReadableProperty<O, P> {
 
-  /**
-   * static constructor
-   *
-   * @param targetReadableProperty targetReadableProperty
-   * @param delegate delegate
-   * @return {@link CompositeReadableProperty}
-   * @author caotc
-   * @date 2019-11-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R, E> ReadableProperty<T, R> create(
-          @NonNull ReadableProperty<T, E> targetReadableProperty,
-          @NonNull ReadableProperty<E, R> delegate) {
-    return new CompositeReadableProperty<>(targetReadableProperty, delegate);
-  }
+    @NonNull
+    ReadableProperty<T, P> delegate;
 
-  @NonNull
-  ReadableProperty<T, P> delegate;
+    private <E extends T> CompositeReadableProperty(
+            @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
+            @NonNull ReadableProperty<T, P> delegate) {
+        super(targetReadableProperty, delegate);
+        this.delegate = delegate;
+    }
 
-  private CompositeReadableProperty(
-          @NonNull ReadableProperty<O, T> targetReadableProperty,
-          @NonNull ReadableProperty<T, P> delegate) {
-    super(targetReadableProperty, delegate);
-    this.delegate = delegate;
-  }
+    /**
+     * static constructor
+     *
+     * @param targetReadableProperty targetReadableProperty
+     * @param delegate               delegate
+     * @return {@link CompositeReadableProperty}
+     * @author caotc
+     * @date 2019-11-27
+     * @since 1.0.0
+     */
+    @NonNull
+    static <O, P, T> ReadableProperty<O, P> create(
+            @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
+            @NonNull ReadableProperty<T, P> delegate) {
+        return new CompositeReadableProperty<>(targetReadableProperty, delegate);
+    }
 
-  @Override
-  public @NonNull Optional<P> read(@NonNull O target) {
-    return transferProperty().read(target).flatMap(delegate().toReadable()::read);
-  }
+    @NonNull
+    static <O, P, T> ReadableProperty<O, P> create1(
+            @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
+            @NonNull ReadableProperty<T, P> delegate) {
+        return new CompositeReadableProperty<>(targetReadableProperty, delegate);
+    }
 
-  @Override
-  public @NonNull <O1> ReadableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeReadableProperty<>(transferProperty().ownBy(ownerType), delegate());
-  }
+    @Override
+    public @NonNull Optional<P> read(@NonNull O target) {
+        return transferProperty().read(target).flatMap(delegate().toReadable()::read);
+    }
 
-  @Override
-  public boolean writable() {
-    return false;
-  }
+    @Override
+    public @NonNull <O1> ReadableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+        return new CompositeReadableProperty<>(transferProperty().ownerType(ownerType), delegate());
+    }
+
+    @Override
+    public boolean writable() {
+        return false;
+    }
 }

@@ -86,7 +86,7 @@ public interface Property<O, P> {
    * @since 1.0.0
    */
   @NonNull
-  TypeToken<P> type();
+  TypeToken<? extends P> type();
 
   @NonNull
   TypeToken<O> ownerType();
@@ -123,9 +123,17 @@ public interface Property<O, P> {
     return (Property<O, P1>) this;
   }
 
-  boolean canOwnBy(@NonNull TypeToken<?> newOwnerType);
+  default boolean checkOwnerType(@NonNull Class<?> newOwnerType) {
+    return checkOwnerType(TypeToken.of(newOwnerType));
+  }
 
-  @NonNull <O1> Property<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+  boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType);
+
+  default @NonNull <O1> Property<O1, P> ownerType(@NonNull Class<O1> ownerType) {
+    return ownerType(TypeToken.of(ownerType));
+  }
+
+  @NonNull <O1> Property<O1, P> ownerType(@NonNull TypeToken<O1> ownerType);
 
   boolean readable();
 
@@ -179,5 +187,4 @@ public interface Property<O, P> {
    */
   @NonNull <X extends Annotation> ImmutableList<X> annotations(
           @NonNull Class<X> annotationClass);
-
 }

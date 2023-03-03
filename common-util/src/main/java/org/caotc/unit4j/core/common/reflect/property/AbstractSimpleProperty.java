@@ -95,7 +95,6 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @Getter(lombok.AccessLevel.PUBLIC)
     @NonNull
     String name;
-    //todo 排除已被重写的方法？
     @NonNull
     ImmutableSortedSet<PropertyReader<O, P>> propertyReaders;
     @NonNull
@@ -157,21 +156,19 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
         this.propertyWriters = propertyWriters;
     }
 
-    @SuppressWarnings("unchecked")
     @NonNull
     @Override
-    public final TypeToken<P> type() {
-        //todo 泛型
+    public final TypeToken<? extends P> type() {
         if (!propertyWriters().isEmpty()) {
-            return (TypeToken<P>) propertyWriters().first().propertyType();
+            return propertyWriters().first().propertyType();
         }
-        return (TypeToken<P>) propertyReaders().first().propertyType();
+        return propertyReaders().first().propertyType();
     }
 
     @Override
-    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
-        return propertyWriters().stream().allMatch(propertyWriter -> propertyWriter.canOwnBy(newOwnerType))
-                && propertyReaders().stream().allMatch(propertyReader -> propertyReader.canOwnBy(newOwnerType));
+    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
+        return propertyWriters().stream().allMatch(propertyWriter -> propertyWriter.checkOwnerType(newOwnerType))
+                && propertyReaders().stream().allMatch(propertyReader -> propertyReader.checkOwnerType(newOwnerType));
     }
 
     @NonNull

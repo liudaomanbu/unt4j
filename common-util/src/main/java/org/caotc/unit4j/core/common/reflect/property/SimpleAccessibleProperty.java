@@ -87,9 +87,9 @@ public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P>
     }
 
     @Override
-    public @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-        return new SimpleAccessibleProperty<>(propertyReaders().stream().map(propertyReader -> propertyReader.ownBy(ownerType))
-                , propertyWriters().stream().map(propertyWriter -> propertyWriter.ownBy(ownerType)));
+    public @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+        return new SimpleAccessibleProperty<>(propertyReaders().stream().map(propertyReader -> propertyReader.ownerType(ownerType))
+                , propertyWriters().stream().map(propertyWriter -> propertyWriter.ownerType(ownerType)));
     }
 
     @Override

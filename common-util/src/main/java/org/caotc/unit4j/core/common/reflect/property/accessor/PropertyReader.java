@@ -127,6 +127,12 @@ public interface PropertyReader<O, P> extends PropertyElement<O, P> {
         return true;
     }
 
+    default @NonNull <O1> PropertyReader<O1, P> ownerType(@NonNull Class<O1> newOwnerType) {
+        return ownerType(TypeToken.of(newOwnerType));
+    }
+
     @Override
-    @NonNull <O1> PropertyReader<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+    @NonNull <O1> PropertyReader<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType);
+
+
 }

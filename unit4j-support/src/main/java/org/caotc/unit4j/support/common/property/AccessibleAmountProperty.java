@@ -71,12 +71,12 @@ public class AccessibleAmountProperty<O, P> extends BaseAmountProperty<O, P, Acc
     }
 
     @Override
-    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
         return false;
     }
 
     @Override
-    public @NonNull <O1> AccessibleProperty<O1, Amount> ownBy(@NonNull TypeToken<O1> ownerType) {
+    public @NonNull <O1> AccessibleProperty<O1, Amount> ownerType(@NonNull TypeToken<O1> ownerType) {
         return null;
     }
 }

@@ -752,7 +752,6 @@ public class ReflectionUtil {
         ImmutableListMultimap<String, PropertyElement<O, Object>> propertyNameToPropertyElements =
                 propertyElementStream(type, propertyAccessorMethodFormats)
                         .collect(ImmutableListMultimap.toImmutableListMultimap(PropertyElement::propertyName, Function.identity()));
-        //todo propertyType和returning是否应该放弃P1 extends P的约束,propertyStream是否应该返回<O,Object>
         return propertyNameToPropertyElements.asMap().values().stream()
                 .map(Collection::stream)
                 .map(Property::create);
@@ -1509,12 +1508,16 @@ public class ReflectionUtil {
             @NonNull TypeToken<O> type, @NonNull PropertyName propertyName,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
         if (propertyName.composite()) {
-            return property(type, propertyName.removeLastTier(), propertyAccessorMethodFormats)
+            return ReflectionUtil.property(type, propertyName.removeLastTier(), propertyAccessorMethodFormats)
                     .filter(Property::readable)
                     .map(Property::toReadable)
-                    .flatMap(transferProperty -> ReflectionUtil.<Object, P>property(
-                            transferProperty.type(), propertyName.lastTier(),
-                            propertyAccessorMethodFormats).map(transferProperty::compose)
+                    .flatMap((ReadableProperty<O, ?> transferProperty) -> {
+                                Optional<? extends Property<? extends Object, P>> property = property(transferProperty.type(), propertyName.lastTier(), propertyAccessorMethodFormats);
+
+                                return ReflectionUtil.<Object, P>property(transferProperty.type(), propertyName.lastTier(), propertyAccessorMethodFormats)
+                                        //                            .map(transferProperty::compose)
+                                        .map(d -> transferProperty.compose(d));
+                            }
                     );
         }
         return properties(type, propertyAccessorMethodFormats)

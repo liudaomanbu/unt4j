@@ -173,8 +173,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
    * @since 1.0.0
    */
   @NonNull
-  default <S> AccessibleProperty<O, S> compose(
-          AccessibleProperty<P, S> accessibleProperty) {
+  default <S> AccessibleProperty<O, S> compose(AccessibleProperty<P, S> accessibleProperty) {
     return new CompositeAccessibleProperty<>(this, accessibleProperty);
   }
 
@@ -213,6 +212,12 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
     return (ReadableProperty<O, P1>) this;
   }
 
+  default @NonNull <O1> ReadableProperty<O1, P> ownerType(@NonNull Class<O1> ownerType) {
+    return ownerType(TypeToken.of(ownerType));
+  }
+
   @Override
-  @NonNull <O1> ReadableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+  @NonNull <O1> ReadableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType);
+
+
 }

@@ -132,6 +132,10 @@ public interface WritableProperty<O, P> extends Property<O, P> {
         return (WritableProperty<O, P1>) this;
     }
 
+    default @NonNull <O1> WritableProperty<O1, P> ownerType(@NonNull Class<O1> ownerType) {
+        return ownerType(TypeToken.of(ownerType));
+    }
+
     @Override
-    @NonNull <O1> WritableProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+    @NonNull <O1> WritableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType);
 }

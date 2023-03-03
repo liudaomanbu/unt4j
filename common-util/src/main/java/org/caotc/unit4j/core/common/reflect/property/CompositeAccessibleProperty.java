@@ -41,7 +41,7 @@ public class CompositeAccessibleProperty<O, P, T> extends
   AccessibleProperty<T, P> delegate;
 
   CompositeAccessibleProperty(
-          @NonNull ReadableProperty<O, T> targetReadableProperty,
+          @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
           @NonNull AccessibleProperty<T, P> delegate) {
     super(targetReadableProperty, delegate);
     this.delegate = delegate;
@@ -60,8 +60,8 @@ public class CompositeAccessibleProperty<O, P, T> extends
   }
 
   @Override
-  public @NonNull <O1> AccessibleProperty<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeAccessibleProperty<>(transferProperty().ownBy(ownerType), delegate());
+  public @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+    return new CompositeAccessibleProperty<>(transferProperty().ownerType(ownerType), delegate());
   }
 
 }

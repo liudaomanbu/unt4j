@@ -130,11 +130,11 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
   }
 
   @Override
-  public @NonNull <O1> PropertyAccessor<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-    if (!canOwnBy(ownerType)) {
-      throw new IllegalArgumentException(String.format("%s is can not own by %s", this, ownerType));
+  public @NonNull <O1> PropertyAccessor<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType) {
+    if (!checkOwnerType(newOwnerType)) {
+      throw new IllegalArgumentException(String.format("%s is can not own by %s", this, newOwnerType));
     }
-    return ownByInternal(ownerType);
+    return ownByInternal(newOwnerType);
   }
 
   @NonNull

@@ -124,11 +124,11 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
     }
 
     @Override
-    public @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-        if (!canOwnBy(ownerType)) {
-            throw new IllegalArgumentException(String.format("%s is can not own by %s", this, ownerType));
+    public @NonNull <O1> PropertyWriter<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType) {
+        if (!checkOwnerType(newOwnerType)) {
+            throw new IllegalArgumentException(String.format("%s is can not own by %s", this, newOwnerType));
         }
-        return ownByInternal(ownerType);
+        return ownByInternal(newOwnerType);
     }
 
     @NonNull
@@ -183,8 +183,8 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
         }
 
         @Override
-        public @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType) {
-            return new InvokablePropertyWriter<>(invokable().ownBy(ownerType), propertyName());
+        public @NonNull <O1> PropertyWriter<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType) {
+            return new InvokablePropertyWriter<>(invokable().ownBy(newOwnerType), propertyName());
         }
 
         @Override

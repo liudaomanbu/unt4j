@@ -89,9 +89,10 @@ public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
 
     /**
      * 给传入对象的该属性设置传入的值
+     * //todo 是不是该把返回值改成写入后的object，否则如果是Value类型的write方法返回一个新对象是无法写入成功的
      *
      * @param object 设置属性值的对象
-     * @param value 设置的属性值
+     * @param value  设置的属性值
      * @return this
      * @author caotc
      * @date 2019-05-28
@@ -130,6 +131,10 @@ public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
         return true;
     }
 
+    default @NonNull <O1> PropertyWriter<O1, P> ownerType(@NonNull Class<O1> newOwnerType) {
+        return ownerType(TypeToken.of(newOwnerType));
+    }
+
     @Override
-    @NonNull <O1> PropertyWriter<O1, P> ownBy(@NonNull TypeToken<O1> ownerType);
+    @NonNull <O1> PropertyWriter<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType);
 }

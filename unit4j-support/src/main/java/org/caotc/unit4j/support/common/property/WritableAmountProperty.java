@@ -58,12 +58,12 @@ public class WritableAmountProperty<O, P> extends BaseAmountProperty<O, P, Writa
     }
 
     @Override
-    public @NonNull <O1> WritableProperty<O1, Amount> ownBy(@NonNull TypeToken<O1> ownerType) {
+    public @NonNull <O1> WritableProperty<O1, Amount> ownerType(@NonNull TypeToken<O1> ownerType) {
         return null;
     }
 
     @Override
-    public boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
         return false;
     }
 }
