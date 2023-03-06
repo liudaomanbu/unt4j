@@ -39,10 +39,10 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
     @NonNull
     String name;
     @NonNull
-    ReadableProperty<O, ? extends T> transferProperty;
+    ReadableProperty<O, T> transferProperty;
 
-    protected AbstractCompositeProperty(@NonNull ReadableProperty<O, ? extends T> transferProperty,
-                                        @NonNull Property<T, P> delegate) {
+    protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
+                                        @NonNull Property<? extends T, P> delegate) {
         this.name = transferProperty.name() + "." + delegate.name();
         this.transferProperty = transferProperty;
     }
@@ -55,7 +55,7 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
 
     @NonNull
     @Override
-    public final TypeToken<? extends P> type() {
+    public final TypeToken<P> type() {
         return delegate().type();
     }
 
@@ -82,5 +82,5 @@ public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, 
     }
 
     @NonNull
-    protected abstract Property<T, P> delegate();
+    protected abstract Property<? extends T, P> delegate();
 }

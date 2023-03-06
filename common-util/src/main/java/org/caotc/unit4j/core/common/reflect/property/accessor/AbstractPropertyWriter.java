@@ -72,29 +72,8 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
    */
   protected abstract void writeInternal(@NonNull O object, @NonNull P value);
 
-    /**
-   * 属性名称
-   *
-   * @return 属性名称
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  public abstract String propertyName();
 
-  /**
-   * 属性类型
-   *
-   * @return 属性类型
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  public abstract TypeToken<? extends P> propertyType();
+
 
     @Override
     @NonNull
@@ -171,11 +150,11 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
           invokable.invoke(obj, value);
       }
 
-      @SuppressWarnings("unchecked")
-      @Override
-      public @NonNull TypeToken<? extends P> propertyType() {
-          return (TypeToken<? extends P>) invokable.parameters().get(0).type();
-      }
+        @SuppressWarnings("unchecked")
+        @Override
+        public @NonNull TypeToken<P> propertyType() {
+            return (TypeToken<P>) invokable.parameters().get(0).type();
+        }
 
         @Override
         public TypeToken<O> ownerType() {

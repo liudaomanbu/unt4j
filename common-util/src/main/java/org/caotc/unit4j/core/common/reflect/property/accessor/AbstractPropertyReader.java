@@ -18,7 +18,10 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.ToString;
+import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.Invokable;
 import org.caotc.unit4j.core.common.reflect.MethodInvokable;
@@ -141,14 +144,18 @@ public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyEleme
 
         @NonNull
         @Override
-        @SneakyThrows
         public Optional<P> readInternal(@NonNull O object) {
-            return Optional.ofNullable(invokable.invoke(object));
+            try {
+                return Optional.ofNullable(invokable.invoke(object));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public @NonNull TypeToken<? extends P> propertyType() {
-            return invokable.returnType();
+        public @NonNull TypeToken<P> propertyType() {
+            return (TypeToken<P>) invokable.returnType();
         }
 
         @Override

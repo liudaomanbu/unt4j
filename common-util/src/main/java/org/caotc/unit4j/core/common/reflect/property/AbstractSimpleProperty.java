@@ -158,7 +158,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
 
     @NonNull
     @Override
-    public final TypeToken<? extends P> type() {
+    public final TypeToken<P> type() {
         if (!propertyWriters().isEmpty()) {
             return propertyWriters().first().propertyType();
         }

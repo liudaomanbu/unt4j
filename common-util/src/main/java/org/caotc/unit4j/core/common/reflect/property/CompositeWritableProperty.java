@@ -36,56 +36,56 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 public class CompositeWritableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T> implements
         WritableProperty<O, P> {
 
-  private CompositeWritableProperty(
-          @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
-          @NonNull WritableProperty<T, P> delegate) {
-    super(targetReadableProperty, delegate);
-    this.delegate = delegate;
-  }
+    @NonNull
+    WritableProperty<T, P> delegate;
 
-  @NonNull
-  WritableProperty<T, P> delegate;
+    private CompositeWritableProperty(
+            @NonNull ReadableProperty<O, T> targetReadableProperty,
+            @NonNull WritableProperty<? extends T, P> delegate) {
+        super(targetReadableProperty, delegate);
+        this.delegate = delegate.ownerType(targetReadableProperty.type());
+    }
 
-  /**
-   * static constructor
-   *
-   * @param targetReadableProperty targetReadableProperty
-   * @param delegate delegate
-   * @return {@link CompositeWritableProperty}
-   * @author caotc
-   * @date 2019-11-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <O, P, T> CompositeWritableProperty<O, P, T> create(
-          @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
-          @NonNull WritableProperty<T, P> delegate) {
-    return new CompositeWritableProperty<>(targetReadableProperty, delegate);
-  }
+    /**
+     * static constructor
+     *
+     * @param targetReadableProperty targetReadableProperty
+     * @param delegate               delegate
+     * @return {@link CompositeWritableProperty}
+     * @author caotc
+     * @date 2019-11-27
+     * @since 1.0.0
+     */
+    @NonNull
+    static <O, P, T> CompositeWritableProperty<O, P, T> create(
+            @NonNull ReadableProperty<O, T> targetReadableProperty,
+            @NonNull WritableProperty<? extends T, P> delegate) {
+        return new CompositeWritableProperty<>(targetReadableProperty, delegate);
+    }
 
-  @Override
-  public @NonNull CompositeWritableProperty<O, P, T> write(@NonNull O target, @NonNull P value) {
-    transferProperty().read(target)
-            .ifPresent(actualTarget -> delegate().toWritable().write(actualTarget, value));
-    return this;
-  }
+    @Override
+    public @NonNull CompositeWritableProperty<O, P, T> write(@NonNull O target, @NonNull P value) {
+        transferProperty().read(target)
+                .ifPresent(actualTarget -> delegate().toWritable().write(actualTarget, value));
+        return this;
+    }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public @NonNull <R1 extends P> CompositeWritableProperty<O, R1, T> type(
-          @NonNull TypeToken<R1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-            , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
-    return (CompositeWritableProperty<O, R1, T>) this;
-  }
+    @Override
+    @SuppressWarnings("unchecked")
+    public @NonNull <R1 extends P> CompositeWritableProperty<O, R1, T> type(
+            @NonNull TypeToken<R1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+                , "PropertySetter is known propertyType %s,not %s ", type(), propertyType);
+        return (CompositeWritableProperty<O, R1, T>) this;
+    }
 
-  @Override
-  public @NonNull <O1> WritableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeWritableProperty<>(transferProperty().ownerType(ownerType), delegate());
-  }
+    @Override
+    public @NonNull <O1> WritableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+        return new CompositeWritableProperty<>(transferProperty().ownerType(ownerType), delegate());
+    }
 
-  @Override
-  public boolean readable() {
-    return false;
-  }
+    @Override
+    public boolean readable() {
+        return false;
+    }
 }

@@ -97,7 +97,7 @@ public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement
      * @since 1.0.0
      */
     @NonNull
-    TypeToken<? extends P> propertyType();//todo 泛型
+    TypeToken<P> propertyType();
 
     /**
      * 设置属性类型

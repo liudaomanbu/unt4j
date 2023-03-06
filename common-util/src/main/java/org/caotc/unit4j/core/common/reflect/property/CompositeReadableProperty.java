@@ -39,11 +39,11 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
     @NonNull
     ReadableProperty<T, P> delegate;
 
-    private <E extends T> CompositeReadableProperty(
-            @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
-            @NonNull ReadableProperty<T, P> delegate) {
+    private CompositeReadableProperty(
+            @NonNull ReadableProperty<O, T> targetReadableProperty,
+            @NonNull ReadableProperty<? extends T, P> delegate) {
         super(targetReadableProperty, delegate);
-        this.delegate = delegate;
+        this.delegate = delegate.ownerType(targetReadableProperty.type());
     }
 
     /**
@@ -58,15 +58,8 @@ public class CompositeReadableProperty<O, P, T> extends AbstractCompositePropert
      */
     @NonNull
     static <O, P, T> ReadableProperty<O, P> create(
-            @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
-            @NonNull ReadableProperty<T, P> delegate) {
-        return new CompositeReadableProperty<>(targetReadableProperty, delegate);
-    }
-
-    @NonNull
-    static <O, P, T> ReadableProperty<O, P> create1(
-            @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
-            @NonNull ReadableProperty<T, P> delegate) {
+            @NonNull ReadableProperty<O, T> targetReadableProperty,
+            @NonNull ReadableProperty<? extends T, P> delegate) {
         return new CompositeReadableProperty<>(targetReadableProperty, delegate);
     }
 

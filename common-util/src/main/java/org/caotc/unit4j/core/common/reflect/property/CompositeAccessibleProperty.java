@@ -36,32 +36,39 @@ import java.util.Optional;
 public class CompositeAccessibleProperty<O, P, T> extends
         AbstractCompositeProperty<O, P, T> implements
         AccessibleProperty<O, P> {
+    @NonNull
+    AccessibleProperty<T, P> delegate;
 
-  @NonNull
-  AccessibleProperty<T, P> delegate;
 
-  CompositeAccessibleProperty(
-          @NonNull ReadableProperty<O, ? extends T> targetReadableProperty,
-          @NonNull AccessibleProperty<T, P> delegate) {
-    super(targetReadableProperty, delegate);
-    this.delegate = delegate;
-  }
+    CompositeAccessibleProperty(
+            @NonNull ReadableProperty<O, T> targetReadableProperty,
+            @NonNull AccessibleProperty<? extends T, P> delegate) {
+        super(targetReadableProperty, delegate);
+        this.delegate = delegate.ownerType(targetReadableProperty.type());
+    }
 
-  @Override
-  public @NonNull Optional<P> read(@NonNull O target) {
-    return transferProperty().read(target).flatMap(delegate().toAccessible()::read);
-  }
+    @NonNull
+    static <O, P, T> CompositeAccessibleProperty<O, P, T> create(
+            @NonNull ReadableProperty<O, T> targetReadableProperty,
+            @NonNull AccessibleProperty<? extends T, P> delegate) {
+        return new CompositeAccessibleProperty<>(targetReadableProperty, delegate);
+    }
 
-  @Override
-  public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-    transferProperty().read(target)
-            .ifPresent(actualTarget -> delegate().toAccessible().write(actualTarget, value));
-    return this;
-  }
+    @Override
+    public @NonNull Optional<P> read(@NonNull O target) {
+        return transferProperty().read(target).flatMap(delegate().toAccessible()::read);
+    }
 
-  @Override
-  public @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
-    return new CompositeAccessibleProperty<>(transferProperty().ownerType(ownerType), delegate());
-  }
+    @Override
+    public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
+        transferProperty().read(target)
+                .ifPresent(actualTarget -> delegate().toAccessible().write(actualTarget, value));
+        return this;
+    }
+
+    @Override
+    public @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+        return new CompositeAccessibleProperty<>(transferProperty().ownerType(ownerType), delegate());
+    }
 
 }

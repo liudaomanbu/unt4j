@@ -184,8 +184,8 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
     @SuppressWarnings("unchecked")
     @Override
     @NonNull
-    public TypeToken<? extends P> propertyType() {
-      return (TypeToken<? extends P>) ownerType().resolveType(field().genericType());
+    public TypeToken<P> propertyType() {
+      return (TypeToken<P>) ownerType().resolveType(field().genericType());
     }
 
     @Override

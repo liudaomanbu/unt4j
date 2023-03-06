@@ -1511,13 +1511,8 @@ public class ReflectionUtil {
             return ReflectionUtil.property(type, propertyName.removeLastTier(), propertyAccessorMethodFormats)
                     .filter(Property::readable)
                     .map(Property::toReadable)
-                    .flatMap((ReadableProperty<O, ?> transferProperty) -> {
-                                Optional<? extends Property<? extends Object, P>> property = property(transferProperty.type(), propertyName.lastTier(), propertyAccessorMethodFormats);
-
-                                return ReflectionUtil.<Object, P>property(transferProperty.type(), propertyName.lastTier(), propertyAccessorMethodFormats)
-                                        //                            .map(transferProperty::compose)
-                                        .map(d -> transferProperty.compose(d));
-                            }
+                    .flatMap(transferProperty -> ReflectionUtil.<Object, P>property(transferProperty.type(), propertyName.lastTier(), propertyAccessorMethodFormats)
+                            .map(transferProperty::compose)
                     );
         }
         return properties(type, propertyAccessorMethodFormats)
