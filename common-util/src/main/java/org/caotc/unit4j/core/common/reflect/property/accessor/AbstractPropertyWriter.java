@@ -143,12 +143,16 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
             this.propertyName = propertyName;
         }
 
+
+        @SuppressWarnings("unchecked")
         @Override
         public O writeInternal(@NonNull O obj, @NonNull P value) {
             try {
-                Object r = invokable().invoke(obj, value);
-                invokable().returnType();
-                return null;//todo
+                Object result = invokable().invoke(obj, value);
+                if (invokable().returnType().equals(invokable().ownerType())) {
+                    return (O) result;
+                }
+                return obj;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -167,12 +171,12 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
 
         @Override
         public @NonNull <O1> PropertyWriter<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType) {
-            return new InvokablePropertyWriter<>(invokable().ownBy(newOwnerType), propertyName());
+            return new InvokablePropertyWriter<>(invokable().ownerType(newOwnerType), propertyName());
         }
 
         @Override
         protected @NonNull <O1> PropertyWriter<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
-            return new InvokablePropertyWriter<>(invokable().ownBy(ownerType), propertyName());
+            return new InvokablePropertyWriter<>(invokable().ownerType(ownerType), propertyName());
         }
     }
 }

@@ -22,11 +22,11 @@ public interface MethodInvokable<O, R> extends Invokable<O, R> {
         return GuavaInvokableProxy.from(method, owner);
     }
 
-    default boolean canOwnBy(@NonNull TypeToken<?> newOwnerType) {
+    default boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
         return declaringType().isSupertypeOf(newOwnerType);
     }
 
-    @NonNull <O1> MethodInvokable<O1, R> ownBy(@NonNull TypeToken<O1> ownerType);
+    @NonNull <O1> MethodInvokable<O1, R> ownerType(@NonNull TypeToken<O1> ownerType);
 
     @NonNull
     MethodInvokable<O, R> accessible(boolean accessible);

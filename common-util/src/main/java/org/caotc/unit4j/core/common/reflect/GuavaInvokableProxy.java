@@ -172,8 +172,8 @@ class MethodGuavaInvokableProxy<O, P> extends GuavaInvokableProxy<O, P> implemen
 
     @SuppressWarnings("unchecked")
     @Override
-    public @NonNull <O1> MethodInvokable<O1, P> ownBy(@NonNull TypeToken<O1> newOwnerType) {
-        if (!canOwnBy(newOwnerType)) {
+    public @NonNull <O1> MethodInvokable<O1, P> ownerType(@NonNull TypeToken<O1> newOwnerType) {
+        if (!checkOwnerType(newOwnerType)) {
             throw new IllegalArgumentException(String.format("%s can not own by %s", source(), newOwnerType));
         }
         return new MethodGuavaInvokableProxy<>((com.google.common.reflect.Invokable<O1, P>) newOwnerType.method(source()), source());

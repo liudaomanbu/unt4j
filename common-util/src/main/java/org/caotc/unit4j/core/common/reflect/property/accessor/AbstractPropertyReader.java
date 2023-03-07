@@ -165,7 +165,7 @@ public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyEleme
 
         @Override
         protected @NonNull <O1> PropertyReader<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
-            return new InvokablePropertyReader<>(invokable().ownBy(ownerType), propertyName());
+            return new InvokablePropertyReader<>(invokable().ownerType(ownerType), propertyName());
         }
     }
 }

@@ -149,8 +149,7 @@ public enum DefaultPropertyAccessorMethodFormat implements PropertyAccessorMetho
      */
     public boolean isPropertyWriter(@NonNull MethodInvokable<?, ?> invokable) {
         return !invokable.getDeclaringClass().equals(Object.class)
-                && (invokable.returnType().getRawType().equals(void.class) || invokable.returnType()
-                .equals(invokable.ownerType()))
+                && (invokable.returnType().getRawType().equals(void.class) || invokable.returnType().equals(invokable.ownerType()))
                 && invokable.parameters().size() == 1
                 && propertyWriterNameMatches(invokable)
                 && !ReflectionUtil.isOverridden(invokable, Object.class);
