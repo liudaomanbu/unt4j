@@ -18,7 +18,10 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.ToString;
+import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.Invokable;
 import org.caotc.unit4j.core.common.reflect.MethodInvokable;
@@ -45,7 +48,7 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
      * 给传入对象的该属性设置传入的值
      *
      * @param object 设置属性值的对象
-     * @param value 设置的属性值
+     * @param value  设置的属性值
      * @return {@code this}
      * @author caotc
      * @date 2019-05-28
@@ -53,27 +56,23 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
      */
     @Override
     @NonNull
-    public final AbstractPropertyWriter<O, P> write(@NonNull O object, @NonNull P value) {
+    public final O write(@NonNull O object, @NonNull P value) {
         if (!accessible()) {
             accessible(true);
         }
-        writeInternal(object, value);
-        return this;
+        return writeInternal(object, value);
     }
 
-  /**
-   * 给传入对象的该属性设置传入的值
-   *
-   * @param object 设置属性值的对象
-   * @param value 设置的属性值
-   * @author caotc
-   * @date 2019-05-28
-   * @since 1.0.0
-   */
-  protected abstract void writeInternal(@NonNull O object, @NonNull P value);
-
-
-
+    /**
+     * 给传入对象的该属性设置传入的值
+     *
+     * @param object 设置属性值的对象
+     * @param value  设置的属性值
+     * @author caotc
+     * @date 2019-05-28
+     * @since 1.0.0
+     */
+    protected abstract O writeInternal(@NonNull O object, @NonNull P value);
 
     @Override
     @NonNull
@@ -122,33 +121,38 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
      */
     @Value
     @EqualsAndHashCode(callSuper = true)
-  @ToString(callSuper = false)
-  public static class InvokablePropertyWriter<O, P> extends AbstractPropertyWriter<O, P> {
+    @ToString(callSuper = false)
+    public static class InvokablePropertyWriter<O, P> extends AbstractPropertyWriter<O, P> {
 
-      /**
-       * set方法
-       */
-      @NonNull
-      MethodInvokable<O, ?> invokable;
+        /**
+         * set方法
+         */
+        @NonNull
+        MethodInvokable<O, ?> invokable;
         /**
          * set方法名称风格
          */
         @NonNull
         String propertyName;
 
-      InvokablePropertyWriter(@NonNull MethodInvokable<O, ?> invokable,
-                              @NonNull String propertyName) {
-          super(invokable);
-          Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a PropertyWriter", invokable);
-          this.invokable = invokable;
-          this.propertyName = propertyName;
-      }
+        InvokablePropertyWriter(@NonNull MethodInvokable<O, ?> invokable,
+                                @NonNull String propertyName) {
+            super(invokable);
+            Preconditions.checkArgument(ReflectionUtil.isPropertyWriter(invokable), "%s is not a PropertyWriter", invokable);
+            this.invokable = invokable;
+            this.propertyName = propertyName;
+        }
 
-      @Override
-      @SneakyThrows
-      public void writeInternal(@NonNull O obj, @NonNull P value) {
-          invokable.invoke(obj, value);
-      }
+        @Override
+        public O writeInternal(@NonNull O obj, @NonNull P value) {
+            try {
+                Object r = invokable().invoke(obj, value);
+                invokable().returnType();
+                return null;//todo
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         @SuppressWarnings("unchecked")
         @Override
@@ -170,5 +174,5 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
         protected @NonNull <O1> PropertyWriter<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
             return new InvokablePropertyWriter<>(invokable().ownBy(ownerType), propertyName());
         }
-  }
+    }
 }

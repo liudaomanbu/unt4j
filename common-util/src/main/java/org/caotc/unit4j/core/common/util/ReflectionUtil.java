@@ -2003,7 +2003,6 @@ public class ReflectionUtil {
         return propertyElementStream(TypeToken.of(type), propertyAccessorMethodFormats);
     }
 
-    //todo fluent风格的属性方法应该永远存在
     @NonNull
     public static <O> Stream<PropertyElement<O, Object>> propertyElementStream(
             @NonNull TypeToken<O> type,

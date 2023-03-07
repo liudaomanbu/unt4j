@@ -64,10 +64,12 @@ public class CompositeWritableProperty<O, P, T> extends AbstractCompositePropert
     }
 
     @Override
-    public @NonNull CompositeWritableProperty<O, P, T> write(@NonNull O target, @NonNull P value) {
-        transferProperty().read(target)
-                .ifPresent(actualTarget -> delegate().toWritable().write(actualTarget, value));
-        return this;
+    public @NonNull O write(@NonNull O target, @NonNull P value) {
+        return transferProperty().read(target)
+                .map(actualTarget -> delegate().toWritable().write(actualTarget, value))
+                .filter(writeResult -> transferProperty().writable())
+                .map(writeResult -> transferProperty().toWritable().write(target, writeResult))
+                .orElse(target);
     }
 
     @Override

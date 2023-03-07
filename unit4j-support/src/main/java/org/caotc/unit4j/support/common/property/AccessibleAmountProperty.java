@@ -49,10 +49,9 @@ public class AccessibleAmountProperty<O, P> extends BaseAmountProperty<O, P, Acc
     }
 
     @Override
-    public @NonNull AccessibleProperty<O, Amount> write(@NonNull O target, @NonNull Amount value) {
+    public @NonNull O write(@NonNull O target, @NonNull Amount value) {
         //TODO value类型处理
-        delegate.write(target, (P) value.convertTo(unit()).value());
-        return this;
+        return delegate.write(target, (P) value.convertTo(unit()).value());
     }
 
   @Override

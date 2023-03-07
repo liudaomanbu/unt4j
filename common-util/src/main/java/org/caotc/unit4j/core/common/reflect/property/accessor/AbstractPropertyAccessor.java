@@ -93,12 +93,11 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
 
   @Override
   @NonNull
-  public final PropertyAccessor<O, P> write(@NonNull O object, @NonNull P value) {
+  public final O write(@NonNull O object, @NonNull P value) {
     if (!accessible()) {
       accessible(true);
     }
-    writeInternal(object, value);
-    return this;
+    return writeInternal(object, value);
   }
 
   /**
@@ -110,7 +109,7 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
    * @date 2019-05-28
    * @since 1.0.0
    */
-  protected abstract void writeInternal(@NonNull O object, @NonNull P value);
+  protected abstract O writeInternal(@NonNull O object, @NonNull P value);
 
   @Override
   @NonNull
@@ -176,8 +175,9 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
     }
 
     @Override
-    protected void writeInternal(@NonNull O object, @NonNull P value) {
+    protected O writeInternal(@NonNull O object, @NonNull P value) {
       field.set(object, value);
+      return object;
     }
 
 

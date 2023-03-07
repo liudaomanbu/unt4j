@@ -89,7 +89,6 @@ public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
 
     /**
      * 给传入对象的该属性设置传入的值
-     * //todo 是不是该把返回值改成写入后的object，否则如果是Value类型的write方法返回一个新对象是无法写入成功的
      *
      * @param object 设置属性值的对象
      * @param value  设置的属性值
@@ -99,7 +98,7 @@ public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
      * @since 1.0.0
      */
     @NonNull
-    PropertyWriter<O, P> write(@NonNull O object, @NonNull P value);
+    O write(@NonNull O object, @NonNull P value);
 
 
     /**

@@ -90,14 +90,12 @@ public enum DefaultPropertyAccessorMethodFormat implements PropertyAccessorMetho
     FLUENT {
         @Override
         public boolean propertyReaderNameMatches(@NonNull Invokable<?, ?> invokable) {
-            return !JAVA_BEAN.propertyReaderNameMatches(invokable) && !JAVA_BEAN
-                    .propertyWriterNameMatches(invokable);
+            return true;
         }
 
         @Override
         protected boolean propertyWriterNameMatches(@NonNull Invokable<?, ?> invokable) {
-            return !JAVA_BEAN.propertyReaderNameMatches(invokable) && !JAVA_BEAN
-                    .propertyWriterNameMatches(invokable);
+            return true;
         }
 
         @NonNull

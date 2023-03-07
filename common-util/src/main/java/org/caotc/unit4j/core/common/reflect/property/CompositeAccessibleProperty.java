@@ -60,10 +60,12 @@ public class CompositeAccessibleProperty<O, P, T> extends
     }
 
     @Override
-    public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-        transferProperty().read(target)
-                .ifPresent(actualTarget -> delegate().toAccessible().write(actualTarget, value));
-        return this;
+    public @NonNull O write(@NonNull O target, @NonNull P value) {
+        return transferProperty().read(target)
+                .map(actualTarget -> delegate().toAccessible().write(actualTarget, value))
+                .filter(writeResult -> transferProperty().writable())
+                .map(writeResult -> transferProperty().toWritable().write(target, writeResult))
+                .orElse(target);
     }
 
     @Override

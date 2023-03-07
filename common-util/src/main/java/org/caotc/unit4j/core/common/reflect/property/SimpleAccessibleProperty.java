@@ -81,9 +81,8 @@ public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P>
     }
 
     @Override
-    public @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value) {
-        propertyWriters().first().write(target, value);
-        return this;
+    public @NonNull O write(@NonNull O target, @NonNull P value) {
+        return propertyWriters().first().write(target, value);
     }
 
     @Override

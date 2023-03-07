@@ -49,9 +49,6 @@ public interface PropertyAccessor<O, P> extends PropertyReader<O, P>, PropertyWr
     @Override
     @NonNull <P1 extends P> PropertyAccessor<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
 
-    @Override
-    @NonNull PropertyAccessor<O, P> write(@NonNull O object, @NonNull P value);
-
     default @NonNull <O1> PropertyAccessor<O1, P> ownerType(@NonNull Class<O1> newOwnerType) {
         return this.ownerType(TypeToken.of(newOwnerType));
     }

@@ -95,7 +95,7 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      * @date 2019-11-22
      * @since 1.0.0
      */
-    @NonNull WritableProperty<O, P> write(@NonNull O target, @NonNull P value);
+    @NonNull O write(@NonNull O target, @NonNull P value);
 
     /**
      * 设置属性类型

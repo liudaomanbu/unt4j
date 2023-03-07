@@ -66,7 +66,7 @@ public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
     }
 
     @Override
-    @NonNull AccessibleProperty<O, P> write(@NonNull O target, @NonNull P value);
+    @NonNull O write(@NonNull O target, @NonNull P value);
 
     /**
      * 设置属性类型
