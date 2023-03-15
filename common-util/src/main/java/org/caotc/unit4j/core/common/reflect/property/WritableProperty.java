@@ -80,10 +80,10 @@ public interface WritableProperty<O, P> extends Property<O, P> {
         return new SimpleWritableProperty<>(propertyWriters);
     }
 
-  @Override
-  default boolean writable() {
-      return true;
-  }
+    @Override
+    default boolean writable() {
+        return true;
+    }
 
     /**
      * 将参数值设置到参数对象的该属性上

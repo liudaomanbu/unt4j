@@ -39,28 +39,11 @@ public class CompositeWritableProperty<O, P, T> extends BaseCompositeProperty<O,
     @NonNull
     WritableProperty<T, P> delegate;
 
-    private CompositeWritableProperty(
+    CompositeWritableProperty(
             @NonNull ReadableProperty<O, T> targetReadableProperty,
             @NonNull WritableProperty<? extends T, P> delegate) {
         super(targetReadableProperty, delegate);
         this.delegate = delegate.ownerType(targetReadableProperty.type());
-    }
-
-    /**
-     * static constructor
-     *
-     * @param targetReadableProperty targetReadableProperty
-     * @param delegate               delegate
-     * @return {@link CompositeWritableProperty}
-     * @author caotc
-     * @date 2019-11-27
-     * @since 1.0.0
-     */
-    @NonNull
-    static <O, P, T> CompositeWritableProperty<O, P, T> create(
-            @NonNull ReadableProperty<O, T> targetReadableProperty,
-            @NonNull WritableProperty<? extends T, P> delegate) {
-        return new CompositeWritableProperty<>(targetReadableProperty, delegate);
     }
 
     @Override

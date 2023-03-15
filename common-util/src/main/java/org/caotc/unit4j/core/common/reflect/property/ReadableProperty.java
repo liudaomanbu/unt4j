@@ -36,188 +36,188 @@ import java.util.stream.Stream;
  */
 public interface ReadableProperty<O, P> extends Property<O, P> {
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> ReadableProperty<T, R> create(
-          @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
-    return new SimpleReadableProperty<>(propertyReaders);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> ReadableProperty<T, R> create(
-          @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
-    return new SimpleReadableProperty<>(propertyReaders);
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param propertyReaders 属性获取器集合
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  static <T, R> ReadableProperty<T, R> create(
-          @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
-    return new SimpleReadableProperty<>(propertyReaders);
-  }
-
-  @Override
-  default boolean readable() {
-    return true;
-  }
-
-
-  /**
-   * 读取参数对象属性值
-   *
-   * @param target 读取属性的对象
-   * @return 参数对象的属性值的 {@link Optional}
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull Optional<P> read(@NonNull O target);
-
-  /**
-   * 读取参数对象属性值
-   *
-   * @param target 读取属性的对象
-   * @return 参数对象的属性值
-   * @author caotc
-   * @date 2019-11-22
-   * @since 1.0.0
-   */
-  @NonNull
-  default P readExact(@NonNull O target) {
-    return read(target)
-            .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
-  }
-
-  @NonNull
-  default <S> Property<O, S> compose(Property<P, S> property) {
-    if (property.accessible()) {
-      return compose(property.toAccessible());
+    /**
+     * 工厂方法
+     *
+     * @param propertyReaders 属性获取器集合
+     * @return 属性获取器
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @NonNull
+    static <T, R> ReadableProperty<T, R> create(
+            @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
+        return new SimpleReadableProperty<>(propertyReaders);
     }
-    if (property.readable()) {
-      return compose(property.toReadable());
+
+    /**
+     * 工厂方法
+     *
+     * @param propertyReaders 属性获取器集合
+     * @return 属性获取器
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @NonNull
+    static <T, R> ReadableProperty<T, R> create(
+            @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
+        return new SimpleReadableProperty<>(propertyReaders);
     }
-    if (property.writable()) {
-      return compose(property.toWritable());
+
+    /**
+     * 工厂方法
+     *
+     * @param propertyReaders 属性获取器集合
+     * @return 属性获取器
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @NonNull
+    static <T, R> ReadableProperty<T, R> create(
+            @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
+        return new SimpleReadableProperty<>(propertyReaders);
     }
-    throw new AssertionError();
-  }
 
-  /**
-   * compose two {@link ReadableProperty} to a {@link ReadableProperty}
-   *
-   * @param readableProperty readableProperty
-   * @return {@link ReadableProperty}
-   * @author caotc
-   * @date 2019-11-27
-   * @since 1.0.0
-   */
-  @NonNull
-  default <S> ReadableProperty<O, S> compose(ReadableProperty<P, S> readableProperty) {
-    if (readableProperty.accessible()) {
-      return compose(readableProperty.toAccessible());
+    @Override
+    default boolean readable() {
+        return true;
     }
-    return CompositeReadableProperty.create(this, readableProperty);
-  }
 
-  /**
-   * compose {@link ReadableProperty} and {@link WritableProperty} to a {@link
-   * WritableProperty}
-   *
-   * @param writableProperty writableProperty
-   * @return {@link WritableProperty}
-   * @author caotc
-   * @date 2019-11-27
-   * @since 1.0.0
-   */
-  @NonNull
-  default <S> WritableProperty<O, S> compose(WritableProperty<P, S> writableProperty) {
-    if (writableProperty.accessible()) {
-      return compose(writableProperty.toAccessible());
+
+    /**
+     * 读取参数对象属性值
+     *
+     * @param target 读取属性的对象
+     * @return 参数对象的属性值的 {@link Optional}
+     * @author caotc
+     * @date 2019-11-22
+     * @since 1.0.0
+     */
+    @NonNull Optional<P> read(@NonNull O target);
+
+    /**
+     * 读取参数对象属性值
+     *
+     * @param target 读取属性的对象
+     * @return 参数对象的属性值
+     * @author caotc
+     * @date 2019-11-22
+     * @since 1.0.0
+     */
+    @NonNull
+    default P readExact(@NonNull O target) {
+        return read(target)
+                .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
     }
-    return CompositeWritableProperty.create(this, writableProperty);
-  }
 
-  /**
-   * compose {@link ReadableProperty} and {@link AccessibleProperty} to a {@link
-   * AccessibleProperty}
-   *
-   * @param accessibleProperty accessibleProperty
-   * @return {@link AccessibleProperty}
-   * @author caotc
-   * @date 2019-11-27
-   * @since 1.0.0
-   */
-  @NonNull
-  default <S> AccessibleProperty<O, S> compose(AccessibleProperty<P, S> accessibleProperty) {
-    return new CompositeAccessibleProperty<>(this, accessibleProperty);
-  }
+    @NonNull
+    default <S> Property<O, S> compose(Property<P, S> property) {
+        if (property.accessible()) {
+            return compose(property.toAccessible());
+        }
+        if (property.readable()) {
+            return compose(property.toReadable());
+        }
+        if (property.writable()) {
+            return compose(property.toWritable());
+        }
+        throw new AssertionError();
+    }
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  default <P1 extends P> ReadableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
-    return type(TypeToken.of(propertyType));
-  }
+    /**
+     * compose two {@link ReadableProperty} to a {@link ReadableProperty}
+     *
+     * @param readableProperty readableProperty
+     * @return {@link ReadableProperty}
+     * @author caotc
+     * @date 2019-11-27
+     * @since 1.0.0
+     */
+    @NonNull
+    default <S> ReadableProperty<O, S> compose(ReadableProperty<P, S> readableProperty) {
+        if (readableProperty.accessible()) {
+            return compose(readableProperty.toAccessible());
+        }
+        return new CompositeReadableProperty<>(this, readableProperty);
+    }
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-11-22
-   * @see Property#type
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  default <P1 extends P> ReadableProperty<O, P1> type(
-          @NonNull TypeToken<P1> propertyType) {
-    Preconditions.checkArgument(propertyType.isSupertypeOf(type())
-            , "ReadableProperty is known type %s,not %s ", type(), propertyType);
-    //noinspection unchecked
-    return (ReadableProperty<O, P1>) this;
-  }
+    /**
+     * compose {@link ReadableProperty} and {@link WritableProperty} to a {@link
+     * WritableProperty}
+     *
+     * @param writableProperty writableProperty
+     * @return {@link WritableProperty}
+     * @author caotc
+     * @date 2019-11-27
+     * @since 1.0.0
+     */
+    @NonNull
+    default <S> WritableProperty<O, S> compose(WritableProperty<P, S> writableProperty) {
+        if (writableProperty.accessible()) {
+            return compose(writableProperty.toAccessible());
+        }
+        return new CompositeWritableProperty<>(this, writableProperty);
+    }
 
-  default @NonNull <O1> ReadableProperty<O1, P> ownerType(@NonNull Class<O1> ownerType) {
-    return ownerType(TypeToken.of(ownerType));
-  }
+    /**
+     * compose {@link ReadableProperty} and {@link AccessibleProperty} to a {@link
+     * AccessibleProperty}
+     *
+     * @param accessibleProperty accessibleProperty
+     * @return {@link AccessibleProperty}
+     * @author caotc
+     * @date 2019-11-27
+     * @since 1.0.0
+     */
+    @NonNull
+    default <S> AccessibleProperty<O, S> compose(AccessibleProperty<P, S> accessibleProperty) {
+        return new CompositeAccessibleProperty<>(this, accessibleProperty);
+    }
 
-  @Override
-  @NonNull <O1> ReadableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull
+    default <P1 extends P> ReadableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+        return type(TypeToken.of(propertyType));
+    }
+
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-11-22
+     * @see Property#type
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull
+    default <P1 extends P> ReadableProperty<O, P1> type(
+            @NonNull TypeToken<P1> propertyType) {
+        Preconditions.checkArgument(propertyType.isSupertypeOf(type())
+                , "ReadableProperty is known type %s,not %s ", type(), propertyType);
+        //noinspection unchecked
+        return (ReadableProperty<O, P1>) this;
+    }
+
+    default @NonNull <O1> ReadableProperty<O1, P> ownerType(@NonNull Class<O1> ownerType) {
+        return ownerType(TypeToken.of(ownerType));
+    }
+
+    @Override
+    @NonNull <O1> ReadableProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType);
 
 
 }

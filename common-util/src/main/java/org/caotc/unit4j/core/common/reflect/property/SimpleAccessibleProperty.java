@@ -39,28 +39,28 @@ import java.util.stream.Stream;
  */
 @Value
 @EqualsAndHashCode(callSuper = true)
-public class SimpleAccessibleProperty<O, P> extends AbstractSimpleProperty<O, P> implements AccessibleProperty<O, P> {
+public class SimpleAccessibleProperty<O, P> extends BaseSimpleProperty<O, P> implements AccessibleProperty<O, P> {
 
-    public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
+    SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
         super(propertyAccessors);
     }
 
-    public SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
-                                    @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
+    SimpleAccessibleProperty(@NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
+                             @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
-    public SimpleAccessibleProperty(@NonNull Iterator<PropertyReader<O, P>> propertyReaders,
-                                    @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
+    SimpleAccessibleProperty(@NonNull Iterator<PropertyReader<O, P>> propertyReaders,
+                             @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
-    public SimpleAccessibleProperty(@NonNull Stream<PropertyReader<O, P>> propertyReaders,
-                                    @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
+    SimpleAccessibleProperty(@NonNull Stream<PropertyReader<O, P>> propertyReaders,
+                             @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);
     }
 
-    public SimpleAccessibleProperty(
+    SimpleAccessibleProperty(
             @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders,
             @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters) {
         super(propertyReaders, propertyWriters);

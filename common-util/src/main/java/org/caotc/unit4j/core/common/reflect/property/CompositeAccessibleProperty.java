@@ -36,22 +36,15 @@ import java.util.Optional;
 public class CompositeAccessibleProperty<O, P, T> extends
         BaseCompositeProperty<O, P, T> implements
         AccessibleProperty<O, P> {
+
     @NonNull
     AccessibleProperty<T, P> delegate;
-
 
     CompositeAccessibleProperty(
             @NonNull ReadableProperty<O, T> targetReadableProperty,
             @NonNull AccessibleProperty<? extends T, P> delegate) {
         super(targetReadableProperty, delegate);
         this.delegate = delegate.ownerType(targetReadableProperty.type());
-    }
-
-    @NonNull
-    static <O, P, T> CompositeAccessibleProperty<O, P, T> create(
-            @NonNull ReadableProperty<O, T> targetReadableProperty,
-            @NonNull AccessibleProperty<? extends T, P> delegate) {
-        return new CompositeAccessibleProperty<>(targetReadableProperty, delegate);
     }
 
     @Override

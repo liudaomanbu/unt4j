@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Optional;
 
 @Slf4j
-class AbstractSimplePropertyTest {
+class BaseSimplePropertyTest {
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.reflect.property.provider.Provider#propertyElementOrderArguments")
     <O> void propertyElementOrder(ReadableProperty<O, ?> readableProperty, O target, Object value) {

@@ -37,25 +37,25 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-public class SimpleWritableProperty<O, P> extends AbstractSimpleProperty<O, P> implements
+public class SimpleWritableProperty<O, P> extends BaseSimpleProperty<O, P> implements
         WritableProperty<O, P> {
 
-    protected SimpleWritableProperty(
+    SimpleWritableProperty(
             @NonNull Iterable<PropertyWriter<O, P>> propertyElements) {
         super(ImmutableSortedSet.of(), propertyElements);
     }
 
-    protected SimpleWritableProperty(
+    SimpleWritableProperty(
             @NonNull Iterator<PropertyWriter<O, P>> propertyElements) {
         super(ImmutableSortedSet.<PropertyReader<O, P>>of().iterator(), propertyElements);
     }
 
-    protected SimpleWritableProperty(
+    SimpleWritableProperty(
             @NonNull Stream<PropertyWriter<O, P>> propertyElements) {
         super(Stream.empty(), propertyElements);
     }
 
-    protected SimpleWritableProperty(
+    private SimpleWritableProperty(
             @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyElements) {
         super(ImmutableSortedSet.of(), propertyElements);
     }

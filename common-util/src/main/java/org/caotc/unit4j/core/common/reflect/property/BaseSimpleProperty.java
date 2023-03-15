@@ -49,7 +49,7 @@ import java.util.stream.Stream;
 @EqualsAndHashCode
 @ToString
 @Getter(lombok.AccessLevel.PROTECTED)
-public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
+public abstract class BaseSimpleProperty<O, P> implements Property<O, P> {
     /**
      * {@link PropertyElement}排序器
      */
@@ -103,27 +103,27 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
     @NonNull
     TypeToken<O> ownerType;
 
-    protected AbstractSimpleProperty(
+    protected BaseSimpleProperty(
             @NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
         this(ImmutableSortedSet.copyOf(ORDERING, propertyAccessors),
                 ImmutableSortedSet.copyOf(ORDERING, propertyAccessors));
     }
 
-    protected AbstractSimpleProperty(
+    protected BaseSimpleProperty(
             @NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
             @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
         this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
                 ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
     }
 
-    protected AbstractSimpleProperty(
+    protected BaseSimpleProperty(
             @NonNull Iterator<PropertyReader<O, P>> propertyReaders,
             @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
         this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
                 ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
     }
 
-    protected AbstractSimpleProperty(
+    protected BaseSimpleProperty(
             @NonNull Stream<PropertyReader<O, P>> propertyReaders,
             @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
         this(propertyReaders
@@ -131,7 +131,7 @@ public abstract class AbstractSimpleProperty<O, P> implements Property<O, P> {
                 .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
     }
 
-    private AbstractSimpleProperty(
+    protected BaseSimpleProperty(
             @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders,
             @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters) {
         //属性读取器集合不能为空

@@ -38,25 +38,25 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-public class SimpleReadableProperty<O, P> extends AbstractSimpleProperty<O, P> implements
+public class SimpleReadableProperty<O, P> extends BaseSimpleProperty<O, P> implements
         ReadableProperty<O, P> {
 
-    protected SimpleReadableProperty(
+    SimpleReadableProperty(
             @NonNull Iterable<PropertyReader<O, P>> propertyElements) {
         super(propertyElements, ImmutableSortedSet.of());
     }
 
-    protected SimpleReadableProperty(
+    SimpleReadableProperty(
             @NonNull Iterator<PropertyReader<O, P>> propertyReaders) {
         super(propertyReaders, ImmutableSortedSet.<PropertyWriter<O, P>>of().iterator());
     }
 
-    protected SimpleReadableProperty(
+    SimpleReadableProperty(
             @NonNull Stream<PropertyReader<O, P>> propertyReaders) {
         super(propertyReaders, Stream.empty());
     }
 
-    protected SimpleReadableProperty(
+    SimpleReadableProperty(
             @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders) {
         super(propertyReaders, ImmutableSortedSet.of());
     }
