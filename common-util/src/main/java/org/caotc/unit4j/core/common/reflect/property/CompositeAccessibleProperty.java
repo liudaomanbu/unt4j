@@ -34,7 +34,7 @@ import java.util.Optional;
  */
 @Value
 public class CompositeAccessibleProperty<O, P, T> extends
-        AbstractCompositeProperty<O, P, T> implements
+        BaseCompositeProperty<O, P, T> implements
         AccessibleProperty<O, P> {
     @NonNull
     AccessibleProperty<T, P> delegate;

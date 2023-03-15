@@ -33,7 +33,7 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class CompositeReadableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T> implements
+public class CompositeReadableProperty<O, P, T> extends BaseCompositeProperty<O, P, T> implements
         ReadableProperty<O, P> {
 
     @NonNull

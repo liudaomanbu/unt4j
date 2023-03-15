@@ -34,15 +34,15 @@ import java.util.Optional;
 @Getter(AccessLevel.PROTECTED)
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractCompositeProperty<O, P, T> implements Property<O, P> {
+public abstract class BaseCompositeProperty<O, P, T> implements Property<O, P> {
 
     @NonNull
     String name;
     @NonNull
     ReadableProperty<O, T> transferProperty;
 
-    protected AbstractCompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
-                                        @NonNull Property<? extends T, P> delegate) {
+    protected BaseCompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
+                                    @NonNull Property<? extends T, P> delegate) {
         this.name = transferProperty.name() + "." + delegate.name();
         this.transferProperty = transferProperty;
     }

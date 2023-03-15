@@ -33,7 +33,7 @@ import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
  * @since 1.0.0
  */
 @Value
-public class CompositeWritableProperty<O, P, T> extends AbstractCompositeProperty<O, P, T> implements
+public class CompositeWritableProperty<O, P, T> extends BaseCompositeProperty<O, P, T> implements
         WritableProperty<O, P> {
 
     @NonNull
