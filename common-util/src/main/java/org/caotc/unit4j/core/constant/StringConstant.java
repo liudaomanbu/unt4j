@@ -180,8 +180,4 @@ public final class StringConstant {
    */
   public static final Splitter UNDERSCORE_SPLITTER = Splitter.on(UNDERSCORE).trimResults();
 
-  /**
-   * static constructor name
-   */
-  public static final String STATIC_CONSTRUCTOR_NAME = "create";
 }

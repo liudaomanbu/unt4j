@@ -19,23 +19,12 @@ package org.caotc.unit4j.support.mybatis.interceptor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import java.sql.Connection;
-import java.util.Properties;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.select.Select;
 import org.apache.ibatis.executor.statement.StatementHandler;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ResultMap;
-import org.apache.ibatis.mapping.ResultMapping;
-import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.mapping.*;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
@@ -50,6 +39,11 @@ import org.caotc.unit4j.support.common.util.AmountUtil;
 import org.caotc.unit4j.support.mybatis.constant.AmountPropertyConstant;
 import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
+
+import java.sql.Connection;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author caotc
@@ -68,7 +62,7 @@ public class SelectInterceptor implements Interceptor {
     Unit4jProperties unit4jProperties = new Unit4jProperties()
             .setFieldNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
             .setFieldNameJoiner((valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_UNDERSCORE
-                    .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream())));
+                    .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList())));
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {

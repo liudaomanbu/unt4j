@@ -37,10 +37,12 @@ import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -78,21 +80,21 @@ public class Unit4jProperties {
   /**
    * 默认的名称拆分器
    */
-  public static final Function<@NonNull String, @NonNull ImmutableList<String>> DEFAULT_NAME_SPLITTER = CaseFormat.LOWER_CAMEL::split;
+  public static final Function<@NonNull String, @NonNull List<String>> DEFAULT_NAME_SPLITTER = CaseFormat.LOWER_CAMEL::split;
   /**
    * 默认的名称拼接器
    */
-  public static final Function<@NonNull ImmutableList<String>, @NonNull String> DEFAULT_NAME_JOINER = CaseFormat.LOWER_CAMEL::join;
+  public static final Function<@NonNull List<String>, @NonNull String> DEFAULT_NAME_JOINER = CaseFormat.LOWER_CAMEL::join;
   /**
    * 默认的名称转换器
    */
   public static final Function<@NonNull String, @NonNull String> DEFAULT_NAME_CONVERTER = DEFAULT_NAME_SPLITTER
-      .andThen(DEFAULT_NAME_JOINER);
+          .andThen(DEFAULT_NAME_JOINER);
   /**
    * 默认的属性名称拼接器
    */
-  public static final BiFunction<@NonNull ImmutableList<String>, @NonNull ImmutableList<String>, @NonNull String> DEFAULT_FIELD_NAME_JOINER = (valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_CAMEL
-      .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()));
+  public static final BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> DEFAULT_FIELD_NAME_JOINER = (valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_CAMEL
+          .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList()));
 
   /**
    * 默认单位的输出别名类型
@@ -142,15 +144,15 @@ public class Unit4jProperties {
   /**
    * 单独的{@link Amount}对象的名称拼接器
    */
-  Function<@NonNull ImmutableList<String>, @NonNull String> nameJoiner = DEFAULT_NAME_JOINER;
+  Function<@NonNull List<String>, @NonNull String> nameJoiner = DEFAULT_NAME_JOINER;
   /**
    * 作为其他类属性的{@link Amount}对象的属性名称拆分器
    */
-  Function<@NonNull String, @NonNull ImmutableList<String>> fieldNameSplitter = DEFAULT_NAME_SPLITTER;
+  Function<@NonNull String, @NonNull List<String>> fieldNameSplitter = DEFAULT_NAME_SPLITTER;
   /**
    * 作为其他类属性的{@link Amount}对象的属性名称拼接器
    */
-  BiFunction<@NonNull ImmutableList<String>, @NonNull ImmutableList<String>, @NonNull String> fieldNameJoiner = DEFAULT_FIELD_NAME_JOINER;
+  BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> fieldNameJoiner = DEFAULT_FIELD_NAME_JOINER;
 
   /**
    * 单位的别名类型
@@ -203,11 +205,11 @@ public class Unit4jProperties {
   public AmountCodecConfig createPropertyAmountCodecConfig(
           @NonNull Property<?, ?> amountReadableProperty) {
     AmountSerialize amountSerialize = amountReadableProperty.annotation(AmountSerialize.class).orElse(null);
-    Function<@NonNull ImmutableList<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
+    Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
             .apply(valueFieldNameWords,
                     Optional.ofNullable(amountSerialize).map(AmountSerialize::caseFormat)
                             .map(
-                                    caseFormat -> (Function<@NonNull String, @NonNull ImmutableList<String>>) caseFormat::split)
+                                    caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
                             .orElseGet(this::getFieldNameSplitter)
                             .apply(amountReadableProperty.name()));
     return AmountCodecConfig.builder()
@@ -241,24 +243,24 @@ public class Unit4jProperties {
     @SuppressWarnings("unchecked")
     public AmountCodecConfig createPropertyAmountCodecConfig(
             @NonNull WritableProperty<?, ?> amountWritableProperty) {
-        AmountDeserialize amountDeserialize = amountWritableProperty.annotation(AmountDeserialize.class).orElse(null);
-        Function<@NonNull ImmutableList<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
-                .apply(valueFieldNameWords,
-                        Optional.ofNullable(amountDeserialize).map(AmountDeserialize::caseFormat)
-                                .map(
-                                        caseFormat -> (Function<@NonNull String, @NonNull ImmutableList<String>>) caseFormat::split)
-                                .orElseGet(this::getFieldNameSplitter)
-                                .apply(amountWritableProperty.name()));
-        return AmountCodecConfig.builder()
-                .configuration(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::configId)
-                        .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
-                .strategy(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::strategy)
-                        .orElseGet(this::getPropertyStrategy))
+      AmountDeserialize amountDeserialize = amountWritableProperty.annotation(AmountDeserialize.class).orElse(null);
+      Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
+              .apply(valueFieldNameWords,
+                      Optional.ofNullable(amountDeserialize).map(AmountDeserialize::caseFormat)
+                              .map(
+                                      caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
+                              .orElseGet(this::getFieldNameSplitter)
+                              .apply(amountWritableProperty.name()));
+      return AmountCodecConfig.builder()
+              .configuration(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::configId)
+                      .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
+              .strategy(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::strategy)
+                      .orElseGet(this::getPropertyStrategy))
 //            .targetUnit(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::targetUnitId)
 //                    .filter(targetUnitId->!targetUnitId.isEmpty())
 //                    .map(Configuration::getUnitByIdExact).orElse(null))
-                .outputName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::name)
-                        .filter(name -> !name.isEmpty())
+              .outputName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::name)
+                      .filter(name -> !name.isEmpty())
                         .orElse(fieldNameConverter.apply(ImmutableList.of())))
                 .outputValueName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::valueName)
                         .filter(name -> !name.isEmpty())

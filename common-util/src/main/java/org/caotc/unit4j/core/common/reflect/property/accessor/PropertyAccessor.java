@@ -40,7 +40,7 @@ public interface PropertyAccessor<O, P> extends PropertyReader<O, P>, PropertyWr
     @NonNull
     static <O, P> PropertyAccessor<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
         Preconditions.checkArgument(ReflectionUtil.isPropertyElement(field), "%s is not a PropertyElement", field);
-        return new AbstractPropertyAccessor.FieldElementPropertyAccessor<>(ownerType, FieldElement.of(field));
+        return new BasePropertyAccessor.FieldElementPropertyAccessor<>(ownerType, FieldElement.of(field));
     }
 
     @Override

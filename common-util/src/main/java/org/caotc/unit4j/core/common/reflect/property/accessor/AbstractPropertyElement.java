@@ -17,10 +17,7 @@
 package org.caotc.unit4j.core.common.reflect.property.accessor;
 
 import com.google.common.reflect.TypeToken;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.caotc.unit4j.core.common.reflect.Element;
 
 import java.lang.annotation.Annotation;
@@ -36,6 +33,7 @@ import java.lang.annotation.Annotation;
  */
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter(AccessLevel.PROTECTED)
 public abstract class AbstractPropertyElement<O, P> implements
         PropertyElement<O, P> {
     @NonNull

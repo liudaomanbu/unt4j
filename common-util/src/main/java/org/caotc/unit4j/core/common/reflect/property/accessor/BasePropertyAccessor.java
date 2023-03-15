@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.FieldElement;
@@ -38,11 +37,10 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = false)
-public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyElement<O, P> implements
+public abstract class BasePropertyAccessor<O, P> extends AbstractPropertyElement<O, P> implements
         PropertyAccessor<O, P> {
 
-  protected AbstractPropertyAccessor(@NonNull Element element) {
+  protected BasePropertyAccessor(@NonNull Element element) {
     super(element);
   }
 
@@ -136,6 +134,11 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
     return ownByInternal(newOwnerType);
   }
 
+  @Override
+  public String toString() {
+    return String.format("Accessor(ownerType=%s,propertyName=%s,element=%s)", ownerType(), propertyName(), element());
+  }
+
   @NonNull
   protected abstract <O1> PropertyAccessor<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType);
 
@@ -148,8 +151,7 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
    */
   @Value
   @EqualsAndHashCode(callSuper = true)
-  @ToString(callSuper = false)
-  public static class FieldElementPropertyAccessor<O, P> extends AbstractPropertyAccessor<O, P> {
+  public static class FieldElementPropertyAccessor<O, P> extends BasePropertyAccessor<O, P> {
     @NonNull
     TypeToken<O> ownerType;
     /**
@@ -198,5 +200,9 @@ public abstract class AbstractPropertyAccessor<O, P> extends AbstractPropertyEle
       return field.getName();
     }
 
+    @Override
+    public String toString() {
+      return super.toString();
+    }
   }
 }

@@ -17,12 +17,6 @@
 package org.caotc.unit4j.support.mybatis.interceptor;
 
 import com.google.common.collect.ImmutableList;
-import java.sql.Connection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
@@ -41,11 +35,7 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.Amount;
@@ -57,6 +47,14 @@ import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.common.util.AmountUtil;
 import org.caotc.unit4j.support.mybatis.sql.visitor.ParameterMappingMatchColumnInsertUpdateVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
+
+import java.sql.Connection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author caotc
@@ -75,7 +73,7 @@ public class InsertUpdateInterceptor implements Interceptor {
     Unit4jProperties unit4jProperties = new Unit4jProperties()
             .setFieldNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
             .setFieldNameJoiner((valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_UNDERSCORE
-                    .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream())));
+                    .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList())));
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
