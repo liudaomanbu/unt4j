@@ -30,7 +30,7 @@ hs_err_pid*
 *.iml
 *.eml
 
-rebel.xml
+*rebel.xml
 
 unit4j-api/target
 unit4j-core/target
