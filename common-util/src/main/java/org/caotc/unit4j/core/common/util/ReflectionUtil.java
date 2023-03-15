@@ -2015,7 +2015,7 @@ public class ReflectionUtil {
                         .map(methodNameStyle -> PropertyElement.from(type, method, methodNameStyle.propertyName(method))));
         return Stream
                 .concat(fieldStream(type).filter(field -> isPropertyReader(field) || isPropertyWriter(field))
-                                .map(field -> PropertyElement.from(type, field)),
+                                .map(field -> PropertyAccessor.from(type, field)),
                         propertyElementStream);
     }
 

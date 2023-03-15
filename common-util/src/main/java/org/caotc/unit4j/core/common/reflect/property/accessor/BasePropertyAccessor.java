@@ -26,7 +26,6 @@ import org.caotc.unit4j.core.common.reflect.FieldElement;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
@@ -37,35 +36,11 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
-public abstract class BasePropertyAccessor<O, P> extends AbstractPropertyElement<O, P> implements
+public abstract class BasePropertyAccessor<O, P> extends BasePropertyElement<O, P> implements
         PropertyAccessor<O, P> {
 
   protected BasePropertyAccessor(@NonNull Element element) {
     super(element);
-  }
-
-  @NonNull
-  public static <O, P> PropertyAccessor<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
-    return PropertyElement.<O, P>from(ownerType, field).toAccessor();
-  }
-
-  @NonNull
-  public static <O, P> PropertyAccessor<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
-    return PropertyElement.<O, P>from(ownerClass, field).toAccessor();
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param field 属性
-   * @return this
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  public static <O, P> PropertyAccessor<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
-    return PropertyElement.<O, P>from(ownerType, field).toAccessor();
   }
 
   @Override

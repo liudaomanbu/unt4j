@@ -34,7 +34,7 @@ import java.lang.annotation.Annotation;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter(AccessLevel.PROTECTED)
-public abstract class AbstractPropertyElement<O, P> implements
+public abstract class BasePropertyElement<O, P> implements
         PropertyElement<O, P> {
     @NonNull
     Element element;

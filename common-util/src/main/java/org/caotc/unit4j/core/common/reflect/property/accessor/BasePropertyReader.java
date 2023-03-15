@@ -38,10 +38,10 @@ import java.util.Optional;
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = false)
-public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyElement<O, P> implements
+public abstract class BasePropertyReader<O, P> extends BasePropertyElement<O, P> implements
         PropertyReader<O, P> {
 
-    protected AbstractPropertyReader(@NonNull Element member) {
+    protected BasePropertyReader(@NonNull Element member) {
         super(member);
     }
 
@@ -123,7 +123,7 @@ public abstract class AbstractPropertyReader<O, P> extends AbstractPropertyEleme
     @Value
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = false)
-    public static class InvokablePropertyReader<O, P> extends AbstractPropertyReader<O, P> {
+    public static class InvokablePropertyReader<O, P> extends BasePropertyReader<O, P> {
 
         /**
          * 方法

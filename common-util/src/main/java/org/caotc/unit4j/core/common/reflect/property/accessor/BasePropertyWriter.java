@@ -36,10 +36,10 @@ import org.caotc.unit4j.core.common.util.ReflectionUtil;
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = false)
-public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyElement<O, P> implements
+public abstract class BasePropertyWriter<O, P> extends BasePropertyElement<O, P> implements
         PropertyWriter<O, P> {
 
-    protected AbstractPropertyWriter(
+    protected BasePropertyWriter(
             @NonNull Element element) {
         super(element);
     }
@@ -122,7 +122,7 @@ public abstract class AbstractPropertyWriter<O, P> extends AbstractPropertyEleme
     @Value
     @EqualsAndHashCode(callSuper = true)
     @ToString(callSuper = false)
-    public static class InvokablePropertyWriter<O, P> extends AbstractPropertyWriter<O, P> {
+    public static class InvokablePropertyWriter<O, P> extends BasePropertyWriter<O, P> {
 
         /**
          * set方法

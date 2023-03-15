@@ -23,7 +23,6 @@ import org.caotc.unit4j.core.common.reflect.AnnotatedElement;
 import org.caotc.unit4j.core.common.reflect.WithAccessLevel;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -37,21 +36,6 @@ import java.lang.reflect.Type;
  * @since 1.0.0
  */
 public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement {
-    @NonNull
-    static <O, P> PropertyElement<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
-        return PropertyAccessor.from(ownerType, field);
-    }
-
-    @NonNull
-    static <O, P> PropertyElement<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
-        return PropertyAccessor.from(ownerClass, field);
-    }
-
-    @NonNull
-    static <O, P> PropertyElement<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
-        return PropertyAccessor.from(ownerType, field);
-    }
-
     @SuppressWarnings("unchecked")
     @NonNull
     static <O, P> PropertyElement<O, P> from(@NonNull Type ownerType, @NonNull Method method,

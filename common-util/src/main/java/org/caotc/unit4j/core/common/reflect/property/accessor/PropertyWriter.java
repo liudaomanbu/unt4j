@@ -59,7 +59,7 @@ public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
   @NonNull
   static <O, P> PropertyWriter<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyWriterMethod,
                                           @NonNull String propertyName) {
-      return new AbstractPropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(propertyWriterMethod, ownerType), propertyName);
+      return new BasePropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(propertyWriterMethod, ownerType), propertyName);
   }
 
     @NonNull

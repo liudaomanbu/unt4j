@@ -20,7 +20,6 @@ import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.GuavaInvokableProxy;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -59,31 +58,7 @@ public interface PropertyReader<O, P> extends PropertyElement<O, P> {
   @NonNull
   static <O, P> PropertyReader<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyReaderMethod,
                                           @NonNull String propertyName) {
-    return new AbstractPropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(propertyReaderMethod, ownerType), propertyName);
-  }
-
-  @NonNull
-  static <O, P> PropertyReader<O, P> from(@NonNull Type ownerType, @NonNull Field field) {
-    return PropertyAccessor.<O, P>from(ownerType, field).toReader();
-  }
-
-  @NonNull
-  static <O, P> PropertyReader<O, P> from(@NonNull Class<O> ownerClass, @NonNull Field field) {
-    return PropertyAccessor.<O, P>from(ownerClass, field).toReader();
-  }
-
-  /**
-   * 工厂方法
-   *
-   * @param field 属性
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  static <O, P> PropertyReader<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Field field) {
-    return PropertyAccessor.<O, P>from(ownerType, field).toReader();
+    return new BasePropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(propertyReaderMethod, ownerType), propertyName);
   }
 
   /**
