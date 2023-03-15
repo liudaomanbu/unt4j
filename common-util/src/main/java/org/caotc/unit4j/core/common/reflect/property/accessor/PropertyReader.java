@@ -32,70 +32,70 @@ import java.util.Optional;
  * @since 1.0.0
  */
 public interface PropertyReader<O, P> extends PropertyElement<O, P> {
-  @SuppressWarnings("unchecked")
-  @NonNull
-  static <O, P> PropertyReader<O, P> from(@NonNull Type ownerType, @NonNull Method propertyReaderMethod,
-                                          @NonNull String propertyName) {
-    return from((TypeToken<O>) TypeToken.of(ownerType), propertyReaderMethod, propertyName);
-  }
+    @SuppressWarnings("unchecked")
+    @NonNull
+    static <O, P> PropertyReader<O, P> from(@NonNull Type ownerType, @NonNull Method propertyReaderMethod,
+                                            @NonNull String propertyName) {
+        return from((TypeToken<O>) TypeToken.of(ownerType), propertyReaderMethod, propertyName);
+    }
 
-  @NonNull
-  static <O, P> PropertyReader<O, P> from(@NonNull Class<O> ownerClass, @NonNull Method propertyReaderMethod,
-                                          @NonNull String propertyName) {
-    return from(TypeToken.of(ownerClass), propertyReaderMethod, propertyName);
-  }
+    @NonNull
+    static <O, P> PropertyReader<O, P> from(@NonNull Class<O> ownerClass, @NonNull Method propertyReaderMethod,
+                                            @NonNull String propertyName) {
+        return from(TypeToken.of(ownerClass), propertyReaderMethod, propertyName);
+    }
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyReaderMethod get方法
-   * @param propertyName         属性名称
-   * @return 属性获取器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  static <O, P> PropertyReader<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyReaderMethod,
-                                          @NonNull String propertyName) {
-    return new BasePropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(propertyReaderMethod, ownerType), propertyName);
-  }
+    /**
+     * 工厂方法
+     *
+     * @param propertyReaderMethod get方法
+     * @param propertyName         属性名称
+     * @return 属性获取器
+     * @author caotc
+     * @date 2019-06-16
+     * @since 1.0.0
+     */
+    @NonNull
+    static <O, P> PropertyReader<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyReaderMethod,
+                                            @NonNull String propertyName) {
+        return new BasePropertyReader.InvokablePropertyReader<>(GuavaInvokableProxy.from(propertyReaderMethod, ownerType), propertyName);
+    }
 
-  /**
-   * 从传入的对象中获取该属性的值
-   *
-   * @param object 对象
-   * @return 对象中该属性的值
-   * @author caotc
-   * @date 2019-05-27
-   * @since 1.0.0
-   */
-  @NonNull
-  Optional<P> read(@NonNull O object);
+    /**
+     * 从传入的对象中获取该属性的值
+     *
+     * @param object 对象
+     * @return 对象中该属性的值
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @NonNull
+    Optional<P> read(@NonNull O object);
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull <P1 extends P> PropertyReader<O, P1> propertyType(@NonNull Class<P1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull <P1 extends P> PropertyReader<O, P1> propertyType(@NonNull Class<P1> propertyType);
 
-  /**
-   * 设置属性类型
-   *
-   * @param propertyType 属性类型
-   * @return this
-   * @author caotc
-   * @date 2019-06-25
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull <P1 extends P> PropertyReader<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
+    /**
+     * 设置属性类型
+     *
+     * @param propertyType 属性类型
+     * @return this
+     * @author caotc
+     * @date 2019-06-25
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull <P1 extends P> PropertyReader<O, P1> propertyType(@NonNull TypeToken<P1> propertyType);
 
     @Override
     default boolean isReader() {

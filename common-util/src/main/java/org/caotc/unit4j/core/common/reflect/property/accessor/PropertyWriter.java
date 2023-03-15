@@ -46,21 +46,21 @@ public interface PropertyWriter<O, P> extends PropertyElement<O, P> {
         return from(TypeToken.of(ownerClass), propertyWriterMethod, propertyName);
     }
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyWriterMethod set方法
-   * @param propertyName         属性名称
-   * @return 属性设置器
-   * @author caotc
-   * @date 2019-06-16
-   * @since 1.0.0
-   */
-  @NonNull
-  static <O, P> PropertyWriter<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyWriterMethod,
-                                          @NonNull String propertyName) {
-      return new BasePropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(propertyWriterMethod, ownerType), propertyName);
-  }
+    /**
+     * 工厂方法
+     *
+     * @param propertyWriterMethod set方法
+     * @param propertyName         属性名称
+     * @return 属性设置器
+     * @author caotc
+     * @date 2019-06-16
+     * @since 1.0.0
+     */
+    @NonNull
+    static <O, P> PropertyWriter<O, P> from(@NonNull TypeToken<O> ownerType, @NonNull Method propertyWriterMethod,
+                                            @NonNull String propertyName) {
+        return new BasePropertyWriter.InvokablePropertyWriter<>(GuavaInvokableProxy.from(propertyWriterMethod, ownerType), propertyName);
+    }
 
     @NonNull
     static <O, P> PropertyWriter<O, P> from(@NonNull Type ownerType, @NonNull Field field) {

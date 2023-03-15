@@ -26,7 +26,6 @@ import org.caotc.unit4j.core.constant.StringConstant;
 import java.lang.reflect.Field;
 
 /**
- * get/set方法的命名风格枚举
  *
  * @author caotc
  * @date 2019-05-29
