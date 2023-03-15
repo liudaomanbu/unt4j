@@ -35,7 +35,6 @@ import org.caotc.unit4j.core.common.util.ReflectionUtil;
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = false)
 public abstract class BasePropertyWriter<O, P> extends BasePropertyElement<O, P> implements
         PropertyWriter<O, P> {
 
@@ -109,6 +108,11 @@ public abstract class BasePropertyWriter<O, P> extends BasePropertyElement<O, P>
         return ownByInternal(newOwnerType);
     }
 
+    @Override
+    public String toString() {
+        return String.format("PropertyWriter(ownerType=%s,propertyName=%s,element=%s)", ownerType(), propertyName(), element());
+    }
+
     @NonNull
     protected abstract <O1> PropertyWriter<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType);
 
@@ -177,6 +181,11 @@ public abstract class BasePropertyWriter<O, P> extends BasePropertyElement<O, P>
         @Override
         protected @NonNull <O1> PropertyWriter<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
             return new InvokablePropertyWriter<>(invokable().ownerType(ownerType), propertyName());
+        }
+
+        @Override
+        public String toString() {
+            return super.toString();
         }
     }
 }

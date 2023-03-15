@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.common.reflect.Element;
 import org.caotc.unit4j.core.common.reflect.Invokable;
@@ -37,7 +36,6 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = false)
 public abstract class BasePropertyReader<O, P> extends BasePropertyElement<O, P> implements
         PropertyReader<O, P> {
 
@@ -110,6 +108,11 @@ public abstract class BasePropertyReader<O, P> extends BasePropertyElement<O, P>
         return ownByInternal(newOwnerType);
     }
 
+    @Override
+    public String toString() {
+        return String.format("PropertyReader(ownerType=%s,propertyName=%s,element=%s)", ownerType(), propertyName(), element());
+    }
+
     @NonNull
     protected abstract <O1> PropertyReader<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType);
 
@@ -122,7 +125,6 @@ public abstract class BasePropertyReader<O, P> extends BasePropertyElement<O, P>
      */
     @Value
     @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = false)
     public static class InvokablePropertyReader<O, P> extends BasePropertyReader<O, P> {
 
         /**
@@ -166,6 +168,11 @@ public abstract class BasePropertyReader<O, P> extends BasePropertyElement<O, P>
         @Override
         protected @NonNull <O1> PropertyReader<O1, P> ownByInternal(@NonNull TypeToken<O1> ownerType) {
             return new InvokablePropertyReader<>(invokable().ownerType(ownerType), propertyName());
+        }
+
+        @Override
+        public String toString() {
+            return super.toString();
         }
     }
 }
