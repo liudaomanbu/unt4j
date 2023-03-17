@@ -8,7 +8,7 @@ import org.caotc.unit4j.core.common.base.AccessLevel;
  * @date 2022-10-14
  * @since 1.0.0
  */
-public interface WithAccessLevel {
+public interface Accessible {
     /**
      * Returns true if the element is public.
      */

@@ -19,8 +19,8 @@ package org.caotc.unit4j.core.common.reflect.property.accessor;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.Accessible;
 import org.caotc.unit4j.core.common.reflect.AnnotatedElement;
-import org.caotc.unit4j.core.common.reflect.WithAccessLevel;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 
 import java.lang.reflect.Method;
@@ -35,7 +35,7 @@ import java.lang.reflect.Type;
  * @date 2019-05-27
  * @since 1.0.0
  */
-public interface PropertyElement<O, P> extends WithAccessLevel, AnnotatedElement {
+public interface PropertyElement<O, P> extends Accessible, AnnotatedElement {
     @SuppressWarnings("unchecked")
     @NonNull
     static <O, P> PropertyElement<O, P> from(@NonNull Type ownerType, @NonNull Method method,

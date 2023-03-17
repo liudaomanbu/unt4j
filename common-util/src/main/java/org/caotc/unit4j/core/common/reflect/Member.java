@@ -1,6 +1,5 @@
 package org.caotc.unit4j.core.common.reflect;
 
-import com.google.common.reflect.Invokable;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 
@@ -11,7 +10,7 @@ import java.lang.reflect.Modifier;
  * @date 2022-08-25
  * @since 1.0.0
  */
-public interface Member extends java.lang.reflect.Member, WithAccessLevel {
+public interface Member extends java.lang.reflect.Member, Accessible {
 
     @NonNull
     default Class<?> getDeclaringClass() {
@@ -74,13 +73,6 @@ public interface Member extends java.lang.reflect.Member, WithAccessLevel {
         return Modifier.isStatic(getModifiers());
     }
 
-    /**
-     * Returns {@code true} if this method is final, per {@code Modifier.isFinal(getModifiers())}.
-     *
-     * <p>Note that a method may still be effectively "final", or non-overridable when it has no
-     * {@code final} keyword. For example, it could be private, or it could be declared by a final
-     * class. To tell whether a method is overridable, use {@link Invokable#isOverridable}.
-     */
     default boolean isFinal() {
         return Modifier.isFinal(getModifiers());
     }

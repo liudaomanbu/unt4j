@@ -24,13 +24,28 @@ import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.common.reflect.*;
+import org.caotc.unit4j.core.common.reflect.ConstructorInvokable;
+import org.caotc.unit4j.core.common.reflect.FieldElement;
+import org.caotc.unit4j.core.common.reflect.Invokable;
+import org.caotc.unit4j.core.common.reflect.MethodInvokable;
+import org.caotc.unit4j.core.common.reflect.PropertyName;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
-import org.caotc.unit4j.core.common.reflect.property.accessor.*;
-import org.caotc.unit4j.core.exception.*;
+import org.caotc.unit4j.core.common.reflect.property.accessor.DefaultPropertyAccessorMethodFormat;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessorMethodFormat;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.caotc.unit4j.core.exception.AccessiblePropertyNotFoundException;
+import org.caotc.unit4j.core.exception.GetMethodNotFoundException;
+import org.caotc.unit4j.core.exception.MethodNotFoundException;
+import org.caotc.unit4j.core.exception.PropertyNotFoundException;
+import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
+import org.caotc.unit4j.core.exception.SetMethodNotFoundException;
+import org.caotc.unit4j.core.exception.WritablePropertyNotFoundException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -2592,21 +2607,21 @@ public class ReflectionUtil {
     }
 
     /**
-     * invokable是否在superTypeToken中被重写
+     * overriddenMethod是否在superTypeToken中被重写
      *
-     * @param invokable
-     * @param superTypeToken
-     * @return
+     * @param overriddenMethod 被重写的方法
+     * @param overridingType   重写方法的类
+     * @return overriddenMethod是否在superTypeToken中被重写
      * @apiNote 仅判断当前superTypeToken, superTypeToken的super class重写忽略
      */
-    public static boolean isOverridden(@NonNull MethodInvokable<?, ?> invokable,
-                                       @NonNull TypeToken<?> superTypeToken) {
-        if (invokable.declaringType().equals(superTypeToken)) {
+    public static boolean isOverridden(@NonNull MethodInvokable<?, ?> overriddenMethod,
+                                       @NonNull TypeToken<?> overridingType) {
+        if (overriddenMethod.declaringType().equals(overridingType)) {
             return false;
         }
-        return Arrays.stream(superTypeToken.getRawType().getDeclaredMethods())
-                .map(method -> Invokable.from(method, superTypeToken))
-                .anyMatch(superMethodInvokable -> isOverridden(invokable, superMethodInvokable));
+        return Arrays.stream(overridingType.getRawType().getDeclaredMethods())
+                .map(method -> Invokable.from(method, overridingType))
+                .anyMatch(superMethodInvokable -> isOverridden(overriddenMethod, superMethodInvokable));
     }
 
     public static boolean isOverridden(@NonNull Method method,

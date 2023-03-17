@@ -20,7 +20,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 
-import java.lang.reflect.*;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.GenericSignatureFormatError;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.MalformedParameterizedTypeException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 /**
@@ -121,8 +128,6 @@ public interface Invokable<O, R> extends Element {
         if (!declaringType().isSupertypeOf(type)) return false;
 
         if (isPublic()) return true;
-        if (isPackageVisible() && type.getRawType().getPackage() == declaringClass().getPackage()) return true;
-
-        return false;
+        return isPackageVisible() && type.getRawType().getPackage() == declaringClass().getPackage();
     }
 }

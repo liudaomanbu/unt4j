@@ -36,4 +36,9 @@ public class GuavaParameterProxy implements Parameter {
     public AnnotatedType annotatedType() {
         return delegate.getAnnotatedType();
     }
+
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
 }
