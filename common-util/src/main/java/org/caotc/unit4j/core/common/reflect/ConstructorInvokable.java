@@ -7,7 +7,6 @@ import java.lang.reflect.Constructor;
 
 /**
  * @param <O> owner type
- * @param <R> return type
  * @author caotc
  * @date 2023-02-17
  * @since 1.0.0
