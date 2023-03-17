@@ -36,38 +36,38 @@ import java.lang.reflect.Type;
 @EqualsAndHashCode
 public class ReadablePropertyNotFoundException extends PropertyNotFoundException {
 
-  @NonNull
-  public static ReadablePropertyNotFoundException create(@NonNull Type type,
-      @NonNull String propertyName) {
-    return new ReadablePropertyNotFoundException(TypeToken.of(type), propertyName);
-  }
+    private ReadablePropertyNotFoundException(@NonNull TypeToken<?> typeToken,
+                                              @NonNull String propertyName) {
+        super(typeToken, propertyName);
+    }
 
-  @NonNull
-  public static ReadablePropertyNotFoundException create(@NonNull Class<?> clazz,
-      @NonNull String propertyName) {
-    return new ReadablePropertyNotFoundException(TypeToken.of(clazz), propertyName);
-  }
+    @NonNull
+    public static ReadablePropertyNotFoundException create(@NonNull Type type,
+                                                           @NonNull String propertyName) {
+        return new ReadablePropertyNotFoundException(TypeToken.of(type), propertyName);
+    }
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyName 属性名称
-   * @param typeToken 类
-   * @return {@link ReadablePropertyNotFoundException}
-   * @author caotc
-   * @date 2019-05-25
-   * @since 1.0.0
-   */
-  @NonNull
-  public static ReadablePropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
-      @NonNull String propertyName) {
-    return new ReadablePropertyNotFoundException(typeToken, propertyName);
-  }
+    @NonNull
+    public static ReadablePropertyNotFoundException create(@NonNull Class<?> clazz,
+                                                           @NonNull String propertyName) {
+        return new ReadablePropertyNotFoundException(TypeToken.of(clazz), propertyName);
+    }
 
-  private ReadablePropertyNotFoundException(@NonNull TypeToken<?> typeToken,
-      @NonNull String propertyName) {
-    super(typeToken, propertyName);
-  }
+    /**
+     * 工厂方法
+     *
+     * @param propertyName 属性名称
+     * @param typeToken    类
+     * @return {@link ReadablePropertyNotFoundException}
+     * @author caotc
+     * @date 2019-05-25
+     * @since 1.0.0
+     */
+    @NonNull
+    public static ReadablePropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
+                                                           @NonNull String propertyName) {
+        return new ReadablePropertyNotFoundException(typeToken, propertyName);
+    }
 
     @Override
     protected @NonNull String messageInternal() {

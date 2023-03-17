@@ -20,6 +20,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 
 import java.lang.reflect.Type;
 
@@ -35,42 +36,42 @@ import java.lang.reflect.Type;
 @EqualsAndHashCode
 public class AccessiblePropertyNotFoundException extends PropertyNotFoundException {
 
-  @NonNull
-  public static AccessiblePropertyNotFoundException create(@NonNull Type type,
-      @NonNull String propertyName) {
-    return new AccessiblePropertyNotFoundException(TypeToken.of(type), propertyName);
-  }
+    private AccessiblePropertyNotFoundException(@NonNull TypeToken<?> typeToken,
+                                                @NonNull String propertyName) {
+        super(typeToken, propertyName);
+    }
 
-  @NonNull
-  public static AccessiblePropertyNotFoundException create(@NonNull Class<?> clazz,
-      @NonNull String propertyName) {
-    return new AccessiblePropertyNotFoundException(TypeToken.of(clazz), propertyName);
-  }
+    @NonNull
+    public static AccessiblePropertyNotFoundException create(@NonNull Type type,
+                                                             @NonNull String propertyName) {
+        return new AccessiblePropertyNotFoundException(TypeToken.of(type), propertyName);
+    }
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyName 属性名称
-   * @param typeToken 类
-   * @return {@link AccessiblePropertyNotFoundException}
-   * @author caotc
-   * @date 2019-05-25
-   * @since 1.0.0
-   */
-  @NonNull
-  public static AccessiblePropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
-      @NonNull String propertyName) {
-    return new AccessiblePropertyNotFoundException(typeToken, propertyName);
-  }
+    @NonNull
+    public static AccessiblePropertyNotFoundException create(@NonNull Class<?> clazz,
+                                                             @NonNull String propertyName) {
+        return new AccessiblePropertyNotFoundException(TypeToken.of(clazz), propertyName);
+    }
 
-  private AccessiblePropertyNotFoundException(@NonNull TypeToken<?> typeToken,
-      @NonNull String propertyName) {
-    super(typeToken, propertyName);
-  }
+    /**
+     * 工厂方法
+     *
+     * @param propertyName 属性名称
+     * @param typeToken    类
+     * @return {@link AccessiblePropertyNotFoundException}
+     * @author caotc
+     * @date 2019-05-25
+     * @since 1.0.0
+     */
+    @NonNull
+    public static AccessiblePropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
+                                                             @NonNull String propertyName) {
+        return new AccessiblePropertyNotFoundException(typeToken, propertyName);
+    }
 
-  @Override
-  protected @NonNull String messageInternal() {
-      return String
-              .format("%s not found the AccessibleProperty named %s", typeToken(), propertyName());
-  }
+    @Override
+    protected @NonNull String messageInternal() {
+        return String
+                .format("%s not found the AccessibleProperty named %s", typeToken(), propertyName());
+    }
 }

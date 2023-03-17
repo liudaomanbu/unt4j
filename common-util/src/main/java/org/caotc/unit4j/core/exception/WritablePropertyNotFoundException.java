@@ -20,6 +20,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 
 import java.lang.reflect.Type;
 
@@ -35,41 +36,41 @@ import java.lang.reflect.Type;
 @EqualsAndHashCode
 public class WritablePropertyNotFoundException extends PropertyNotFoundException {
 
-  @NonNull
-  public static WritablePropertyNotFoundException create(@NonNull Type type,
-      @NonNull String propertyName) {
-    return new WritablePropertyNotFoundException(TypeToken.of(type), propertyName);
-  }
+    private WritablePropertyNotFoundException(@NonNull TypeToken<?> typeToken,
+                                              @NonNull String propertyName) {
+        super(typeToken, propertyName);
+    }
 
-  @NonNull
-  public static WritablePropertyNotFoundException create(@NonNull Class<?> clazz,
-      @NonNull String propertyName) {
-    return new WritablePropertyNotFoundException(TypeToken.of(clazz), propertyName);
-  }
+    @NonNull
+    public static WritablePropertyNotFoundException create(@NonNull Type type,
+                                                           @NonNull String propertyName) {
+        return new WritablePropertyNotFoundException(TypeToken.of(type), propertyName);
+    }
 
-  /**
-   * 工厂方法
-   *
-   * @param propertyName 属性名称
-   * @param typeToken 类
-   * @return {@link WritablePropertyNotFoundException}
-   * @author caotc
-   * @date 2019-05-25
-   * @since 1.0.0
-   */
-  @NonNull
-  public static WritablePropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
-      @NonNull String propertyName) {
-    return new WritablePropertyNotFoundException(typeToken, propertyName);
-  }
+    @NonNull
+    public static WritablePropertyNotFoundException create(@NonNull Class<?> clazz,
+                                                           @NonNull String propertyName) {
+        return new WritablePropertyNotFoundException(TypeToken.of(clazz), propertyName);
+    }
 
-  private WritablePropertyNotFoundException(@NonNull TypeToken<?> typeToken,
-      @NonNull String propertyName) {
-    super(typeToken, propertyName);
-  }
+    /**
+     * 工厂方法
+     *
+     * @param propertyName 属性名称
+     * @param typeToken    类
+     * @return {@link WritablePropertyNotFoundException}
+     * @author caotc
+     * @date 2019-05-25
+     * @since 1.0.0
+     */
+    @NonNull
+    public static WritablePropertyNotFoundException create(@NonNull TypeToken<?> typeToken,
+                                                           @NonNull String propertyName) {
+        return new WritablePropertyNotFoundException(typeToken, propertyName);
+    }
 
-  @Override
-  protected @NonNull String messageInternal() {
-      return String.format("%s not found the WritableProperty named %s", typeToken(), propertyName());
-  }
+    @Override
+    protected @NonNull String messageInternal() {
+        return String.format("%s not found the WritableProperty named %s", typeToken(), propertyName());
+    }
 }

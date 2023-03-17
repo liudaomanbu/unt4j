@@ -35,16 +35,16 @@ import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 @EqualsAndHashCode
 public class ReadablePropertyValueNotFoundException extends IllegalStateException {
 
-  @NonNull
-  ReadableProperty<?, ?> readableProperty;
-  @NonNull
-  Object target;
-  @Getter(lazy = true)
-  String message = String
-      .format("property %s for %s value not found", readableProperty.name(), target);
+    @NonNull
+    ReadableProperty<?, ?> readableProperty;
+    @NonNull
+    Object target;
+    @Getter(lazy = true)
+    String message = String
+            .format("property %s for %s value not found", readableProperty.name(), target);
 
-  @Override
-  public String getMessage() {
-    return message();
-  }
+    @Override
+    public String getMessage() {
+        return message();
+    }
 }
