@@ -16,9 +16,11 @@
 
 package org.caotc.unit4j.core.common.reflect.property;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import lombok.*;
+import lombok.NonNull;
+import lombok.Value;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
@@ -31,31 +33,26 @@ import java.util.Optional;
  * @date 2019-11-28
  * @since 1.0.0
  */
-@Getter(AccessLevel.PROTECTED)
-@EqualsAndHashCode
-@ToString
-public abstract class BaseCompositeProperty<O, P, T> implements Property<O, P> {
+@Value
+public class CompositeProperty<O, P, T> implements AccessibleProperty<O, P> {
 
     @NonNull
     String name;
     @NonNull
     ReadableProperty<O, T> transferProperty;
+    @NonNull
+    Property<T, P> delegate;
 
-    protected BaseCompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
-                                    @NonNull Property<? extends T, P> delegate) {
+    CompositeProperty(@NonNull ReadableProperty<O, T> transferProperty,
+                      @NonNull Property<? extends T, P> delegate) {
         this.name = transferProperty.name() + "." + delegate.name();
         this.transferProperty = transferProperty;
+        this.delegate = delegate.ownerType(transferProperty.type());
     }
 
     @NonNull
     @Override
-    public final String name() {
-        return name;
-    }
-
-    @NonNull
-    @Override
-    public final TypeToken<P> type() {
+    public TypeToken<P> type() {
         return delegate().type();
     }
 
@@ -70,17 +67,44 @@ public abstract class BaseCompositeProperty<O, P, T> implements Property<O, P> {
     }
 
     @Override
-    public final @NonNull <X extends Annotation> Optional<X> annotation(
+    public @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+        Preconditions.checkArgument(checkOwnerType(ownerType), "%s can not owner by %s", ownerType);
+        return new CompositeProperty<>(transferProperty().ownerType(ownerType), delegate());
+    }
+
+    @Override
+    public boolean readable() {
+        return delegate().readable();
+    }
+
+    @Override
+    public boolean writable() {
+        return delegate().writable();
+    }
+
+    @Override
+    public @NonNull Optional<P> read(@NonNull O target) {
+        return transferProperty().read(target).flatMap(delegate().toReadable()::read);
+    }
+
+    @Override
+    public @NonNull O write(@NonNull O target, @NonNull P value) {
+        return transferProperty().read(target)
+                .map(actualTarget -> delegate().toWritable().write(actualTarget, value))
+                .filter(writeResult -> transferProperty().writable())
+                .map(writeResult -> transferProperty().toWritable().write(target, writeResult))
+                .orElse(target);
+    }
+
+    @Override
+    public @NonNull <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass) {
         return delegate().annotation(annotationClass);
     }
 
     @Override
-    public final @NonNull <X extends Annotation> ImmutableList<X> annotations(
+    public @NonNull <X extends Annotation> ImmutableList<X> annotations(
             @NonNull Class<X> annotationClass) {
         return delegate().annotations(annotationClass);
     }
-
-    @NonNull
-    protected abstract Property<? extends T, P> delegate();
 }

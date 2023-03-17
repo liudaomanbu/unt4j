@@ -23,10 +23,9 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
+import lombok.Value;
 import org.caotc.unit4j.core.common.base.AccessLevel;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
@@ -55,9 +54,7 @@ import java.util.stream.Stream;
  * @date 2019-11-28
  * @since 1.0.0
  */
-@EqualsAndHashCode
-@ToString
-@Getter
+@Value
 public class SimpleProperty<O, P> implements AccessibleProperty<O, P> {
     /**
      * {@link PropertyElement}排序器

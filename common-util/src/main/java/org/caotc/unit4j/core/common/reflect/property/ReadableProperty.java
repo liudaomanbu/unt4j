@@ -110,7 +110,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
         if (readableProperty.accessible()) {
             return compose(readableProperty.toAccessible());
         }
-        return new CompositeReadableProperty<>(this, readableProperty);
+        return new CompositeProperty<>(this, readableProperty);
     }
 
     /**
@@ -128,7 +128,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
         if (writableProperty.accessible()) {
             return compose(writableProperty.toAccessible());
         }
-        return new CompositeWritableProperty<>(this, writableProperty);
+        return new CompositeProperty<>(this, writableProperty);
     }
 
     /**
@@ -143,7 +143,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     default <S> AccessibleProperty<O, S> compose(AccessibleProperty<P, S> accessibleProperty) {
-        return new CompositeAccessibleProperty<>(this, accessibleProperty);
+        return new CompositeProperty<>(this, accessibleProperty);
     }
 
     /**
