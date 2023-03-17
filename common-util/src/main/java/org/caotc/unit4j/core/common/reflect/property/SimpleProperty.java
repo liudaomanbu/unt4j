@@ -17,14 +17,17 @@
 package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import org.caotc.unit4j.core.common.base.AccessLevel;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
@@ -32,7 +35,13 @@ import org.caotc.unit4j.core.common.util.ClassUtil;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -48,8 +57,8 @@ import java.util.stream.Stream;
  */
 @EqualsAndHashCode
 @ToString
-@Getter(lombok.AccessLevel.PROTECTED)
-public abstract class BaseSimpleProperty<O, P> implements Property<O, P> {
+@Getter
+public class SimpleProperty<O, P> implements AccessibleProperty<O, P> {
     /**
      * {@link PropertyElement}排序器
      */
@@ -103,62 +112,37 @@ public abstract class BaseSimpleProperty<O, P> implements Property<O, P> {
     @NonNull
     TypeToken<O> ownerType;
 
-    protected BaseSimpleProperty(
-            @NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
-        this(ImmutableSortedSet.copyOf(ORDERING, propertyAccessors),
-                ImmutableSortedSet.copyOf(ORDERING, propertyAccessors));
-    }
 
-    protected BaseSimpleProperty(
-            @NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
-            @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
-        this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
-                ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
-    }
-
-    protected BaseSimpleProperty(
-            @NonNull Iterator<PropertyReader<O, P>> propertyReaders,
-            @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
-        this(ImmutableSortedSet.copyOf(ORDERING, propertyReaders),
-                ImmutableSortedSet.copyOf(ORDERING, propertyWriters));
-    }
-
-    protected BaseSimpleProperty(
-            @NonNull Stream<PropertyReader<O, P>> propertyReaders,
-            @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
-        this(propertyReaders
-                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)), propertyWriters
-                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING)));
-    }
-
-    protected BaseSimpleProperty(
-            @NonNull ImmutableSortedSet<PropertyReader<O, P>> propertyReaders,
-            @NonNull ImmutableSortedSet<PropertyWriter<O, P>> propertyWriters) {
+    SimpleProperty(
+            @NonNull Collection<? extends PropertyElement<O, P>> propertyElements) {
         //属性读取器集合不能为空
-        Preconditions
-                .checkArgument(!propertyReaders.isEmpty() || !propertyWriters.isEmpty(),
-                        "propertyReaders and propertyWriters can't be all empty");
+        Preconditions.checkArgument(!propertyElements.isEmpty(), "propertyElements can't be empty");
         //属性只能有一个
-        ImmutableSet<String> propertyNames = Streams
-                .concat(propertyReaders.stream(), propertyWriters.stream())
+        ImmutableSet<String> propertyNames = propertyElements.stream()
                 .map(PropertyElement::propertyName).collect(ImmutableSet.toImmutableSet());
         Preconditions.checkArgument(propertyNames.size() == 1,
-                "propertyReaders and propertyWriters not belong to a common property.propertyNames:%s", propertyNames);
+                "propertyElements not belong to a common property.propertyNames:%s", propertyNames);
         //ownerType只能有一个
-        ImmutableSet<TypeToken<O>> ownerTypes = Streams.concat(propertyReaders.stream(), propertyWriters.stream())
+        ImmutableSet<TypeToken<O>> ownerTypes = propertyElements.stream()
                 .map(PropertyElement::ownerType)
                 .collect(ImmutableSet.toImmutableSet());
         Preconditions.checkArgument(ownerTypes.size() == 1,
-                "propertyReaders and propertyWriters not belong to a common property.ownerTypes:%s", ownerTypes);
+                "propertyElements not belong to a common property.ownerTypes:%s", ownerTypes);
         this.name = Iterables.getOnlyElement(propertyNames);
         this.ownerType = Iterables.getOnlyElement(ownerTypes);
-        this.propertyReaders = propertyReaders;
-        this.propertyWriters = propertyWriters;
+        this.propertyReaders = propertyElements.stream()
+                .filter(PropertyElement::isReader)
+                .map(PropertyElement::toReader)
+                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
+        this.propertyWriters = propertyElements.stream()
+                .filter(PropertyElement::isWriter)
+                .map(PropertyElement::toWriter)
+                .collect(ImmutableSortedSet.toImmutableSortedSet(ORDERING));
     }
 
     @NonNull
     @Override
-    public final TypeToken<P> type() {
+    public TypeToken<P> type() {
         if (!propertyWriters().isEmpty()) {
             return propertyWriters().first().propertyType();
         }
@@ -167,15 +151,46 @@ public abstract class BaseSimpleProperty<O, P> implements Property<O, P> {
 
     @Override
     public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
-        return propertyWriters().stream().allMatch(propertyWriter -> propertyWriter.checkOwnerType(newOwnerType))
-                && propertyReaders().stream().allMatch(propertyReader -> propertyReader.checkOwnerType(newOwnerType));
+        return propertyElements().allMatch(propertyElement -> propertyElement.checkOwnerType(newOwnerType));
+    }
+
+    @Override
+    public @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
+        Preconditions.checkArgument(checkOwnerType(ownerType), "%s can not owner by %s", ownerType);
+        return new SimpleProperty<>(propertyElements()
+                .map(propertyElement -> propertyElement.ownerType(ownerType))
+                .collect(Collectors.toSet()));
+    }
+
+    @Override
+    public boolean writable() {
+        return !propertyWriters().isEmpty();
+    }
+
+    @Override
+    public boolean readable() {
+        return !propertyReaders().isEmpty();
+    }
+
+    @Override
+    public @NonNull O write(@NonNull O target, @NonNull P value) {
+        Preconditions.checkState(writable(), "%s can not write", this);
+        //property writers should write to a same property
+        return propertyWriters().first().write(target, value);
+    }
+
+    @Override
+    public @NonNull Optional<P> read(@NonNull O target) {
+        Preconditions.checkState(readable(), "%s can not read", this);
+        return propertyReaders().stream().map(propertyGetter -> propertyGetter.read(target))
+                .filter(Optional::isPresent).map(Optional::get).findFirst();
     }
 
     @NonNull
     @Override
-    public final <X extends Annotation> Optional<X> annotation(
+    public <X extends Annotation> Optional<X> annotation(
             @NonNull Class<X> annotationClass) {
-        return Streams.concat(propertyReaders().stream(), propertyWriters().stream())
+        return propertyElements()
                 .map(propertyElement -> AnnotatedElementUtils.findMergedAnnotation(propertyElement, annotationClass))
                 .filter(Objects::nonNull)
                 .findFirst();
@@ -183,10 +198,14 @@ public abstract class BaseSimpleProperty<O, P> implements Property<O, P> {
 
     @NonNull
     @Override
-    public final <X extends Annotation> ImmutableList<X> annotations(
+    public <X extends Annotation> ImmutableList<X> annotations(
             @NonNull Class<X> annotationClass) {
-        return Streams.concat(propertyReaders().stream(), propertyWriters().stream())
+        return propertyElements()
                 .map(propertyGetter -> AnnotatedElementUtils.findAllMergedAnnotations(propertyGetter, annotationClass))
                 .flatMap(Collection::stream).collect(ImmutableList.toImmutableList());
+    }
+
+    Stream<PropertyElement<O, P>> propertyElements() {
+        return Streams.concat(propertyReaders().stream(), propertyWriters().stream());
     }
 }

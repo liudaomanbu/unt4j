@@ -21,8 +21,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
 
-import java.util.Iterator;
-import java.util.stream.Stream;
+import java.util.Collection;
 
 /**
  * @param <O> owner type
@@ -45,39 +44,8 @@ public interface WritableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> WritableProperty<T, R> create(
-            @NonNull Iterable<PropertyWriter<T, R>> propertyWriters) {
-
-        return new SimpleWritableProperty<>(propertyWriters);
-    }
-
-    /**
-     * 工厂方法
-     *
-     * @param propertyWriters 属性设置器集合
-     * @return 属性设置器
-     * @author caotc
-     * @date 2019-05-27
-     * @since 1.0.0
-     */
-    @NonNull
-    static <T, R> WritableProperty<T, R> create(
-            @NonNull Iterator<PropertyWriter<T, R>> propertyWriters) {
-        return new SimpleWritableProperty<>(propertyWriters);
-    }
-
-    /**
-     * 工厂方法
-     *
-     * @param propertyWriters 属性设置器集合
-     * @return 属性设置器
-     * @author caotc
-     * @date 2019-05-27
-     * @since 1.0.0
-     */
-    @NonNull
-    static <T, R> WritableProperty<T, R> create(
-            @NonNull Stream<PropertyWriter<T, R>> propertyWriters) {
-        return new SimpleWritableProperty<>(propertyWriters);
+            @NonNull Collection<PropertyWriter<T, R>> propertyWriters) {
+        return new SimpleProperty<>(propertyWriters);
     }
 
     @Override

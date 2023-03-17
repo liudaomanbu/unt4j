@@ -22,9 +22,8 @@ import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
 import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @param <O> owner type
@@ -47,38 +46,8 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
      */
     @NonNull
     static <T, R> ReadableProperty<T, R> create(
-            @NonNull Iterable<PropertyReader<T, R>> propertyReaders) {
-        return new SimpleReadableProperty<>(propertyReaders);
-    }
-
-    /**
-     * 工厂方法
-     *
-     * @param propertyReaders 属性获取器集合
-     * @return 属性获取器
-     * @author caotc
-     * @date 2019-05-27
-     * @since 1.0.0
-     */
-    @NonNull
-    static <T, R> ReadableProperty<T, R> create(
-            @NonNull Iterator<PropertyReader<T, R>> propertyReaders) {
-        return new SimpleReadableProperty<>(propertyReaders);
-    }
-
-    /**
-     * 工厂方法
-     *
-     * @param propertyReaders 属性获取器集合
-     * @return 属性获取器
-     * @author caotc
-     * @date 2019-05-27
-     * @since 1.0.0
-     */
-    @NonNull
-    static <T, R> ReadableProperty<T, R> create(
-            @NonNull Stream<PropertyReader<T, R>> propertyReaders) {
-        return new SimpleReadableProperty<>(propertyReaders);
+            @NonNull Collection<PropertyReader<T, R>> propertyReaders) {
+        return new SimpleProperty<>(propertyReaders);
     }
 
     @Override

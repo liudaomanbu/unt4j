@@ -19,12 +19,9 @@ package org.caotc.unit4j.core.common.reflect.property;
 import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyAccessor;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyWriter;
+import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 
-import java.util.Iterator;
-import java.util.stream.Stream;
+import java.util.Collection;
 
 /**
  * @param <O> owner type
@@ -39,30 +36,9 @@ public interface AccessibleProperty<O, P> extends ReadableProperty<O, P>,
         WritableProperty<O, P> {
 
     @NonNull
-    static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterable<? extends PropertyAccessor<O, P>> propertyAccessors) {
-        return new SimpleAccessibleProperty<>(propertyAccessors, propertyAccessors);
-    }
-
-    @NonNull
-    static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterable<? extends PropertyReader<O, P>> propertyReaders,
-            @NonNull Iterable<? extends PropertyWriter<O, P>> propertyWriters) {
-        return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
-    }
-
-    @NonNull
-    static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Iterator<PropertyReader<O, P>> propertyReaders,
-            @NonNull Iterator<PropertyWriter<O, P>> propertyWriters) {
-        return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
-    }
-
-    @NonNull
-    static <O, P> SimpleAccessibleProperty<O, P> create(
-            @NonNull Stream<PropertyReader<O, P>> propertyReaders,
-            @NonNull Stream<PropertyWriter<O, P>> propertyWriters) {
-        return new SimpleAccessibleProperty<>(propertyReaders, propertyWriters);
+    static <O, P> AccessibleProperty<O, P> create(
+            @NonNull Collection<? extends PropertyElement<O, P>> propertyAccessors) {
+        return new SimpleProperty<>(propertyAccessors).toAccessible();
     }
 
     @Override

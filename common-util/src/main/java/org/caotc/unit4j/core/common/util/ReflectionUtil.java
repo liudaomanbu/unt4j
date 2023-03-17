@@ -52,7 +52,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -768,7 +767,6 @@ public class ReflectionUtil {
                 propertyElementStream(type, propertyAccessorMethodFormats)
                         .collect(ImmutableListMultimap.toImmutableListMultimap(PropertyElement::propertyName, Function.identity()));
         return propertyNameToPropertyElements.asMap().values().stream()
-                .map(Collection::stream)
                 .map(Property::create);
     }
 

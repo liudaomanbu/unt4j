@@ -18,16 +18,14 @@ package org.caotc.unit4j.core.common.reflect.property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyElement;
 import org.caotc.unit4j.core.exception.AnnotationNotFoundException;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * 属性
@@ -44,25 +42,8 @@ public interface Property<O, P> {
 
     @NonNull
     static <T, R> Property<T, R> create(
-            @NonNull Iterable<PropertyElement<T, R>> propertyElements) {
-        boolean hasReader = Streams.stream(propertyElements).anyMatch(PropertyElement::isReader);
-        if (!hasReader) {
-            return WritableProperty
-                    .create(Streams.stream(propertyElements).map(PropertyElement::toWriter));
-        }
-        boolean hasWriter = Streams.stream(propertyElements).anyMatch(PropertyElement::isWriter);
-        if (!hasWriter) {
-            return ReadableProperty
-                    .create(Streams.stream(propertyElements).map(PropertyElement::toReader));
-        }
-        return new SimpleAccessibleProperty<>(Streams.stream(propertyElements).filter(PropertyElement::isReader).map(PropertyElement::toReader)
-                , Streams.stream(propertyElements).filter(PropertyElement::isWriter).map(PropertyElement::toWriter));
-    }
-
-    @NonNull
-    static <T, R> Property<T, R> create(
-            @NonNull Stream<PropertyElement<T, R>> propertyElements) {
-        return create(propertyElements.collect(ImmutableSet.toImmutableSet()));
+            @NonNull Collection<PropertyElement<T, R>> propertyElements) {
+        return new SimpleProperty<>(propertyElements);
     }
 
     @NonNull
