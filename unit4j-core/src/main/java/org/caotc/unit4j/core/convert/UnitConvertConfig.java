@@ -18,13 +18,13 @@ import org.caotc.unit4j.core.math.number.BigDecimal;
 @Value
 @Builder(toBuilder = true)
 @Slf4j
-public final class UnitConvertConfig {
+public class UnitConvertConfig {
 
   /**
    * 空对象
    */
   private static final UnitConvertConfig EMPTY = builder().ratio(BigDecimal.ONE)
-      .zeroDifference(BigDecimal.ZERO).build();
+          .zeroDifference(BigDecimal.ZERO).build();
 
   /**
    * 空对象

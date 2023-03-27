@@ -3,11 +3,6 @@ package org.caotc.unit4j.core.unit.type;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
@@ -15,6 +10,12 @@ import lombok.Value;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.util.Util;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 组合单位类型,由基本到位和其他组合单位类型组合而成
@@ -25,7 +26,7 @@ import org.caotc.unit4j.core.common.util.Util;
  **/
 @Value
 @Builder(toBuilder = true)
-public final class CompositeUnitType extends UnitType {
+public class CompositeUnitType extends UnitType {
 
   /**
    * 无量纲单位类型
@@ -128,28 +129,28 @@ public final class CompositeUnitType extends UnitType {
   public static final CompositeUnitType MAGNETIC_FLUX_DENSITY = builder()
       .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
       .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
+          .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
 
   /**
    * 电感
    */
   public static final CompositeUnitType INDUCTANCE = builder().unitTypeComponentToExponent(
-      BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -2).build();
-//  /**
-//   * TODO 不同单位类型属性完全相同待处理
-//   * 光通量 Φ
-//   */
-//  public static final CompositeUnitType LUMINOUS_FLUX = builder().unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
+                  BaseUnitType.MASS, 1)
+          .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
+          .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
+          .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -2).build();
+  /**
+   * TODO 不同单位类型属性完全相同待处理
+   * 光通量 Φ
+   */
+  public static final CompositeUnitType LUMINOUS_FLUX = builder().unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
 
   /**
    * 照度
    */
   public static final CompositeUnitType ILLUMINANCE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, -2)
-      .unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
+          .unitTypeComponentToExponent(BaseUnitType.LENGTH, -2)
+          .unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
 
   /**
    * 放射性活度

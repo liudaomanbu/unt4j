@@ -369,47 +369,45 @@ public class UnitConstant {
   public static final CompositeStandardUnit LUMEN = CompositeStandardUnit.builder()
       .unitComponentToExponent(UnitConstant.CANDELA, 1)
       .unitComponentToExponent(NON, 1)
-      .build();
+          .build();
 
   /**
    * 勒克斯 lm/m2	m−2·cd 照度
    */
   public static final CompositeStandardUnit LUX = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.METER, -2)
-      .unitComponentToExponent(UnitConstant.SECOND, -2).unitComponentToExponent(
-          UnitConstant.CANDELA, 1).build();
+          .unitComponentToExponent(UnitConstant.METER, -2)
+          .unitComponentToExponent(UnitConstant.SECOND, -2).unitComponentToExponent(
+                  UnitConstant.CANDELA, 1).build();
 
-  //TODO 单位拥有多个名字时处理
-//  /**
-//   * 贝克勒尔 s−1 放射性活度
-//   */
-//  public static final CompositeStandardUnit BECQUEREL = CompositeStandardUnit.builder()
-//      .unitComponentToExponent(UnitConstant.SECOND, -1).build();
+  /**
+   * 贝克勒尔 s−1 放射性活度
+   */
+  public static final CompositeStandardUnit BECQUEREL = CompositeStandardUnit.builder()
+          .unitComponentToExponent(UnitConstant.SECOND, -1).build();
 
   /**
    * 戈瑞 J/kg	m2·s−2 致电离辐射的吸收剂量
    */
   public static final CompositeStandardUnit GRAY = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.METER, 2)
-      .unitComponentToExponent(UnitConstant.SECOND, -2)
-      .build();
+          .unitComponentToExponent(UnitConstant.METER, 2)
+          .unitComponentToExponent(UnitConstant.SECOND, -2)
+          .build();
 
-  //TODO 单位拥有多个名字时处理
-//  /**
-//   * 希沃特 J/kg	m2·s−2 致电离辐射等效剂量
-//   */
-//  public static final CompositeStandardUnit SIEVERT = CompositeStandardUnit.builder()
-//      .unitComponentToExponent(UnitConstant.METER, 2)
-//      .unitComponentToExponent(UnitConstant.SECOND, -2)
-//      .build();
+  /**
+   * 希沃特 J/kg	m2·s−2 致电离辐射等效剂量
+   */
+  public static final CompositeStandardUnit SIEVERT = CompositeStandardUnit.builder()
+          .unitComponentToExponent(UnitConstant.METER, 2)
+          .unitComponentToExponent(UnitConstant.SECOND, -2)
+          .build();
 
   /**
    * 开特 mol·s−1 催化活度
    */
   public static final CompositeStandardUnit KATAL = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.MOLE, 1)
-      .unitComponentToExponent(UnitConstant.SECOND, -1)
-      .build();
+          .unitComponentToExponent(UnitConstant.MOLE, 1)
+          .unitComponentToExponent(UnitConstant.SECOND, -1)
+          .build();
 
   /**
    * 国际单位制7个基本标准单位不可变集合
