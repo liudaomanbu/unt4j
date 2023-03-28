@@ -2,11 +2,12 @@ package org.caotc.unit4j.core.unit.type;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
+
+import java.util.Optional;
 
 /**
  * 基本单位类型 由于基本单位类型没有任何有意义的关联属性,纯粹由定义产生,因此仅拥有id属性,用以定义和区分基本单位类型
@@ -16,7 +17,7 @@ import org.caotc.unit4j.core.Configuration;
  * @since 1.0.0
  **/
 @Value(staticConstructor = "create")
-public class BaseUnitType extends UnitType {
+public class BaseUnitType implements UnitType {
 
   /**
    * 长度

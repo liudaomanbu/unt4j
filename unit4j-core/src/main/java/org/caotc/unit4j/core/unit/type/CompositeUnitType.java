@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  **/
 @Value
 @Builder(toBuilder = true)
-public class CompositeUnitType extends UnitType {
+public class CompositeUnitType implements UnitType {
 
   /**
    * 无量纲单位类型

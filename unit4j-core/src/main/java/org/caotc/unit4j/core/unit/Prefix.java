@@ -3,11 +3,9 @@ package org.caotc.unit4j.core.unit;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.AliasRegistrable;
 import org.caotc.unit4j.core.Aliased;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.WithId;
@@ -17,6 +15,8 @@ import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigInteger;
 
+import java.util.Optional;
+
 /**
  * 词头 //TODO 考虑将词头类改为类似基本单位类型
  *
@@ -25,7 +25,7 @@ import org.caotc.unit4j.core.math.number.BigInteger;
  * @since 1.0.0
  **/
 @Value(staticConstructor = "create")
-public class Prefix implements Comparable<Prefix>, WithId, Aliased, AliasRegistrable {
+public class Prefix implements Comparable<Prefix>, WithId, Aliased {
 
   /**
    * 空对象

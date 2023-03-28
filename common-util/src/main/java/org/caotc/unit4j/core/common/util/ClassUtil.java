@@ -2,13 +2,15 @@ package org.caotc.unit4j.core.common.util;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author caotc
@@ -17,13 +19,13 @@ import java.util.stream.Collectors;
  */
 @UtilityClass
 public class ClassUtil {
-    public static Set<Class<?>> lowestCommonSuperclasses(Class<?>... classes) {
+    public static ImmutableSet<Class<?>> lowestCommonSuperclasses(Class<?>... classes) {
         return lowestCommonSuperclasses(Arrays.stream(classes).collect(ImmutableSet.toImmutableSet()));
     }
 
-    public static Set<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
+    public static ImmutableSet<Class<?>> lowestCommonSuperclasses(Iterable<Class<?>> classes) {
         if (Iterables.isEmpty(classes)) {
-            return Sets.newHashSet();
+            return ImmutableSet.of();
         }
         final Set<Class<?>> result = TypeToken.of(classes.iterator().next()).getTypes().stream()
                 .map(TypeToken::getRawType)
@@ -33,21 +35,21 @@ public class ClassUtil {
                 .filter(type1 -> result.stream()
                         .filter(type2 -> !Objects.equals(type1, type2))
                         .noneMatch(type2 -> type1.isAssignableFrom(type2)))
-                .collect(Collectors.toSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
-    public static Set<TypeToken<?>> lowestCommonAncestors(Class<?>... classes) {
+    public static ImmutableSet<TypeToken<?>> lowestCommonAncestors(Class<?>... classes) {
         return lowestCommonAncestors(Arrays.stream(classes).map(TypeToken::of).collect(ImmutableSet.toImmutableSet()));
     }
 
-    public static Set<TypeToken<?>> lowestCommonAncestors(TypeToken<?>... types) {
+    public static ImmutableSet<TypeToken<?>> lowestCommonAncestors(TypeToken<?>... types) {
         return lowestCommonAncestors(Arrays.stream(types).collect(ImmutableSet.toImmutableSet()));
     }
 
 
-    public static Set<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
+    public static ImmutableSet<TypeToken<?>> lowestCommonAncestors(Iterable<? extends TypeToken<?>> types) {
         if (Iterables.isEmpty(types)) {
-            return Sets.newHashSet();
+            return ImmutableSet.of();
         }
 
         final Set<? extends TypeToken<?>> result = types.iterator().next().getTypes().stream()
@@ -57,7 +59,7 @@ public class ClassUtil {
                 .filter(type1 -> result.stream()
                         .filter(type2 -> !Objects.equals(type1, type2))
                         .noneMatch(type2 -> type1.isSupertypeOf(type2)))
-                .collect(Collectors.toSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     public static TypeToken<?> unwrapContainer(TypeToken<?> type) {

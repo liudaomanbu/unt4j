@@ -72,9 +72,8 @@ public class Util {
   public static String createCompositeIdOrAlias(
           @NonNull Map<? extends WithId, Integer> stringSupplierToExponents) {
     return stringSupplierToExponents.entrySet().stream()
-            .map(entry -> StringConstant.EMPTY_JOINER
-                    .join(StringConstant.HALF_WIDTH_LEFT_PARENTHESIS, entry.getKey().id(),
-                            StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS, getSuperscript(entry.getValue())))
+            .map(entry -> StringConstant.EMPTY_JOINER.join(StringConstant.HALF_WIDTH_LEFT_PARENTHESIS, entry.getKey().id(),
+                    StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS, getSuperscript(entry.getValue())))
             .collect(Collectors.joining());
   }
 }

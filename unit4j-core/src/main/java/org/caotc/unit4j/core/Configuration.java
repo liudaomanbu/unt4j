@@ -129,12 +129,12 @@ public final class Configuration implements WithId {
      * 可注册别名的对象与别名类型和对应的别名Table 数据与{@link #aliasToTypeToAliasRegistrableTable}保持对应
      */
     @NonNull
-    final Multimap<? super AliasRegistrable, Alias> aliasRegistrableToAliases = Multimaps.synchronizedMultimap(HashMultimap.create());
+    final Multimap<Object, Alias> aliasRegistrableToAliases = Multimaps.synchronizedMultimap(HashMultimap.create());
     /**
      * 别名值与别名类型和对应的可注册别名的对象 数据与{@link #aliasRegistrableToAliases}保持对应
      */
     @NonNull
-    final Table<String, Alias.Type, AliasRegistrable> aliasToTypeToAliasRegistrableTable = Tables
+    final Table<String, Alias.Type, Object> aliasToTypeToAliasRegistrableTable = Tables
             .synchronizedTable(HashBasedTable.create());
     /**
      * 自动转换时的目标单位选择器
@@ -400,7 +400,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public ImmutableSet<Alias> aliases(@NonNull AliasRegistrable aliasRegistrable) {
+    public ImmutableSet<Alias> aliases(@NonNull Object aliasRegistrable) {
         return ImmutableSet.copyOf(aliasRegistrableToAliases.get(aliasRegistrable));
     }
 
@@ -415,7 +415,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public Optional<Alias> alias(@NonNull AliasRegistrable aliasRegistrable,
+    public Optional<Alias> alias(@NonNull Object aliasRegistrable,
                                  @NonNull Alias.Type aliasType) {
         Collection<Alias> aliases = aliasRegistrableToAliases.get(aliasRegistrable)
                 .stream()
@@ -496,7 +496,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public Optional<? extends AliasRegistrable> aliasRegistrableByAlias(@NonNull Alias alias) {
+    public Optional<?> aliasRegistrableByAlias(@NonNull Alias alias) {
         return Optional.ofNullable(aliasToTypeToAliasRegistrableTable.get(alias.value(), alias.type()));
     }
 
@@ -510,7 +510,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public ImmutableSet<? extends AliasRegistrable> aliasRegistrablesByAlias(@NonNull String alias) {
+    public ImmutableSet<?> aliasRegistrablesByAlias(@NonNull String alias) {
         return ImmutableSet.copyOf(aliasToTypeToAliasRegistrableTable.row(alias).values());
     }
 
@@ -526,7 +526,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public Configuration registerAlias(@NonNull AliasRegistrable aliasRegistrable,
+    public Configuration registerAlias(@NonNull Object aliasRegistrable,
                                        @NonNull Alias... aliases) {
         Arrays.stream(aliases).forEach(alias -> registerAlias(aliasRegistrable, alias));
         return this;
@@ -544,7 +544,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public synchronized Configuration registerAlias(@NonNull AliasRegistrable aliasRegistrable,
+    public synchronized Configuration registerAlias(@NonNull Object aliasRegistrable,
                                                     @NonNull Alias alias) {
         if (aliasRegistrableToAliases.containsEntry(aliasRegistrable, alias)) {
             throw new IllegalArgumentException("" + aliasRegistrable + alias + "重复注册");

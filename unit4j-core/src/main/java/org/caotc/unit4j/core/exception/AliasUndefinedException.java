@@ -14,7 +14,6 @@ import org.caotc.unit4j.core.Configuration;
  * @author caotc
  * @date 2019-05-17
  * @see Aliased
- * @see org.caotc.unit4j.core.AliasRegistrable
  * @since 1.0.0
  */
 @Value

@@ -53,9 +53,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 //TODO cache和热加载修改类对象
 
@@ -74,8 +72,8 @@ public class ReflectionUtil {
             .values();
 
     @NonNull
-    public static Set<Field> fields(@NonNull Type type) {
-        return fieldStream(type).collect(Collectors.toSet());
+    public static ImmutableSet<Field> fields(@NonNull Type type) {
+        return fieldStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     /**
@@ -88,13 +86,13 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static Set<Field> fields(@NonNull Class<?> type) {
-        return fieldStream(type).collect(Collectors.toSet());
+    public static ImmutableSet<Field> fields(@NonNull Class<?> type) {
+        return fieldStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static Set<Field> fields(@NonNull TypeToken<?> type) {
-        return fieldStream(type).collect(Collectors.toSet());
+    public static ImmutableSet<Field> fields(@NonNull TypeToken<?> type) {
+        return fieldStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -114,10 +112,10 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static Set<Field> fields(@NonNull Type type,
-                                    @NonNull String fieldName) {
+    public static ImmutableSet<Field> fields(@NonNull Type type,
+                                             @NonNull String fieldName) {
         return fieldStream(type).filter(field -> fieldName.equals(field.getName()))
-                .collect(Collectors.toSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     /**
@@ -132,17 +130,17 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static Set<Field> fields(@NonNull Class<?> type,
-                                    @NonNull String fieldName) {
+    public static ImmutableSet<Field> fields(@NonNull Class<?> type,
+                                             @NonNull String fieldName) {
         return fieldStream(type).filter(field -> fieldName.equals(field.getName()))
-                .collect(Collectors.toSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static Set<Field> fields(@NonNull TypeToken<?> type,
-                                    @NonNull String fieldName) {
+    public static ImmutableSet<Field> fields(@NonNull TypeToken<?> type,
+                                             @NonNull String fieldName) {
         return fieldStream(type).filter(field -> fieldName.equals(field.getName()))
-                .collect(Collectors.toSet());
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     /**
@@ -155,18 +153,18 @@ public class ReflectionUtil {
      * @since 1.0.0
      */
     @NonNull
-    public static Set<Method> methods(@NonNull Class<?> type) {
-        return methodStream(type).collect(Collectors.toSet());
+    public static ImmutableSet<Method> methods(@NonNull Class<?> type) {
+        return methodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static Set<Method> methods(@NonNull Type type) {
-        return methodStream(type).collect(Collectors.toSet());
+    public static ImmutableSet<Method> methods(@NonNull Type type) {
+        return methodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static Set<Method> methods(@NonNull TypeToken<?> type) {
-        return methodStream(type).collect(Collectors.toSet());
+    public static ImmutableSet<Method> methods(@NonNull TypeToken<?> type) {
+        return methodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -187,21 +185,21 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<MethodInvokable<O, Object>> methodInvokables(
+    public static <O> ImmutableSet<MethodInvokable<O, Object>> methodInvokables(
             @NonNull Type type) {
-        return ReflectionUtil.<O>methodInvokableStream(type).collect(Collectors.toSet());
+        return ReflectionUtil.<O>methodInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<MethodInvokable<O, Object>> methodInvokables(
+    public static <O> ImmutableSet<MethodInvokable<O, Object>> methodInvokables(
             @NonNull Class<O> type) {
-        return methodInvokableStream(type).collect(Collectors.toSet());
+        return methodInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<MethodInvokable<O, Object>> methodInvokables(
+    public static <O> ImmutableSet<MethodInvokable<O, Object>> methodInvokables(
             @NonNull TypeToken<O> type) {
-        return methodInvokableStream(type).collect(Collectors.toSet());
+        return methodInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @SuppressWarnings("unchecked")
@@ -224,19 +222,19 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<Constructor<O>> constructors(@NonNull Type type) {
-        return ReflectionUtil.<O>constructorStream(type).collect(Collectors.toSet());
+    public static <O> ImmutableSet<Constructor<O>> constructors(@NonNull Type type) {
+        return ReflectionUtil.<O>constructorStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<Constructor<O>> constructors(@NonNull Class<O> type) {
-        return constructorStream(type).collect(Collectors.toSet());
+    public static <O> ImmutableSet<Constructor<O>> constructors(@NonNull Class<O> type) {
+        return constructorStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<Constructor<O>> constructors(
+    public static <O> ImmutableSet<Constructor<O>> constructors(
             @NonNull TypeToken<O> type) {
-        return constructorStream(type).collect(Collectors.toSet());
+        return constructorStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @SuppressWarnings("unchecked")
@@ -263,21 +261,21 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<ConstructorInvokable<O>> constructorInvokables(
+    public static <O> ImmutableSet<ConstructorInvokable<O>> constructorInvokables(
             @NonNull Type type) {
-        return ReflectionUtil.<O>constructorInvokableStream(type).collect(Collectors.toSet());
+        return ReflectionUtil.<O>constructorInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<ConstructorInvokable<O>> constructorInvokables(
+    public static <O> ImmutableSet<ConstructorInvokable<O>> constructorInvokables(
             @NonNull Class<O> type) {
-        return constructorInvokableStream(type).collect(Collectors.toSet());
+        return constructorInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<ConstructorInvokable<O>> constructorInvokables(
+    public static <O> ImmutableSet<ConstructorInvokable<O>> constructorInvokables(
             @NonNull TypeToken<O> type) {
-        return constructorInvokableStream(type).collect(Collectors.toSet());
+        return constructorInvokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @SuppressWarnings("unchecked")
@@ -306,21 +304,21 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<Invokable<O, ?>> invokables(
+    public static <O> ImmutableSet<Invokable<O, ?>> invokables(
             @NonNull Type type) {
-        return ReflectionUtil.<O>invokableStream(type).collect(Collectors.toSet());
+        return ReflectionUtil.<O>invokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<Invokable<O, ?>> invokables(
+    public static <O> ImmutableSet<Invokable<O, ?>> invokables(
             @NonNull Class<O> type) {
-        return invokableStream(type).collect(Collectors.toSet());
+        return invokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<Invokable<O, ?>> invokables(
+    public static <O> ImmutableSet<Invokable<O, ?>> invokables(
             @NonNull TypeToken<O> type) {
-        return invokableStream(type).collect(Collectors.toSet());
+        return invokableStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @SuppressWarnings("unchecked")
@@ -343,18 +341,18 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public Set<Method> getMethods(@NonNull Type type) {
+    public ImmutableSet<Method> getMethods(@NonNull Type type) {
         return getMethods(TypeToken.of(type));
     }
 
     @NonNull
-    public Set<Method> getMethods(@NonNull Class<?> type) {
+    public ImmutableSet<Method> getMethods(@NonNull Class<?> type) {
         return getMethods(TypeToken.of(type));
     }
 
     @NonNull
-    public Set<Method> getMethods(@NonNull TypeToken<?> type) {
-        return getMethodStream(type).collect(Collectors.toSet());
+    public ImmutableSet<Method> getMethods(@NonNull TypeToken<?> type) {
+        return getMethodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -374,19 +372,18 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public Set<Method> setMethods(@NonNull Type type) {
+    public ImmutableSet<Method> setMethods(@NonNull Type type) {
         return setMethods(TypeToken.of(type));
     }
 
     @NonNull
-    public Set<Method> setMethods(@NonNull Class<?> type) {
+    public ImmutableSet<Method> setMethods(@NonNull Class<?> type) {
         return setMethods(TypeToken.of(type));
     }
 
     @NonNull
-    public Set<Method> setMethods(@NonNull TypeToken<?> type) {
-        return setMethodStream(type)
-                .collect(Collectors.toSet());
+    public ImmutableSet<Method> setMethods(@NonNull TypeToken<?> type) {
+        return setMethodStream(type).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -610,22 +607,21 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public Set<Method> setMethods(@NonNull Type type,
-                                  @NonNull String fieldName) {
+    public ImmutableSet<Method> setMethods(@NonNull Type type,
+                                           @NonNull String fieldName) {
         return setMethods(TypeToken.of(type), fieldName);
     }
 
     @NonNull
-    public Set<Method> setMethods(@NonNull Class<?> type,
-                                  @NonNull String fieldName) {
+    public ImmutableSet<Method> setMethods(@NonNull Class<?> type,
+                                           @NonNull String fieldName) {
         return setMethods(TypeToken.of(type), fieldName);
     }
 
     @NonNull
-    public Set<Method> setMethods(@NonNull TypeToken<?> type,
-                                  @NonNull String fieldName) {
-        return setMethodStream(type, fieldName)
-                .collect(Collectors.toSet());
+    public ImmutableSet<Method> setMethods(@NonNull TypeToken<?> type,
+                                           @NonNull String fieldName) {
+        return setMethodStream(type, fieldName).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -771,55 +767,55 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull O object) {
         return properties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyStream(object.getClass(), propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull Type type) {
         return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull Class<O> type) {
         return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull TypeToken<O> type) {
         return properties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<Property<O, Object>> properties(
+    public static <O> ImmutableSet<Property<O, Object>> properties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     public static <O> Stream<ReadableProperty<O, Object>> readablePropertyStream(
@@ -945,57 +941,56 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull O object) {
         return readableProperties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.readablePropertyStream(object, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.readablePropertyStream(object, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull Type type) {
         return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>readablePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>readablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull Class<O> type) {
         return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyStream(type, propertyAccessorMethodFormats)
-                .collect(Collectors.toSet());
+        return readablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull TypeToken<O> type) {
         return readableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<ReadableProperty<O, Object>> readableProperties(
+    public static <O> ImmutableSet<ReadableProperty<O, Object>> readableProperties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return readablePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return readablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -1122,59 +1117,57 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull O object) {
         return writableProperties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.writablePropertyStream(object, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.writablePropertyStream(object, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull Type type) {
         return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>writablePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>writablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull Class<O> type) {
         return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyStream(type, propertyAccessorMethodFormats)
-                .collect(Collectors.toSet());
+        return writablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull TypeToken<O> type) {
         return writableProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<WritableProperty<O, Object>> writableProperties(
+    public static <O> ImmutableSet<WritableProperty<O, Object>> writableProperties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return writablePropertyStream(type, propertyAccessorMethodFormats)
-                .collect(Collectors.toSet());
+        return writablePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     /**
@@ -1322,56 +1315,55 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull O object) {
         return accessibleProperties(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.accessiblePropertyStream(object, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.accessiblePropertyStream(object, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Type type) {
         return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Class<O> type) {
         return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull TypeToken<O> type) {
         return accessibleProperties(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<AccessibleProperty<O, Object>> accessibleProperties(
+    public static <O> ImmutableSet<AccessibleProperty<O, Object>> accessibleProperties(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return accessiblePropertyStream(type, propertyAccessorMethodFormats)
-                .collect(Collectors.toSet());
+        return accessiblePropertyStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -1921,51 +1913,51 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull O object) {
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(@NonNull O object) {
         return propertyElements(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull Type type) {
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(@NonNull Type type) {
         return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull Class<O> type) {
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(@NonNull Class<O> type) {
         return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(@NonNull TypeToken<O> type) {
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(@NonNull TypeToken<O> type) {
         return propertyElements(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyElementStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyElementStream(object.getClass(), propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyElementStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyElementStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyElementStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyElement<O, Object>> propertyElements(
+    public static <O> ImmutableSet<PropertyElement<O, Object>> propertyElements(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyElementStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyElementStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -2033,55 +2025,55 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull O object) {
         return propertyReaders(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull Type type) {
         return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull Class<O> type) {
         return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull TypeToken<O> type) {
         return propertyReaders(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyReaderStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyReaderStream(object.getClass(), propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyReaderStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyReaderStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyReaderStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyReaderStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyReader<O, Object>> propertyReaders(
+    public static <O> ImmutableSet<PropertyReader<O, Object>> propertyReaders(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyReaderStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyReaderStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -2143,55 +2135,55 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull O object) {
         return propertyWriters(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Type type) {
         return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Class<O> type) {
         return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull TypeToken<O> type) {
         return propertyWriters(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyWriterStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyWriterStream(object.getClass(), propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyWriterStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyWriterStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyWriterStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyWriterStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyWriter<O, Object>> propertyWriters(
+    public static <O> ImmutableSet<PropertyWriter<O, Object>> propertyWriters(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyWriterStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyWriterStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
@@ -2255,55 +2247,55 @@ public class ReflectionUtil {
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull O object) {
         return propertyAccessors(object, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Type type) {
         return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Class<O> type) {
         return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull TypeToken<O> type) {
         return propertyAccessors(type, DEFAULT_METHOD_NAME_STYLES);
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull O object,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyAccessorStream(object.getClass(), propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyAccessorStream(object.getClass(), propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Type type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return ReflectionUtil.<O>propertyAccessorStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return ReflectionUtil.<O>propertyAccessorStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull Class<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyAccessorStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyAccessorStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <O> Set<PropertyAccessor<O, Object>> propertyAccessors(
+    public static <O> ImmutableSet<PropertyAccessor<O, Object>> propertyAccessors(
             @NonNull TypeToken<O> type,
             @NonNull PropertyAccessorMethodFormat... propertyAccessorMethodFormats) {
-        return propertyAccessorStream(type, propertyAccessorMethodFormats).collect(Collectors.toSet());
+        return propertyAccessorStream(type, propertyAccessorMethodFormats).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull

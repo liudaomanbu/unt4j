@@ -41,7 +41,7 @@ import java.math.MathContext;
 @With
 @Value(staticConstructor = "create")
 @FieldNameConstants
-public final class Amount {
+public class Amount {
     public static final Amount UNKNOWN = create(UnkownNumber.INSTANCE, UnkownUnit.INSTANCE);
 
     @NonNull
