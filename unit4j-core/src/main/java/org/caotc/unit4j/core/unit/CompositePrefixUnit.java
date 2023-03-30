@@ -1,15 +1,16 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.unit.type.CompositeUnitType;
+
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * 有词头的组合单位
@@ -125,6 +126,6 @@ public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
   @Override
   public @NonNull Optional<Alias> compositeAliasFromConfiguration(
       @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-    return aliasFromConfiguration(configuration, aliasType);
+      return alias(configuration, aliasType);
   }
 }

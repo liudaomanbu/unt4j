@@ -246,20 +246,20 @@ public class Prefix implements Comparable<Prefix>, WithId, Aliased {
   }
 
   @Override
-  public @NonNull ImmutableSet<Alias> aliasesFromConfiguration(
-      @NonNull Configuration configuration) {
+  public @NonNull ImmutableSet<Alias> aliases(
+          @NonNull Configuration configuration) {
     return configuration.aliases(this);
   }
 
   @Override
-  public @NonNull Optional<Alias> aliasFromConfiguration(@NonNull Configuration configuration,
-      @NonNull Alias.Type aliasType) {
+  public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
+                                        @NonNull Alias.Type aliasType) {
     return configuration.alias(this, aliasType);
   }
 
   @Override
   public @NonNull Optional<Alias> compositeAliasFromConfiguration(
       @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-    return aliasFromConfiguration(configuration, aliasType);
+    return alias(configuration, aliasType);
   }
 }

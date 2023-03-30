@@ -44,7 +44,7 @@ public class UnitCodecConfig {
   @NonNull
   public String serialize(@NonNull Unit unit) {
     //TODO 增加UnitSerializeStrategy
-    return unit.aliasFromConfiguration(configuration(), type()).map(Alias::value)
-        .orElseGet(() -> aliasUndefinedStrategy().execute(unit, configuration(), type()));
+    return unit.alias(configuration(), type()).map(Alias::value)
+            .orElseGet(() -> aliasUndefinedStrategy().execute(unit, configuration(), type()));
   }
 }

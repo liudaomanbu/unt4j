@@ -349,7 +349,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public static Optional<Configuration> getById(@NonNull String id) {
+    public static Optional<Configuration> find(@NonNull String id) {
         return Optional.ofNullable(ID_TO_CONFIGURATIONS.get(id));
     }
 
@@ -364,7 +364,7 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public static Configuration getByIdExact(@NonNull String id) {
+    public static Configuration findExact(@NonNull String id) {
         if (ID_TO_CONFIGURATIONS.containsKey(id)) {
             return ID_TO_CONFIGURATIONS.get(id);
         }

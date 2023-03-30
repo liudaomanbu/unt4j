@@ -214,7 +214,7 @@ public class Unit4jProperties {
                             .apply(amountReadableProperty.name()));
     return AmountCodecConfig.builder()
             .configuration(Optional.ofNullable(amountSerialize).map(AmountSerialize::configId)
-                    .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
+                    .map(Configuration::findExact).orElseGet(this::getConfiguration))
             .strategy(Optional.ofNullable(amountSerialize).map(AmountSerialize::strategy)
                     .orElseGet(this::getPropertyStrategy))
             .targetUnit(Optional.ofNullable(amountSerialize).map(AmountSerialize::targetUnitId)
@@ -253,7 +253,7 @@ public class Unit4jProperties {
                               .apply(amountWritableProperty.name()));
       return AmountCodecConfig.builder()
               .configuration(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::configId)
-                      .map(Configuration::getByIdExact).orElseGet(this::getConfiguration))
+                      .map(Configuration::findExact).orElseGet(this::getConfiguration))
               .strategy(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::strategy)
                       .orElseGet(this::getPropertyStrategy))
 //            .targetUnit(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::targetUnitId)

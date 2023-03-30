@@ -5,11 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
@@ -18,6 +13,12 @@ import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.unit.type.CompositeUnitType;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 组合标准单位
@@ -118,23 +119,23 @@ public class CompositeStandardUnit implements CompositeUnit, StandardUnit {
     return Util.createCompositeIdOrAlias(unitComponentToExponents());
   }
 
-  @Override
-  public @NonNull ImmutableSet<Alias> aliasesFromConfiguration(
-      @NonNull Configuration configuration) {
-    return configuration.aliases(this);
-  }
+    @Override
+    public @NonNull ImmutableSet<Alias> aliases(
+            @NonNull Configuration configuration) {
+        return configuration.aliases(this);
+    }
 
-  @Override
-  public @NonNull Optional<Alias> aliasFromConfiguration(@NonNull Configuration configuration,
-      @NonNull Alias.Type aliasType) {
-    return configuration.alias(this, aliasType);
-  }
+    @Override
+    public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
+                                          @NonNull Alias.Type aliasType) {
+        return configuration.alias(this, aliasType);
+    }
 
   @NonNull
   @Override
   public Optional<Alias> compositeAliasFromConfiguration(@NonNull Configuration configuration,
       @NonNull Alias.Type aliasType) {
-    Optional<Alias> alias = aliasFromConfiguration(configuration, aliasType);
+      Optional<Alias> alias = alias(configuration, aliasType);
     if (alias.isPresent()) {
       return alias;
     }

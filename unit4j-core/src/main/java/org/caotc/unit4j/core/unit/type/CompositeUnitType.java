@@ -254,21 +254,21 @@ public class CompositeUnitType implements UnitType {
   }
 
   @Override
-  public @NonNull ImmutableSet<Alias> aliasesFromConfiguration(
-      @NonNull Configuration configuration) {
-    return configuration.aliases(this);
+  public @NonNull ImmutableSet<Alias> aliases(
+          @NonNull Configuration configuration) {
+      return configuration.aliases(this);
   }
 
-  @Override
-  public @NonNull Optional<Alias> aliasFromConfiguration(@NonNull Configuration configuration,
-      @NonNull Alias.Type aliasType) {
-    return configuration.alias(this, aliasType);
-  }
+    @Override
+    public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
+                                          @NonNull Alias.Type aliasType) {
+        return configuration.alias(this, aliasType);
+    }
 
   @Override
   public @NonNull Optional<Alias> compositeAliasFromConfiguration(
       @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-    Optional<Alias> alias = aliasFromConfiguration(configuration, aliasType);
+      Optional<Alias> alias = alias(configuration, aliasType);
     if (alias.isPresent()) {
       return alias;
     }

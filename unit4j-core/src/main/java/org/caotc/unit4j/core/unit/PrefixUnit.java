@@ -71,25 +71,25 @@ public interface PrefixUnit extends Unit {
 
   @Override
   @NonNull
-  default ImmutableSet<Alias> aliasesFromConfiguration(@NonNull Configuration configuration) {
-    return standardUnit().aliasesFromConfiguration(configuration).stream()
-        .map(Alias::type)
-        .map(aliasType -> aliasFromConfiguration(configuration, aliasType))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(ImmutableSet.toImmutableSet());
+  default ImmutableSet<Alias> aliases(@NonNull Configuration configuration) {
+    return standardUnit().aliases(configuration).stream()
+            .map(Alias::type)
+            .map(aliasType -> alias(configuration, aliasType))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(ImmutableSet.toImmutableSet());
   }
 
   @Override
   @NonNull
-  default Optional<Alias> aliasFromConfiguration(@NonNull Configuration configuration,
-      @NonNull Alias.Type aliasType) {
-    return standardUnit().aliasFromConfiguration(configuration, aliasType)
-        .map(Alias::value)
-        .flatMap(standardUnitAlias -> prefix().aliasFromConfiguration(configuration, aliasType)
+  default Optional<Alias> alias(@NonNull Configuration configuration,
+                                @NonNull Alias.Type aliasType) {
+    return standardUnit().alias(configuration, aliasType)
             .map(Alias::value)
-            .map(prefixAlias -> composite(prefixAlias, standardUnitAlias)))
-        .map(compositedAlias -> Alias.create(aliasType, compositedAlias));
+            .flatMap(standardUnitAlias -> prefix().alias(configuration, aliasType)
+                    .map(Alias::value)
+                    .map(prefixAlias -> composite(prefixAlias, standardUnitAlias)))
+            .map(compositedAlias -> Alias.create(aliasType, compositedAlias));
   }
 
   /**

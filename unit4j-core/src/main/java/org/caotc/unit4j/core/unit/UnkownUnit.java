@@ -88,12 +88,12 @@ public class UnkownUnit implements Unit {
     }
 
     @Override
-    public @NonNull ImmutableSet<Alias> aliasesFromConfiguration(@NonNull Configuration configuration) {
+    public @NonNull ImmutableSet<Alias> aliases(@NonNull Configuration configuration) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public @NonNull Optional<Alias> aliasFromConfiguration(@NonNull Configuration configuration, Alias.@NonNull Type aliasType) {
+    public @NonNull Optional<Alias> alias(@NonNull Configuration configuration, Alias.@NonNull Type aliasType) {
         throw new UnsupportedOperationException();
     }
 
