@@ -17,14 +17,9 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.unit.type.UnitType;
-
-import java.util.Optional;
 
 /**
  * 有词头的单位
@@ -67,29 +62,6 @@ public interface PrefixUnit extends Unit {
   @NonNull
   default String id() {
     return composite(prefix().id(), standardUnit().id());
-  }
-
-  @Override
-  @NonNull
-  default ImmutableSet<Alias> aliases(@NonNull Configuration configuration) {
-    return standardUnit().aliases(configuration).stream()
-            .map(Alias::type)
-            .map(aliasType -> alias(configuration, aliasType))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(ImmutableSet.toImmutableSet());
-  }
-
-  @Override
-  @NonNull
-  default Optional<Alias> alias(@NonNull Configuration configuration,
-                                @NonNull Alias.Type aliasType) {
-    return standardUnit().alias(configuration, aliasType)
-            .map(Alias::value)
-            .flatMap(standardUnitAlias -> prefix().alias(configuration, aliasType)
-                    .map(Alias::value)
-                    .map(prefixAlias -> composite(prefixAlias, standardUnitAlias)))
-            .map(compositedAlias -> Alias.create(aliasType, compositedAlias));
   }
 
   /**

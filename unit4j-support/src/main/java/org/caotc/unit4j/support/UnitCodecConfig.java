@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.codec.AliasUndefinedStrategy;
 import org.caotc.unit4j.core.unit.Unit;
 
 /**
@@ -43,8 +44,9 @@ public class UnitCodecConfig {
    */
   @NonNull
   public String serialize(@NonNull Unit unit) {
-    //TODO 增加UnitSerializeStrategy
-    return unit.alias(configuration(), type()).map(Alias::value)
-            .orElseGet(() -> aliasUndefinedStrategy().execute(unit, configuration(), type()));
+      //TODO 增加UnitSerializeStrategy
+//    return unit.alias(configuration(), type()).map(Alias::value)
+//            .orElseGet(() -> aliasUndefinedStrategy().execute(unit, configuration(), type()));
+      return "";
   }
 }

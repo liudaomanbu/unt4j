@@ -17,17 +17,13 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.unit.type.BaseUnitType;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -125,21 +121,4 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
     return BasePrefixUnit.builder().prefix(prefix).standardUnit(this).build();
   }
 
-    @Override
-    public @NonNull ImmutableSet<Alias> aliases(
-            @NonNull Configuration configuration) {
-        return configuration.aliases(this);
-    }
-
-    @Override
-    public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
-                                          @NonNull Alias.Type aliasType) {
-        return configuration.alias(this, aliasType);
-    }
-
-  @Override
-  public @NonNull Optional<Alias> compositeAliasFromConfiguration(
-      @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-      return alias(configuration, aliasType);
-  }
 }

@@ -74,7 +74,7 @@ import java.util.Optional;
 @Data
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 @Slf4j
-public final class Configuration implements WithId {
+public final class Configuration implements Identifiable {
 
     /**
      * 默认实例的id
@@ -415,16 +415,12 @@ public final class Configuration implements WithId {
      * @since 1.0.0
      */
     @NonNull
-    public Optional<Alias> alias(@NonNull Object aliasRegistrable,
-                                 @NonNull Alias.Type aliasType) {
-        Collection<Alias> aliases = aliasRegistrableToAliases.get(aliasRegistrable)
+    public ImmutableSet<Alias> aliases(@NonNull Object aliasRegistrable,
+                                       @NonNull Alias.Type aliasType) {
+        return aliasRegistrableToAliases.get(aliasRegistrable)
                 .stream()
                 .filter(alias -> alias.type().equals(aliasType))
                 .collect(ImmutableSet.toImmutableSet());
-        if (aliases.size() > 1) {
-            throw new IllegalArgumentException(aliasRegistrable + " alias is not only");//todo 方法签名返回复数
-        }
-        return aliases.stream().findAny();
     }
 
     /**

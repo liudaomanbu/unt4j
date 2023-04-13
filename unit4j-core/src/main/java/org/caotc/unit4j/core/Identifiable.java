@@ -9,7 +9,7 @@ import lombok.NonNull;
  * @date 2018-09-28
  * @since 1.0.0
  **/
-public interface WithId {
+public interface Identifiable {
 
     /**
      * 获取{@code this}主键

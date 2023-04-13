@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Streams;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.caotc.unit4j.core.WithId;
+import org.caotc.unit4j.core.Identifiable;
 import org.caotc.unit4j.core.constant.StringConstant;
 
 import java.util.Map;
@@ -70,10 +70,11 @@ public class Util {
    */
   @NonNull
   public static String createCompositeIdOrAlias(
-          @NonNull Map<? extends WithId, Integer> stringSupplierToExponents) {
-    return stringSupplierToExponents.entrySet().stream()
-            .map(entry -> StringConstant.EMPTY_JOINER.join(StringConstant.HALF_WIDTH_LEFT_PARENTHESIS, entry.getKey().id(),
-                    StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS, getSuperscript(entry.getValue())))
-            .collect(Collectors.joining());
+          @NonNull Map<? extends Identifiable, Integer> stringSupplierToExponents) {
+      return stringSupplierToExponents.entrySet().stream()
+              .map(entry -> StringConstant.EMPTY_JOINER.join(StringConstant.HALF_WIDTH_LEFT_PARENTHESIS, entry.getKey().id(),
+                      StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS, getSuperscript(entry.getValue())))
+//            .map(entry -> StringConstant.EMPTY_JOINER.join(entry.getKey().id(), getSuperscript(entry.getValue())))
+              .collect(Collectors.joining());
   }
 }

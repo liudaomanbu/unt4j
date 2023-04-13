@@ -27,7 +27,7 @@ import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.math.number.UnkownNumber;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.core.unit.UnkownUnit;
+import org.caotc.unit4j.core.unit.UnknownUnit;
 
 import java.math.MathContext;
 
@@ -42,7 +42,7 @@ import java.math.MathContext;
 @Value(staticConstructor = "create")
 @FieldNameConstants
 public class Amount {
-    public static final Amount UNKNOWN = create(UnkownNumber.INSTANCE, UnkownUnit.INSTANCE);
+    public static final Amount UNKNOWN = create(UnkownNumber.INSTANCE, UnknownUnit.INSTANCE);
 
     @NonNull
     public static Amount create(@NonNull Object value, @NonNull Unit unit) {

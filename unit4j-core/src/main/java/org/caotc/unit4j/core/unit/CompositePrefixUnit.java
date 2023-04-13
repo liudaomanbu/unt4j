@@ -4,11 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.unit.type.CompositeUnitType;
 
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -121,11 +118,5 @@ public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
   public @NonNull Unit multiply(@NonNull CompositePrefixUnit multiplicand) {
     return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this, multiplicand)
         .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
-  }
-
-  @Override
-  public @NonNull Optional<Alias> compositeAliasFromConfiguration(
-      @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-      return alias(configuration, aliasType);
   }
 }

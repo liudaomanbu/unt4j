@@ -2,8 +2,7 @@ package org.caotc.unit4j.core.unit.type;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
-import org.caotc.unit4j.core.Aliased;
-import org.caotc.unit4j.core.WithId;
+import org.caotc.unit4j.core.Identifiable;
 
 /**
  * 单位类型接口
@@ -12,17 +11,17 @@ import org.caotc.unit4j.core.WithId;
  * @date 2018-04-14
  * @since 1.0.0
  **/
-public interface UnitType extends WithId, Aliased {
+public interface UnitType extends Identifiable {
 
-  /**
-   * 获取组成该对象的单位类型组件与对应指数
-   *
-   * @return 组成该对象的单位类型组件与对应指数的Map
-   * @author caotc
-   * @date 2019-01-11
-   * @since 1.0.0
-   */
-  @NonNull ImmutableMap<UnitType, Integer> unitTypeComponentToExponents();
+    /**
+     * 获取组成该对象的单位类型组件与对应指数
+     *
+     * @return 组成该对象的单位类型组件与对应指数的Map
+     * @author caotc
+     * @date 2019-01-11
+     * @since 1.0.0
+     */
+    @NonNull ImmutableMap<UnitType, Integer> unitTypeComponentToExponents();
 
   /**
    * 重定基准,将所有非基本类型拆解合并,返回等价于原对象但是组件仅为基本单位类型的单位类型.

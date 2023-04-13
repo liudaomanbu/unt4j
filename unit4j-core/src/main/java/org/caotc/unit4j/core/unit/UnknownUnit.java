@@ -17,15 +17,10 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.unit.type.BaseUnitType;
 import org.caotc.unit4j.core.unit.type.UnitType;
-
-import java.util.Optional;
 
 /**
  * @author caotc
@@ -33,9 +28,9 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class UnkownUnit implements Unit {
-    public static final UnkownUnit INSTANCE = new UnkownUnit();
-    private static final UnitType TYPE = BaseUnitType.create("unknow");
+public class UnknownUnit implements Unit {
+    public static final UnknownUnit INSTANCE = new UnknownUnit();
+    private static final UnitType TYPE = BaseUnitType.create("unknown");
 
     @Override
     public @NonNull Prefix prefix() {
@@ -88,22 +83,8 @@ public class UnkownUnit implements Unit {
     }
 
     @Override
-    public @NonNull ImmutableSet<Alias> aliases(@NonNull Configuration configuration) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Optional<Alias> alias(@NonNull Configuration configuration, Alias.@NonNull Type aliasType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Optional<Alias> compositeAliasFromConfiguration(@NonNull Configuration configuration, Alias.@NonNull Type aliasType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public @NonNull String id() {
-        return "unknow";
+        return "unknown";
     }
+
 }

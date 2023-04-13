@@ -30,6 +30,7 @@ import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.codec.AliasUndefinedStrategy;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;

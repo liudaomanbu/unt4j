@@ -4,10 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
-
-import java.util.Optional;
 
 /**
  * 基本单位类型 由于基本单位类型没有任何有意义的关联属性,纯粹由定义产生,因此仅拥有id属性,用以定义和区分基本单位类型
@@ -83,23 +79,5 @@ public class BaseUnitType implements UnitType {
   @Override
   public UnitType rebase() {
     return this;
-  }
-
-  @Override
-  public @NonNull ImmutableSet<Alias> aliases(
-          @NonNull Configuration configuration) {
-    return configuration.aliases(this);
-  }
-
-  @Override
-  public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
-                                        @NonNull Alias.Type aliasType) {
-    return configuration.alias(this, aliasType);
-  }
-
-  @Override
-  public @NonNull Optional<Alias> compositeAliasFromConfiguration(
-      @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-    return alias(configuration, aliasType);
   }
 }

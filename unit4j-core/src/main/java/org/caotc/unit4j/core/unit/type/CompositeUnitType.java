@@ -1,20 +1,16 @@
 package org.caotc.unit4j.core.unit.type;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.util.Util;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -251,40 +247,6 @@ public class CompositeUnitType implements UnitType {
   public CompositeUnitType inverse() {
     return builder().unitTypeComponentToExponents(
         Maps.transformValues(this.unitTypeComponentToExponents(), exponent -> -exponent)).build();
-  }
-
-  @Override
-  public @NonNull ImmutableSet<Alias> aliases(
-          @NonNull Configuration configuration) {
-      return configuration.aliases(this);
-  }
-
-    @Override
-    public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
-                                          @NonNull Alias.Type aliasType) {
-        return configuration.alias(this, aliasType);
-    }
-
-  @Override
-  public @NonNull Optional<Alias> compositeAliasFromConfiguration(
-      @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-      Optional<Alias> alias = alias(configuration, aliasType);
-    if (alias.isPresent()) {
-      return alias;
-    }
-    boolean componentAliased = unitTypeComponentToExponents().keySet().stream()
-        .map(unit -> unit.compositeAliasFromConfiguration(configuration, aliasType))
-        .allMatch(Optional::isPresent);
-    if (componentAliased) {
-      String compositeAlias = Util.createCompositeIdOrAlias(
-          unitTypeComponentToExponents().entrySet().stream()
-              .collect(ImmutableMap.toImmutableMap(entry -> (() -> entry.getKey()
-                      .compositeAliasFromConfiguration(configuration, aliasType).map(Alias::value)
-                      .get())
-                  , Entry::getValue)));
-      return Optional.of(Alias.create(aliasType, compositeAlias));
-    }
-    return Optional.empty();
   }
 
   public static InternalBuilder builder() {

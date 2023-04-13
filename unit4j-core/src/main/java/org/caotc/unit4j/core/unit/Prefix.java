@@ -1,21 +1,15 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Aliased;
-import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.WithId;
+import org.caotc.unit4j.core.Identifiable;
 import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigInteger;
-
-import java.util.Optional;
 
 /**
  * 词头 //TODO 考虑将词头类改为类似基本单位类型
@@ -25,17 +19,17 @@ import java.util.Optional;
  * @since 1.0.0
  **/
 @Value(staticConstructor = "create")
-public class Prefix implements Comparable<Prefix>, WithId, Aliased {
+public class Prefix implements Comparable<Prefix>, Identifiable {
 
-  /**
-   * 空对象
-   */
-  public static final Prefix EMPTY = create(1, 0);
+    /**
+     * 空对象
+     */
+    public static final Prefix EMPTY = create(1, 0);
 
-  /**
-   * 符号:y 中国大陆:幺(科托) 台湾:攸 10⁻²⁴
-   */
-  public static final Prefix YOCTO = create(10, -24);
+    /**
+     * 符号:y 中国大陆:幺(科托) 台湾:攸 10⁻²⁴
+     */
+    public static final Prefix YOCTO = create(10, -24);
   /**
    * 符号:z 中国大陆:仄(普托) 台湾:介 10⁻²¹
    */
@@ -223,16 +217,16 @@ public class Prefix implements Comparable<Prefix>, WithId, Aliased {
     return UnitConvertConfig.create(reciprocal().value());
   }
 
-  /**
-   * 词头的值
-   *
-   * @return 词头的值
-   * @author caotc
-   * @date 2019-05-26
-   * @since 1.0.0
-   */
-  protected AbstractNumber value() {
-    return BigInteger.valueOf(radix()).pow(exponent());
+    /**
+     * 词头的值
+     *
+     * @return 词头的值
+     * @author caotc
+     * @date 2019-05-26
+     * @since 1.0.0
+     */
+    private AbstractNumber value() {
+        return BigInteger.valueOf(radix()).pow(exponent());
   }
 
   @Override
@@ -242,24 +236,6 @@ public class Prefix implements Comparable<Prefix>, WithId, Aliased {
 
   @Override
   public @NonNull String id() {
-    return StringConstant.EMPTY_JOINER.join(radix(), Util.getSuperscript(exponent()));
-  }
-
-  @Override
-  public @NonNull ImmutableSet<Alias> aliases(
-          @NonNull Configuration configuration) {
-    return configuration.aliases(this);
-  }
-
-  @Override
-  public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
-                                        @NonNull Alias.Type aliasType) {
-    return configuration.alias(this, aliasType);
-  }
-
-  @Override
-  public @NonNull Optional<Alias> compositeAliasFromConfiguration(
-      @NonNull Configuration configuration, @NonNull Alias.Type aliasType) {
-    return alias(configuration, aliasType);
+      return StringConstant.EMPTY_JOINER.join(radix(), Util.getSuperscript(exponent()));//todo
   }
 }

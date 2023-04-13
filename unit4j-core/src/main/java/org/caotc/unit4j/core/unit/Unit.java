@@ -2,8 +2,7 @@ package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
-import org.caotc.unit4j.core.Aliased;
-import org.caotc.unit4j.core.WithId;
+import org.caotc.unit4j.core.Identifiable;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
 /**
@@ -13,17 +12,17 @@ import org.caotc.unit4j.core.unit.type.UnitType;
  * @date 2018-03-27
  * @since 1.0.0
  **/
-public interface Unit extends WithId, Aliased {
+public interface Unit extends Identifiable {
 
-  //TODO 尝试删除
-  @NonNull Prefix prefix();
+    //TODO 尝试删除
+    @NonNull Prefix prefix();
 
-  /**
-   * 单位类型
-   *
-   * @return 单位类型
-   * @author caotc
-   * @date 2019-01-11
+    /**
+     * 单位类型
+     *
+     * @return 单位类型
+     * @author caotc
+     * @date 2019-01-11
    * @since 1.0.0
    */
   @NonNull UnitType type();

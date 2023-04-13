@@ -2,22 +2,18 @@ package org.caotc.unit4j.core.unit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.unit.type.CompositeUnitType;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -119,41 +115,6 @@ public class CompositeStandardUnit implements CompositeUnit, StandardUnit {
     return Util.createCompositeIdOrAlias(unitComponentToExponents());
   }
 
-    @Override
-    public @NonNull ImmutableSet<Alias> aliases(
-            @NonNull Configuration configuration) {
-        return configuration.aliases(this);
-    }
-
-    @Override
-    public @NonNull Optional<Alias> alias(@NonNull Configuration configuration,
-                                          @NonNull Alias.Type aliasType) {
-        return configuration.alias(this, aliasType);
-    }
-
-  @NonNull
-  @Override
-  public Optional<Alias> compositeAliasFromConfiguration(@NonNull Configuration configuration,
-      @NonNull Alias.Type aliasType) {
-      Optional<Alias> alias = alias(configuration, aliasType);
-    if (alias.isPresent()) {
-      return alias;
-    }
-    boolean componentAliased = unitComponentToExponents().keySet().stream()
-        .map(unit -> unit.compositeAliasFromConfiguration(configuration, aliasType))
-        .allMatch(Optional::isPresent);
-    if (componentAliased) {
-      String compositeAlias = Util.createCompositeIdOrAlias(
-          unitComponentToExponents().entrySet().stream()
-              .collect(ImmutableMap.toImmutableMap(entry -> (() -> entry.getKey()
-                      .compositeAliasFromConfiguration(configuration, aliasType).map(Alias::value)
-                      .get())
-                  , Entry::getValue)));
-      return Optional.of(Alias.create(aliasType, compositeAlias));
-    }
-    return Optional.empty();
-  }
-
   /**
    * 校验方法
    *
@@ -173,7 +134,8 @@ public class CompositeStandardUnit implements CompositeUnit, StandardUnit {
     return this;
   }
 
-  public static CompositeStandardUnitBuilder builder() {
+
+    public static CompositeStandardUnitBuilder builder() {
     return new InternalBuilder();
   }
 
