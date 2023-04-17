@@ -67,26 +67,26 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
 
   @NonNull
   @Override
-  public ImmutableMap<Unit, Integer> unitComponentToExponents() {
-    return ImmutableMap.of(this, 1);
+  public ImmutableMap<Unit, Integer> componentToExponents() {
+      return ImmutableMap.of(this, 1);
   }
 
   @NonNull
   @Override
   public StandardUnit power(int exponent) {
-    return exponent == 1 ? this
-        : CompositeStandardUnit.builder().unitComponentToExponent(this, exponent).build();
+      return exponent == 1 ? this
+              : CompositeStandardUnit.builder().componentToExponent(this, exponent).build();
   }
 
   @Override
   public @NonNull CompositeStandardUnit inverse() {
-    return CompositeStandardUnit.builder().unitComponentToExponent(this, -1).build();
+      return CompositeStandardUnit.builder().componentToExponent(this, -1).build();
   }
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull BaseStandardUnit multiplicand) {
-    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this, multiplicand)
-        .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
+      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+              .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
 //    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this,multiplicand)
 //        .map(Unit::unitComponentToExponents)
 //        .map(Map::entrySet)
@@ -102,12 +102,12 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull CompositeStandardUnit multiplicand) {
-    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this, multiplicand)
-        .map(Unit::unitComponentToExponents)
-        .map(Map::entrySet)
-        .flatMap(Collection::stream)
-        .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
-        .build();
+      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+                      .map(Unit::componentToExponents)
+                      .map(Map::entrySet)
+                      .flatMap(Collection::stream)
+                      .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
+              .build();
   }
 
   @Override

@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 class ConfigTest {
-
   Configuration configuration = Configuration.defaultInstance();
 
   @Test
@@ -46,15 +45,15 @@ class ConfigTest {
         Prefix.DECA.convertFromStandardUnitConfig().ratio().compareTo(config.ratio()));
 
     CompositeStandardUnit compositePrefixUnit1 = CompositeStandardUnit
-        .builder().unitComponentToExponent(UnitConstant.KILOGRAM, 1)
-        .unitComponentToExponent(
-            BasePrefixUnit.create(Prefix.HECTO, UnitConstant.METER), 2)
-        .unitComponentToExponent(UnitConstant.SECOND, -3).build();
+            .builder().componentToExponent(UnitConstant.KILOGRAM, 1)
+            .componentToExponent(
+                    BasePrefixUnit.create(Prefix.HECTO, UnitConstant.METER), 2)
+            .componentToExponent(UnitConstant.SECOND, -3).build();
     CompositeStandardUnit compositePrefixUnit2 = CompositeStandardUnit
-        .builder().unitComponentToExponent(UnitConstant.GRAM, 1)
-        .unitComponentToExponent(UnitConstant.METER, 2)
-        .unitComponentToExponent(
-            BasePrefixUnit.create(Prefix.DECA, UnitConstant.SECOND), -3).build();
+            .builder().componentToExponent(UnitConstant.GRAM, 1)
+            .componentToExponent(UnitConstant.METER, 2)
+            .componentToExponent(
+                    BasePrefixUnit.create(Prefix.DECA, UnitConstant.SECOND), -3).build();
     config = this.configuration.getConvertConfig(compositePrefixUnit1, compositePrefixUnit2);
     log.debug("{}", config);
     Assertions
@@ -88,15 +87,15 @@ class ConfigTest {
   @Test
   void getTargetUnit() {
     Assertions.assertThrows(IllegalArgumentException.class, () ->
-        configuration.register(
-            UnitGroup.builder(Configuration.defaultInstance()::compare).unit(UnitConstant.MINUTE)
-                .unit(
-                    UnitConstant.SECOND).build()));
-    Amount amount = Amount.create(BigDecimal.valueOf("0.26"), UnitConstant.MINUTE);
-    Unit targetCompositePrefixUnit = configuration.getTargetUnit(amount);
+            configuration.register(
+                    UnitGroup.builder(Configuration.defaultInstance()::compare).unit(UnitConstant.MINUTE)
+                            .unit(
+                                    UnitConstant.SECOND).build()));
+    Quantity quantity = Quantity.create(BigDecimal.valueOf("0.26"), UnitConstant.MINUTE);
+    Unit targetCompositePrefixUnit = configuration.getTargetUnit(quantity);
     Assertions.assertEquals(UnitConstant.SECOND, targetCompositePrefixUnit);
 
-    targetCompositePrefixUnit = configuration.getTargetUnit(ImmutableSet.of(amount));
+    targetCompositePrefixUnit = configuration.getTargetUnit(ImmutableSet.of(quantity));
     Assertions.assertEquals(UnitConstant.SECOND, targetCompositePrefixUnit);
   }
 
@@ -133,26 +132,26 @@ class ConfigTest {
   @Test
   void compareTo() {
     Assertions.assertTrue(
-        configuration.compare(Amount.create(java.math.BigDecimal.TEN, UnitConstant.KILOGRAM),
-            Amount.create(
-                java.math.BigDecimal.ONE, UnitConstant.KILOGRAM)) > 0);
+            configuration.compare(Quantity.create(java.math.BigDecimal.TEN, UnitConstant.KILOGRAM),
+                    Quantity.create(
+                            java.math.BigDecimal.ONE, UnitConstant.KILOGRAM)) > 0);
 
     Assertions.assertTrue(
-        configuration.compare(Amount.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
-            Amount.create(
-                java.math.BigDecimal.TEN, UnitConstant.GRAM)) > 0);
+            configuration.compare(Quantity.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
+                    Quantity.create(
+                            java.math.BigDecimal.TEN, UnitConstant.GRAM)) > 0);
 
     Assertions.assertEquals(0,
-        configuration.compare(Amount.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
-            Amount.create(
-                java.math.BigDecimal.valueOf(1000), UnitConstant.GRAM)));
+            configuration.compare(Quantity.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
+                    Quantity.create(
+                            java.math.BigDecimal.valueOf(1000), UnitConstant.GRAM)));
 
     Assertions.assertThrows(IllegalArgumentException.class,
         () -> {
           int i = configuration
-              .compare(Amount.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
-                  Amount.create(
-                      java.math.BigDecimal.valueOf(1000), UnitConstant.NEWTON));
+                  .compare(Quantity.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
+                          Quantity.create(
+                                  java.math.BigDecimal.valueOf(1000), UnitConstant.NEWTON));
         });
   }
 }

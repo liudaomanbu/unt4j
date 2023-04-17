@@ -25,7 +25,7 @@
     <typeHandlers>
         <typeHandler handler="org.caotc.unit4j.support.mybatis.type.handler.UnitTypeHandler"/>
         <typeHandler handler="org.caotc.unit4j.support.mybatis.type.handler.NumberTypeHandler"/>
-        <typeHandler javaType="org.caotc.unit4j.core.Amount" handler="org.apache.ibatis.type.ObjectTypeHandler"/>
+        <typeHandler javaType="org.caotc.unit4j.core.Quantity" handler="org.apache.ibatis.type.ObjectTypeHandler"/>
         <!--    <typeHandler jdbcType="OTHER" javaType="org.caotc.unit4j.core.Amount" handler="org.apache.ibatis.type.ObjectTypeHandler"/>-->
         <!--    <typeHandler jdbcType="NULL" javaType="org.caotc.unit4j.core.Amount" handler="org.caotc.unit4j.support.mybatis.type.handler.AmountTypeHandler"/>-->
     </typeHandlers>

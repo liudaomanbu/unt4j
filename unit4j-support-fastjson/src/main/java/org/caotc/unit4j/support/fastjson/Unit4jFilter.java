@@ -25,19 +25,19 @@ import com.alibaba.fastjson.serializer.PropertyFilter;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.api.annotation.AmountSerialize;
+import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.api.annotation.SerializeCommand;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
-import org.caotc.unit4j.support.AmountCodecConfig;
+import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
 
 import java.lang.reflect.Type;
 
 
 /**
- * {@link Amount}在fastjson中的属性过滤器,为了实现不同类中的{@link Amount}属性通过注解实现不同策略序列化 ,在fastjson中需要通过Filter实现
+ * {@link Quantity}在fastjson中的属性过滤器,为了实现不同类中的{@link Quantity}属性通过注解实现不同策略序列化 ,在fastjson中需要通过Filter实现
  * //TODO 考虑Spring环境时配置刷新问题
  *
  * @author caotc
@@ -57,43 +57,43 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
 
   @Override
   public Object process(BeanContext context, Object object, String name, Object value) {
-    AmountCodecConfig amountCodecConfig = ReflectionUtil
-            .readableProperty(object.getClass(), name)
-            .map(unit4jProperties::createPropertyAmountCodecConfig)
-        .orElseGet(unit4jProperties::createAmountCodecConfig);
-    return amountCodecConfig.serializeCommandsFromAmount((Amount) value);
+      QuantityCodecConfig quantityCodecConfig = ReflectionUtil
+              .readableProperty(object.getClass(), name)
+              .map(unit4jProperties::createPropertyAmountCodecConfig)
+              .orElseGet(unit4jProperties::createAmountCodecConfig);
+      return quantityCodecConfig.serializeCommandsFromAmount((Quantity) value);
   }
 
   @Override
   public boolean apply(Object object, String name, Object value) {
-    AmountCodecConfig amountCodecConfig = ReflectionUtil
-            .readableProperty(object.getClass(), name)
-            .map(unit4jProperties::createPropertyAmountCodecConfig)
-        .orElseGet(unit4jProperties::createAmountCodecConfig);
-    return amountCodecConfig.serializeCommandsFromAmount((Amount) value).commands().stream()
-        .noneMatch(SerializeCommand.REMOVE_ORIGINAL_FIELD::equals);
+      QuantityCodecConfig quantityCodecConfig = ReflectionUtil
+              .readableProperty(object.getClass(), name)
+              .map(unit4jProperties::createPropertyAmountCodecConfig)
+              .orElseGet(unit4jProperties::createAmountCodecConfig);
+      return quantityCodecConfig.serializeCommandsFromAmount((Quantity) value).commands().stream()
+              .noneMatch(SerializeCommand.REMOVE_ORIGINAL_FIELD::equals);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void writeBefore(Object object) {
       ReflectionUtil.readableProperties((Class<Object>) object.getClass())
-        .stream()
-        .filter(fieldWrapper -> fieldWrapper.annotation(AmountSerialize.class).isPresent()
-            || Amount.class.equals(fieldWrapper.type().getRawType()))
+              .stream()
+              .filter(fieldWrapper -> fieldWrapper.annotation(QuantitySerialize.class).isPresent()
+                      || Quantity.class.equals(fieldWrapper.type().getRawType()))
         .forEach(fieldWrapper -> {
-          fieldWrapper.read(object).map(Amount.class::cast).ifPresent(amount -> {
-            AmountCodecConfig amountCodecConfig = fieldWrapper.annotation(AmountSerialize.class)
-                .map(amountSerialize -> unit4jProperties
-                        .createPropertyAmountCodecConfig(fieldWrapper))
-                .orElseGet(unit4jProperties::createAmountCodecConfig);
-            SerializeCommands serializeCommands = amountCodecConfig
-                .serializeCommandsFromAmount(amount);
-            if (serializeCommands.commands().stream()
-                .anyMatch(SerializeCommand.REMOVE_ORIGINAL_FIELD::equals)) {
-              serializeCommands.commands().forEach(command -> {
-                if (command.type() == SerializeCommand.Type.WRITE_FIELD) {
-                  writeKeyValue(command.fieldName(), command.fieldValue());
+            fieldWrapper.read(object).map(Quantity.class::cast).ifPresent(amount -> {
+                QuantityCodecConfig quantityCodecConfig = fieldWrapper.annotation(QuantitySerialize.class)
+                        .map(amountSerialize -> unit4jProperties
+                                .createPropertyAmountCodecConfig(fieldWrapper))
+                        .orElseGet(unit4jProperties::createAmountCodecConfig);
+                SerializeCommands serializeCommands = quantityCodecConfig
+                        .serializeCommandsFromAmount(amount);
+                if (serializeCommands.commands().stream()
+                        .anyMatch(SerializeCommand.REMOVE_ORIGINAL_FIELD::equals)) {
+                    serializeCommands.commands().forEach(command -> {
+                        if (command.type() == SerializeCommand.Type.WRITE_FIELD) {
+                            writeKeyValue(command.fieldName(), command.fieldValue());
                 }
               });
             }

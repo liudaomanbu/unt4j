@@ -116,7 +116,7 @@ public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
 
   @Override
   public @NonNull Unit multiply(@NonNull CompositePrefixUnit multiplicand) {
-    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this, multiplicand)
-        .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
+    return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+            .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
   }
 }

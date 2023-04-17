@@ -16,9 +16,9 @@ class UnitUtilTest {
     log.debug("parse SECOND:{}", second);
     Unit unit = UnitUtil.parseUnit("METER/DAY");
     log.debug("parse METER/DAY:{}", unit);
-    Assertions.assertEquals(CompositeStandardUnit
-        .builder().unitComponentToExponent(UnitConstant.METER, 1)
-        .unitComponentToExponent(UnitConstant.DAY, -1).build(), unit);
+      Assertions.assertEquals(CompositeStandardUnit
+              .builder().componentToExponent(UnitConstant.METER, 1)
+              .componentToExponent(UnitConstant.DAY, -1).build(), unit);
   }
 
   @Test

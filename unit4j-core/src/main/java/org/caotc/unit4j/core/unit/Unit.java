@@ -2,6 +2,7 @@ package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
+import org.caotc.unit4j.core.Component;
 import org.caotc.unit4j.core.Identifiable;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
@@ -12,7 +13,7 @@ import org.caotc.unit4j.core.unit.type.UnitType;
  * @date 2018-03-27
  * @since 1.0.0
  **/
-public interface Unit extends Identifiable {
+public interface Unit extends Identifiable, Component<Unit> {
 
     //TODO 尝试删除
     @NonNull Prefix prefix();
@@ -37,21 +38,21 @@ public interface Unit extends Identifiable {
    */
   @NonNull Unit rebase();
 
-  /**
-   * 获取组成该对象的单位组件与对应指数
-   *
-   * @return 组成该对象的单位组件与对应指数的Map
-   * @author caotc
-   * @date 2019-01-11
-   * @since 1.0.0
-   */
-  @NonNull ImmutableMap<Unit, Integer> unitComponentToExponents();
+    /**
+     * 获取组成该对象的单位组件与对应指数
+     *
+     * @return 组成该对象的单位组件与对应指数的Map
+     * @author caotc
+     * @date 2019-01-11
+     * @since 1.0.0
+     */
+    @NonNull ImmutableMap<Unit, Integer> componentToExponents();
 
   @NonNull
   default ImmutableMap<UnitType, Dimension> typeToDimensionElementMap() {
-    return unitComponentToExponents().entrySet().stream().collect(ImmutableMap
-        .toImmutableMap(entry -> entry.getKey().type(),
-            entry -> Dimension.create(entry.getKey(), entry.getValue())));
+      return componentToExponents().entrySet().stream().collect(ImmutableMap
+              .toImmutableMap(entry -> entry.getKey().type(),
+                      entry -> Dimension.create(entry.getKey(), entry.getValue())));
   }
 
   /**

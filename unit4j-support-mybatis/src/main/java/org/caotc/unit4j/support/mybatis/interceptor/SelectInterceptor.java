@@ -23,19 +23,27 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.select.Select;
 import org.apache.ibatis.executor.statement.StatementHandler;
-import org.apache.ibatis.mapping.*;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ResultMap;
+import org.apache.ibatis.mapping.ResultMapping;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.support.AmountCodecConfig;
+import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
-import org.caotc.unit4j.support.common.util.AmountUtil;
+import org.caotc.unit4j.support.common.util.QuantityUtil;
 import org.caotc.unit4j.support.mybatis.constant.AmountPropertyConstant;
 import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
@@ -92,11 +100,11 @@ public class SelectInterceptor implements Interceptor {
                         .map(ResultMapping::getProperty)
                         .collect(ImmutableSet.toImmutableSet());
 
-                ImmutableSet<WritableProperty<?, Amount>> writableAmountProperties = AmountUtil.writableAmountPropertyStreamFromClass(resultMap.getType())
+                ImmutableSet<WritableProperty<?, Quantity>> writableAmountProperties = QuantityUtil.writableAmountPropertyStreamFromClass(resultMap.getType())
                         .filter(writableProperty -> resultMappingPropertyNames.isEmpty() || resultMappingPropertyNames.contains(writableProperty.name()))
                         .collect(ImmutableSet.toImmutableSet());
 
-                ImmutableSet<AmountCodecConfig> amountCodecConfigs = writableAmountProperties
+                ImmutableSet<QuantityCodecConfig> quantityCodecConfigs = writableAmountProperties
                         .stream()
                         .map(unit4jProperties::createPropertyAmountCodecConfig)
                         .collect(ImmutableSet.toImmutableSet());
@@ -114,7 +122,7 @@ public class SelectInterceptor implements Interceptor {
 
                 mappedStatement.getConfiguration().newMetaObject(mappedStatement).setValue(MAPPED_STATEMENT_RESULT_MAPS_FIELD_NAME, ImmutableList.of(newResultMap));
 
-                amountCodecConfigs.forEach(amountCodecConfig -> {
+                quantityCodecConfigs.forEach(amountCodecConfig -> {
                     switch (amountCodecConfig.strategy()) {
                         case VALUE:
                             break;
@@ -155,21 +163,21 @@ public class SelectInterceptor implements Interceptor {
     }
 
     private Stream<ResultMapping> createAmountResultMapping(Configuration configuration, WritableProperty<?, ?> amountWritableProperty) {
-        AmountCodecConfig amountCodecConfig = unit4jProperties.createPropertyAmountCodecConfig(amountWritableProperty);
-        switch (amountCodecConfig.strategy()) {
+        QuantityCodecConfig quantityCodecConfig = unit4jProperties.createPropertyAmountCodecConfig(amountWritableProperty);
+        switch (quantityCodecConfig.strategy()) {
             case OBJECT:
                 throw new IllegalArgumentException(
                         "database strategy can't use " + CodecStrategy.OBJECT);
             case VALUE:
                 //TODO outputName
-                ResultMapping amountResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Amount.Fields.VALUE, amountCodecConfig.outputName(), AbstractNumber.class).build();
+                ResultMapping amountResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputName(), AbstractNumber.class).build();
                 return Stream.of(amountResultMapping);
             case FLAT:
-                ResultMapping amountValueResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Amount.Fields.VALUE, amountCodecConfig.outputValueName(), AbstractNumber.class).build();
-                ResultMapping amountUnitResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Amount.Fields.UNIT, amountCodecConfig.outputUnitName(), Unit.class).build();
+                ResultMapping amountValueResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputValueName(), AbstractNumber.class).build();
+                ResultMapping amountUnitResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.UNIT, quantityCodecConfig.outputUnitName(), Unit.class).build();
                 return Stream.of(amountValueResultMapping, amountUnitResultMapping);
             default:
-                throw new IllegalStateException("Unexpected value: " + amountCodecConfig.strategy());
+                throw new IllegalStateException("Unexpected value: " + quantityCodecConfig.strategy());
         }
     }
 }

@@ -21,7 +21,7 @@ import lombok.NonNull;
 import lombok.Value;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
-import org.caotc.unit4j.support.AmountCodecConfig;
+import org.caotc.unit4j.support.QuantityCodecConfig;
 
 /**
  * {@link CodecStrategy#FLAT}策略的查询语句访问器
@@ -33,21 +33,21 @@ import org.caotc.unit4j.support.AmountCodecConfig;
 @Value
 public class FlatSelectVisitor extends AbstractSelectVisitor {
 
-  @NonNull
-  ColumnRenameSelectVisitor columnRenameSelectVisitor;
-  @NonNull
-  ColumnAddSelectVisitor columnAddSelectVisitor;
+    @NonNull
+    ColumnRenameSelectVisitor columnRenameSelectVisitor;
+    @NonNull
+    ColumnAddSelectVisitor columnAddSelectVisitor;
 
-  public FlatSelectVisitor(@NonNull AmountCodecConfig amountCodecConfig) {
-    Preconditions.checkArgument(CodecStrategy.FLAT == amountCodecConfig.strategy());
-    this.columnRenameSelectVisitor = new ColumnRenameSelectVisitor(amountCodecConfig.outputName()
-        , amountCodecConfig.outputValueName());
-    this.columnAddSelectVisitor = new ColumnAddSelectVisitor(amountCodecConfig.outputUnitName());
-  }
+    public FlatSelectVisitor(@NonNull QuantityCodecConfig quantityCodecConfig) {
+        Preconditions.checkArgument(CodecStrategy.FLAT == quantityCodecConfig.strategy());
+        this.columnRenameSelectVisitor = new ColumnRenameSelectVisitor(quantityCodecConfig.outputName()
+                , quantityCodecConfig.outputValueName());
+        this.columnAddSelectVisitor = new ColumnAddSelectVisitor(quantityCodecConfig.outputUnitName());
+    }
 
-  @Override
-  public void visit(PlainSelect plainSelect) {
-    plainSelect.accept(columnRenameSelectVisitor);
-    plainSelect.accept(columnAddSelectVisitor);
-  }
+    @Override
+    public void visit(PlainSelect plainSelect) {
+        plainSelect.accept(columnRenameSelectVisitor);
+        plainSelect.accept(columnAddSelectVisitor);
+    }
 }

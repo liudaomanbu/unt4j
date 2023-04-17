@@ -17,20 +17,21 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.caotc.unit4j.support.mybatis.mapper.TestAmountMapper">
+<mapper namespace="org.caotc.unit4j.support.mybatis.mapper.TestQuantityMapper">
 
     <resultMap id="TestAmountResultMap"
-               type="org.caotc.unit4j.support.mybatis.model.TestAmount">
+               type="org.caotc.unit4j.support.mybatis.model.TestQuantity">
         <id property="id" column="id"/>
         <result property="data" column="data"/>
     </resultMap>
 
     <sql id="baseColumnList">
-        id,data
+        id
+        ,data
     </sql>
 
     <insert id="insertSelective" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
-            parameterType="org.caotc.unit4j.support.mybatis.model.TestAmount">
+            parameterType="org.caotc.unit4j.support.mybatis.model.TestQuantity">
         insert into test_amount(
         <trim suffixOverrides=",">
             <if test="data!= null">data,</if>
@@ -52,7 +53,7 @@
     </update>
 
     <select id="findByPrimaryKeyOnResultType"
-            resultType="org.caotc.unit4j.support.mybatis.model.TestAmount">
+            resultType="org.caotc.unit4j.support.mybatis.model.TestQuantity">
         select
         <include refid="baseColumnList"/>
         from test_amount where id = #{ id }

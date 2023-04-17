@@ -19,15 +19,19 @@ package org.caotc.unit4j.support.common.property;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 import org.caotc.unit4j.api.annotation.WithUnit;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.support.common.util.AmountUtil;
+import org.caotc.unit4j.support.common.util.QuantityUtil;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
@@ -40,7 +44,7 @@ import java.util.Optional;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> implements Property<O, Amount> {
+public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> implements Property<O, Quantity> {
     //    @Delegate(types=Property.class)
     @NonNull
     protected D delegate;
@@ -56,8 +60,8 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
 
     @Override
     @NonNull
-    public TypeToken<Amount> type() {
-        return TypeToken.of(Amount.class);
+    public TypeToken<Quantity> type() {
+        return TypeToken.of(Quantity.class);
     }
 
     @Override
@@ -67,18 +71,18 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
 
     @Override
     @NonNull
-    public <P1 extends Amount> Property<O, P1> type(@NonNull Class<P1> propertyType) {
+    public <P1 extends Quantity> Property<O, P1> type(@NonNull Class<P1> propertyType) {
         return type(TypeToken.of(propertyType));
     }
 
     @Override
     @NonNull
-    public <P1 extends Amount> Property<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+    public <P1 extends Quantity> Property<O, P1> type(@NonNull TypeToken<P1> propertyType) {
         Preconditions.checkArgument(propertyType.isSupertypeOf(type())
                 , "Property is known type %s,not %s ", type(), propertyType);
-    //noinspection unchecked
-    return (Property<O, P1>) this;
-  }
+        //noinspection unchecked
+        return (Property<O, P1>) this;
+    }
 
     @Override
     public boolean readable() {
@@ -96,18 +100,18 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
     }
 
     @Override
-    public ReadableProperty<O, Amount> toReadable() {
+    public ReadableProperty<O, Quantity> toReadable() {
         return new ReadableAmountProperty<>(delegate.toReadable());
     }
 
     @Override
-    public WritableProperty<O, Amount> toWritable() {
+    public WritableProperty<O, Quantity> toWritable() {
         return new WritableAmountProperty<>(delegate.toWritable());
     }
 
     @Override
-    public AccessibleProperty<O, Amount> toAccessible() {
-        return (AccessibleProperty<O, Amount>) delegate.toAccessible();
+    public AccessibleProperty<O, Quantity> toAccessible() {
+        return (AccessibleProperty<O, Quantity>) delegate.toAccessible();
     }
 
     @Override
@@ -124,6 +128,6 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
 
     @NonNull
     protected Unit unit() {
-        return AmountUtil.readUnit(withUnit());
+        return QuantityUtil.readUnit(withUnit());
     }
 }

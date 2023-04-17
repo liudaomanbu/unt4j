@@ -54,8 +54,8 @@ public interface PrefixUnit extends Unit {
 
   @Override
   @NonNull
-  default ImmutableMap<Unit, Integer> unitComponentToExponents() {
-    return standardUnit().unitComponentToExponents();
+  default ImmutableMap<Unit, Integer> componentToExponents() {
+      return standardUnit().componentToExponents();
   }
 
   @Override

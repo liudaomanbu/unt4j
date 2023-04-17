@@ -26,8 +26,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.api.annotation.AmountSerialize;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.api.annotation.QuantitySerialize;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.Unit4jProperties;
 
@@ -36,8 +36,8 @@ import java.util.Objects;
 
 
 /**
- * {@link Amount}在jackson中的上下文序列化器. 为了实现不同类中的{@link Amount}属性通过注解实现不同策略序列化 ,在jackson中需要通过{@link
- * ContextualSerializer}实现给每个属性返回不同的{@link AmountSerializer}
+ * {@link Quantity}在jackson中的上下文序列化器. 为了实现不同类中的{@link Quantity}属性通过注解实现不同策略序列化 ,在jackson中需要通过{@link
+ * ContextualSerializer}实现给每个属性返回不同的{@link QuantitySerializer}
  *
  * @author caotc
  * @date 2019-05-11
@@ -45,27 +45,27 @@ import java.util.Objects;
  */
 @Value
 @Slf4j
-public class Unit4jContextualSerializer extends StdSerializer<Amount> implements
-    ContextualSerializer {
+public class Unit4jContextualSerializer extends StdSerializer<Quantity> implements
+        ContextualSerializer {
 
-  /**
-   * 属性
-   */
-  @NonNull
-  Unit4jProperties unit4jProperties;
-  @NonNull
-  AmountSerializer amountSerializer;
+    /**
+     * 属性
+     */
+    @NonNull
+    Unit4jProperties unit4jProperties;
+    @NonNull
+    QuantitySerializer quantitySerializer;
 
   public Unit4jContextualSerializer(@NonNull Unit4jProperties unit4jProperties) {
-    super(Amount.class);
-    this.unit4jProperties = unit4jProperties;
-    amountSerializer = new AmountSerializer(unit4jProperties.createAmountCodecConfig());
+      super(Quantity.class);
+      this.unit4jProperties = unit4jProperties;
+      quantitySerializer = new QuantitySerializer(unit4jProperties.createAmountCodecConfig());
   }
 
-  @Override
-  public void serialize(Amount value, JsonGenerator gen, SerializerProvider provider)
-      throws IOException {
-    amountSerializer.serialize(value, gen, provider);
+    @Override
+    public void serialize(Quantity value, JsonGenerator gen, SerializerProvider provider)
+            throws IOException {
+        quantitySerializer.serialize(value, gen, provider);
   }
 
   @Override
@@ -76,22 +76,22 @@ public class Unit4jContextualSerializer extends StdSerializer<Amount> implements
     log.debug("property:{}", property);
     //TODO 待确认
     if (property != null) {
-      if (Objects.equals(property.getType().getRawClass(), Amount.class)) {
-        AmountSerialize amountSerialize = property.getAnnotation(AmountSerialize.class);
-        //TODO 整个类生效
+        if (Objects.equals(property.getType().getRawClass(), Quantity.class)) {
+            QuantitySerialize quantitySerialize = property.getAnnotation(QuantitySerialize.class);
+            //TODO 整个类生效
 //        if (amountSerialize == null) {
 //          amountSerialize = property.getContextAnnotation(AmountSerialize.class);
 //        }
-        if (amountSerialize != null) {
-          return new AmountSerializer(
-                  unit4jProperties.createPropertyAmountCodecConfig(ReflectionUtil
-                          .readablePropertyExact(prov.getActiveView(), property.getName())));
-        } else {
-          return new AmountSerializer(unit4jProperties.createAmountCodecConfig());
+            if (quantitySerialize != null) {
+                return new QuantitySerializer(
+                        unit4jProperties.createPropertyAmountCodecConfig(ReflectionUtil
+                                .readablePropertyExact(prov.getActiveView(), property.getName())));
+            } else {
+                return new QuantitySerializer(unit4jProperties.createAmountCodecConfig());
+            }
         }
-      }
       return prov.findValueSerializer(property.getType(), property);
     }
-    return amountSerializer;
+      return quantitySerializer;
   }
 }

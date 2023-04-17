@@ -23,17 +23,17 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import org.caotc.unit4j.api.annotation.AmountDeserialize;
-import org.caotc.unit4j.api.annotation.AmountSerialize;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
+import org.caotc.unit4j.api.annotation.QuantityDeserialize;
+import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Alias.Type;
-import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.codec.AliasUndefinedStrategy;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
+import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -47,12 +47,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * 属性,生成{@link AmountCodecConfig}对象使用 //TODO 可变性考虑
+ * 属性,生成{@link QuantityCodecConfig}对象使用 //TODO 可变性考虑
  *
  * @author caotc
  * @date 2019-04-21
- * @see AmountSerialize
- * @see AmountCodecConfig
+ * @see QuantitySerialize
+ * @see QuantityCodecConfig
  * @since 1.0.0
  */
 @Data
@@ -132,27 +132,27 @@ public class Unit4jProperties {
    */
   @NonNull
   MathContext mathContext = DEFAULT_MATH_CONTEXT;
-  /**
-   * 单独的{@link Amount}对象的序列化反序列化策略
-   */
+    /**
+     * 单独的{@link Quantity}对象的序列化反序列化策略
+     */
   @NonNull
   CodecStrategy strategy = DEFAULT_STRATEGY;
-  /**
-   * 作为其他类属性的{@link Amount}对象的序列化反序列化策略
-   */
+    /**
+     * 作为其他类属性的{@link Quantity}对象的序列化反序列化策略
+     */
   @NonNull
   CodecStrategy propertyStrategy = DEFAULT_STRATEGY;
-  /**
-   * 单独的{@link Amount}对象的名称拼接器
-   */
+    /**
+     * 单独的{@link Quantity}对象的名称拼接器
+     */
   Function<@NonNull List<String>, @NonNull String> nameJoiner = DEFAULT_NAME_JOINER;
-  /**
-   * 作为其他类属性的{@link Amount}对象的属性名称拆分器
-   */
+    /**
+     * 作为其他类属性的{@link Quantity}对象的属性名称拆分器
+     */
   Function<@NonNull String, @NonNull List<String>> fieldNameSplitter = DEFAULT_NAME_SPLITTER;
-  /**
-   * 作为其他类属性的{@link Amount}对象的属性名称拼接器
-   */
+    /**
+     * 作为其他类属性的{@link Quantity}对象的属性名称拼接器
+     */
   BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> fieldNameJoiner = DEFAULT_FIELD_NAME_JOINER;
 
   /**
@@ -172,107 +172,107 @@ public class Unit4jProperties {
   @NonNull
   Map<String, Map<String, String>> unitConvertConfigs = Maps.newHashMap();
 
-  /**
-   * 获取单独的{@link Amount}对象的序列化反序列化配置
-   *
-   * @return 序列化反序列化配置
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  @NonNull
-  public AmountCodecConfig createAmountCodecConfig() {
-    return AmountCodecConfig.builder().configuration(getConfiguration()).strategy(getStrategy())
+    /**
+     * 获取单独的{@link Quantity}对象的序列化反序列化配置
+     *
+     * @return 序列化反序列化配置
+     * @author caotc
+     * @date 2019-05-29
+     * @since 1.0.0
+     */
+    @NonNull
+    public QuantityCodecConfig createAmountCodecConfig() {
+        return QuantityCodecConfig.builder().configuration(getConfiguration()).strategy(getStrategy())
 //        .nameTransformer()
-            .outputName(getNameJoiner().apply(ImmutableList.of()))
-            .outputValueName(getNameJoiner().apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
-            .outputUnitName(getNameJoiner().apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
-        .valueCodecConfig(new AmountValueCodecConfig(getValueType(), getMathContext()))
-        .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
-            getUnitAliasUndefinedStrategy())).build();
-  }
+                .outputName(getNameJoiner().apply(ImmutableList.of()))
+                .outputValueName(getNameJoiner().apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
+                .outputUnitName(getNameJoiner().apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
+                .valueCodecConfig(new QuantityValueCodecConfig(getValueType(), getMathContext()))
+                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
+                        getUnitAliasUndefinedStrategy())).build();
+    }
 
-  /**
-   * 获取作为其他类属性的{@link Amount}对象的序列化反序列化配置
-   *
-   * @param amountReadableProperty 属性名称
-   * @return 序列化反序列化配置
-   * @author caotc
-   * @date 2019-11-06
-   * @since 1.0.0
-   */
-  @NonNull
-  @SuppressWarnings("unchecked")
-  public AmountCodecConfig createPropertyAmountCodecConfig(
-          @NonNull Property<?, ?> amountReadableProperty) {
-    AmountSerialize amountSerialize = amountReadableProperty.annotation(AmountSerialize.class).orElse(null);
-    Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
-            .apply(valueFieldNameWords,
-                    Optional.ofNullable(amountSerialize).map(AmountSerialize::caseFormat)
-                            .map(
-                                    caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
-                            .orElseGet(this::getFieldNameSplitter)
-                            .apply(amountReadableProperty.name()));
-    return AmountCodecConfig.builder()
-            .configuration(Optional.ofNullable(amountSerialize).map(AmountSerialize::configId)
-                    .map(Configuration::findExact).orElseGet(this::getConfiguration))
-            .strategy(Optional.ofNullable(amountSerialize).map(AmountSerialize::strategy)
-                    .orElseGet(this::getPropertyStrategy))
-            .targetUnit(Optional.ofNullable(amountSerialize).map(AmountSerialize::targetUnitId)
-                    .filter(targetUnitId -> !targetUnitId.isEmpty())
-                    .map(Configuration::getUnitByIdExact).orElse(null))
-            .outputName(Optional.ofNullable(amountSerialize).map(AmountSerialize::name)
-                    .filter(name -> !name.isEmpty())
-                    .orElse(fieldNameConverter.apply(ImmutableList.of())))
-            .outputValueName(Optional.ofNullable(amountSerialize).map(AmountSerialize::valueName)
-                    .filter(name -> !name.isEmpty())
-                    .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME))))
-            .outputUnitName(Optional.ofNullable(amountSerialize).map(AmountSerialize::unitName)
-                    .filter(name -> !name.isEmpty())
-                    .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
-            .valueCodecConfig(new AmountValueCodecConfig(
-                    Optional.ofNullable(amountSerialize).map(AmountSerialize::valueType)
-                            .orElseGet(() -> (Class) getValueType()),
-                    Optional.ofNullable(amountSerialize)
-                            .map(a -> new MathContext(a.precision(), a.roundingMode()))
-                            .orElseGet(this::getMathContext)))
+    /**
+     * 获取作为其他类属性的{@link Quantity}对象的序列化反序列化配置
+     *
+     * @param amountReadableProperty 属性名称
+     * @return 序列化反序列化配置
+     * @author caotc
+     * @date 2019-11-06
+     * @since 1.0.0
+     */
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public QuantityCodecConfig createPropertyAmountCodecConfig(
+            @NonNull Property<?, ?> amountReadableProperty) {
+        QuantitySerialize quantitySerialize = amountReadableProperty.annotation(QuantitySerialize.class).orElse(null);
+        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
+                .apply(valueFieldNameWords,
+                        Optional.ofNullable(quantitySerialize).map(QuantitySerialize::caseFormat)
+                                .map(
+                                        caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
+                                .orElseGet(this::getFieldNameSplitter)
+                                .apply(amountReadableProperty.name()));
+        return QuantityCodecConfig.builder()
+                .configuration(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::configId)
+                        .map(Configuration::findExact).orElseGet(this::getConfiguration))
+                .strategy(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::strategy)
+                        .orElseGet(this::getPropertyStrategy))
+                .targetUnit(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::targetUnitId)
+                        .filter(targetUnitId -> !targetUnitId.isEmpty())
+                        .map(Configuration::getUnitByIdExact).orElse(null))
+                .outputName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::name)
+                        .filter(name -> !name.isEmpty())
+                        .orElse(fieldNameConverter.apply(ImmutableList.of())))
+                .outputValueName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueName)
+                        .filter(name -> !name.isEmpty())
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME))))
+                .outputUnitName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::unitName)
+                        .filter(name -> !name.isEmpty())
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
+                .valueCodecConfig(new QuantityValueCodecConfig(
+                        Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueType)
+                                .orElseGet(() -> (Class) getValueType()),
+                        Optional.ofNullable(quantitySerialize)
+                                .map(a -> new MathContext(a.precision(), a.roundingMode()))
+                                .orElseGet(this::getMathContext)))
             .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
                     getUnitAliasUndefinedStrategy())).build();
-  }
+    }
 
     @NonNull
     @SuppressWarnings("unchecked")
-    public AmountCodecConfig createPropertyAmountCodecConfig(
+    public QuantityCodecConfig createPropertyAmountCodecConfig(
             @NonNull WritableProperty<?, ?> amountWritableProperty) {
-      AmountDeserialize amountDeserialize = amountWritableProperty.annotation(AmountDeserialize.class).orElse(null);
-      Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
-              .apply(valueFieldNameWords,
-                      Optional.ofNullable(amountDeserialize).map(AmountDeserialize::caseFormat)
-                              .map(
-                                      caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
-                              .orElseGet(this::getFieldNameSplitter)
-                              .apply(amountWritableProperty.name()));
-      return AmountCodecConfig.builder()
-              .configuration(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::configId)
-                      .map(Configuration::findExact).orElseGet(this::getConfiguration))
-              .strategy(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::strategy)
-                      .orElseGet(this::getPropertyStrategy))
+        QuantityDeserialize quantityDeserialize = amountWritableProperty.annotation(QuantityDeserialize.class).orElse(null);
+        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
+                .apply(valueFieldNameWords,
+                        Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::caseFormat)
+                                .map(
+                                        caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
+                                .orElseGet(this::getFieldNameSplitter)
+                                .apply(amountWritableProperty.name()));
+        return QuantityCodecConfig.builder()
+                .configuration(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::configId)
+                        .map(Configuration::findExact).orElseGet(this::getConfiguration))
+                .strategy(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::strategy)
+                        .orElseGet(this::getPropertyStrategy))
 //            .targetUnit(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::targetUnitId)
 //                    .filter(targetUnitId->!targetUnitId.isEmpty())
 //                    .map(Configuration::getUnitByIdExact).orElse(null))
-              .outputName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::name)
-                      .filter(name -> !name.isEmpty())
+                .outputName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::name)
+                        .filter(name -> !name.isEmpty())
                         .orElse(fieldNameConverter.apply(ImmutableList.of())))
-                .outputValueName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::valueName)
+                .outputValueName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueName)
                         .filter(name -> !name.isEmpty())
                         .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME))))
-                .outputUnitName(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::unitName)
+                .outputUnitName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::unitName)
                         .filter(name -> !name.isEmpty())
                         .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
-                .valueCodecConfig(new AmountValueCodecConfig(
-                        Optional.ofNullable(amountDeserialize).map(AmountDeserialize::valueType)
+                .valueCodecConfig(new QuantityValueCodecConfig(
+                        Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueType)
                                 .orElseGet(() -> (Class) getValueType()),
-                        Optional.ofNullable(amountDeserialize)
+                        Optional.ofNullable(quantityDeserialize)
                                 .map(a -> new MathContext(a.precision(), a.roundingMode()))
                                 .orElseGet(this::getMathContext)))
                 .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),

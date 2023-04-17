@@ -22,12 +22,12 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.Value;
 import org.caotc.unit4j.api.annotation.SerializeCommand;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 
 import java.io.IOException;
 
 /**
- * {@link SerializeCommands}在jackson中的序列化器. {@link Amount}通过转换为序列化指令对象,来实现同时存在多套序列化格式的需求
+ * {@link SerializeCommands}在jackson中的序列化器. {@link Quantity}通过转换为序列化指令对象,来实现同时存在多套序列化格式的需求
  *
  * @author caotc
  * @date 2019-05-11

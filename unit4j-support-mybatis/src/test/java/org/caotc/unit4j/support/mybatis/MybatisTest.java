@@ -24,11 +24,11 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.constant.UnitConstant;
-import org.caotc.unit4j.support.mybatis.mapper.TestAmountMapper;
-import org.caotc.unit4j.support.mybatis.model.TestAmount;
+import org.caotc.unit4j.support.mybatis.mapper.TestQuantityMapper;
 import org.caotc.unit4j.support.mybatis.model.TestAmountField;
+import org.caotc.unit4j.support.mybatis.model.TestQuantity;
 import org.caotc.unit4j.support.mybatis.sql.visitor.AbstractExpressionVisitor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ import java.util.Random;
 public class MybatisTest {
     private static final SqlSessionFactory SQL_SESSION_FACTORY;
     private static final SqlSession SESSION;
-    private static final TestAmountMapper MAPPER;
+    private static final TestQuantityMapper MAPPER;
     private static final Random RANDOM = new Random();
 
     static {
@@ -54,12 +54,12 @@ public class MybatisTest {
         }
         SQL_SESSION_FACTORY = new SqlSessionFactoryBuilder().build(inputStream);
         SESSION = SQL_SESSION_FACTORY.openSession();
-        MAPPER = SESSION.getMapper(TestAmountMapper.class);
+        MAPPER = SESSION.getMapper(TestQuantityMapper.class);
     }
 
   @Test
   void findByPrimaryKeyOnResultType() {
-      TestAmount result = MAPPER.findByPrimaryKeyOnResultType(1L);
+      TestQuantity result = MAPPER.findByPrimaryKeyOnResultType(1L);
       log.debug("result:{}", result);
       Assertions.assertEquals(BigDecimal.ONE.negate(), result.data().bigDecimalValue());
       Assertions.assertEquals(UnitConstant.SECOND, result.data().unit());
@@ -67,7 +67,7 @@ public class MybatisTest {
 
   @Test
   void findByPrimaryKeyOnResultMap() {
-      TestAmount result = MAPPER.findByPrimaryKeyOnResultMap(1L);
+      TestQuantity result = MAPPER.findByPrimaryKeyOnResultMap(1L);
       log.debug("result:{}", result);
       Assertions.assertEquals(BigDecimal.ONE.negate(), result.data().bigDecimalValue());
       Assertions.assertEquals(UnitConstant.SECOND, result.data().unit());
@@ -75,8 +75,8 @@ public class MybatisTest {
 
   @Test
   void insert() {
-      Amount amount = Amount.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
-      TestAmount param = new TestAmount().data(amount);
+      Quantity quantity = Quantity.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
+      TestQuantity param = new TestQuantity().data(quantity);
       log.debug("param:{}", param);
       int effectRows = MAPPER.insertSelective(param);
       log.debug("effectRows:{}", effectRows);
@@ -92,9 +92,9 @@ public class MybatisTest {
 
   @Test
   void update() {
-      Amount amount = Amount.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
-      TestAmount param = new TestAmount()
-              .data(amount).id(1L);
+      Quantity quantity = Quantity.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
+      TestQuantity param = new TestQuantity()
+              .data(quantity).id(1L);
       int effectRows = MAPPER.updateByPrimaryKeySelective(param);
       log.debug("effectRows:{}", effectRows);
       Assertions.assertEquals(1, effectRows);

@@ -48,7 +48,7 @@ public class UnknownUnit implements Unit {
     }
 
     @Override
-    public @NonNull ImmutableMap<Unit, Integer> unitComponentToExponents() {
+    public @NonNull ImmutableMap<Unit, Integer> componentToExponents() {
         throw new UnsupportedOperationException();
     }
 

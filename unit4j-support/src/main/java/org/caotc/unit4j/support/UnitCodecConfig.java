@@ -4,7 +4,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.codec.AliasUndefinedStrategy;
+import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 import org.caotc.unit4j.core.unit.Unit;
 
 /**

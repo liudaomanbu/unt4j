@@ -35,16 +35,20 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.constant.StringConstant;
-import org.caotc.unit4j.support.AmountCodecConfig;
+import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
-import org.caotc.unit4j.support.common.util.AmountUtil;
+import org.caotc.unit4j.support.common.util.QuantityUtil;
 import org.caotc.unit4j.support.mybatis.sql.visitor.ParameterMappingMatchColumnInsertUpdateVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
 
@@ -110,31 +114,31 @@ public class InsertUpdateInterceptor implements Interceptor {
               .forEach(sqlParam -> {
                 sqlParam.readableProperty.read(boundSql.getParameterObject());
                 //noinspection unchecked
-                AmountUtil
+                  QuantityUtil
                                 .readAmount((ReadableProperty<? super Object, ?>) sqlParam.readableProperty,
                                         boundSql.getParameterObject()).ifPresent(amount -> {
-                            AmountCodecConfig amountCodecConfig = unit4jProperties
-                                    .createPropertyAmountCodecConfig(sqlParam.readableProperty);
+                              QuantityCodecConfig quantityCodecConfig = unit4jProperties
+                                      .createPropertyAmountCodecConfig(sqlParam.readableProperty);
 
-                            if (Objects.nonNull(amountCodecConfig.targetUnit()) && !amountCodecConfig
-                                    .targetUnit().equals(amount.unit())) {
-                                amount = amount.convertTo(amountCodecConfig.targetUnit());
-                            }
-                            boundSql.setAdditionalParameter(sqlParam.parameterMapping.getProperty()
-                                    , amount.value(amountCodecConfig.valueCodecConfig().valueType(),
-                                            amountCodecConfig.valueCodecConfig().mathContext()));
+                              if (Objects.nonNull(quantityCodecConfig.targetUnit()) && !quantityCodecConfig
+                                      .targetUnit().equals(amount.unit())) {
+                                  amount = amount.convertTo(quantityCodecConfig.targetUnit());
+                              }
+                              boundSql.setAdditionalParameter(sqlParam.parameterMapping.getProperty()
+                                      , amount.value(quantityCodecConfig.valueCodecConfig().valueType(),
+                                              quantityCodecConfig.valueCodecConfig().mathContext()));
 
-                            switch (amountCodecConfig.strategy()) {
-                                case VALUE:
-                                    break;
-                                case FLAT:
-                                    ParameterMapping valueParameterMapping = new ParameterMapping.Builder(mappedStatement.getConfiguration(), sqlParam.parameterMapping.getProperty(), amountCodecConfig.valueCodecConfig().valueType()).build();
-                                    boundSql.getParameterMappings().set(boundSql.getParameterMappings().indexOf(sqlParam.parameterMapping), valueParameterMapping);
+                              switch (quantityCodecConfig.strategy()) {
+                                  case VALUE:
+                                      break;
+                                  case FLAT:
+                                      ParameterMapping valueParameterMapping = new ParameterMapping.Builder(mappedStatement.getConfiguration(), sqlParam.parameterMapping.getProperty(), quantityCodecConfig.valueCodecConfig().valueType()).build();
+                                      boundSql.getParameterMappings().set(boundSql.getParameterMappings().indexOf(sqlParam.parameterMapping), valueParameterMapping);
 
-                                    sqlParam.column.setColumnName(amountCodecConfig.outputValueName());
+                                      sqlParam.column.setColumnName(quantityCodecConfig.outputValueName());
 
-                                    Column unitColumn = new Column(sqlParam.column.getTable(),
-                                            amountCodecConfig.outputUnitName());
+                                      Column unitColumn = new Column(sqlParam.column.getTable(),
+                                              quantityCodecConfig.outputUnitName());
                                     if (!columns.contains(unitColumn)) {
                                         columns.add(unitColumn);
                                         if (SqlCommandType.INSERT == sqlCommandType) {
@@ -163,8 +167,8 @@ public class InsertUpdateInterceptor implements Interceptor {
                                     boundSql.getParameterMappings().add(parameterMappingMatchColumnInsertUpdateVisitor.columnToParameterMappings().size(), unitParameterMapping);
 
 
-                                    boundSql.setAdditionalParameter(amountCodecConfig.outputUnitName(),
-                                            amount.unit().id());
+                                      boundSql.setAdditionalParameter(quantityCodecConfig.outputUnitName(),
+                                              amount.unit().id());
                                     break;
                                 case OBJECT:
                                     throw new IllegalArgumentException(
@@ -191,17 +195,17 @@ public class InsertUpdateInterceptor implements Interceptor {
 
     }
 
-  private <T> Optional<? extends ReadableProperty<T, Amount>> readableAmountProperty(
-      @NonNull ParameterMapping parameterMapping,
-      @NonNull T parameterObject, @NonNull MappedStatement mappedStatement) {
-    Class<?> clazz = parameterObject.getClass();
-    String fieldName = parameterMapping.getProperty();
-    if (parameterMapping.getProperty().contains(StringConstant.DOT)) {
-      ImmutableList<String> propertyNames = ImmutableList
-          .copyOf(StringConstant.DOT_SPLITTER.split(parameterMapping.getProperty()));
-      //获取复杂属性名的最后一层属性名之前的属性名
-      String directPropertyName = StringConstant.DOT_JOINER
-          .join(propertyNames.subList(0, propertyNames.size() - 1));
+    private <T> Optional<? extends ReadableProperty<T, Quantity>> readableAmountProperty(
+            @NonNull ParameterMapping parameterMapping,
+            @NonNull T parameterObject, @NonNull MappedStatement mappedStatement) {
+        Class<?> clazz = parameterObject.getClass();
+        String fieldName = parameterMapping.getProperty();
+        if (parameterMapping.getProperty().contains(StringConstant.DOT)) {
+            ImmutableList<String> propertyNames = ImmutableList
+                    .copyOf(StringConstant.DOT_SPLITTER.split(parameterMapping.getProperty()));
+            //获取复杂属性名的最后一层属性名之前的属性名
+            String directPropertyName = StringConstant.DOT_JOINER
+                    .join(propertyNames.subList(0, propertyNames.size() - 1));
       Object directParameterObject = mappedStatement.getConfiguration()
           .newMetaObject(parameterObject).getValue(directPropertyName);
       if (Objects.isNull(directParameterObject)) {
@@ -220,14 +224,14 @@ public class InsertUpdateInterceptor implements Interceptor {
 
     @NonNull
     ParameterMapping parameterMapping;
-    @NonNull
-    Column column;
-    @NonNull
-    ReadableProperty<O, Amount> readableProperty;
-    //复杂属性名的最后一层属性名之前的属性名
-    @Getter(lazy = true)
-    @NonNull
-    String directPropertyName = generateDirectPropertyName();
+      @NonNull
+      Column column;
+      @NonNull
+      ReadableProperty<O, Quantity> readableProperty;
+      //复杂属性名的最后一层属性名之前的属性名
+      @Getter(lazy = true)
+      @NonNull
+      String directPropertyName = generateDirectPropertyName();
 
         private String generateDirectPropertyName() {
             if (parameterMapping().getProperty().contains(StringConstant.DOT)) {

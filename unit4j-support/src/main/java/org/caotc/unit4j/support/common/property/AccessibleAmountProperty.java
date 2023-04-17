@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 
@@ -32,37 +32,37 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class AccessibleAmountProperty<O, P> extends BaseAmountProperty<O, P, AccessibleProperty<O, P>> implements AccessibleProperty<O, Amount> {
+public class AccessibleAmountProperty<O, P> extends BaseAmountProperty<O, P, AccessibleProperty<O, P>> implements AccessibleProperty<O, Quantity> {
     public AccessibleAmountProperty(@NonNull AccessibleProperty<O, P> delegate) {
         super(delegate);
     }
 
     @NonNull
-    public Optional<Amount> read(@NonNull O target) {
-        return delegate.read(target).map(value -> Amount.create(value, unit()));
+    public Optional<Quantity> read(@NonNull O target) {
+        return delegate.read(target).map(value -> Quantity.create(value, unit()));
     }
 
     @NonNull
-    public Amount readExact(@NonNull O target) {
+    public Quantity readExact(@NonNull O target) {
         return read(target)
                 .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
     }
 
     @Override
-    public @NonNull O write(@NonNull O target, @NonNull Amount value) {
+    public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
         //TODO value类型处理
         return delegate.write(target, (P) value.convertTo(unit()).value());
     }
 
-  @Override
-  @NonNull
-  public <P1 extends Amount> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType) {
-    return type(TypeToken.of(propertyType));
-  }
+    @Override
+    @NonNull
+    public <P1 extends Quantity> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+        return type(TypeToken.of(propertyType));
+    }
 
     @Override
     @NonNull
-    public <P1 extends Amount> AccessibleProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+    public <P1 extends Quantity> AccessibleProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
         Preconditions.checkArgument(propertyType.isSupertypeOf(type())
                 , "Property is known type %s,not %s ", type(), propertyType);
         //noinspection unchecked
@@ -75,7 +75,7 @@ public class AccessibleAmountProperty<O, P> extends BaseAmountProperty<O, P, Acc
     }
 
     @Override
-    public @NonNull <O1> AccessibleProperty<O1, Amount> ownerType(@NonNull TypeToken<O1> ownerType) {
+    public @NonNull <O1> AccessibleProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
         return null;
     }
 }

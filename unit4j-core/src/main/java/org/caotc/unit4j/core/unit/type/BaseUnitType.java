@@ -71,7 +71,7 @@ public class BaseUnitType implements UnitType {
 
   @NonNull
   @Override
-  public ImmutableMap<UnitType, Integer> unitTypeComponentToExponents() {
+  public ImmutableMap<UnitType, Integer> componentToExponents() {
     return ImmutableMap.of(this, 1);
   }
 

@@ -20,10 +20,10 @@ class UnitTest {
   @Test
   void multiplyUnitComponent() {
     CompositeStandardUnit gram = CompositeStandardUnit
-        .builder().unitComponentToExponent(UnitConstant.GRAM, 2).build();
-    Unit multiply = UnitConstant.GRAM.multiply(UnitConstant.GRAM);
-    Assertions.assertEquals(gram.unitComponentToExponents(), multiply.unitComponentToExponents());
-    Assertions.assertEquals(0, gram.prefix().compareTo(multiply.prefix()));
+            .builder().componentToExponent(UnitConstant.GRAM, 2).build();
+      Unit multiply = UnitConstant.GRAM.multiply(UnitConstant.GRAM);
+      Assertions.assertEquals(gram.componentToExponents(), multiply.componentToExponents());
+      Assertions.assertEquals(0, gram.prefix().compareTo(multiply.prefix()));
     Assertions.assertEquals(gram, multiply);
   }
 
@@ -34,8 +34,8 @@ class UnitTest {
 
   @Test
   void unitComponentToExponents() {
-    ImmutableMap<Unit, Integer> unitComponentIntegerImmutableMap = UnitConstant.GRAM
-        .unitComponentToExponents();
+      ImmutableMap<Unit, Integer> unitComponentIntegerImmutableMap = UnitConstant.GRAM
+              .componentToExponents();
     Assertions
         .assertEquals(ImmutableMap.of(UnitConstant.GRAM, 1), unitComponentIntegerImmutableMap);
   }
@@ -45,15 +45,15 @@ class UnitTest {
     Unit pow = UnitConstant.GRAM.power(3);
     Assertions
         .assertEquals(
-            CompositeStandardUnit.builder().unitComponentToExponent(UnitConstant.GRAM, 3)
+                CompositeStandardUnit.builder().componentToExponent(UnitConstant.GRAM, 3)
                 .build(), pow);
   }
 
   @Test
   void id() {
     Unit unit = CompositeStandardUnit.builder()
-        .unitComponentToExponent(UnitConstant.WATT.addPrefix(Prefix.CENTI), 2)
-        .unitComponentToExponent(UnitConstant.NEWTON, 3).build()
+            .componentToExponent(UnitConstant.WATT.addPrefix(Prefix.CENTI), 2)
+            .componentToExponent(UnitConstant.NEWTON, 3).build()
         .addPrefix(Prefix.HECTO);
     log.info("id:{}", unit.id());
   }

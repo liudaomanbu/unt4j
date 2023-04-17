@@ -19,16 +19,16 @@ class CompositeUnitTypeTest {
   @Test
   void rebaseEquals() {
     CompositeUnitType actual = CompositeStandardUnit
-        .builder().unitComponentToExponent(UnitConstant.NEWTON, 1)
-        .unitComponentToExponent(UnitConstant.METER, -2).build().type();
+            .builder().componentToExponent(UnitConstant.NEWTON, 1)
+            .componentToExponent(UnitConstant.METER, -2).build().type();
     Assertions.assertTrue(UnitConstant.PASCAL.type().rebaseEquals(actual));
   }
 
   @Test
   void rebase() {
-    CompositeUnitType actual = CompositeStandardUnit
-        .builder().unitComponentToExponent(UnitConstant.NEWTON, 1)
-        .unitComponentToExponent(UnitConstant.METER, -2).build().type();
+      CompositeUnitType actual = CompositeStandardUnit
+              .builder().componentToExponent(UnitConstant.NEWTON, 1)
+              .componentToExponent(UnitConstant.METER, -2).build().type();
     Assertions.assertEquals(UnitConstant.PASCAL.type().rebase(), actual.rebase());
   }
 
@@ -37,10 +37,10 @@ class CompositeUnitTypeTest {
     CompositeUnitType multiply = CompositeUnitType.FORCE_WEIGHT
         .multiply(CompositeUnitType.ILLUMINANCE);
     CompositeUnitType expected = CompositeUnitType.builder()
-        .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-        .unitTypeComponentToExponent(BaseUnitType.LENGTH, -1)
-        .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
-        .unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1)
+            .componentToExponents(BaseUnitType.MASS, 1)
+            .componentToExponent(BaseUnitType.LENGTH, -1)
+            .componentToExponent(BaseUnitType.TIME, -2)
+            .componentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1)
         .build();
     Assertions.assertEquals(expected, multiply);
   }
@@ -49,21 +49,21 @@ class CompositeUnitTypeTest {
   void divide() {
     CompositeUnitType divide = CompositeUnitType.FORCE_WEIGHT.divide(CompositeUnitType.ILLUMINANCE);
     CompositeUnitType expected = CompositeUnitType.builder()
-        .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-        .unitTypeComponentToExponent(BaseUnitType.LENGTH, 3)
-        .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
-        .unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, -1)
+            .componentToExponents(BaseUnitType.MASS, 1)
+            .componentToExponent(BaseUnitType.LENGTH, 3)
+            .componentToExponent(BaseUnitType.TIME, -2)
+            .componentToExponent(BaseUnitType.LUMINOUS_INTENSITY, -1)
         .build();
     Assertions.assertEquals(expected, divide);
   }
 
   @Test
   void inverse() {
-    CompositeUnitType inverse = CompositeUnitType.FORCE_WEIGHT.inverse();
-    CompositeUnitType expected = CompositeUnitType
-        .builder().unitTypeComponentToExponent(BaseUnitType.MASS, -1)
-        .unitTypeComponentToExponent(BaseUnitType.LENGTH, -1)
-        .unitTypeComponentToExponent(BaseUnitType.TIME, 2).build();
+      CompositeUnitType inverse = CompositeUnitType.FORCE_WEIGHT.inverse();
+      CompositeUnitType expected = CompositeUnitType
+              .builder().componentToExponents(BaseUnitType.MASS, -1)
+              .componentToExponent(BaseUnitType.LENGTH, -1)
+              .componentToExponent(BaseUnitType.TIME, 2).build();
     Assertions.assertEquals(expected, inverse);
   }
 }

@@ -33,7 +33,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.constant.UnitConstant;
-import org.caotc.unit4j.core.convert.AmountChooser;
+import org.caotc.unit4j.core.convert.QuantityChooser;
 import org.caotc.unit4j.core.convert.TargetUnitChooser;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
@@ -90,8 +90,8 @@ public final class Configuration implements Identifiable {
      * 默认的自动转换时的目标单位选择器
      */
     private static final TargetUnitChooser DEFAULT_TARGET_UNIT_CHOOSER = TargetUnitChooser
-            .create(AmountChooser.createTargetValueAmountChooser(BigInteger.ONE),
-                    AmountChooser.minAmountChooser());
+            .create(QuantityChooser.createTargetValueAmountChooser(BigInteger.ONE),
+                    QuantityChooser.minAmountChooser());
 
     /**
      * 保存全局配置与id的map
@@ -405,6 +405,7 @@ public final class Configuration implements Identifiable {
     }
 
     /**
+     * //todo 优化成非遍历模式
      * 获取可注册别名对象注册的指定类型别名
      *
      * @param aliasRegistrable 可注册别名对象
@@ -622,29 +623,29 @@ public final class Configuration implements Identifiable {
     /**
      * 获取数量对象的自动转换目标单位
      *
-     * @param amount 数量对象
+     * @param quantity 数量对象
      * @return 自动转换目标单位
      * @author caotc
      * @date 2019-05-29
      * @since 1.0.0
      */
     @NonNull
-    public Unit getTargetUnit(@NonNull Amount amount) {
-        return targetUnitChooser.targetUnitFromAmount(amount, this);
+    public Unit getTargetUnit(@NonNull Quantity quantity) {
+        return targetUnitChooser.targetUnitFromAmount(quantity, this);
     }
 
     /**
      * 获取数量对象集合的自动转换目标单位
      *
-     * @param amounts 数量对象集合
+     * @param quantities 数量对象集合
      * @return 自动转换目标单位
      * @author caotc
      * @date 2019-05-29
      * @since 1.0.0
      */
     @NonNull
-    public Unit getTargetUnit(@NonNull Collection<Amount> amounts) {
-        return targetUnitChooser.targetUnitFromAmounts(amounts, this);
+    public Unit getTargetUnit(@NonNull Collection<Quantity> quantities) {
+        return targetUnitChooser.targetUnitFromAmounts(quantities, this);
     }
 
     /**
@@ -722,8 +723,8 @@ public final class Configuration implements Identifiable {
     /**
      * 比较两个数量大小
      *
-     * @param amount1 比较数量
-     * @param amount2 比较数量
+     * @param quantity1 比较数量
+     * @param quantity2 比较数量
      * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
      * or greater than the specified object.
      * @throws IllegalArgumentException 如果两个比较数量的单位类型不同
@@ -733,11 +734,11 @@ public final class Configuration implements Identifiable {
      * @see #compare(Unit, Unit)
      * @since 1.0.0
      */
-    public int compare(@NonNull Amount amount1, @NonNull Amount amount2) {
-        Preconditions.checkArgument(amount1.unit().type().equals(amount2.unit().type()),
+    public int compare(@NonNull Quantity quantity1, @NonNull Quantity quantity2) {
+        Preconditions.checkArgument(quantity1.unit().type().equals(quantity2.unit().type()),
                 "%s and %s can't compare,%s and %s are not type equals",
-                amount1, amount2, amount1.unit(), amount2.unit());
-        return amount1.value().compareTo(amount2.convertTo(amount1.unit()).value());
+                quantity1, quantity2, quantity1.unit(), quantity2.unit());
+        return quantity1.value().compareTo(quantity2.convertTo(quantity1.unit()).value());
     }
 
     /**
@@ -842,7 +843,7 @@ public final class Configuration implements Identifiable {
                                      @NonNull CompositeStandardUnit target) {
         ImmutableMap<UnitType, Dimension> targetRebaseTypeToDimensionElementMap = target
                 .typeToDimensionElementMap();
-        return source.unitComponentToExponents().entrySet().stream()
+        return source.componentToExponents().entrySet().stream()
                 .map(entry -> getConvertConfig(entry.getKey(),
                         targetRebaseTypeToDimensionElementMap.get(entry.getKey().type()).unit())
                         //TODO 确认负数逻辑

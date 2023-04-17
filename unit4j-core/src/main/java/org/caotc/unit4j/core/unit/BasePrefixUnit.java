@@ -59,8 +59,8 @@ public class BasePrefixUnit implements BaseUnit, PrefixUnit {
   }
 
   @Override
-  public @NonNull ImmutableMap<Unit, Integer> unitComponentToExponents() {
-    return ImmutableMap.of(standardUnit(), 1);
+  public @NonNull ImmutableMap<Unit, Integer> componentToExponents() {
+      return ImmutableMap.of(standardUnit(), 1);
   }
 
   @Override
@@ -81,8 +81,8 @@ public class BasePrefixUnit implements BaseUnit, PrefixUnit {
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull BasePrefixUnit multiplicand) {
-    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this, multiplicand)
-        .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
+      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+              .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
   }
 
   @Override
@@ -93,7 +93,7 @@ public class BasePrefixUnit implements BaseUnit, PrefixUnit {
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull CompositePrefixUnit multiplicand) {
-    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this, multiplicand)
-        .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
+      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+              .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
   }
 }

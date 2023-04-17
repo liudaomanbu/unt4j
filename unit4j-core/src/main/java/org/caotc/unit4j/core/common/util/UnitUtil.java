@@ -2,19 +2,20 @@ package org.caotc.unit4j.core.common.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.caotc.unit4j.core.Amount;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 单位工具类,封装一些基本使用
@@ -73,8 +74,8 @@ public class UnitUtil {
     if (unitString.matches(UNIT_REGEX)) {
       List<String> units = StringConstant.SLASH_SPLITTER.splitToList(unitString);
       if (units.size() == 2) {
-        return CompositeStandardUnit.builder().unitComponentToExponent(parseUnit(units.get(0)), 1)
-            .unitComponentToExponent(parseUnit(units.get(1)), -1).build();
+          return CompositeStandardUnit.builder().componentToExponent(parseUnit(units.get(0)), 1)
+                  .componentToExponent(parseUnit(units.get(1)), -1).build();
       }
     }
     throw new IllegalArgumentException(unitString + " can't parse a Unit");
@@ -97,7 +98,7 @@ public class UnitUtil {
       @NonNull String targetUnit) {
     Unit current = parseUnit(currentUnit);
     Unit target = parseUnit(targetUnit);
-    return Amount.create(value, current).convertTo(target).value();
+      return Quantity.create(value, current).convertTo(target).value();
   }
 
   /**

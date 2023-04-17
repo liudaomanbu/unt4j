@@ -260,153 +260,153 @@ public class UnitConstant {
    * 赫兹 s−1
    */
   public static final CompositeStandardUnit HERTZ = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.SECOND, -1).build();
+          .componentToExponent(UnitConstant.SECOND, -1).build();
 
-  /**
-   * 牛顿 kg·m·s−2 力 重量
-   */
-  public static final CompositeStandardUnit NEWTON = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, 1)
-      .unitComponentToExponent(UnitConstant.SECOND, -2).build();
+    /**
+     * 牛顿 kg·m·s−2 力 重量
+     */
+    public static final CompositeStandardUnit NEWTON = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, 1)
+            .componentToExponent(UnitConstant.SECOND, -2).build();
 
-  /**
-   * 帕斯卡 N/m2 kg·m−1·s−2 压强 应力
-   */
-  public static final CompositeStandardUnit PASCAL = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, -1)
-      .unitComponentToExponent(UnitConstant.SECOND, -2).build();
+    /**
+     * 帕斯卡 N/m2 kg·m−1·s−2 压强 应力
+     */
+    public static final CompositeStandardUnit PASCAL = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, -1)
+            .componentToExponent(UnitConstant.SECOND, -2).build();
 
-  /**
-   * 焦耳 N·m kg·m2·s−2 能量 功 热量
-   */
-  public static final CompositeStandardUnit JOULE = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, 2)
-      .unitComponentToExponent(UnitConstant.SECOND, -2).build();
+    /**
+     * 焦耳 N·m kg·m2·s−2 能量 功 热量
+     */
+    public static final CompositeStandardUnit JOULE = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, 2)
+            .componentToExponent(UnitConstant.SECOND, -2).build();
 
 
-  /**
-   * 瓦特 J/s kg·m2·s−3 功率 辐射通量
-   */
-  public static final CompositeStandardUnit WATT = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, 2)
-      .unitComponentToExponent(UnitConstant.SECOND, -3).build();
+    /**
+     * 瓦特 J/s kg·m2·s−3 功率 辐射通量
+     */
+    public static final CompositeStandardUnit WATT = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, 2)
+            .componentToExponent(UnitConstant.SECOND, -3).build();
 
   /**
    * 库仑 s·A 电荷
    */
   public static final CompositeStandardUnit COULOMB = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.SECOND, 1)
-      .unitComponentToExponent(UnitConstant.AMPERE, 1)
-      .build();
+          .componentToExponent(UnitConstant.SECOND, 1)
+          .componentToExponent(UnitConstant.AMPERE, 1)
+          .build();
 
-  /**
-   * 伏特 W/A kg·m2·s−3·A−1 电压(电势差) 电动势
-   */
-  public static final CompositeStandardUnit VOLT = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, 2)
-      .unitComponentToExponent(UnitConstant.SECOND, -3)
-      .unitComponentToExponent(UnitConstant.AMPERE, -1).build();
+    /**
+     * 伏特 W/A kg·m2·s−3·A−1 电压(电势差) 电动势
+     */
+    public static final CompositeStandardUnit VOLT = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, 2)
+            .componentToExponent(UnitConstant.SECOND, -3)
+            .componentToExponent(UnitConstant.AMPERE, -1).build();
 
   /**
    * 法拉 C/V	kg−1·m−2·s4·A2 电容
    */
   public static final CompositeStandardUnit FARAD = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, -1).unitComponentToExponent(
-          UnitConstant.METER, -2)
-      .unitComponentToExponent(UnitConstant.SECOND, 4)
-      .unitComponentToExponent(UnitConstant.AMPERE, 2)
-      .build();
+          .componentToExponent(UnitConstant.KILOGRAM, -1).componentToExponent(
+                  UnitConstant.METER, -2)
+          .componentToExponent(UnitConstant.SECOND, 4)
+          .componentToExponent(UnitConstant.AMPERE, 2)
+          .build();
 
-  /**
-   * 欧姆 V/A	kg·m2·s−3·A−2 电阻、阻抗、电抗
-   */
-  public static final CompositeStandardUnit OHM = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, 2)
-      .unitComponentToExponent(UnitConstant.SECOND, -3)
-      .unitComponentToExponent(UnitConstant.AMPERE, -2).build();
+    /**
+     * 欧姆 V/A	kg·m2·s−3·A−2 电阻、阻抗、电抗
+     */
+    public static final CompositeStandardUnit OHM = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, 2)
+            .componentToExponent(UnitConstant.SECOND, -3)
+            .componentToExponent(UnitConstant.AMPERE, -2).build();
 
   /**
    * 西门子 A/V	kg−1·m−2·s3·A2 电导
    */
   public static final CompositeStandardUnit SIEMENS = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, -1).unitComponentToExponent(
-          UnitConstant.METER, -2)
-      .unitComponentToExponent(UnitConstant.SECOND, 3)
-      .unitComponentToExponent(UnitConstant.AMPERE, 2)
-      .build();
-  /**
-   * 韦伯 V·s	kg·m2·s−2·A−1 磁通量
-   */
-  public static final CompositeStandardUnit WEBER = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, 2)
-      .unitComponentToExponent(UnitConstant.SECOND, -2)
-      .unitComponentToExponent(UnitConstant.AMPERE, -1).build();
-  /**
-   * 特斯拉 Wb/m2	kg·s−2·A−1 磁通量密度(磁场)
-   */
-  public static final CompositeStandardUnit TESLA = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.SECOND, -2)
-      .unitComponentToExponent(UnitConstant.AMPERE, -1).build();
-  /**
-   * 亨利 Wb/A	kg·m2·s−2·A−2 电感
-   */
-  public static final CompositeStandardUnit HENRY = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.KILOGRAM, 1).unitComponentToExponent(
-          UnitConstant.METER, 2)
-      .unitComponentToExponent(UnitConstant.SECOND, -2)
-      .unitComponentToExponent(UnitConstant.AMPERE, -2).build();
-  /**
-   * 流明 cd·sr	cd 光通量
-   */
-  public static final CompositeStandardUnit LUMEN = CompositeStandardUnit.builder()
-      .unitComponentToExponent(UnitConstant.CANDELA, 1)
-      .unitComponentToExponent(NON, 1)
+          .componentToExponent(UnitConstant.KILOGRAM, -1).componentToExponent(
+                  UnitConstant.METER, -2)
+          .componentToExponent(UnitConstant.SECOND, 3)
+          .componentToExponent(UnitConstant.AMPERE, 2)
+          .build();
+    /**
+     * 韦伯 V·s	kg·m2·s−2·A−1 磁通量
+     */
+    public static final CompositeStandardUnit WEBER = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, 2)
+            .componentToExponent(UnitConstant.SECOND, -2)
+            .componentToExponent(UnitConstant.AMPERE, -1).build();
+    /**
+     * 特斯拉 Wb/m2	kg·s−2·A−1 磁通量密度(磁场)
+     */
+    public static final CompositeStandardUnit TESLA = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.SECOND, -2)
+            .componentToExponent(UnitConstant.AMPERE, -1).build();
+    /**
+     * 亨利 Wb/A	kg·m2·s−2·A−2 电感
+     */
+    public static final CompositeStandardUnit HENRY = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
+                    UnitConstant.METER, 2)
+            .componentToExponent(UnitConstant.SECOND, -2)
+            .componentToExponent(UnitConstant.AMPERE, -2).build();
+    /**
+     * 流明 cd·sr	cd 光通量
+     */
+    public static final CompositeStandardUnit LUMEN = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.CANDELA, 1)
+            .componentToExponent(NON, 1)
           .build();
 
   /**
    * 勒克斯 lm/m2	m−2·cd 照度
    */
   public static final CompositeStandardUnit LUX = CompositeStandardUnit.builder()
-          .unitComponentToExponent(UnitConstant.METER, -2)
-          .unitComponentToExponent(UnitConstant.SECOND, -2).unitComponentToExponent(
+          .componentToExponent(UnitConstant.METER, -2)
+          .componentToExponent(UnitConstant.SECOND, -2).componentToExponent(
                   UnitConstant.CANDELA, 1).build();
 
-  /**
-   * 贝克勒尔 s−1 放射性活度
-   */
-  public static final CompositeStandardUnit BECQUEREL = CompositeStandardUnit.builder()
-          .unitComponentToExponent(UnitConstant.SECOND, -1).build();
+    /**
+     * 贝克勒尔 s−1 放射性活度
+     */
+    public static final CompositeStandardUnit BECQUEREL = CompositeStandardUnit.builder()
+            .componentToExponent(UnitConstant.SECOND, -1).build();
 
   /**
    * 戈瑞 J/kg	m2·s−2 致电离辐射的吸收剂量
    */
   public static final CompositeStandardUnit GRAY = CompositeStandardUnit.builder()
-          .unitComponentToExponent(UnitConstant.METER, 2)
-          .unitComponentToExponent(UnitConstant.SECOND, -2)
+          .componentToExponent(UnitConstant.METER, 2)
+          .componentToExponent(UnitConstant.SECOND, -2)
           .build();
 
   /**
    * 希沃特 J/kg	m2·s−2 致电离辐射等效剂量
    */
   public static final CompositeStandardUnit SIEVERT = CompositeStandardUnit.builder()
-          .unitComponentToExponent(UnitConstant.METER, 2)
-          .unitComponentToExponent(UnitConstant.SECOND, -2)
+          .componentToExponent(UnitConstant.METER, 2)
+          .componentToExponent(UnitConstant.SECOND, -2)
           .build();
 
   /**
    * 开特 mol·s−1 催化活度
    */
   public static final CompositeStandardUnit KATAL = CompositeStandardUnit.builder()
-          .unitComponentToExponent(UnitConstant.MOLE, 1)
-          .unitComponentToExponent(UnitConstant.SECOND, -1)
+          .componentToExponent(UnitConstant.MOLE, 1)
+          .componentToExponent(UnitConstant.SECOND, -1)
           .build();
 
   /**

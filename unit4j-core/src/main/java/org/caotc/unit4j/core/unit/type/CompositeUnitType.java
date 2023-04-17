@@ -33,171 +33,170 @@ public class CompositeUnitType implements UnitType {
    * 频率
    */
   public static final CompositeUnitType FREQUENCY = builder()
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -1).build();
+          .componentToExponents(BaseUnitType.TIME, -1).build();
 
   /**
    * 力/重量
    */
   public static final CompositeUnitType FORCE_WEIGHT = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 1)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -2).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.LENGTH, 1)
+          .componentToExponent(BaseUnitType.TIME, -2).build();
 
   /**
    * 压强/应力
    */
   public static final CompositeUnitType PRESSURE_STRESS = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, -1).unitTypeComponentToExponent(
-          BaseUnitType.TIME, -2).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.LENGTH, -1).componentToExponent(
+                  BaseUnitType.TIME, -2).build();
 
   /**
    * 能量/功/热量
    */
   public static final CompositeUnitType ENERGY_WORK_HEAT_QUANTITY = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -2).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -2).build();
 
   /**
    * 功率/辐射通量
    */
   public static final CompositeUnitType POWER_RADIANT_FLUX = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -3).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -3).build();
 
   /**
    * 电荷
    */
   public static final CompositeUnitType ELECTRIC_CHARGE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.TIME, 1)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, 1).build();
+          .componentToExponents(BaseUnitType.TIME, 1)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, 1).build();
 
   /**
    * 电压(电势差)/电动势
    */
   public static final CompositeUnitType VOLTAGE_ELECTROMOTIVE_FORCE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -3)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -3)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
 
   /**
    * 电容
    */
   public static final CompositeUnitType CAPACITANCE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, -1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, -2).unitTypeComponentToExponent(
-          BaseUnitType.TIME, 4)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, 2).build();
+          .componentToExponents(BaseUnitType.MASS, -1)
+          .componentToExponent(BaseUnitType.LENGTH, -2).componentToExponent(
+                  BaseUnitType.TIME, 4)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, 2).build();
 
   /**
    * 电阻/阻抗/电抗
    */
   public static final CompositeUnitType RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -3)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -2).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -3)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, -2).build();
 
   /**
    * 电导
    */
   public static final CompositeUnitType ELECTRICAL_CONDUCTANCE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, -1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, -2).unitTypeComponentToExponent(
-          BaseUnitType.TIME, 3)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, 2).build();
+          .componentToExponents(BaseUnitType.MASS, -1)
+          .componentToExponent(BaseUnitType.LENGTH, -2).componentToExponent(
+                  BaseUnitType.TIME, 3)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, 2).build();
 
   /**
    * 磁通量
    */
   public static final CompositeUnitType MAGNETIC_FLUX = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
-      .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -2)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
 
   /**
    * 磁通量密度(磁场)
    */
   public static final CompositeUnitType MAGNETIC_FLUX_DENSITY = builder()
-      .unitTypeComponentToExponent(BaseUnitType.MASS, 1)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
-          .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
+          .componentToExponents(BaseUnitType.MASS, 1)
+          .componentToExponent(BaseUnitType.TIME, -2)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, -1).build();
 
   /**
    * 电感
    */
-  public static final CompositeUnitType INDUCTANCE = builder().unitTypeComponentToExponent(
+  public static final CompositeUnitType INDUCTANCE = builder().componentToExponents(
                   BaseUnitType.MASS, 1)
-          .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-          .unitTypeComponentToExponent(BaseUnitType.TIME, -2)
-          .unitTypeComponentToExponent(BaseUnitType.ELECTRIC_CURRENT, -2).build();
+          .componentToExponent(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -2)
+          .componentToExponent(BaseUnitType.ELECTRIC_CURRENT, -2).build();
   /**
    * TODO 不同单位类型属性完全相同待处理
    * 光通量 Φ
    */
-  public static final CompositeUnitType LUMINOUS_FLUX = builder().unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
+  public static final CompositeUnitType LUMINOUS_FLUX = builder().componentToExponents(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
 
   /**
    * 照度
    */
   public static final CompositeUnitType ILLUMINANCE = builder()
-          .unitTypeComponentToExponent(BaseUnitType.LENGTH, -2)
-          .unitTypeComponentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
+          .componentToExponents(BaseUnitType.LENGTH, -2)
+          .componentToExponent(BaseUnitType.LUMINOUS_INTENSITY, 1).build();
 
   /**
    * 放射性活度
    */
   public static final CompositeUnitType RADIOACTIVITY = builder()
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -1).build();
+          .componentToExponents(BaseUnitType.TIME, -1).build();
 
   /**
    * 致电离辐射的吸收剂量
    */
   public static final CompositeUnitType ABSORBED_DOSE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -2).build();
+          .componentToExponents(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -2).build();
 
   /**
    * 致电离辐射等效剂量
    */
   public static final CompositeUnitType EQUIVALENT_DOSE = builder()
-      .unitTypeComponentToExponent(BaseUnitType.LENGTH, 2)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -2).build();
+          .componentToExponents(BaseUnitType.LENGTH, 2)
+          .componentToExponent(BaseUnitType.TIME, -2).build();
 
   /**
    * 催化活度
    */
   public static final CompositeUnitType CATALYTIC_ACTIVITY = builder()
-      .unitTypeComponentToExponent(BaseUnitType.SUBSTANCE_AMOUNT, 1)
-      .unitTypeComponentToExponent(BaseUnitType.TIME, -1).build();
+          .componentToExponents(BaseUnitType.SUBSTANCE_AMOUNT, 1)
+          .componentToExponent(BaseUnitType.TIME, -1).build();
 
   /**
    * 单位类型组件与对应指数
    */
   @NonNull
   @Singular
-  ImmutableMap<UnitType, Integer> unitTypeComponentToExponents;
+  ImmutableMap<UnitType, Integer> componentToExponents;
 
   @NonNull
   @Override
   public String id() {
-    return Util.createCompositeIdOrAlias(this.unitTypeComponentToExponents());
+    return Util.createCompositeIdOrAlias(this.componentToExponents());
   }
 
   @NonNull
   @Override
   public UnitType rebase() {
-    return builder().unitTypeComponentToExponents(unitTypeComponentToExponents().entrySet().stream()
-        .map(entry -> entry.getKey().rebase().unitTypeComponentToExponents().entrySet().stream()
-            .collect(
-                ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue() * entry.getValue())))
-        .map(Map::entrySet)
-        .flatMap(Collection::stream)
-        .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
+    return builder().componentToExponents(componentToExponents().entrySet().stream()
+                    .map(entry -> entry.getKey().rebase().componentToExponents().entrySet().stream()
+                            .collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue() * entry.getValue())))
+                    .map(Map::entrySet)
+                    .flatMap(Collection::stream)
+                    .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
         .build();
   }
 
@@ -213,11 +212,11 @@ public class CompositeUnitType implements UnitType {
   @NonNull
   public CompositeUnitType multiply(@NonNull CompositeUnitType multiplicand) {
     ImmutableMap<UnitType, Integer> unitTypeToIndexMap = Stream
-        .of(this.unitTypeComponentToExponents(), multiplicand.unitTypeComponentToExponents())
+        .of(this.componentToExponents(), multiplicand.componentToExponents())
         .map(Map::entrySet)
         .flatMap(Collection::stream)
         .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum));
-    return builder().unitTypeComponentToExponents(unitTypeToIndexMap).build();
+    return builder().componentToExponents(unitTypeToIndexMap).build();
   }
 
   /**
@@ -245,8 +244,8 @@ public class CompositeUnitType implements UnitType {
   @SuppressWarnings("ConstantConditions")
   @NonNull
   public CompositeUnitType inverse() {
-    return builder().unitTypeComponentToExponents(
-        Maps.transformValues(this.unitTypeComponentToExponents(), exponent -> -exponent)).build();
+    return builder().componentToExponents(
+            Maps.transformValues(this.componentToExponents(), exponent -> -exponent)).build();
   }
 
   public static InternalBuilder builder() {
@@ -255,19 +254,18 @@ public class CompositeUnitType implements UnitType {
 
   public static class InternalBuilder extends CompositeUnitTypeBuilder {
 
-    @Override
-    public CompositeUnitTypeBuilder unitTypeComponentToExponent(UnitType key, Integer value) {
+    public CompositeUnitTypeBuilder componentToExponents(UnitType key, Integer value) {
       if (value == 0) {
         return this;
       }
-      return super.unitTypeComponentToExponent(key, value);
+      return super.componentToExponent(key, value);
     }
 
     @Override
-    public CompositeUnitTypeBuilder unitTypeComponentToExponents(
-        Map<? extends UnitType, ? extends Integer> unitTypeComponentToExponents) {
-      return super.unitTypeComponentToExponents(
-          Maps.filterValues(unitTypeComponentToExponents, exponent -> exponent != 0));
+    public CompositeUnitTypeBuilder componentToExponents(
+            Map<? extends UnitType, ? extends Integer> unitTypeComponentToExponents) {
+      return super.componentToExponents(
+              Maps.filterValues(unitTypeComponentToExponents, exponent -> exponent != 0));
     }
 
     @Override

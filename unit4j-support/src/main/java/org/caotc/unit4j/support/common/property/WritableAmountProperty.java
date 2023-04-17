@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 
 /**
@@ -29,27 +29,27 @@ import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
  * @since 1.0.0
  */
 @Value
-public class WritableAmountProperty<O, P> extends BaseAmountProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Amount> {
+public class WritableAmountProperty<O, P> extends BaseAmountProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Quantity> {
     public WritableAmountProperty(@NonNull WritableProperty<O, P> delegate) {
         super(delegate);
     }
 
 
     @Override
-    public @NonNull O write(@NonNull O target, @NonNull Amount value) {
+    public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
         //TODO value类型处理
         return delegate.write(target, (P) value.convertTo(unit()).value());
     }
 
-  @Override
-  @NonNull
-  public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
-    return type(TypeToken.of(propertyType));
-  }
+    @Override
+    @NonNull
+    public <P1 extends Quantity> WritableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+        return type(TypeToken.of(propertyType));
+    }
 
     @Override
     @NonNull
-    public <P1 extends Amount> WritableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+    public <P1 extends Quantity> WritableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
         Preconditions.checkArgument(propertyType.isSupertypeOf(type())
                 , "Property is known type %s,not %s ", type(), propertyType);
         //noinspection unchecked
@@ -57,7 +57,7 @@ public class WritableAmountProperty<O, P> extends BaseAmountProperty<O, P, Writa
     }
 
     @Override
-    public @NonNull <O1> WritableProperty<O1, Amount> ownerType(@NonNull TypeToken<O1> ownerType) {
+    public @NonNull <O1> WritableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
         return null;
     }
 

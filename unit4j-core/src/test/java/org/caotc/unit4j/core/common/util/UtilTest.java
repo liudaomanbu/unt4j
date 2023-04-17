@@ -17,6 +17,7 @@ class UtilTest {
 
   @Test
   void getSuperscript() {
+
     String superscript = Util.getSuperscript(-1234567890);
     log.info(superscript);
     Assertions.assertEquals("⁻¹²³⁴⁵⁶⁷⁸⁹⁰", superscript);
@@ -25,16 +26,16 @@ class UtilTest {
   @Test
   void createCompositeId() {
     String compositeId = Util
-        .createCompositeIdOrAlias(CompositeUnitType.PRESSURE_STRESS.unitTypeComponentToExponents());
+            .createCompositeIdOrAlias(CompositeUnitType.PRESSURE_STRESS.componentToExponents());
     log.info(compositeId);
     Assertions.assertEquals("(MASS)¹(LENGTH)⁻¹(TIME)⁻²", compositeId);
     CompositeUnitType compositeUnitType = CompositeUnitType
-        .builder().unitTypeComponentToExponent(CompositeUnitType.PRESSURE_STRESS, 2)
-        .unitTypeComponentToExponent(CompositeUnitType.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE, 3)
+            .builder().componentToExponents(CompositeUnitType.PRESSURE_STRESS, 2)
+            .componentToExponent(CompositeUnitType.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE, 3)
         .build();
-    compositeId = Util
-        .createCompositeIdOrAlias(compositeUnitType.unitTypeComponentToExponents());
-    log.info(compositeId);
+      compositeId = Util
+              .createCompositeIdOrAlias(compositeUnitType.componentToExponents());
+      log.info(compositeId);
     Assertions
         .assertEquals("((MASS)¹(LENGTH)⁻¹(TIME)⁻²)²((MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²)³",
             compositeId);

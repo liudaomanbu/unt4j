@@ -18,7 +18,7 @@ package org.caotc.unit4j.support.mybatis.factory;
 
 import lombok.Value;
 import org.apache.ibatis.reflection.factory.DefaultObjectFactory;
-import org.caotc.unit4j.core.Amount;
+import org.caotc.unit4j.core.Quantity;
 
 import java.util.List;
 
@@ -32,8 +32,8 @@ public class AmountObjectFactory extends DefaultObjectFactory {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T create(Class<T> type) {
-        if (Amount.class.equals(type)) {
-            return (T) Amount.UNKNOWN;
+        if (Quantity.class.equals(type)) {
+            return (T) Quantity.UNKNOWN;
         }
         return super.create(type);
     }

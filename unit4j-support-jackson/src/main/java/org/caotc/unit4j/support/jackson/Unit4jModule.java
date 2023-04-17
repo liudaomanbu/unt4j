@@ -15,17 +15,17 @@ import org.caotc.unit4j.support.Unit4jProperties;
 public class Unit4jModule extends SimpleModule {
 
   public static Unit4jModule create(@NonNull Unit4jProperties unit4jProperties) {
-    Unit4jModule unit4jModule = new Unit4jModule();
-    Unit4jContextualSerializer unit4jContextualSerializer = new Unit4jContextualSerializer(
-        unit4jProperties);
-    unit4jModule.addSerializer(unit4jContextualSerializer);
-    unit4jModule.addSerializer(unit4jContextualSerializer.amountSerializer());
-    unit4jModule
-        .addSerializer(unit4jContextualSerializer.amountSerializer().amountValueSerializer());
-    unit4jModule.addSerializer(unit4jContextualSerializer.amountSerializer().unitSerializer());
-    SerializeCommandsSerializer serializeCommandsSerializer = new SerializeCommandsSerializer();
-    unit4jModule.addSerializer(serializeCommandsSerializer);
-    return unit4jModule;
+      Unit4jModule unit4jModule = new Unit4jModule();
+      Unit4jContextualSerializer unit4jContextualSerializer = new Unit4jContextualSerializer(
+              unit4jProperties);
+      unit4jModule.addSerializer(unit4jContextualSerializer);
+      unit4jModule.addSerializer(unit4jContextualSerializer.quantitySerializer());
+      unit4jModule
+              .addSerializer(unit4jContextualSerializer.quantitySerializer().quantityValueSerializer());
+      unit4jModule.addSerializer(unit4jContextualSerializer.quantitySerializer().unitSerializer());
+      SerializeCommandsSerializer serializeCommandsSerializer = new SerializeCommandsSerializer();
+      unit4jModule.addSerializer(serializeCommandsSerializer);
+      return unit4jModule;
   }
 
   private Unit4jModule() {
