@@ -1,7 +1,6 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.unit.type.BaseUnitType;
@@ -17,8 +16,7 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
-@Builder(toBuilder = true)
-public class BasePrefixUnit implements BaseUnit, PrefixUnit {
+public class BasePrefixUnit extends PrefixUnit {
 
   /**
    * 工厂方法
@@ -33,7 +31,8 @@ public class BasePrefixUnit implements BaseUnit, PrefixUnit {
   @NonNull
   public static BasePrefixUnit create(@NonNull Prefix prefix,
       @NonNull BaseStandardUnit baseStandardUnit) {
-    return builder().prefix(prefix).standardUnit(baseStandardUnit).build();
+    //todo cast remove
+    return (BasePrefixUnit) builder().prefix(prefix).standardUnit(baseStandardUnit).build();
   }
 
   /**
@@ -81,19 +80,22 @@ public class BasePrefixUnit implements BaseUnit, PrefixUnit {
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull BasePrefixUnit multiplicand) {
-      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
-              .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
+    //todo cast remove
+    return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+            .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
   }
 
   @Override
   public @NonNull CompositePrefixUnit multiply(@NonNull CompositeStandardUnit multiplicand) {
-    return CompositePrefixUnit.builder().prefix(prefix())
-        .standardUnit(standardUnit().multiply(multiplicand)).build();
+    //todo cast remove
+    return (CompositePrefixUnit) CompositePrefixUnit.builder().prefix(prefix())
+            .standardUnit(standardUnit().multiply(multiplicand)).build();
   }
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull CompositePrefixUnit multiplicand) {
-      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
-              .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
+    //todo cast remove
+    return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+            .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
   }
 }

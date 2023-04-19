@@ -9,11 +9,11 @@ import lombok.NonNull;
  * @date 2019-04-26
  * @since 1.0.0
  */
-public interface StandardUnit extends Unit {
+public abstract class StandardUnit extends Unit {
 
   @Override
   @NonNull
-  default Prefix prefix() {
+  public final Prefix prefix() {
     return Prefix.EMPTY;
   }
 
@@ -27,5 +27,5 @@ public interface StandardUnit extends Unit {
    * @since 1.0.0
    */
   @NonNull
-  PrefixUnit addPrefix(@NonNull Prefix prefix);
+  public abstract PrefixUnit addPrefix(@NonNull Prefix prefix);
 }

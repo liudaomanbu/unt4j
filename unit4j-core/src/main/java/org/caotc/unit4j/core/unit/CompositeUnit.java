@@ -7,6 +7,7 @@ package org.caotc.unit4j.core.unit;
  * @date 2019-05-26
  * @since 1.0.0
  */
-public interface CompositeUnit extends Unit {
-
+public abstract class CompositeUnit extends Unit {
+//    @Override
+//    @NonNull CompositeUnitType type();
 }

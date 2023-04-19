@@ -31,9 +31,9 @@ import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.support.common.property.AccessibleAmountProperty;
-import org.caotc.unit4j.support.common.property.ReadableAmountProperty;
-import org.caotc.unit4j.support.common.property.WritableAmountProperty;
+import org.caotc.unit4j.support.common.property.AccessibleQuantityProperty;
+import org.caotc.unit4j.support.common.property.ReadableQuantityProperty;
+import org.caotc.unit4j.support.common.property.WritableQuantityProperty;
 import org.caotc.unit4j.support.exception.NotQuantityPropertyException;
 
 import java.math.BigDecimal;
@@ -134,7 +134,7 @@ public class QuantityUtil {
     private static <O, P> ReadableProperty<O, Quantity> warp(@NonNull ReadableProperty<O, P> readableValueProperty) {
         return readableValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
                 (ReadableProperty<O, Quantity>) readableValueProperty
-                : new ReadableAmountProperty<O, P>(readableValueProperty);
+                : new ReadableQuantityProperty<O, P>(readableValueProperty);
     }
 
     @SuppressWarnings("unchecked")
@@ -142,7 +142,7 @@ public class QuantityUtil {
     private static <O, P> WritableProperty<O, Quantity> warp(@NonNull WritableProperty<O, P> writableValueProperty) {
         return writableValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
                 (WritableProperty<O, Quantity>) writableValueProperty
-                : new WritableAmountProperty<O, P>(writableValueProperty);
+                : new WritableQuantityProperty<O, P>(writableValueProperty);
     }
 
     @SuppressWarnings("unchecked")
@@ -150,7 +150,7 @@ public class QuantityUtil {
     private static <O, P> AccessibleProperty<O, Quantity> warp(@NonNull AccessibleProperty<O, P> accessibleValueProperty) {
         return accessibleValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
                 (AccessibleProperty<O, Quantity>) accessibleValueProperty
-                : new AccessibleAmountProperty<O, P>(accessibleValueProperty);
+                : new AccessibleQuantityProperty<O, P>(accessibleValueProperty);
     }
 
     @NonNull

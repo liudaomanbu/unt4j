@@ -200,7 +200,7 @@ public class Quantity {
      */
     @NonNull
     public Quantity autoConvert(@NonNull Configuration configuration) {
-        return convertTo(configuration.targetUnitChooser().targetUnitFromAmount(this, configuration),
+        return convertTo(configuration.targetUnitChooser().targetUnit(this, configuration),
                 configuration);
     }
 

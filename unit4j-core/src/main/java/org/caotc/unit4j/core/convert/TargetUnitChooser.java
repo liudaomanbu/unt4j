@@ -27,18 +27,18 @@ public class TargetUnitChooser {
      * 单个{@link Quantity}对象目标单位选择器
      */
     @NonNull
-    BiFunction<Quantity, Configuration, Unit> amountTargetUnitChooser;
+    BiFunction<Quantity, Configuration, Unit> quantityTargetUnitChooser;
     /**
      * {@link Quantity}对象集合目标单位选择器
      */
     @NonNull
-    BiFunction<? super Iterable<Quantity>, Configuration, Unit> amountsTargetUnitChooser;
+    BiFunction<? super Iterable<Quantity>, Configuration, Unit> quantitiesTargetUnitChooser;
 
     /**
      * 目标单位选择器工厂方法
      *
-     * @param amountTargetUnitChooser  对象目标单位选择器
-     * @param amountsTargetUnitChooser 对象集合目标单位选择器
+     * @param quantityTargetUnitChooser   对象目标单位选择器
+     * @param quantitiesTargetUnitChooser 对象集合目标单位选择器
      * @return 目标单位选择器
      * @author caotc
      * @date 2019-05-24
@@ -46,16 +46,16 @@ public class TargetUnitChooser {
      */
     @NonNull
     public static TargetUnitChooser create(
-            @NonNull BiFunction<Quantity, Configuration, Unit> amountTargetUnitChooser,
-            @NonNull BiFunction<? super Iterable<Quantity>, Configuration, Unit> amountsTargetUnitChooser) {
-        return builder().amountTargetUnitChooser(amountTargetUnitChooser)
-                .amountsTargetUnitChooser(amountsTargetUnitChooser).build();
+            @NonNull BiFunction<Quantity, Configuration, Unit> quantityTargetUnitChooser,
+            @NonNull BiFunction<? super Iterable<Quantity>, Configuration, Unit> quantitiesTargetUnitChooser) {
+        return builder().quantityTargetUnitChooser(quantityTargetUnitChooser)
+                .quantitiesTargetUnitChooser(quantitiesTargetUnitChooser).build();
     }
 
     /**
-     * 目标单位选择器工厂方法,对象集合由{@code amountChooser}参数选择出目标对象后由对象目标单位选择器处理
+     * 目标单位选择器工厂方法,对象集合由{@code quantityChooser}参数选择出目标对象后由对象目标单位选择器处理
      *
-     * @param amountTargetUnitChooser 对象目标单位选择器
+     * @param quantityTargetUnitChooser 对象目标单位选择器
      * @param quantityChooser         {@link Quantity}选择器
      * @return 目标单位选择器
      * @author caotc
@@ -64,17 +64,17 @@ public class TargetUnitChooser {
      */
     @NonNull
     public static TargetUnitChooser create(
-            @NonNull BiFunction<Quantity, Configuration, Unit> amountTargetUnitChooser,
+            @NonNull BiFunction<Quantity, Configuration, Unit> quantityTargetUnitChooser,
             @NonNull QuantityChooser quantityChooser) {
-        return create(amountTargetUnitChooser, (amounts, configuration) -> amountTargetUnitChooser
-                .apply(quantityChooser.choose(amounts, configuration), configuration));
+        return create(quantityTargetUnitChooser, (quantities, configuration) -> quantityTargetUnitChooser
+                .apply(quantityChooser.choose(quantities, configuration), configuration));
     }
 
     /**
-     * 目标单位选择器工厂方法,对象集合由{@code amountChooser}参数选择出目标对象后由对象目标单位选择器处理,目标单位由{@code
-     * amountConvertResultsChooser}参数从传入的{@link Quantity}对象所有可转换结果中选择
+     * 目标单位选择器工厂方法,对象集合由{@code quantityChooser}参数选择出目标对象后由对象目标单位选择器处理,目标单位由{@code
+     * quantityConvertResultsChooser}参数从传入的{@link Quantity}对象所有可转换结果中选择
      *
-     * @param amountConvertResultsChooser 从传入的{@link Quantity}对象所有可转换结果中选择目标单位的选择器
+     * @param quantityConvertResultsChooser 从传入的{@link Quantity}对象所有可转换结果中选择目标单位的选择器
      * @param quantityChooser             {@link Quantity}选择器
      * @return 目标单位选择器
      * @author caotc
@@ -83,17 +83,17 @@ public class TargetUnitChooser {
      */
     @NonNull
     public static TargetUnitChooser create(
-            @NonNull QuantityChooser amountConvertResultsChooser,
+            @NonNull QuantityChooser quantityConvertResultsChooser,
             @NonNull QuantityChooser quantityChooser) {
-        BiFunction<Quantity, Configuration, Unit> amountTargetUnitChooser = (amount, configuration) -> {
-            UnitGroup unitGroup = configuration.getUnitGroup(amount.unit());
-            return amountConvertResultsChooser.chooseInternal(
-                    unitGroup.units().stream().map(unit -> amount.convertTo(unit, configuration)),
+        BiFunction<Quantity, Configuration, Unit> quantityTargetUnitChooser = (quantity, configuration) -> {
+            UnitGroup unitGroup = configuration.getUnitGroup(quantity.unit());
+            return quantityConvertResultsChooser.chooseInternal(
+                    unitGroup.units().stream().map(unit -> quantity.convertTo(unit, configuration)),
                     configuration).unit();
         };
 
-        return create(amountTargetUnitChooser, (amounts, configuration) -> amountTargetUnitChooser
-                .apply(quantityChooser.choose(amounts, configuration), configuration));
+        return create(quantityTargetUnitChooser, (quantities, configuration) -> quantityTargetUnitChooser
+                .apply(quantityChooser.choose(quantities, configuration), configuration));
     }
 
     /**
@@ -107,9 +107,9 @@ public class TargetUnitChooser {
      * @since 1.0.0
      */
     @NonNull
-    public Unit targetUnitFromAmount(@NonNull Quantity quantity,
-                                     @NonNull Configuration configuration) {
-        return amountTargetUnitChooser.apply(quantity, configuration);
+    public Unit targetUnit(@NonNull Quantity quantity,
+                           @NonNull Configuration configuration) {
+        return quantityTargetUnitChooser.apply(quantity, configuration);
     }
 
     /**
@@ -123,14 +123,14 @@ public class TargetUnitChooser {
      * @since 1.0.0
      */
     @NonNull
-    public Unit targetUnitFromAmounts(@NonNull Collection<Quantity> quantities,
-                                      @NonNull Configuration configuration) {
+    public Unit targetUnit(@NonNull Collection<Quantity> quantities,
+                           @NonNull Configuration configuration) {
         Preconditions.checkArgument(!quantities.isEmpty(), "empty collection can't auto toUnit");
         boolean isSameUnitType =
                 quantities.stream().map(Quantity::unit).map(Unit::type).distinct().count() == 1;
         Preconditions
                 .checkArgument(isSameUnitType, "all data must have same unitElement possibleTypes");
-    return amountsTargetUnitChooser.apply(quantities, configuration);
-  }
+        return quantitiesTargetUnitChooser.apply(quantities, configuration);
+    }
 
 }

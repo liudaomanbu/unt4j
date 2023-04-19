@@ -32,18 +32,18 @@ class CompositePrefixUnitTest {
 
   @Test
   void pow() {
-    CompositeStandardUnit actual = UnitConstant.NEWTON.power(3);
-    CompositeStandardUnit expected = CompositeStandardUnit.builder()
-            .componentToExponent(UnitConstant.KILOGRAM, 3)
-            .componentToExponent(UnitConstant.METER, 3)
-            .componentToExponent(UnitConstant.SECOND, -6)
-        .build();
-    Assertions.assertEquals(expected, actual);
+      Unit actual = UnitConstant.NEWTON.power(3);
+      Unit expected = CompositeStandardUnit.builder()
+              .componentToExponent(UnitConstant.KILOGRAM, 3)
+              .componentToExponent(UnitConstant.METER, 3)
+              .componentToExponent(UnitConstant.SECOND, -6)
+              .build();
+      Assertions.assertEquals(expected, actual);
 
-    actual = UnitConstant.NEWTON.power(-3);
-    expected = CompositeStandardUnit.builder()
-            .componentToExponent(UnitConstant.KILOGRAM, -3)
-            .componentToExponent(UnitConstant.METER, -3)
+      actual = UnitConstant.NEWTON.power(-3);
+      expected = CompositeStandardUnit.builder()
+              .componentToExponent(UnitConstant.KILOGRAM, -3)
+              .componentToExponent(UnitConstant.METER, -3)
             .componentToExponent(UnitConstant.SECOND, 6)
         .build();
     Assertions.assertEquals(expected, actual);
@@ -52,11 +52,11 @@ class CompositePrefixUnitTest {
   @Test
   void divide() {
       Unit actual = UnitConstant.PASCAL.divide(UnitConstant.NEWTON);
-      CompositeStandardUnit expected = CompositeStandardUnit.builder()
+      Unit expected = CompositeStandardUnit.builder()
               .componentToExponent(UnitConstant.METER, -2).build();
     Assertions.assertEquals(expected, actual);
 
-      CompositeStandardUnit pascalOther = CompositeStandardUnit
+      Unit pascalOther = CompositeStandardUnit
               .builder().componentToExponent(UnitConstant.NEWTON, 1)
               .componentToExponent(UnitConstant.METER, -2).build();
       Unit result = pascalOther.divide(UnitConstant.NEWTON);
@@ -65,13 +65,13 @@ class CompositePrefixUnitTest {
 
   @Test
   void inverse() {
-    CompositeStandardUnit actual = UnitConstant.NEWTON.inverse();
-    CompositeStandardUnit expected = CompositeStandardUnit.builder()
-            .componentToExponent(UnitConstant.KILOGRAM, -1)
-            .componentToExponent(UnitConstant.METER, -1)
-            .componentToExponent(UnitConstant.SECOND, 2)
-        .build();
-    Assertions.assertEquals(expected, actual);
+      Unit actual = UnitConstant.NEWTON.inverse();
+      Unit expected = CompositeStandardUnit.builder()
+              .componentToExponent(UnitConstant.KILOGRAM, -1)
+              .componentToExponent(UnitConstant.METER, -1)
+              .componentToExponent(UnitConstant.SECOND, 2)
+              .build();
+      Assertions.assertEquals(expected, actual);
   }
 
   @Test
@@ -93,10 +93,10 @@ class CompositePrefixUnitTest {
 
   @Test
   void sameTypeCompent() {
-    CompositeStandardUnit compositePrefixUnit = CompositeStandardUnit
-            .builder().componentToExponent(UnitConstant.SECOND, 1)
-            .componentToExponent(UnitConstant.MINUTE, 1)
-        .build();
+      Unit compositePrefixUnit = CompositeStandardUnit
+              .builder().componentToExponent(UnitConstant.SECOND, 1)
+              .componentToExponent(UnitConstant.MINUTE, 1)
+              .build();
     log.info("unit:{}", compositePrefixUnit);
     log.info("type:{}", compositePrefixUnit.type().id());
   }

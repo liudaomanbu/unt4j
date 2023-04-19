@@ -33,6 +33,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.constant.UnitConstant;
+import org.caotc.unit4j.core.constant.UnitTypes;
 import org.caotc.unit4j.core.convert.QuantityChooser;
 import org.caotc.unit4j.core.convert.TargetUnitChooser;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
@@ -51,7 +52,6 @@ import org.caotc.unit4j.core.unit.PrefixUnit;
 import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
-import org.caotc.unit4j.core.unit.type.BaseUnitType;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
 import java.math.BigInteger;
@@ -90,8 +90,8 @@ public final class Configuration implements Identifiable {
      * 默认的自动转换时的目标单位选择器
      */
     private static final TargetUnitChooser DEFAULT_TARGET_UNIT_CHOOSER = TargetUnitChooser
-            .create(QuantityChooser.createTargetValueAmountChooser(BigInteger.ONE),
-                    QuantityChooser.minAmountChooser());
+            .create(QuantityChooser.targetValueQuantityChooser(BigInteger.ONE),
+                    QuantityChooser.minQuantityChooser());
 
     /**
      * 保存全局配置与id的map
@@ -211,16 +211,16 @@ public final class Configuration implements Identifiable {
         register(UnitConstant.ERA, UnitConstant.YEAR,
                 UnitConvertConfig.create(BigDecimal.valueOf(1000000000)));
 
-        registerAlias(BaseUnitType.LENGTH, Alias.LENGTH_ENGLISH_NAME, Alias.LENGTH_CHINESE_NAME);
-        registerAlias(BaseUnitType.MASS, Alias.MASS_ENGLISH_NAME, Alias.MASS_CHINESE_NAME);
-        registerAlias(BaseUnitType.TIME, Alias.TIME_ENGLISH_NAME, Alias.TIME_CHINESE_NAME);
-        registerAlias(BaseUnitType.ELECTRIC_CURRENT, Alias.ELECTRIC_CURRENT_ENGLISH_NAME,
+        registerAlias(UnitTypes.LENGTH, Alias.LENGTH_ENGLISH_NAME, Alias.LENGTH_CHINESE_NAME);
+        registerAlias(UnitTypes.MASS, Alias.MASS_ENGLISH_NAME, Alias.MASS_CHINESE_NAME);
+        registerAlias(UnitTypes.TIME, Alias.TIME_ENGLISH_NAME, Alias.TIME_CHINESE_NAME);
+        registerAlias(UnitTypes.ELECTRIC_CURRENT, Alias.ELECTRIC_CURRENT_ENGLISH_NAME,
                 Alias.ELECTRIC_CURRENT_CHINESE_NAME);
-        registerAlias(BaseUnitType.TEMPERATURE, Alias.TEMPERATURE_ENGLISH_NAME,
+        registerAlias(UnitTypes.TEMPERATURE, Alias.TEMPERATURE_ENGLISH_NAME,
                 Alias.TEMPERATURE_CHINESE_NAME);
-        registerAlias(BaseUnitType.SUBSTANCE_AMOUNT, Alias.SUBSTANCE_AMOUNT_ENGLISH_NAME,
+        registerAlias(UnitTypes.SUBSTANCE_AMOUNT, Alias.SUBSTANCE_AMOUNT_ENGLISH_NAME,
                 Alias.SUBSTANCE_AMOUNT_CHINESE_NAME);
-        registerAlias(BaseUnitType.LUMINOUS_INTENSITY, Alias.LUMINOUS_INTENSITY_ENGLISH_NAME,
+        registerAlias(UnitTypes.LUMINOUS_INTENSITY, Alias.LUMINOUS_INTENSITY_ENGLISH_NAME,
                 Alias.LUMINOUS_INTENSITY_CHINESE_NAME);
 
         //注册默认词头别名
@@ -631,7 +631,7 @@ public final class Configuration implements Identifiable {
      */
     @NonNull
     public Unit getTargetUnit(@NonNull Quantity quantity) {
-        return targetUnitChooser.targetUnitFromAmount(quantity, this);
+        return targetUnitChooser.targetUnit(quantity, this);
     }
 
     /**
@@ -645,7 +645,7 @@ public final class Configuration implements Identifiable {
      */
     @NonNull
     public Unit getTargetUnit(@NonNull Collection<Quantity> quantities) {
-        return targetUnitChooser.targetUnitFromAmounts(quantities, this);
+        return targetUnitChooser.targetUnit(quantities, this);
     }
 
     /**

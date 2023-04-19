@@ -21,7 +21,7 @@ import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 
 import java.util.Optional;
@@ -32,8 +32,8 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class AccessibleAmountProperty<O, P> extends BaseAmountProperty<O, P, AccessibleProperty<O, P>> implements AccessibleProperty<O, Quantity> {
-    public AccessibleAmountProperty(@NonNull AccessibleProperty<O, P> delegate) {
+public class ReadableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, ReadableProperty<O, P>> implements ReadableProperty<O, Quantity> {
+    public ReadableQuantityProperty(@NonNull ReadableProperty<O, P> delegate) {
         super(delegate);
     }
 
@@ -49,33 +49,27 @@ public class AccessibleAmountProperty<O, P> extends BaseAmountProperty<O, P, Acc
     }
 
     @Override
-    public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
-        //TODO value类型处理
-        return delegate.write(target, (P) value.convertTo(unit()).value());
-    }
-
-    @Override
     @NonNull
-    public <P1 extends Quantity> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+    public <P1 extends Quantity> ReadableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
         return type(TypeToken.of(propertyType));
     }
 
     @Override
     @NonNull
-    public <P1 extends Quantity> AccessibleProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+    public <P1 extends Quantity> ReadableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
         Preconditions.checkArgument(propertyType.isSupertypeOf(type())
                 , "Property is known type %s,not %s ", type(), propertyType);
         //noinspection unchecked
-        return (AccessibleProperty<O, P1>) this;
+        return (ReadableProperty<O, P1>) this;
+    }
+
+    @Override
+    public @NonNull <O1> ReadableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
+        return null;
     }
 
     @Override
     public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
         return false;
-    }
-
-    @Override
-    public @NonNull <O1> AccessibleProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return null;
     }
 }

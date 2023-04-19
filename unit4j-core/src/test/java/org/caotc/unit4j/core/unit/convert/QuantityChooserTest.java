@@ -31,10 +31,10 @@ class QuantityChooserTest {
 
     @Test
     void test() {
-        Stream.of(QuantityChooser.minAmountChooser(),
-                        QuantityChooser.maxAmountChooser()
-                        , QuantityChooser.averageAmountChooser(),
-                        QuantityChooser.medianAmountChooser())
+        Stream.of(QuantityChooser.minQuantityChooser(),
+                        QuantityChooser.maxQuantityChooser()
+                        , QuantityChooser.averageQuantityChooser(),
+                        QuantityChooser.medianQuantityChooser())
                 .forEach(this::choose);
     }
 

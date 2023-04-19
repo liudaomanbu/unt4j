@@ -3,6 +3,7 @@ package org.caotc.unit4j.core;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.constant.UnitConstant;
+import org.caotc.unit4j.core.constant.UnitTypes;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.unit.BasePrefixUnit;
@@ -12,7 +13,6 @@ import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
-import org.caotc.unit4j.core.unit.type.BaseUnitType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -64,9 +64,9 @@ class ConfigTest {
   @Test
   void registerConvertConfig() {
     BaseStandardUnit testLength = BaseStandardUnit
-        .create("testLength", BaseUnitType.LENGTH);
+            .create("testLength", UnitTypes.LENGTH);
     UnitConvertConfig expected = UnitConvertConfig.create(
-        BigDecimal.valueOf("3.14"));
+            BigDecimal.valueOf("3.14"));
     configuration
         .register(testLength, UnitConstant.METER, expected);
     UnitConvertConfig actual = configuration

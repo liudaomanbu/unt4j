@@ -3,7 +3,7 @@ package org.caotc.unit4j.core.unit;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.constant.UnitConstant;
-import org.caotc.unit4j.core.unit.type.BaseUnitType;
+import org.caotc.unit4j.core.constant.UnitTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,15 +13,15 @@ class UnitTest {
   @Test
   void typeToDimensionElementMap() {
     Assertions.assertEquals(
-        ImmutableMap.of(BaseUnitType.MASS, Dimension.create(UnitConstant.GRAM, 1)),
-        UnitConstant.GRAM.typeToDimensionElementMap());
+            ImmutableMap.of(UnitTypes.MASS, Dimension.create(UnitConstant.GRAM, 1)),
+            UnitConstant.GRAM.typeToDimensionElementMap());
   }
 
   @Test
   void multiplyUnitComponent() {
-    CompositeStandardUnit gram = CompositeStandardUnit
+    Unit gram = CompositeStandardUnit
             .builder().componentToExponent(UnitConstant.GRAM, 2).build();
-      Unit multiply = UnitConstant.GRAM.multiply(UnitConstant.GRAM);
+    Unit multiply = UnitConstant.GRAM.multiply(UnitConstant.GRAM);
       Assertions.assertEquals(gram.componentToExponents(), multiply.componentToExponents());
       Assertions.assertEquals(0, gram.prefix().compareTo(multiply.prefix()));
     Assertions.assertEquals(gram, multiply);

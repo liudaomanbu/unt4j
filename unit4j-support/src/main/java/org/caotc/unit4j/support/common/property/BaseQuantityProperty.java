@@ -44,7 +44,7 @@ import java.util.Optional;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> implements Property<O, Quantity> {
+public abstract class BaseQuantityProperty<O, P, D extends Property<O, P>> implements Property<O, Quantity> {
     //    @Delegate(types=Property.class)
     @NonNull
     protected D delegate;
@@ -101,12 +101,12 @@ public abstract class BaseAmountProperty<O, P, D extends Property<O, P>> impleme
 
     @Override
     public ReadableProperty<O, Quantity> toReadable() {
-        return new ReadableAmountProperty<>(delegate.toReadable());
+        return new ReadableQuantityProperty<>(delegate.toReadable());
     }
 
     @Override
     public WritableProperty<O, Quantity> toWritable() {
-        return new WritableAmountProperty<>(delegate.toWritable());
+        return new WritableQuantityProperty<>(delegate.toWritable());
     }
 
     @Override

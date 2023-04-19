@@ -1,10 +1,9 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.unit.type.CompositeUnitType;
+import org.caotc.unit4j.core.unit.type.UnitType;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -17,8 +16,7 @@ import java.util.stream.Stream;
  * @since 1.0.0
  **/
 @Value
-@Builder(toBuilder = true)
-public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
+public class CompositePrefixUnit extends PrefixUnit {
 
   /**
    * 工厂方法
@@ -33,7 +31,8 @@ public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
   @NonNull
   public static CompositePrefixUnit create(@NonNull Prefix prefix,
       @NonNull CompositeStandardUnit compositeStandardUnit) {
-    return builder().prefix(prefix).standardUnit(compositeStandardUnit).build();
+    //todo cast remove
+    return (CompositePrefixUnit) builder().prefix(prefix).standardUnit(compositeStandardUnit).build();
   }
 
   /**
@@ -50,14 +49,15 @@ public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
 
   @NonNull
   @Override
-  public CompositeUnitType type() {
+  public UnitType type() {
     return standardUnit().type();
   }
 
   @NonNull
   @Override
   public CompositePrefixUnit rebase() {
-    return builder().prefix(prefix()).standardUnit(standardUnit().rebase()).build();
+    //todo cast remove
+    return (CompositePrefixUnit) builder().prefix(prefix()).standardUnit(standardUnit().rebase()).build();
   }
 
   /**
@@ -72,10 +72,11 @@ public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
   @Override
   @NonNull
   public CompositePrefixUnit power(int exponent) {
-    return CompositePrefixUnit.builder()
-        .prefix(this.prefix().power(exponent))
-        .standardUnit(standardUnit().power(exponent))
-        .build();
+    //todo cast remove
+    return (CompositePrefixUnit) CompositePrefixUnit.builder()
+            .prefix(this.prefix().power(exponent))
+            .standardUnit(standardUnit().power(exponent))
+            .build();
   }
 
   /**
@@ -95,8 +96,9 @@ public class CompositePrefixUnit implements CompositeUnit, PrefixUnit {
   @Override
   @NonNull
   public CompositePrefixUnit inverse() {
-    return builder().prefix(this.prefix().reciprocal())
-        .standardUnit(standardUnit().inverse()).build();
+    //todo cast remove
+    return (CompositePrefixUnit) builder().prefix(this.prefix().reciprocal())
+            .standardUnit(standardUnit().inverse()).build();
   }
 
   @Override

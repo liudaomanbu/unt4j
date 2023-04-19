@@ -125,7 +125,7 @@ public class Prefix implements Comparable<Prefix>, Identifiable {
       .of(YOCTO, ZEPTO, ATTO, FEMTO, PICO, NANO, MICRO, MILLI, CENTI, DECI, DECA, HECTO, KILO,
           MEGA, GIGA, TERA, PETA, EXA, ZETTA, YOTTA);
 
-  //TODO 封装指数类
+  //TODO 封装指数类或改成直接的number
   /**
    * 底数，必须为正数
    */

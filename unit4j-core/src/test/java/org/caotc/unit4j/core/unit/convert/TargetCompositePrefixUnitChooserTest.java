@@ -28,7 +28,7 @@ abstract class TargetCompositePrefixUnitChooserTest {
   @Test
   void findTargetUnit() {
     Unit targetCompositePrefixUnit = targetUnitChooser
-            .targetUnitFromAmount(Quantity.create(BigDecimal.TEN, UnitConstant.HOUR),
+            .targetUnit(Quantity.create(BigDecimal.TEN, UnitConstant.HOUR),
                     Configuration.defaultInstance());
     Assertions.assertNotNull(targetCompositePrefixUnit);
     log.info("targetCompositePrefixUnit:{}", targetCompositePrefixUnit);

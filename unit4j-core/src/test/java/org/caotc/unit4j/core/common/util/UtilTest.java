@@ -1,7 +1,8 @@
 package org.caotc.unit4j.core.common.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.unit.type.CompositeUnitType;
+import org.caotc.unit4j.core.constant.UnitTypes;
+import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,20 +26,20 @@ class UtilTest {
 
   @Test
   void createCompositeId() {
-    String compositeId = Util
-            .createCompositeIdOrAlias(CompositeUnitType.PRESSURE_STRESS.componentToExponents());
-    log.info(compositeId);
-    Assertions.assertEquals("(MASS)¹(LENGTH)⁻¹(TIME)⁻²", compositeId);
-    CompositeUnitType compositeUnitType = CompositeUnitType
-            .builder().componentToExponents(CompositeUnitType.PRESSURE_STRESS, 2)
-            .componentToExponent(CompositeUnitType.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE, 3)
-        .build();
+      String compositeId = Util
+              .createCompositeIdOrAlias(UnitTypes.PRESSURE_STRESS.componentToExponents());
+      log.info(compositeId);
+      Assertions.assertEquals("(MASS)¹(LENGTH)⁻¹(TIME)⁻²", compositeId);
+      UnitType compositeUnitType = UnitType
+              .builder().componentToExponent(UnitTypes.PRESSURE_STRESS, 2)
+              .componentToExponent(UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE, 3)
+              .build();
       compositeId = Util
               .createCompositeIdOrAlias(compositeUnitType.componentToExponents());
       log.info(compositeId);
-    Assertions
-        .assertEquals("((MASS)¹(LENGTH)⁻¹(TIME)⁻²)²((MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²)³",
-            compositeId);
+      Assertions
+              .assertEquals("((MASS)¹(LENGTH)⁻¹(TIME)⁻²)²((MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²)³",
+                      compositeId);
   }
 
   @Test

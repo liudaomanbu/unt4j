@@ -35,16 +35,16 @@ import java.util.stream.Stream;
  * @since 1.0.0
  **/
 @Value
-public class BaseStandardUnit implements StandardUnit, BaseUnit {
+public class BaseStandardUnit extends StandardUnit {
 
-  @NonNull
-  public static BaseStandardUnit create(@NonNull String id,
-      @NonNull BaseUnitType type) {
-    return new BaseStandardUnit(id, type);
-  }
+    @NonNull
+    public static BaseStandardUnit create(@NonNull String id,
+                                          @NonNull BaseUnitType type) {
+        return new BaseStandardUnit(id, type);
+    }
 
-  @NonNull
-  String id;
+    @NonNull
+    String id;
 
   /**
    * 单位类型
@@ -56,7 +56,6 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
       @NonNull BaseUnitType type) {
     this.id = id;
     this.type = type;
-//    Configuration.register(this);
   }
 
   @NonNull
@@ -75,17 +74,20 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
   @Override
   public StandardUnit power(int exponent) {
       return exponent == 1 ? this
-              : CompositeStandardUnit.builder().componentToExponent(this, exponent).build();
+              //todo cast remove
+              : (StandardUnit) CompositeStandardUnit.builder().componentToExponent(this, exponent).build();
   }
 
   @Override
   public @NonNull CompositeStandardUnit inverse() {
-      return CompositeStandardUnit.builder().componentToExponent(this, -1).build();
+      //todo cast remove
+      return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponent(this, -1).build();
   }
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull BaseStandardUnit multiplicand) {
-      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+      //todo cast remove
+      return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
               .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
 //    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this,multiplicand)
 //        .map(Unit::unitComponentToExponents)
@@ -96,13 +98,14 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
 
   @Override
   public @NonNull CompositePrefixUnit multiply(@NonNull BasePrefixUnit multiplicand) {
-    return CompositePrefixUnit.builder().prefix(prefix())
-        .standardUnit(multiply(multiplicand.standardUnit())).build();
+      return (CompositePrefixUnit) CompositePrefixUnit.builder().prefix(prefix())
+              .standardUnit(multiply(multiplicand.standardUnit())).build();
   }
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull CompositeStandardUnit multiplicand) {
-      return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+      //todo cast remove
+      return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
                       .map(Unit::componentToExponents)
                       .map(Map::entrySet)
                       .flatMap(Collection::stream)
@@ -112,13 +115,13 @@ public class BaseStandardUnit implements StandardUnit, BaseUnit {
 
   @Override
   public @NonNull CompositePrefixUnit multiply(@NonNull CompositePrefixUnit multiplicand) {
-    return CompositePrefixUnit.builder().prefix(prefix())
-        .standardUnit(multiply(multiplicand.standardUnit())).build();
+      //todo cast remove
+      return (CompositePrefixUnit) CompositePrefixUnit.builder().prefix(prefix())
+              .standardUnit(multiply(multiplicand.standardUnit())).build();
   }
 
-  @Override
   public @NonNull BasePrefixUnit addPrefix(@NonNull Prefix prefix) {
-    return BasePrefixUnit.builder().prefix(prefix).standardUnit(this).build();
+      //todo cast remove
+      return (BasePrefixUnit) Unit.builder().prefix(prefix).standardUnit(this).build();
   }
-
 }

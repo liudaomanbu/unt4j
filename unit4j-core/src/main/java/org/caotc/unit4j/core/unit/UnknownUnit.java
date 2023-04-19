@@ -19,7 +19,6 @@ package org.caotc.unit4j.core.unit;
 import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.unit.type.BaseUnitType;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
 /**
@@ -28,9 +27,9 @@ import org.caotc.unit4j.core.unit.type.UnitType;
  * @since 1.0.0
  */
 @Value
-public class UnknownUnit implements Unit {
+public class UnknownUnit extends Unit {
     public static final UnknownUnit INSTANCE = new UnknownUnit();
-    private static final UnitType TYPE = BaseUnitType.create("unknown");
+    private static final UnitType TYPE = UnitType.of("unknown");
 
     @Override
     public @NonNull Prefix prefix() {

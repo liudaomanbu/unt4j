@@ -29,8 +29,8 @@ import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
  * @since 1.0.0
  */
 @Value
-public class WritableAmountProperty<O, P> extends BaseAmountProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Quantity> {
-    public WritableAmountProperty(@NonNull WritableProperty<O, P> delegate) {
+public class WritableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Quantity> {
+    public WritableQuantityProperty(@NonNull WritableProperty<O, P> delegate) {
         super(delegate);
     }
 
