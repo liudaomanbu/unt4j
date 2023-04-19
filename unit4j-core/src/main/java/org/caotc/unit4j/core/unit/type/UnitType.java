@@ -5,7 +5,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.NonFinal;
 import org.caotc.unit4j.core.Component;
 import org.caotc.unit4j.core.Identifiable;
@@ -47,7 +49,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      * @date 2019-01-11
      * @since 1.0.0
      */
-    public abstract @NonNull ImmutableMap<UnitType, Integer> componentToExponents();
+    public abstract @NonNull ImmutableMap<@NonNull UnitType, @NonNull Integer> componentToExponents();
 
     /**
      * 重定基准,将所有非基本类型拆解合并,返回等价于原对象但是组件仅为基本单位类型的单位类型.
@@ -88,7 +90,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
     }
 
     /**
-     * 乘法{@code this * multiplicand} //TODO 待移到父类
+     * 乘法{@code this * multiplicand}
      *
      * @param multiplicand 被乘数
      * @return {@code this * multiplicand}
@@ -124,12 +126,11 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
         return builder().componentToExponents(componentToExponents());
     }
 
+    @ToString
+    @NoArgsConstructor(access = AccessLevel.MODULE)
     public static class Builder {
         @NonFinal
-        private ImmutableMap.Builder<UnitType, Integer> componentToExponents;
-
-        Builder() {
-        }
+        ImmutableMap.Builder<UnitType, Integer> componentToExponents;
 
         public Builder componentToExponent(@NonNull UnitType key, int value) {
             if (this.componentToExponents == null) {
@@ -168,10 +169,6 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
                 }
             }
             return new CompositeUnitType(componentToExponents);
-        }
-
-        public String toString() {
-            return "UnitType.Builder(componentToExponents=" + this.componentToExponents + ")";
         }
     }
 }

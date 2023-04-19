@@ -26,8 +26,8 @@ public class BaseUnitType extends UnitType {
     }
 
     @NonNull
-  @Override
-  public UnitType rebase() {
-    return this;
-  }
+    @Override
+    public UnitType rebase() {
+        return this;
+    }
 }
