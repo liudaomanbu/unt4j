@@ -2,17 +2,16 @@ package org.caotc.unit4j.core;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.constant.UnitConstant;
-import org.caotc.unit4j.core.constant.UnitTypes;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.unit.BasePrefixUnit;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
-import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.Unit;
+import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitGroup;
+import org.caotc.unit4j.core.unit.UnitTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -44,12 +43,12 @@ class ConfigTest {
     Assertions.assertEquals(0,
         Prefix.DECA.convertFromStandardUnitConfig().ratio().compareTo(config.ratio()));
 
-    CompositeStandardUnit compositePrefixUnit1 = CompositeStandardUnit
+    Unit compositePrefixUnit1 = Unit
             .builder().componentToExponent(UnitConstant.KILOGRAM, 1)
             .componentToExponent(
                     BasePrefixUnit.create(Prefix.HECTO, UnitConstant.METER), 2)
             .componentToExponent(UnitConstant.SECOND, -3).build();
-    CompositeStandardUnit compositePrefixUnit2 = CompositeStandardUnit
+    Unit compositePrefixUnit2 = Unit
             .builder().componentToExponent(UnitConstant.GRAM, 1)
             .componentToExponent(UnitConstant.METER, 2)
             .componentToExponent(

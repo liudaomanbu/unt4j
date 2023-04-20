@@ -1,6 +1,6 @@
 package org.caotc.unit4j.core.unit.type;
 
-import org.caotc.unit4j.core.constant.UnitTypes;
+import org.caotc.unit4j.core.unit.UnitTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

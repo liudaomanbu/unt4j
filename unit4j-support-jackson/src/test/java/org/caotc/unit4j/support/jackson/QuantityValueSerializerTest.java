@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.constant.UnitConstant;
+import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.QuantityValueCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;

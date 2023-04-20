@@ -2,7 +2,6 @@ package org.caotc.unit4j.core.unit;
 
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.constant.UnitConstant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

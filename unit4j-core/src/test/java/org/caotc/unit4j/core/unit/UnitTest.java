@@ -2,8 +2,6 @@ package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.constant.UnitConstant;
-import org.caotc.unit4j.core.constant.UnitTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -51,10 +49,10 @@ class UnitTest {
 
   @Test
   void id() {
-    Unit unit = CompositeStandardUnit.builder()
-            .componentToExponent(UnitConstant.WATT.addPrefix(Prefix.CENTI), 2)
-            .componentToExponent(UnitConstant.NEWTON, 3).build()
-        .addPrefix(Prefix.HECTO);
-    log.info("id:{}", unit.id());
+//    Unit unit = CompositeStandardUnit.builder()
+//            .componentToExponent(UnitConstant.WATT.addPrefix(Prefix.CENTI), 2)
+//            .componentToExponent(UnitConstant.NEWTON, 3).build()
+//        .addPrefix(Prefix.HECTO);
+//    log.info("id:{}", unit.id());
   }
 }

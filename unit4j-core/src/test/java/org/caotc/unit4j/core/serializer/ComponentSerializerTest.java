@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.util.Util;
-import org.caotc.unit4j.core.constant.UnitTypes;
+import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Test;
 

@@ -21,7 +21,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.constant.UnitConstant;
+import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.QuantityValueCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;

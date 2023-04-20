@@ -1,16 +1,16 @@
 package org.caotc.unit4j.core.unit;
 
-import java.util.Optional;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.constant.UnitConstant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 class CompositePrefixUnitGroupTest {
 
   private UnitGroup timeUnitGroup = UnitGroup
-      .create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS,
-          Configuration.defaultInstance()::compare);
+          .create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS,
+                  Configuration.defaultInstance()::compare);
 
   @Test
   void previous() {

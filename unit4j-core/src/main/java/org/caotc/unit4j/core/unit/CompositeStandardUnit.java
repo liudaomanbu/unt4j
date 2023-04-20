@@ -3,6 +3,7 @@ package org.caotc.unit4j.core.unit;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Singular;
 import lombok.Value;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
+@lombok.Builder(builderMethodName = "builderInternal", access = AccessLevel.MODULE)
 public class CompositeStandardUnit extends StandardUnit {
 
   /**

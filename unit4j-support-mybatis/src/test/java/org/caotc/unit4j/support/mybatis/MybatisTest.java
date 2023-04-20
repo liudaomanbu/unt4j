@@ -25,7 +25,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.constant.UnitConstant;
+import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.support.mybatis.mapper.TestQuantityMapper;
 import org.caotc.unit4j.support.mybatis.model.TestAmountField;
 import org.caotc.unit4j.support.mybatis.model.TestQuantity;
