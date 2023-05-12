@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.unit.type;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.UnitConstant;
@@ -25,53 +26,17 @@ class CompositeUnitTypeTest {
     }
 
     @Test
-    void rebaseEquals() {
+    void rebase() {
         UnitType actual = CompositeStandardUnit
                 .builder().componentToExponent(UnitConstant.NEWTON, 1)
-              .componentToExponent(UnitConstant.METER, -2).build().type();
-    Assertions.assertTrue(UnitConstant.PASCAL.type().rebaseEquals(actual));
-  }
+                .componentToExponent(UnitConstant.METER, -2).build().type();
+        Assertions.assertEquals(UnitConstant.PASCAL.type().rebase(), actual.rebase());
+    }
 
-  @Test
-  void rebase() {
-      UnitType actual = CompositeStandardUnit
-              .builder().componentToExponent(UnitConstant.NEWTON, 1)
-              .componentToExponent(UnitConstant.METER, -2).build().type();
-    Assertions.assertEquals(UnitConstant.PASCAL.type().rebase(), actual.rebase());
-  }
-
-  @Test
-  void multiply() {
-      UnitType multiply = UnitTypes.FORCE_WEIGHT
-              .multiply(UnitTypes.ILLUMINANCE);
-      UnitType expected = CompositeUnitType.builder()
-              .componentToExponent(UnitTypes.MASS, 1)
-              .componentToExponent(UnitTypes.LENGTH, -1)
-              .componentToExponent(UnitTypes.TIME, -2)
-              .componentToExponent(UnitTypes.LUMINOUS_INTENSITY, 1)
-              .build();
-      Assertions.assertEquals(expected, multiply);
-  }
-
-  @Test
-  void divide() {
-      UnitType divide = UnitTypes.FORCE_WEIGHT.divide(UnitTypes.ILLUMINANCE);
-      UnitType expected = UnitType.builder()
-              .componentToExponent(UnitTypes.MASS, 1)
-              .componentToExponent(UnitTypes.LENGTH, 3)
-              .componentToExponent(UnitTypes.TIME, -2)
-              .componentToExponent(UnitTypes.LUMINOUS_INTENSITY, -1)
-              .build();
-      Assertions.assertEquals(expected, divide);
-  }
-
-  @Test
-  void inverse() {
-      UnitType inverse = UnitTypes.FORCE_WEIGHT.inverse();
-      UnitType expected = UnitType
-              .builder().componentToExponent(UnitTypes.MASS, -1)
-              .componentToExponent(UnitTypes.LENGTH, -1)
-              .componentToExponent(UnitTypes.TIME, 2).build();
-      Assertions.assertEquals(expected, inverse);
-  }
+    @Test
+    void validate() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new CompositeUnitType(ImmutableMap.of(UnitTypes.LENGTH, 1)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new CompositeUnitType(ImmutableMap.of(UnitTypes.FORCE_WEIGHT, 1)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new CompositeUnitType(ImmutableMap.<UnitType, Integer>builder().putAll(UnitTypes.FORCE_WEIGHT.componentToExponents()).put(UnitTypes.TEMPERATURE, 0).build()));
+    }
 }
