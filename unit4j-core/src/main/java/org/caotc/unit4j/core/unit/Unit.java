@@ -248,10 +248,15 @@ public abstract class Unit implements Identifiable, Component<Unit> {
             if (componentToExponents.size() == 1) {
                 Map.Entry<Unit, Integer> entry = Iterables.getOnlyElement(componentToExponents.entrySet());
                 if (entry.getValue() == 1) {
+                    Unit unit = entry.getKey();
                     if (!prefix.isEmpty()) {
-                        throw new IllegalStateException(String.format("unit:%s already has prefix,can not add prefix:%s", entry.getKey(), prefix));
+                        if (!unit.prefix().isEmpty()) {
+                            throw new IllegalStateException(String.format("unit:%s already has prefix,can not add prefix:%s", unit, prefix));
+                        }
+                        //todo cast?
+                        unit = ((StandardUnit) unit).addPrefix(prefix);
                     }
-                    return entry.getKey();
+                    return unit;
                 }
             }
             CompositeStandardUnit result = new CompositeStandardUnit(componentToExponents);

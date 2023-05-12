@@ -16,8 +16,12 @@
 
 package org.caotc.unit4j.core.unit;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
@@ -28,12 +32,20 @@ import org.caotc.unit4j.core.unit.type.UnitType;
  * @date 2019-05-27
  * @since 1.0.0
  */
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = false)
+@Getter
 public abstract class PrefixUnit extends Unit {
-
     /**
-     * 词头与单位的id分隔符
+     * 词头
      */
-    String DELIMITER = StringConstant.UNDERSCORE;
+    @NonNull
+    Prefix prefix;
+
+    protected PrefixUnit(@NonNull Prefix prefix) {
+        this.prefix = prefix;
+        Preconditions.checkArgument(!prefix().isEmpty());
+    }
 
     /**
      * 该词头单位的标准单位

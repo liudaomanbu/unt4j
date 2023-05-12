@@ -10,17 +10,24 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 class CompositeUnitTypeTest {
 
-  @Test
-  void id() {
-      String id = UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE.id();
-    log.debug("id:{}", id);
-    Assertions.assertEquals("(MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²", id);
-  }
+    @Test
+    void test() {
+        String toString = UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE.toString();
+        log.debug("toString:{}", toString);
+    }
 
-  @Test
-  void rebaseEquals() {
-      UnitType actual = CompositeStandardUnit
-              .builder().componentToExponent(UnitConstant.NEWTON, 1)
+
+    @Test
+    void id() {
+        String id = UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE.id();
+        log.debug("id:{}", id);
+        Assertions.assertEquals("(MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²", id);
+    }
+
+    @Test
+    void rebaseEquals() {
+        UnitType actual = CompositeStandardUnit
+                .builder().componentToExponent(UnitConstant.NEWTON, 1)
               .componentToExponent(UnitConstant.METER, -2).build().type();
     Assertions.assertTrue(UnitConstant.PASCAL.type().rebaseEquals(actual));
   }

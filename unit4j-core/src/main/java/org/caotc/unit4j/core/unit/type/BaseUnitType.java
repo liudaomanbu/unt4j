@@ -3,7 +3,9 @@ package org.caotc.unit4j.core.unit.type;
 import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
 
 /**
@@ -14,6 +16,8 @@ import lombok.Value;
  * @since 1.0.0
  **/
 @Value
+@ToString(callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor(access = AccessLevel.MODULE)
 public class BaseUnitType extends UnitType {
     @NonNull

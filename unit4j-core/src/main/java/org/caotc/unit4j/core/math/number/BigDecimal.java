@@ -1,14 +1,14 @@
 package org.caotc.unit4j.core.math.number;
 
 import com.google.common.annotations.Beta;
-import java.math.MathContext;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
-import lombok.experimental.FieldDefaults;
+
+import java.math.MathContext;
 
 /**
  * @author caotc
@@ -18,10 +18,9 @@ import lombok.experimental.FieldDefaults;
  * @apiNote
  * @since 1.0.0
  */
-@ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = false)
 @AllArgsConstructor(staticName = "valueOf")
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Beta
 public class BigDecimal extends AbstractNumber {
 

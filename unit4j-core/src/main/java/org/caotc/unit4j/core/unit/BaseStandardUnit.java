@@ -17,7 +17,9 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.unit.type.BaseUnitType;
 
@@ -35,6 +37,8 @@ import java.util.stream.Stream;
  * @since 1.0.0
  **/
 @Value
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = false)
 public class BaseStandardUnit extends StandardUnit {
 
     @NonNull
@@ -96,11 +100,14 @@ public class BaseStandardUnit extends StandardUnit {
 //        .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum))).build();
   }
 
-  @Override
-  public @NonNull CompositePrefixUnit multiply(@NonNull BasePrefixUnit multiplicand) {
-      return (CompositePrefixUnit) CompositePrefixUnit.builder().prefix(prefix())
-              .standardUnit(multiply(multiplicand.standardUnit())).build();
-  }
+    @Override
+    public @NonNull Unit multiply(@NonNull BasePrefixUnit multiplicand) {
+        if (multiplicand.standardUnit().equals(this)) {
+            //todo 是否都走下面逻辑
+            return Unit.builder().prefix(multiplicand.prefix()).componentToExponent(this, 2).build();
+        }
+        return Unit.builder().componentToExponent(this, 1).componentToExponent(multiplicand, 1).build();
+    }
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull CompositeStandardUnit multiplicand) {
@@ -121,7 +128,6 @@ public class BaseStandardUnit extends StandardUnit {
   }
 
   public @NonNull BasePrefixUnit addPrefix(@NonNull Prefix prefix) {
-      //todo cast remove
-      return (BasePrefixUnit) Unit.builder().prefix(prefix).standardUnit(this).build();
+      return new BasePrefixUnit(prefix, this);
   }
 }

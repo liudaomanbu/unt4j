@@ -232,8 +232,8 @@ public class UnitConstant {
     /**
      * 千克
      */
-    public static final BasePrefixUnit KILOGRAM = BasePrefixUnit
-            .create(Prefix.KILO, UnitConstant.GRAM);
+    public static final BasePrefixUnit KILOGRAM = GRAM.addPrefix(Prefix.KILO);
+
     /**
      * 牛顿 kg·m·s−2 力 重量
      */
@@ -322,12 +322,11 @@ public class UnitConstant {
     /**
      * 埃米 10−8m 不是国际制单位 Å
      */
-    public static final BasePrefixUnit ANGSTROM_METER = BasePrefixUnit.create(Prefix.ANGSTROM, METER);
+    public static final BasePrefixUnit ANGSTROM_METER = METER.addPrefix(Prefix.ANGSTROM);
     /**
      * 忽米 10−5m cmm
      */
-    public static final BasePrefixUnit CENTIMILLI_METER = BasePrefixUnit
-            .create(Prefix.CENTIMILLI, METER);
+    public static final BasePrefixUnit CENTIMILLI_METER = METER.addPrefix(Prefix.CENTIMILLI);
     /**
      * 弧度 m·m−1 平面角 球面度 m2·m−2 立体角
      */

@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Singular;
+import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.unit.type.UnitType;
@@ -23,6 +25,8 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 @Value
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = false)
 @lombok.Builder(builderMethodName = "builderInternal", access = AccessLevel.MODULE)
 public class CompositeStandardUnit extends StandardUnit {
 
@@ -114,8 +118,7 @@ public class CompositeStandardUnit extends StandardUnit {
 
   @Override
   public @NonNull CompositePrefixUnit addPrefix(@NonNull Prefix prefix) {
-    //todo remove
-    return (CompositePrefixUnit) CompositePrefixUnit.builder().prefix(prefix).standardUnit(this).build();
+      return new CompositePrefixUnit(prefix, this);
   }
 
   @Override

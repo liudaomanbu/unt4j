@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.BigDecimal;
-import org.caotc.unit4j.core.unit.BasePrefixUnit;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.Prefix;
@@ -45,14 +44,12 @@ class ConfigTest {
 
     Unit compositePrefixUnit1 = Unit
             .builder().componentToExponent(UnitConstant.KILOGRAM, 1)
-            .componentToExponent(
-                    BasePrefixUnit.create(Prefix.HECTO, UnitConstant.METER), 2)
+            .componentToExponent(UnitConstant.METER.addPrefix(Prefix.HECTO), 2)
             .componentToExponent(UnitConstant.SECOND, -3).build();
     Unit compositePrefixUnit2 = Unit
             .builder().componentToExponent(UnitConstant.GRAM, 1)
             .componentToExponent(UnitConstant.METER, 2)
-            .componentToExponent(
-                    BasePrefixUnit.create(Prefix.DECA, UnitConstant.SECOND), -3).build();
+            .componentToExponent(UnitConstant.SECOND.addPrefix(Prefix.DECA), -3).build();
     config = this.configuration.getConvertConfig(compositePrefixUnit1, compositePrefixUnit2);
     log.debug("{}", config);
     Assertions

@@ -43,7 +43,6 @@ import org.caotc.unit4j.core.math.number.Fraction;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
-import org.caotc.unit4j.core.unit.CompositeUnit;
 import org.caotc.unit4j.core.unit.Dimension;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.PrefixUnit;
@@ -602,7 +601,8 @@ public final class Configuration implements Identifiable {
                     target.prefix().convertToStandardUnitConfig());
         }
 
-        if (source instanceof CompositeUnit && target instanceof CompositeUnit) {
+        //todo 把这个变成Unit的方法?
+        if (source.componentToExponents().size() != 1 && target.componentToExponents().size() != 1) {
             CompositeStandardUnit sourceCompositeStandardUnit =
                     source instanceof CompositeStandardUnit ? (CompositeStandardUnit) source
                             : ((CompositePrefixUnit) source).standardUnit();

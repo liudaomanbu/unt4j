@@ -1,6 +1,9 @@
 package org.caotc.unit4j.core.common.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.unit.Prefix;
+import org.caotc.unit4j.core.unit.Unit;
+import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Assertions;
@@ -16,44 +19,44 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 class UtilTest {
 
-  @Test
-  void getSuperscript() {
+    @Test
+    void getSuperscript() {
 
-    String superscript = Util.getSuperscript(-1234567890);
-    log.info(superscript);
-    Assertions.assertEquals("⁻¹²³⁴⁵⁶⁷⁸⁹⁰", superscript);
-  }
+        String superscript = Util.getSuperscript(-1234567890);
+        log.info(superscript);
+        Assertions.assertEquals("⁻¹²³⁴⁵⁶⁷⁸⁹⁰", superscript);
+    }
 
-  @Test
-  void createCompositeId() {
-      String compositeId = Util
-              .createCompositeIdOrAlias(UnitTypes.PRESSURE_STRESS.componentToExponents());
-      log.info(compositeId);
-      Assertions.assertEquals("(MASS)¹(LENGTH)⁻¹(TIME)⁻²", compositeId);
-      UnitType compositeUnitType = UnitType
-              .builder().componentToExponent(UnitTypes.PRESSURE_STRESS, 2)
-              .componentToExponent(UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE, 3)
-              .build();
-      compositeId = Util
-              .createCompositeIdOrAlias(compositeUnitType.componentToExponents());
-      log.info(compositeId);
-      Assertions
-              .assertEquals("((MASS)¹(LENGTH)⁻¹(TIME)⁻²)²((MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²)³",
-                      compositeId);
-  }
+    @Test
+    void createCompositeId() {
+        String compositeId = Util
+                .createCompositeIdOrAlias(UnitTypes.PRESSURE_STRESS.componentToExponents());
+        log.info(compositeId);
+        Assertions.assertEquals("(MASS)¹(LENGTH)⁻¹(TIME)⁻²", compositeId);
+        UnitType compositeUnitType = UnitType
+                .builder().componentToExponent(UnitTypes.PRESSURE_STRESS, 2)
+                .componentToExponent(UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE, 3)
+                .build();
+        compositeId = Util
+                .createCompositeIdOrAlias(compositeUnitType.componentToExponents());
+        log.info(compositeId);
+        Assertions
+                .assertEquals("((MASS)¹(LENGTH)⁻¹(TIME)⁻²)²((MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²)³",
+                        compositeId);
+    }
 
-  @Test
-  void createCompositeAlias() {
-//    log.debug("NEWTON_ENGLISH_NAME ENGLISH_NAME:{}",
-//        Util.createCompositeAlias(UnitConstant.NEWTON_ENGLISH_NAME.unitComponentToExponents(),
-//            Configuration.defaultInstance(), Type.ENGLISH_NAME));
+    @Test
+    void createCompositeAlias() {
+        log.debug("NEWTON_ENGLISH_NAME ENGLISH_NAME:{}",
+                Util.createCompositeIdOrAlias(UnitConstant.NEWTON.componentToExponents()));
 
-//    Unit unit = CompositeStandardUnit.builder()
-//        .unitComponentToExponent(UnitConstant.WATT_ENGLISH_NAME.addPrefix(Prefix.CENTI_ENGLISH_NAME), 2)
-//        .unitComponentToExponent(UnitConstant.NEWTON_ENGLISH_NAME, 3).build()
-//        .addPrefix(Prefix.HECTO_ENGLISH_NAME);;
-//    Util.createCompositeAlias(unit.unitComponentToExponents(), Configuration.defaultInstance(),
-//        Type.ENGLISH_NAME);
-  }
+        Unit unit = Unit.builder()
+                .componentToExponent(UnitConstant.WATT.addPrefix(Prefix.CENTI), 2)
+                .componentToExponent(UnitConstant.NEWTON, 3)
+                .prefix(Prefix.HECTO)
+                .build();
+
+        Util.createCompositeIdOrAlias(unit.componentToExponents());
+    }
 
 }

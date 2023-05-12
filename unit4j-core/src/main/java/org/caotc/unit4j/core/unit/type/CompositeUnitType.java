@@ -2,8 +2,10 @@ package org.caotc.unit4j.core.unit.type;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Singular;
+import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.common.util.Util;
 
@@ -19,6 +21,8 @@ import java.util.Map.Entry;
  * @since 1.0.0
  **/
 @Value
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = false)
 public class CompositeUnitType extends UnitType {
     /**
      * 单位类型组件与对应指数

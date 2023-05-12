@@ -1,7 +1,8 @@
 package org.caotc.unit4j.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.unit.CompositeStandardUnit;
+import org.caotc.unit4j.core.unit.Prefix;
+import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitConstant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -54,9 +55,11 @@ class QuantityTest {
     Quantity result = quantity.multiply(multiplicand);
     log.debug("{}", result);
     Quantity expected = Quantity
-            .create(BigDecimal.valueOf(100), CompositeStandardUnit.builder()
-                    .componentToExponent(UnitConstant.GRAM, 2).build());
-    Assertions.assertEquals(0, configuration.compare(expected, result));
+            .create(BigDecimal.valueOf(100), Unit.builder()
+                    .prefix(Prefix.KILO)
+                    .componentToExponent(UnitConstant.GRAM, 2)
+                    .build());
+    Assertions.assertEquals(expected, result);
   }
 
   @Test

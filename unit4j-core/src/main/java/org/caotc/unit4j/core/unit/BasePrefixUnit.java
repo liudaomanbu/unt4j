@@ -17,35 +17,22 @@ import java.util.stream.Stream;
  */
 @Value
 public class BasePrefixUnit extends PrefixUnit {
-
-  /**
-   * 工厂方法
-   *
-   * @param prefix 词头
-   * @param baseStandardUnit 基本标准单位
-   * @return 有词头的基本单位
-   * @author caotc
-   * @date 2019-05-26
-   * @since 1.0.0
-   */
-  @NonNull
-  public static BasePrefixUnit create(@NonNull Prefix prefix,
-      @NonNull BaseStandardUnit baseStandardUnit) {
-    //todo cast remove
-    return (BasePrefixUnit) builder().prefix(prefix).standardUnit(baseStandardUnit).build();
-  }
-
-  /**
-   * 词头
-   */
-  @NonNull
-  Prefix prefix;
-
+//  /**
+//   * 词头
+//   */
+//  @NonNull
+//  Prefix prefix;
+//
   /**
    * 基本标准单位
    */
   @NonNull
   BaseStandardUnit standardUnit;
+
+  BasePrefixUnit(@NonNull Prefix prefix, @NonNull BaseStandardUnit standardUnit) {
+    super(prefix);
+    this.standardUnit = standardUnit;
+  }
 
   @Override
   public @NonNull BaseUnitType type() {
@@ -69,19 +56,18 @@ public class BasePrefixUnit extends PrefixUnit {
 
   @Override
   public @NonNull Unit inverse() {
-    return CompositePrefixUnit.builder().prefix(prefix.reciprocal())
-        .standardUnit(standardUnit().inverse()).build();
+    return CompositePrefixUnit.builder().prefix(prefix().reciprocal())
+            .standardUnit(standardUnit().inverse()).build();
   }
 
   @Override
-  public @NonNull CompositePrefixUnit multiply(@NonNull BaseStandardUnit multiplicand) {
+  public @NonNull Unit multiply(@NonNull BaseStandardUnit multiplicand) {
     return multiplicand.multiply(this);
   }
 
   @Override
-  public @NonNull CompositeStandardUnit multiply(@NonNull BasePrefixUnit multiplicand) {
-    //todo cast remove
-    return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
+  public @NonNull Unit multiply(@NonNull BasePrefixUnit multiplicand) {
+    return Unit.builder().componentToExponents(Stream.of(this, multiplicand)
             .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
   }
 
