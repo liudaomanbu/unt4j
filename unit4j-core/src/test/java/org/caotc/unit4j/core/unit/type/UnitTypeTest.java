@@ -11,13 +11,9 @@ import java.util.Random;
 class UnitTypeTest {
 
     @Test
-    void rebase() {
-    }
-
-    @Test
     void rebaseEquals() {
         Assertions.assertTrue(UnitTypes.LENGTH.rebaseEquals(UnitTypes.LENGTH));
-//        Assertions.assertTrue(UnitTypes.LENGTH.rebaseEquals(UnitTypes.FORCE_WEIGHT));todo
+        Assertions.assertTrue(UnitTypes.ENERGY_WORK_HEAT_QUANTITY.rebaseEquals(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH)));
     }
 
     @Test
