@@ -12,9 +12,7 @@ import lombok.experimental.NonFinal;
 import org.caotc.unit4j.core.Component;
 import org.caotc.unit4j.core.Identifiable;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * 单位类型接口
@@ -100,12 +98,44 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      */
     @NonNull
     public UnitType multiply(@NonNull UnitType multiplicand) {
-        ImmutableMap<UnitType, Integer> unitTypeToIndexMap = Stream
-                .of(this.componentToExponents(), multiplicand.componentToExponents())
-                .map(Map::entrySet)
-                .flatMap(Collection::stream)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
-        return builder().componentToExponents(unitTypeToIndexMap).build();
+        if (componentToExponents().isEmpty()) {
+            return multiplicand;
+        }
+        if (multiplicand.componentToExponents().isEmpty()) {
+            return this;
+        }
+        if (equals(multiplicand)) {
+            return builder().componentToExponent(this, 2).build();
+        }
+        if (componentToExponents().keySet().size() == 1 || multiplicand.componentToExponents().keySet().size() == 1) {
+            //(LENGTH)*(LENGTH)=(LENGTH)²
+            if (componentToExponents().keySet().equals(multiplicand.componentToExponents().keySet())) {
+                return builder()
+                        .componentToExponent(Iterables.getOnlyElement(componentToExponents().keySet()), Iterables.getOnlyElement(componentToExponents().values()) + Iterables.getOnlyElement(multiplicand.componentToExponents().values()))
+                        .build();
+            }
+            /*
+            处理如(FORCE_WEIGHT)*(FORCE_WEIGHT)⁻¹的情况.
+            FORCE_WEIGHT的componentToExponents不是(FORCE_WEIGHT)¹而是(MASS)¹(LENGTH)¹(TIME)⁻²
+            但是(FORCE_WEIGHT)⁻¹的componentToExponents是(FORCE_WEIGHT)⁻¹
+            这种情况需要把(MASS)¹(LENGTH)¹(TIME)⁻²视为(FORCE_WEIGHT)¹处理
+             */
+            if (componentToExponents().keySet().size() == 1 && componentToExponents().containsKey(multiplicand)) {
+                return builder()
+                        .componentToExponent(multiplicand, componentToExponents().get(multiplicand) + 1)
+                        .build();
+            }
+            if (multiplicand.componentToExponents().keySet().size() == 1 && multiplicand.componentToExponents().containsKey(this)) {
+                return builder()
+                        .componentToExponent(this, multiplicand.componentToExponents().get(this) + 1)
+                        .build();
+            }
+        }
+
+        return builder()
+                .componentToExponent(this, 1)
+                .componentToExponent(multiplicand, 1)
+                .build();
     }
 
     /**

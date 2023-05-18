@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Random;
 
@@ -30,16 +32,12 @@ class UnitTypeTest {
                 , UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1).componentToExponent(UnitTypes.MASS, value).build().inverse());
     }
 
-    @Test
-    void multiply() {
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, 2).build(), UnitTypes.LENGTH.multiply(UnitTypes.LENGTH));
-        Assertions.assertEquals(UnitTypes.NON, UnitTypes.LENGTH.multiply(UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build()));
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1)
-                .componentToExponent(UnitTypes.MASS, 1)
-                .build(), UnitTypes.LENGTH.multiply(UnitTypes.MASS));
-        int value = new Random().nextInt();
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1).componentToExponent(UnitTypes.MASS, value).build()
-                , UnitTypes.LENGTH.multiply(UnitType.builder().componentToExponent(UnitTypes.MASS, value).build()));
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#multiplyArguments")
+    void multiply(UnitType multiplier, UnitType multiplicand, UnitType product) {
+        UnitType result = multiplier.multiply(multiplicand);
+        log.debug("multiplier:{},multiplicand:{},result:{}", multiplier, multiplicand, result);
+        Assertions.assertEquals(product, result);
     }
 
     @Test

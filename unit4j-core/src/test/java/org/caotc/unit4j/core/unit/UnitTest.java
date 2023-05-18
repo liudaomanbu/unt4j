@@ -54,5 +54,6 @@ class UnitTest {
 //            .componentToExponent(UnitConstant.NEWTON, 3).build()
 //        .addPrefix(Prefix.HECTO);
 //    log.info("id:{}", unit.id());
+    log.info("id:{}", UnitConstant.JOULE.id());
   }
 }
