@@ -18,18 +18,12 @@ class UnitTypeTest {
         Assertions.assertTrue(UnitTypes.ENERGY_WORK_HEAT_QUANTITY.rebaseEquals(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH)));
     }
 
-    @Test
-    void inverse() {
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build(), UnitTypes.LENGTH.inverse());
-        Assertions.assertEquals(UnitTypes.NON, UnitTypes.NON.inverse());
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1)
-                .componentToExponent(UnitTypes.MASS, -1)
-                .build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1)
-                .componentToExponent(UnitTypes.MASS, 1)
-                .build().inverse());
-        int value = new Random().nextInt();
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).componentToExponent(UnitTypes.MASS, -value).build()
-                , UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1).componentToExponent(UnitTypes.MASS, value).build().inverse());
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#inverseAndResults")
+    void inverse(UnitType inverseBefore, UnitType inverseAfter) {
+        UnitType result = inverseBefore.inverse();
+        log.debug("inverseBefore:{},result:{}", inverseBefore, result);
+        Assertions.assertEquals(inverseAfter, result);
     }
 
     @ParameterizedTest

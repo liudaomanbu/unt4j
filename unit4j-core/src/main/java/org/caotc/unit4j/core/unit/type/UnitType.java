@@ -83,8 +83,14 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      */
     @NonNull
     public UnitType inverse() {
-        return builder().componentToExponents(
-                Maps.transformValues(componentToExponents(), exponent -> -exponent)).build();
+        if (componentToExponents().isEmpty()) {
+            return this;
+        }
+        //X倒数两次后结果仍然为X,更符合直觉.所以当(X)⁻¹倒数后结果为X
+        if (componentToExponents().size() == 1 && componentToExponents().containsValue(-1)) {
+            return Iterables.getOnlyElement(componentToExponents().keySet());
+        }
+        return builder().componentToExponent(this, -1).build();
     }
 
     /**
