@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Random;
-
 @Slf4j
 class UnitTypeTest {
 
@@ -19,11 +17,12 @@ class UnitTypeTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#inverseAndResults")
-    void inverse(UnitType inverseBefore, UnitType inverseAfter) {
-        UnitType result = inverseBefore.inverse();
-        log.debug("inverseBefore:{},result:{}", inverseBefore, result);
-        Assertions.assertEquals(inverseAfter, result);
+    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#originalAndInverseds")
+    void inverse(UnitType original, UnitType inversed) {
+        UnitType result = original.inverse();
+        log.debug("original:{},result:{}", original, result);
+        Assertions.assertEquals(inversed, result);
+        Assertions.assertEquals(original, result.inverse());
     }
 
     @ParameterizedTest
@@ -34,16 +33,12 @@ class UnitTypeTest {
         Assertions.assertEquals(product, result);
     }
 
-    @Test
-    void divide() {
-        Assertions.assertEquals(UnitTypes.NON, UnitTypes.LENGTH.divide(UnitTypes.LENGTH));
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, 2).build(), UnitTypes.LENGTH.divide(UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build()));
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1)
-                .componentToExponent(UnitTypes.MASS, -1)
-                .build(), UnitTypes.LENGTH.divide(UnitTypes.MASS));
-        int value = new Random().nextInt();
-        Assertions.assertEquals(UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1).componentToExponent(UnitTypes.MASS, -value).build()
-                , UnitTypes.LENGTH.divide(UnitType.builder().componentToExponent(UnitTypes.MASS, value).build()));
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#divideArguments")
+    void divide(UnitType dividend, UnitType divisor, UnitType quotient) {
+        UnitType result = dividend.divide(divisor);
+        log.debug("dividend:{},divisor:{},result:{}", dividend, divisor, result);
+        Assertions.assertEquals(quotient, result);
     }
 
 }

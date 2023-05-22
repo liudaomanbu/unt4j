@@ -23,4 +23,9 @@ class BaseUnitTypeTest {
     Assertions.assertEquals(UnitTypes.LENGTH, UnitTypes.LENGTH.rebase());
   }
 
+  @Test
+  void simplify() {
+    Assertions.assertEquals(UnitTypes.LENGTH, UnitTypes.LENGTH.simplify(true));
+    Assertions.assertEquals(UnitTypes.LENGTH, UnitTypes.LENGTH.simplify(false));
+  }
 }

@@ -1,4 +1,4 @@
-package org.caotc.unit4j.core.unit.type;
+package org.caotc.unit4j.core.unit;
 
 import lombok.Value;
 

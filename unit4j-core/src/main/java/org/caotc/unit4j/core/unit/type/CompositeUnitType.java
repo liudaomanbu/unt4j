@@ -54,6 +54,22 @@ public class CompositeUnitType extends UnitType {
                 .build();
     }
 
+    public UnitType simplify(boolean recursive) {
+        return builder().componentToExponents(componentToExponents().entrySet().stream()
+                        .map(entry -> {
+                            UnitType key = entry.getKey();
+                            if (recursive) {
+                                key = key.simplify(true);
+                            }
+                            return key.componentToExponents().entrySet().stream()
+                                    .collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue() * entry.getValue()));
+                        })
+                        .map(Map::entrySet)
+                        .flatMap(Collection::stream)
+                        .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
+                .build();
+    }
+
     private void validate() {
         if (componentToExponents().size() == 1 && Iterables.getOnlyElement(componentToExponents().values()) == 1) {
             throw new IllegalArgumentException(String.format("UnitType only and Exponent is 1.%s is not a CompositeUnitType", componentToExponents()));

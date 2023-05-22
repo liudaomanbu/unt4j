@@ -59,6 +59,8 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      */
     public abstract @NonNull UnitType rebase();
 
+    public abstract @NonNull UnitType simplify(boolean recursive);
+
     /**
      * 两个单位类型{@link #rebase()}后是否相等
      *
@@ -86,9 +88,13 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
         if (componentToExponents().isEmpty()) {
             return this;
         }
-        //X倒数两次后结果仍然为X,更符合直觉.所以当(X)⁻¹倒数后结果为X
-        if (componentToExponents().size() == 1 && componentToExponents().containsValue(-1)) {
-            return Iterables.getOnlyElement(componentToExponents().keySet());
+        /*
+            当只有一个组件时,将-1次方简化.
+            能满足X倒数两次后结果仍然为X,更符合直觉.
+         */
+        if (componentToExponents().size() == 1) {
+            Map.Entry<@NonNull UnitType, @NonNull Integer> entry = Iterables.getOnlyElement(componentToExponents().entrySet());
+            return builder().componentToExponent(entry.getKey(), -entry.getValue()).build();
         }
         return builder().componentToExponent(this, -1).build();
     }
@@ -181,12 +187,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
         }
 
         public Builder componentToExponents(@NonNull Map<? extends UnitType, ? extends Integer> componentToExponents) {
-            if (this.componentToExponents == null) {
-                this.componentToExponents = ImmutableMap.builder();
-            }
-
-            //过滤无意义的数据
-            this.componentToExponents.putAll(Maps.filterValues(componentToExponents, (exponent) -> exponent != 0));
+            componentToExponents.forEach(this::componentToExponent);
             return this;
         }
 
@@ -203,6 +204,18 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
                 if (entry.getValue() == 1) {
                     return entry.getKey();
                 }
+            }
+
+            //避免N变成(N)¹之类的无意义操作
+            if (componentToExponents.containsValue(1)) {
+                componentToExponents = componentToExponents.entrySet().stream()
+                        .map(entry -> {
+                            if (entry.getValue() != 1 || entry.getKey().componentToExponents().size() != 1) {
+                                return entry;
+                            }
+                            entry = Iterables.getOnlyElement(entry.getKey().componentToExponents().entrySet());
+                            return Maps.immutableEntry(entry.getKey(), entry.getValue());
+                        }).collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
             }
             return new CompositeUnitType(componentToExponents);
         }

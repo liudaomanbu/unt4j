@@ -7,6 +7,8 @@ import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
 class CompositeUnitTypeTest {
@@ -32,6 +34,14 @@ class CompositeUnitTypeTest {
                 .builder().componentToExponent(UnitConstant.NEWTON, 1)
                 .componentToExponent(UnitConstant.METER, -2).build().type();
         Assertions.assertEquals(UnitConstant.PASCAL.type().rebase(), actual.rebase());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#originalAndRecursiveAndSimplifieds")
+    void simplify(UnitType original, boolean recursive, UnitType simplified) {
+        UnitType result = original.simplify(recursive);
+        log.debug("original:{},recursive:{},result:{}", original, recursive, result);
+        Assertions.assertEquals(simplified, result);
     }
 
     @Test

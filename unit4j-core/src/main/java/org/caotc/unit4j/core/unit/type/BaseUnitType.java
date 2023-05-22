@@ -35,4 +35,9 @@ public class BaseUnitType extends UnitType {
         return this;
     }
 
+    @Override
+    public @NonNull UnitType simplify(boolean recursive) {
+        return this;
+    }
+
 }
