@@ -54,7 +54,7 @@ public class CompositeUnitType extends UnitType {
                 .build();
     }
 
-    public UnitType simplify(boolean recursive) {
+    public @NonNull UnitType simplify(boolean recursive) {
         return builder().componentToExponents(componentToExponents().entrySet().stream()
                         .map(entry -> {
                             UnitType key = entry.getKey();

@@ -25,7 +25,7 @@ class CompositeUnitTypeTest {
         String id = UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE.id();
         log.debug("id:{}", id);
         Assertions.assertEquals("(MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²", id);
-        log.debug("id:{}", UnitTypes.FORCE_WEIGHT.id());
+        log.debug("id:{}", UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH), -1).build().id());
     }
 
     @Test

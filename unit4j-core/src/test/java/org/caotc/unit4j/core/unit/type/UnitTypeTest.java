@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Map;
+
 @Slf4j
 class UnitTypeTest {
 
@@ -17,16 +19,24 @@ class UnitTypeTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#originalAndInverseds")
-    void inverse(UnitType original, UnitType inversed) {
-        UnitType result = original.inverse();
+    @MethodSource("org.caotc.unit4j.core.unit.type.Provider#originalAndInverseds")
+    void reciprocal(UnitType original, UnitType inversed) {
+        UnitType result = original.reciprocal();
         log.debug("original:{},result:{}", original, result);
         Assertions.assertEquals(inversed, result);
-        Assertions.assertEquals(original, result.inverse());
+        Assertions.assertEquals(original, result.reciprocal());
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#multiplyArguments")
+    @MethodSource("org.caotc.unit4j.core.unit.type.Provider#originalAndExponentAndPoweds")
+    void pow(UnitType original, int exponent, UnitType powed) {
+        UnitType result = original.pow(exponent);
+        log.debug("original:{},exponent:{},result:{}", original, exponent, result);
+        Assertions.assertEquals(powed, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.type.Provider#multiplyArguments")
     void multiply(UnitType multiplier, UnitType multiplicand, UnitType product) {
         UnitType result = multiplier.multiply(multiplicand);
         log.debug("multiplier:{},multiplicand:{},result:{}", multiplier, multiplicand, result);
@@ -34,11 +44,29 @@ class UnitTypeTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#divideArguments")
+    @MethodSource("org.caotc.unit4j.core.unit.type.Provider#divideArguments")
     void divide(UnitType dividend, UnitType divisor, UnitType quotient) {
         UnitType result = dividend.divide(divisor);
         log.debug("dividend:{},divisor:{},result:{}", dividend, divisor, result);
-        Assertions.assertEquals(quotient, result);
+        Assertions.assertEquals(quotient, result, String.format("%s!=%s", quotient.id(), result.id()));
     }
 
+    @Slf4j
+    static class BuilderTest {
+        @ParameterizedTest
+        @MethodSource("org.caotc.unit4j.core.unit.type.Provider#componentAndExponentAndUnitTypes")
+        void componentToExponent(UnitType component, int exponent, UnitType unitType) {
+            UnitType result = UnitType.builder().componentToExponent(component, exponent).build();
+            log.debug("component:{},exponent:{},result:{}", component, exponent, result);
+            Assertions.assertEquals(unitType, result, String.format("%s!=%s", unitType.id(), result.id()));
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.caotc.unit4j.core.unit.type.Provider#componentMapAndUnitTypes")
+        void build(Map<UnitType, Integer> componentMap, UnitType unitType) {
+            UnitType result = UnitType.builder().componentToExponents(componentMap).build();
+            log.debug("component:{},result:{}", componentMap, result);
+            Assertions.assertEquals(unitType, result, String.format("%s!=%s", unitType.id(), result.id()));
+        }
+    }
 }

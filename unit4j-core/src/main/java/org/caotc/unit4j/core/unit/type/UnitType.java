@@ -59,6 +59,10 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      */
     public abstract @NonNull UnitType rebase();
 
+    public @NonNull UnitType simplify() {
+        return simplify(true);
+    }
+
     public abstract @NonNull UnitType simplify(boolean recursive);
 
     /**
@@ -84,7 +88,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      * @since 1.0.0
      */
     @NonNull
-    public UnitType inverse() {
+    public UnitType reciprocal() {
         if (componentToExponents().isEmpty()) {
             return this;
         }
@@ -96,7 +100,12 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
             Map.Entry<@NonNull UnitType, @NonNull Integer> entry = Iterables.getOnlyElement(componentToExponents().entrySet());
             return builder().componentToExponent(entry.getKey(), -entry.getValue()).build();
         }
-        return builder().componentToExponent(this, -1).build();
+        return pow(-1);
+    }
+
+    @NonNull
+    public UnitType pow(int exponent) {
+        return UnitType.builder().componentToExponent(this, exponent).build();
     }
 
     /**
@@ -161,9 +170,10 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      */
     @NonNull
     public UnitType divide(@NonNull UnitType divisor) {
-        return multiply(divisor.inverse());
+        return multiply(divisor.reciprocal());
     }
 
+    @NonNull
     public Builder toBuilder() {
         return builder().componentToExponents(componentToExponents());
     }
@@ -175,12 +185,12 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
         ImmutableMap.Builder<UnitType, Integer> componentToExponents;
 
         public Builder componentToExponent(@NonNull UnitType key, int value) {
+            //过滤无意义的数据
+            if (value == 0 || key.componentToExponents().isEmpty()) {
+                return this;
+            }
             if (this.componentToExponents == null) {
                 this.componentToExponents = ImmutableMap.builder();
-            }
-            //过滤无意义的数据
-            if (value == 0) {
-                return this;
             }
             this.componentToExponents.put(key, value);
             return this;
@@ -206,7 +216,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
                 }
             }
 
-            //避免N变成(N)¹之类的无意义操作
+            //避免(N)¹变成((N)¹)¹之类的无意义操作
             if (componentToExponents.containsValue(1)) {
                 componentToExponents = componentToExponents.entrySet().stream()
                         .map(entry -> {
@@ -216,6 +226,12 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
                             entry = Iterables.getOnlyElement(entry.getKey().componentToExponents().entrySet());
                             return Maps.immutableEntry(entry.getKey(), entry.getValue());
                         }).collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
+                //上面同key合并操作后可能出现指数为0,需要过滤 todo 换成builder支持add方法自动合并?
+                if (componentToExponents.containsValue(0)) {
+                    componentToExponents = componentToExponents.entrySet().stream()
+                            .filter(entry -> entry.getValue() != 0)
+                            .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+                }
             }
             return new CompositeUnitType(componentToExponents);
         }
