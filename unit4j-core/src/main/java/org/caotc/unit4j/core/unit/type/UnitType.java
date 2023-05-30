@@ -39,6 +39,10 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
         return new Builder();
     }
 
+    public boolean isEmpty() {
+        return componentToExponents().isEmpty();
+    }
+
     /**
      * 获取组成该对象的单位类型组件与对应指数
      *
@@ -89,7 +93,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      */
     @NonNull
     public UnitType reciprocal() {
-        if (componentToExponents().isEmpty()) {
+        if (isEmpty()) {
             return this;
         }
         /*
@@ -119,10 +123,10 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
      */
     @NonNull
     public UnitType multiply(@NonNull UnitType multiplicand) {
-        if (componentToExponents().isEmpty()) {
+        if (isEmpty()) {
             return multiplicand;
         }
-        if (multiplicand.componentToExponents().isEmpty()) {
+        if (multiplicand.isEmpty()) {
             return this;
         }
         if (equals(multiplicand)) {
@@ -186,7 +190,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
 
         public Builder componentToExponent(@NonNull UnitType key, int value) {
             //过滤无意义的数据
-            if (value == 0 || key.componentToExponents().isEmpty()) {
+            if (value == 0 || key.isEmpty()) {
                 return this;
             }
             if (this.componentToExponents == null) {
@@ -226,12 +230,10 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
                             entry = Iterables.getOnlyElement(entry.getKey().componentToExponents().entrySet());
                             return Maps.immutableEntry(entry.getKey(), entry.getValue());
                         }).collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
-                //上面同key合并操作后可能出现指数为0,需要过滤 todo 换成builder支持add方法自动合并?
-                if (componentToExponents.containsValue(0)) {
-                    componentToExponents = componentToExponents.entrySet().stream()
-                            .filter(entry -> entry.getValue() != 0)
-                            .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-                }
+                //上面同key合并操作后可能出现指数为0,需要过滤
+                componentToExponents = componentToExponents.entrySet().stream()
+                        .filter(entry -> entry.getValue() != 0)
+                        .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
             }
             return new CompositeUnitType(componentToExponents);
         }

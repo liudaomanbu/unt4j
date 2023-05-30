@@ -37,7 +37,7 @@ class CompositeUnitTypeTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.unit.type.provider.Provider#originalAndRecursiveAndSimplifieds")
+    @MethodSource("org.caotc.unit4j.core.unit.type.Provider#originalAndRecursiveAndSimplifieds")
     void simplify(UnitType original, boolean recursive, UnitType simplified) {
         UnitType result = original.simplify(recursive);
         log.debug("original:{},recursive:{},result:{}", original, recursive, result);

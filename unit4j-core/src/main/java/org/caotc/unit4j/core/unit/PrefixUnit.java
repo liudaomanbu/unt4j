@@ -67,7 +67,7 @@ public abstract class PrefixUnit extends Unit {
     @Override
     @NonNull
     public ImmutableMap<Unit, Integer> componentToExponents() {
-        return standardUnit().componentToExponents();
+        return ImmutableMap.of(this, 1);
     }
 
     @Override

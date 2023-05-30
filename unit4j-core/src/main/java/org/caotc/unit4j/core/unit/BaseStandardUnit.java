@@ -58,35 +58,40 @@ public class BaseStandardUnit extends StandardUnit {
 
   private BaseStandardUnit(@NonNull String id,
       @NonNull BaseUnitType type) {
-    this.id = id;
-    this.type = type;
+      this.id = id;
+      this.type = type;
   }
 
-  @NonNull
-  @Override
-  public Unit rebase() {
-    return this;
-  }
+    @NonNull
+    @Override
+    public Unit rebase() {
+        return this;
+    }
 
-  @NonNull
-  @Override
-  public ImmutableMap<Unit, Integer> componentToExponents() {
-      return ImmutableMap.of(this, 1);
-  }
+    @Override
+    public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+        return this;
+    }
 
-  @NonNull
-  @Override
-  public StandardUnit power(int exponent) {
-      return exponent == 1 ? this
-              //todo cast remove
-              : (StandardUnit) CompositeStandardUnit.builder().componentToExponent(this, exponent).build();
-  }
+    @NonNull
+    @Override
+    public ImmutableMap<Unit, Integer> componentToExponents() {
+        return ImmutableMap.of(this, 1);
+    }
 
-  @Override
-  public @NonNull CompositeStandardUnit inverse() {
-      //todo cast remove
-      return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponent(this, -1).build();
-  }
+    @NonNull
+    @Override
+    public StandardUnit pow(int exponent) {
+        return exponent == 1 ? this
+                //todo cast remove
+                : (StandardUnit) CompositeStandardUnit.builder().componentToExponent(this, exponent).build();
+    }
+
+    @Override
+    public @NonNull CompositeStandardUnit reciprocal() {
+        //todo cast remove
+        return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponent(this, -1).build();
+    }
 
   @Override
   public @NonNull CompositeStandardUnit multiply(@NonNull BaseStandardUnit multiplicand) {

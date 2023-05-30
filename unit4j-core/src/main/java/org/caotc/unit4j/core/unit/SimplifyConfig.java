@@ -9,5 +9,8 @@ import lombok.Value;
  */
 @Value
 public class SimplifyConfig {
+    //todo prefixUnit (10³_GRAM)⁻¹->10⁻³_(GRAM)⁻¹?
     boolean prefixMerge;
+    boolean dimensionMerge;
+    boolean recursive;
 }

@@ -43,28 +43,34 @@ public class CompositePrefixUnit extends PrefixUnit {
     @NonNull
     @Override
     public CompositePrefixUnit rebase() {
-    //todo cast remove
-    return (CompositePrefixUnit) builder().prefix(prefix()).standardUnit(standardUnit().rebase()).build();
-  }
+        //todo cast remove
+        return (CompositePrefixUnit) builder().prefix(prefix()).standardUnit(standardUnit().rebase()).build();
+    }
 
-  /**
-   * 幂函数,返回<tt>(this<sup>n</sup>)</tt>
-   *
-   * @param exponent 指数
-   * @return <tt>this<sup>n</sup></tt>
-   * @author caotc
-   * @date 2019-01-11
-   * @since 1.0.0
-   */
-  @Override
-  @NonNull
-  public CompositePrefixUnit power(int exponent) {
-    //todo cast remove
-    return (CompositePrefixUnit) CompositePrefixUnit.builder()
-            .prefix(this.prefix().power(exponent))
-            .standardUnit(standardUnit().power(exponent))
-            .build();
-  }
+    @Override
+    public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+        throw new UnsupportedOperationException();
+//        return standardUnit().simplify(config);
+    }
+
+    /**
+     * 幂函数,返回<tt>(this<sup>n</sup>)</tt>
+     *
+     * @param exponent 指数
+     * @return <tt>this<sup>n</sup></tt>
+     * @author caotc
+     * @date 2019-01-11
+     * @since 1.0.0
+     */
+    @Override
+    @NonNull
+    public CompositePrefixUnit pow(int exponent) {
+        //todo cast remove
+        return (CompositePrefixUnit) CompositePrefixUnit.builder()
+                .prefix(this.prefix().power(exponent))
+                .standardUnit(standardUnit().pow(exponent))
+                .build();
+    }
 
   /**
    * 除法,{@code (this / divisor)}
@@ -77,15 +83,15 @@ public class CompositePrefixUnit extends PrefixUnit {
    */
   @NonNull
   public Unit divide(@NonNull CompositePrefixUnit divisor) {
-    return multiply(divisor.inverse());
+      return multiply(divisor.reciprocal());
   }
 
-  @Override
-  @NonNull
-  public CompositePrefixUnit inverse() {
-    //todo cast remove
-    return (CompositePrefixUnit) builder().prefix(this.prefix().reciprocal())
-            .standardUnit(standardUnit().inverse()).build();
+    @Override
+    @NonNull
+    public CompositePrefixUnit reciprocal() {
+        //todo cast remove
+        return (CompositePrefixUnit) builder().prefix(this.prefix().reciprocal())
+                .standardUnit(standardUnit().reciprocal()).build();
   }
 
   @Override

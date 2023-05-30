@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  */
 @Value
 public class BasePrefixUnit extends PrefixUnit {
-//  /**
+//  /**todo
 //   * 词头
 //   */
 //  @NonNull
@@ -45,19 +45,19 @@ public class BasePrefixUnit extends PrefixUnit {
   }
 
   @Override
-  public @NonNull ImmutableMap<Unit, Integer> componentToExponents() {
-      return ImmutableMap.of(standardUnit(), 1);
+  public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+    return this;
   }
 
   @Override
-  public @NonNull PrefixUnit power(int exponent) {
-    return standardUnit().power(exponent).addPrefix(prefix());
+  public @NonNull PrefixUnit pow(int exponent) {
+    return standardUnit().pow(exponent).addPrefix(prefix().power(exponent));
   }
 
   @Override
-  public @NonNull Unit inverse() {
+  public @NonNull Unit reciprocal() {
     return CompositePrefixUnit.builder().prefix(prefix().reciprocal())
-            .standardUnit(standardUnit().inverse()).build();
+            .standardUnit(standardUnit().reciprocal()).build();
   }
 
   @Override

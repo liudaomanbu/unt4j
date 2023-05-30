@@ -46,8 +46,7 @@ public class CompositeStandardUnit extends StandardUnit {
   public @NonNull UnitType type() {
     return UnitType.builder().componentToExponents(
                     componentToExponents().entrySet().stream()
-                            .collect(ImmutableMap
-                                    .toImmutableMap(entry -> entry.getKey().type(), Entry::getValue, Integer::sum)))
+                            .collect(ImmutableMap.toImmutableMap(entry -> entry.getKey().type(), Entry::getValue, Integer::sum)))
             .build();
   }
 
@@ -56,7 +55,7 @@ public class CompositeStandardUnit extends StandardUnit {
     //todo cast remove
     return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(
                     componentToExponents().entrySet().stream()
-                            .map(entry -> entry.getKey().rebase().power(entry.getValue()))
+                            .map(entry -> entry.getKey().rebase().pow(entry.getValue()))
                             .map(Unit::componentToExponents)
                             .map(Map::entrySet)
                             .flatMap(Collection::stream)
@@ -64,9 +63,28 @@ public class CompositeStandardUnit extends StandardUnit {
             .build();
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Override
-  public @NonNull CompositeStandardUnit power(int exponent) {
+  public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+    return builder().componentToExponents(
+                    componentToExponents().entrySet().stream()
+                            .map(entry -> {
+                              Unit unit = entry.getKey();
+                              if (config.recursive()) {
+                                unit = unit.simplify(config);
+                              } //todo merge
+                              Unit pow = unit.pow(entry.getValue());
+                              System.out.println("pow" + pow);
+                              return pow;
+                            })
+                            .map(Unit::componentToExponents)
+                            .map(Map::entrySet)
+                            .flatMap(Collection::stream)
+                            .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
+            .build();
+  }
+
+  @Override
+  public @NonNull CompositeStandardUnit pow(int exponent) {
     //todo cast remove
     return (CompositeStandardUnit) CompositeStandardUnit.builder()
             .componentToExponents(Maps.transformValues(componentToExponents, i -> i * exponent))
@@ -76,7 +94,7 @@ public class CompositeStandardUnit extends StandardUnit {
   @Override
   @SuppressWarnings("ConstantConditions")
   @NonNull
-  public CompositeStandardUnit inverse() {
+  public CompositeStandardUnit reciprocal() {
     //todo cast remove
     return (CompositeStandardUnit) builder().componentToExponents(
                     Maps.transformValues(componentToExponents(), exponent -> -exponent))

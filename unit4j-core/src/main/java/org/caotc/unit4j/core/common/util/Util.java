@@ -74,7 +74,6 @@ public class Util {
       return stringSupplierToExponents.entrySet().stream()
               .map(entry -> StringConstant.EMPTY_JOINER.join(StringConstant.HALF_WIDTH_LEFT_PARENTHESIS, entry.getKey().id(),
                       StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS, getSuperscript(entry.getValue())))
-//            .map(entry -> StringConstant.EMPTY_JOINER.join(entry.getKey().id(), getSuperscript(entry.getValue())))
               .collect(Collectors.joining());
   }
 }

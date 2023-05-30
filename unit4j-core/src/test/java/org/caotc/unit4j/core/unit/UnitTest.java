@@ -40,7 +40,7 @@ class UnitTest {
 
   @Test
   void pow() {
-    Unit pow = UnitConstant.GRAM.power(3);
+    Unit pow = UnitConstant.GRAM.pow(3);
     Assertions
         .assertEquals(
                 CompositeStandardUnit.builder().componentToExponent(UnitConstant.GRAM, 3)

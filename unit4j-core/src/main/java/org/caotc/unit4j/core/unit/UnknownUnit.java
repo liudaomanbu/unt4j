@@ -47,17 +47,22 @@ public class UnknownUnit extends Unit {
     }
 
     @Override
+    public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public @NonNull ImmutableMap<Unit, Integer> componentToExponents() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public @NonNull Unit power(int exponent) {
+    public @NonNull Unit pow(int exponent) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public @NonNull Unit inverse() {
+    public @NonNull Unit reciprocal() {
         throw new UnsupportedOperationException();
     }
 

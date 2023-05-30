@@ -167,6 +167,7 @@ public class Prefix implements Comparable<Prefix>, Identifiable {
 
   /**
    * 幂函数,<tt>(this<sup>n</sup>)</tt>
+   * todo name
    *
    * @param exponent 指数
    * @return <tt>this<sup>n</sup></tt>
