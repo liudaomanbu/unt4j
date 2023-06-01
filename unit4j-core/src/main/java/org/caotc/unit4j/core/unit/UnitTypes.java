@@ -71,9 +71,9 @@ public class UnitTypes {
      * 能量/功/热量
      */
     public static final UnitType ENERGY_WORK_HEAT_QUANTITY = UnitType.builder()
-            .componentToExponent(MASS, 1)
-            .componentToExponent(LENGTH, 2)
-            .componentToExponent(TIME, -2).build();
+            .componentToExponent(FORCE_WEIGHT, 1)
+            .componentToExponent(LENGTH, 1)
+            .build();
     /**
      * 功率/辐射通量
      */

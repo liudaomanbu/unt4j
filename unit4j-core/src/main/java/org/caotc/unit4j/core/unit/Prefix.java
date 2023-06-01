@@ -176,8 +176,8 @@ public class Prefix implements Comparable<Prefix>, Identifiable {
    * @since 1.0.0
    */
   @NonNull
-  public Prefix power(int exponent) {
-    return create(radix(), exponent() * exponent);
+  public Prefix pow(int exponent) {
+      return create(radix(), exponent() * exponent);
   }
 
   /**

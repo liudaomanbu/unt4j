@@ -238,9 +238,10 @@ public class UnitConstant {
      * 牛顿 kg·m·s−2 力 重量
      */
     public static final CompositeStandardUnit NEWTON = CompositeStandardUnit.builderInternal()
-            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
-                    UnitConstant.METER, 1)
-            .componentToExponent(UnitConstant.SECOND, -2).build();
+            .componentToExponent(UnitConstant.KILOGRAM, 1)
+            .componentToExponent(UnitConstant.METER, 1)
+            .componentToExponent(UnitConstant.SECOND, -2)
+            .build();
     /**
      * 帕斯卡 N/m2 kg·m−1·s−2 压强 应力
      */
@@ -252,33 +253,24 @@ public class UnitConstant {
      * 焦耳 N·m kg·m2·s−2 能量 功 热量
      */
     public static final CompositeStandardUnit JOULE = CompositeStandardUnit.builderInternal()
-            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
-                    UnitConstant.METER, 2)
-            .componentToExponent(UnitConstant.SECOND, -2).build();
+            .componentToExponent(UnitConstant.NEWTON, 1)
+            .componentToExponent(UnitConstant.METER, 1)
+            .build();
     /**
      * 瓦特 J/s kg·m2·s−3 功率 辐射通量
      */
     public static final CompositeStandardUnit WATT = CompositeStandardUnit.builderInternal()
-            .componentToExponent(UnitConstant.KILOGRAM, 1)
-            .componentToExponent(UnitConstant.METER, 2)
-            .componentToExponent(UnitConstant.SECOND, -3).build();
+            .componentToExponent(UnitConstant.JOULE, 1)
+            .componentToExponent(UnitConstant.SECOND, -1)
+            .build();
     /**
      * 伏特 W/A kg·m2·s−3·A−1 电压(电势差) 电动势
      */
     public static final CompositeStandardUnit VOLT = CompositeStandardUnit.builderInternal()
-            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
-                    UnitConstant.METER, 2)
-            .componentToExponent(UnitConstant.SECOND, -3)
-            .componentToExponent(UnitConstant.AMPERE, -1).build();
-    /**
-     * 法拉 C/V	kg−1·m−2·s4·A2 电容
-     */
-    public static final CompositeStandardUnit FARAD = CompositeStandardUnit.builderInternal()
-            .componentToExponent(UnitConstant.KILOGRAM, -1).componentToExponent(
-                    UnitConstant.METER, -2)
-            .componentToExponent(UnitConstant.SECOND, 4)
-            .componentToExponent(UnitConstant.AMPERE, 2)
+            .componentToExponent(UnitConstant.WATT, 1)
+            .componentToExponent(UnitConstant.AMPERE, -1)
             .build();
+
     /**
      * 欧姆 V/A	kg·m2·s−3·A−2 电阻、阻抗、电抗
      */
@@ -343,6 +335,15 @@ public class UnitConstant {
             .componentToExponent(UnitConstant.SECOND, 1)
             .componentToExponent(UnitConstant.AMPERE, 1)
             .build();
+
+    /**
+     * 法拉 C/V	kg−1·m−2·s4·A2 电容
+     */
+    public static final CompositeStandardUnit FARAD = CompositeStandardUnit.builderInternal()
+            .componentToExponent(COULOMB, 1)
+            .componentToExponent(VOLT, -1)
+            .build();
+
     /**
      * 流明 cd·sr	cd 光通量
      */

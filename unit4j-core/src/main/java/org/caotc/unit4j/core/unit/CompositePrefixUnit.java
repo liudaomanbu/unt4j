@@ -53,25 +53,6 @@ public class CompositePrefixUnit extends PrefixUnit {
 //        return standardUnit().simplify(config);
     }
 
-    /**
-     * 幂函数,返回<tt>(this<sup>n</sup>)</tt>
-     *
-     * @param exponent 指数
-     * @return <tt>this<sup>n</sup></tt>
-     * @author caotc
-     * @date 2019-01-11
-     * @since 1.0.0
-     */
-    @Override
-    @NonNull
-    public CompositePrefixUnit pow(int exponent) {
-        //todo cast remove
-        return (CompositePrefixUnit) CompositePrefixUnit.builder()
-                .prefix(this.prefix().power(exponent))
-                .standardUnit(standardUnit().pow(exponent))
-                .build();
-    }
-
   /**
    * 除法,{@code (this / divisor)}
    *

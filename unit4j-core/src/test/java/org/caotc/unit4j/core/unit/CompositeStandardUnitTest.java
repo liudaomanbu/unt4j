@@ -18,10 +18,10 @@ class CompositeStandardUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.unit.Provider#originalAndRecursiveAndSimplifieds")
-    void simplify(Unit original, boolean recursive, Unit simplified) {
-        Unit result = original.simplify(new SimplifyConfig(true, true, recursive));
-        log.debug("original:{},recursive:{},result:{}", original, recursive, result);
+    @MethodSource("org.caotc.unit4j.core.unit.Provider#originalAndSimplifyConfigAndSimplifieds")
+    void simplify(Unit original, SimplifyConfig simplifyConfig, Unit simplified) {
+        Unit result = original.simplify(simplifyConfig);
+        log.debug("original:{},simplifyConfig:{},result:{}", original.id(), simplifyConfig, result.id());
         Assertions.assertEquals(simplified, result, String.format("%s!=%s", simplified.id(), result.id()));
     }
 

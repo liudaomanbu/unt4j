@@ -69,25 +69,22 @@ public class CompositeStandardUnit extends StandardUnit {
                     componentToExponents().entrySet().stream()
                             .map(entry -> {
                               Unit unit = entry.getKey();
+                              Unit.Builder builder = builder();
                               if (config.recursive()) {
                                 unit = unit.simplify(config);
                               } //todo merge
-                              Unit pow = unit.pow(entry.getValue());
-                              System.out.println("pow" + pow);
-                              return pow;
+                              if (config.prefixUnit() && !unit.prefix().isEmpty()) {
+                                builder.prefix(unit.prefix().pow(entry.getValue()));
+                                unit = ((PrefixUnit) unit).standardUnit();
+                              }
+                              return builder
+                                      .componentToExponents(Maps.transformValues(unit.componentToExponents(), i -> i * entry.getValue()))
+                                      .build();
                             })
                             .map(Unit::componentToExponents)
                             .map(Map::entrySet)
                             .flatMap(Collection::stream)
                             .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
-            .build();
-  }
-
-  @Override
-  public @NonNull CompositeStandardUnit pow(int exponent) {
-    //todo cast remove
-    return (CompositeStandardUnit) CompositeStandardUnit.builder()
-            .componentToExponents(Maps.transformValues(componentToExponents, i -> i * exponent))
             .build();
   }
 

@@ -79,14 +79,6 @@ public class BaseStandardUnit extends StandardUnit {
         return ImmutableMap.of(this, 1);
     }
 
-    @NonNull
-    @Override
-    public StandardUnit pow(int exponent) {
-        return exponent == 1 ? this
-                //todo cast remove
-                : (StandardUnit) CompositeStandardUnit.builder().componentToExponent(this, exponent).build();
-    }
-
     @Override
     public @NonNull CompositeStandardUnit reciprocal() {
         //todo cast remove

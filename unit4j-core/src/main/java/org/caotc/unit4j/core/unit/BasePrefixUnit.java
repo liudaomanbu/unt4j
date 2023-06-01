@@ -50,11 +50,6 @@ public class BasePrefixUnit extends PrefixUnit {
   }
 
   @Override
-  public @NonNull PrefixUnit pow(int exponent) {
-    return standardUnit().pow(exponent).addPrefix(prefix().power(exponent));
-  }
-
-  @Override
   public @NonNull Unit reciprocal() {
     return CompositePrefixUnit.builder().prefix(prefix().reciprocal())
             .standardUnit(standardUnit().reciprocal()).build();

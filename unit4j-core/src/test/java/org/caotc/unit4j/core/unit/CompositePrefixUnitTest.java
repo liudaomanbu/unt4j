@@ -30,25 +30,6 @@ class CompositePrefixUnitTest {
   }
 
   @Test
-  void pow() {
-      Unit actual = UnitConstant.NEWTON.pow(3);
-      Unit expected = CompositeStandardUnit.builder()
-              .componentToExponent(UnitConstant.KILOGRAM, 3)
-              .componentToExponent(UnitConstant.METER, 3)
-              .componentToExponent(UnitConstant.SECOND, -6)
-              .build();
-      Assertions.assertEquals(expected, actual);
-
-      actual = UnitConstant.NEWTON.pow(-3);
-      expected = CompositeStandardUnit.builder()
-              .componentToExponent(UnitConstant.KILOGRAM, -3)
-              .componentToExponent(UnitConstant.METER, -3)
-              .componentToExponent(UnitConstant.SECOND, 6)
-              .build();
-    Assertions.assertEquals(expected, actual);
-  }
-
-  @Test
   void divide() {
       Unit actual = UnitConstant.PASCAL.divide(UnitConstant.NEWTON);
       Unit expected = CompositeStandardUnit.builder()

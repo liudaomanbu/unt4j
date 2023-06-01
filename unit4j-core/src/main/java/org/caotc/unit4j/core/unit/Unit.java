@@ -67,7 +67,7 @@ public abstract class Unit implements Identifiable, Component<Unit> {
     public abstract Unit rebase();
 
     public @NonNull Unit simplify() {
-        return simplify(new SimplifyConfig(true, true, true));
+        return simplify(new SimplifyConfig(true, true, true, true));
     }
 
     public abstract @NonNull Unit simplify(@NonNull SimplifyConfig config);
@@ -100,7 +100,9 @@ public abstract class Unit implements Identifiable, Component<Unit> {
      * @since 1.0.0
      */
     @NonNull
-    public abstract Unit pow(int exponent);
+    public Unit pow(int exponent) {
+        return Unit.builder().componentToExponent(this, exponent).build();
+    }
 
     /**
      * 倒转
