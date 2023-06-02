@@ -11,16 +11,6 @@ class CompositePrefixUnitTest {
   Configuration configuration = Configuration.defaultInstance();
 
   @Test
-  void multiplyUnitComponent() {
-    Unit result = UnitConstant.NEWTON
-        .multiply(
-            CompositeStandardUnit.builder().componentToExponent(UnitConstant.METER, -2)
-                .build());
-    log.debug("expected:{},actual:{}", UnitConstant.PASCAL, result);
-    Assertions.assertEquals(UnitConstant.PASCAL, result);
-  }
-
-  @Test
   void rebase() {
       Unit actual = CompositeStandardUnit
               .builder().componentToExponent(UnitConstant.NEWTON, 1)
@@ -31,11 +21,6 @@ class CompositePrefixUnitTest {
 
   @Test
   void divide() {
-      Unit actual = UnitConstant.PASCAL.divide(UnitConstant.NEWTON);
-      Unit expected = CompositeStandardUnit.builder()
-              .componentToExponent(UnitConstant.METER, -2).build();
-    Assertions.assertEquals(expected, actual);
-
       Unit pascalOther = CompositeStandardUnit
               .builder().componentToExponent(UnitConstant.NEWTON, 1)
               .componentToExponent(UnitConstant.METER, -2).build();
@@ -47,9 +32,7 @@ class CompositePrefixUnitTest {
   void inverse() {
       Unit actual = UnitConstant.NEWTON.reciprocal();
       Unit expected = CompositeStandardUnit.builder()
-              .componentToExponent(UnitConstant.KILOGRAM, -1)
-              .componentToExponent(UnitConstant.METER, -1)
-              .componentToExponent(UnitConstant.SECOND, 2)
+              .componentToExponent(UnitConstant.NEWTON, -1)
               .build();
       Assertions.assertEquals(expected, actual);
   }

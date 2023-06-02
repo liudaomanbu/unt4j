@@ -246,9 +246,10 @@ public class UnitConstant {
      * 帕斯卡 N/m2 kg·m−1·s−2 压强 应力
      */
     public static final CompositeStandardUnit PASCAL = CompositeStandardUnit.builderInternal()
-            .componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(
-                    UnitConstant.METER, -1)
-            .componentToExponent(UnitConstant.SECOND, -2).build();
+            .componentToExponent(UnitConstant.KILOGRAM, 1)
+            .componentToExponent(UnitConstant.METER, -1)
+            .componentToExponent(UnitConstant.SECOND, -2)
+            .build();
     /**
      * 焦耳 N·m kg·m2·s−2 能量 功 热量
      */

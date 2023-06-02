@@ -19,7 +19,7 @@ public class Provider {
 
     static Stream<Arguments> allEqualedOriginalAndSimplifieds() {
         Random random = new Random();
-        int exponent = random.nextInt(10000);
+        int exponent = random.nextInt();
         return Stream.of(
                 Arguments.of(UnitConstant.NON, UnitConstant.NON),
                 Arguments.of(UnitConstant.METER, UnitConstant.METER),
@@ -33,7 +33,7 @@ public class Provider {
 
     static Stream<Arguments> recursiveEqualedOriginalAndPrefixUnitAndSimplifieds() {
         Random random = new Random();
-        int exponent = random.nextInt(10000);
+        int exponent = random.nextInt();
         return Stream.of(
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build(), true, Unit.builder().componentToExponent(Unit.builder().prefix(Prefix.KILO.pow(-1)).componentToExponent(UnitConstant.GRAM, -1).build(), 1).build()),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build(), false, Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build()),
@@ -44,7 +44,7 @@ public class Provider {
 
     static Stream<Arguments> prefixUnitEqualedOriginalAndRecursiveAndSimplifieds() {
         Random random = new Random();
-        int exponent = random.nextInt(10000);
+        int exponent = random.nextInt();
         return Stream.of(
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, -1).build(), true, Unit.builder().componentToExponent(UnitConstant.KILOGRAM, 1).componentToExponent(UnitConstant.METER, 2).componentToExponent(UnitConstant.SECOND, -4).componentToExponent(UnitConstant.AMPERE, -2).build()),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, -1).build(), false, Unit.builder().componentToExponent(UnitConstant.COULOMB, -1).componentToExponent(UnitConstant.VOLT, 1).build())
@@ -53,8 +53,9 @@ public class Provider {
 
     static Stream<Arguments> originalAndSimplifyConfigAndSimplifieds() {
         Random random = new Random();
-        int exponent = random.nextInt(10000);
-        return Streams.concat(allEqualedOriginalAndSimplifieds()
+        int exponent = random.nextInt();
+        return Streams.concat(
+                allEqualedOriginalAndSimplifieds()
                         .flatMap(arguments -> Stream.of(Arguments.of(arguments.get()[0], new SimplifyConfig(true, true, true, true), arguments.get()[1]),
                                 Arguments.of(arguments.get()[0], new SimplifyConfig(true, true, true, false), arguments.get()[1]),
                                 Arguments.of(arguments.get()[0], new SimplifyConfig(true, true, false, true), arguments.get()[1]),
@@ -70,13 +71,13 @@ public class Provider {
                         )),
                 Stream.of(
                         Arguments.of(UnitConstant.FARAD, new SimplifyConfig(true, true, true, true), Unit.builder().componentToExponent(Unit.builder().prefix(Prefix.KILO.pow(-1)).componentToExponent(UnitConstant.GRAM, -1).build(), 1).componentToExponent(UnitConstant.METER, -2).componentToExponent(UnitConstant.SECOND, 4).componentToExponent(UnitConstant.AMPERE, 2).build()),
-                        Arguments.of(UnitConstant.FARAD, new SimplifyConfig(true, true, true, false), UnitConstant.FARAD),
+                        Arguments.of(UnitConstant.FARAD, new SimplifyConfig(true, true, true, false), Unit.builder().componentToExponent(UnitConstant.WATT, -1).componentToExponent(UnitConstant.SECOND, 1).componentToExponent(UnitConstant.AMPERE, 2).build()),
                         Arguments.of(UnitConstant.FARAD, new SimplifyConfig(true, true, false, true), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).componentToExponent(UnitConstant.METER, -2).componentToExponent(UnitConstant.SECOND, 4).componentToExponent(UnitConstant.AMPERE, 2).build()),
-                        Arguments.of(UnitConstant.FARAD, new SimplifyConfig(true, true, false, false), UnitConstant.FARAD),
+                        Arguments.of(UnitConstant.FARAD, new SimplifyConfig(true, true, false, false), Unit.builder().componentToExponent(UnitConstant.WATT, -1).componentToExponent(UnitConstant.SECOND, 1).componentToExponent(UnitConstant.AMPERE, 2).build()),
                         Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, exponent).build(), new SimplifyConfig(true, true, true, true), Unit.builder().componentToExponent(Unit.builder().prefix(Prefix.KILO.pow(-exponent)).componentToExponent(UnitConstant.GRAM, -exponent).build(), 1).componentToExponent(UnitConstant.METER, -2 * exponent).componentToExponent(UnitConstant.SECOND, 4 * exponent).componentToExponent(UnitConstant.AMPERE, 2 * exponent).build()),
                         Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, exponent).build(), new SimplifyConfig(true, true, true, false), Unit.builder().componentToExponent(UnitConstant.COULOMB, exponent).componentToExponent(UnitConstant.VOLT, -exponent).build()),
-                        Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, exponent).build(), new SimplifyConfig(true, true, true, true), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -exponent).componentToExponent(UnitConstant.METER, -2 * exponent).componentToExponent(UnitConstant.SECOND, 4 * exponent).componentToExponent(UnitConstant.AMPERE, 2 * exponent).build()),
-                        Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, exponent).build(), new SimplifyConfig(true, true, true, false), Unit.builder().componentToExponent(UnitConstant.COULOMB, exponent).componentToExponent(UnitConstant.VOLT, -exponent).build())
+                        Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, exponent).build(), new SimplifyConfig(true, true, false, true), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -exponent).componentToExponent(UnitConstant.METER, -2 * exponent).componentToExponent(UnitConstant.SECOND, 4 * exponent).componentToExponent(UnitConstant.AMPERE, 2 * exponent).build()),
+                        Arguments.of(Unit.builder().componentToExponent(UnitConstant.FARAD, exponent).build(), new SimplifyConfig(true, true, false, false), Unit.builder().componentToExponent(UnitConstant.COULOMB, exponent).componentToExponent(UnitConstant.VOLT, -exponent).build())
                 ));
     }
 }

@@ -1,7 +1,6 @@
 package org.caotc.unit4j.core.unit.type;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +24,11 @@ public class Provider {
         return Stream.of(
                 Arguments.of(UnitTypes.NON, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build()),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -1).build()),
+                Arguments.of(UnitTypes.CAPACITANCE, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build()),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build(), UnitTypes.LENGTH),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -1).build(), UnitTypes.ENERGY_WORK_HEAT_QUANTITY),
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build(), UnitTypes.CAPACITANCE),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, -exponent).build()),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -exponent).build())
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -exponent).build())
         );
     }
 
@@ -39,16 +38,16 @@ public class Provider {
         return Stream.of(
                 Arguments.of(UnitTypes.NON, 0, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, 0, UnitTypes.NON),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, 0, UnitTypes.NON),
+                Arguments.of(UnitTypes.CAPACITANCE, 0, UnitTypes.NON),
                 Arguments.of(UnitTypes.NON, 1, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, 1, UnitTypes.LENGTH),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, 1, UnitTypes.ENERGY_WORK_HEAT_QUANTITY),
+                Arguments.of(UnitTypes.CAPACITANCE, 1, UnitTypes.CAPACITANCE),
                 Arguments.of(UnitTypes.NON, -1, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, -1, UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build()),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -1, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -1).build()),
+                Arguments.of(UnitTypes.CAPACITANCE, -1, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build()),
                 Arguments.of(UnitTypes.NON, exponent, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, exponent, UnitType.builder().componentToExponent(UnitTypes.LENGTH, exponent).build()),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, exponent, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, exponent).build())
+                Arguments.of(UnitTypes.CAPACITANCE, exponent, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, exponent).build())
         );
     }
 
@@ -57,18 +56,18 @@ public class Provider {
         int exponent = random.nextInt();
         return Stream.of(
                 Arguments.of(UnitTypes.NON, UnitTypes.LENGTH, UnitTypes.LENGTH),
-                Arguments.of(UnitTypes.NON, UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitTypes.ENERGY_WORK_HEAT_QUANTITY),
+                Arguments.of(UnitTypes.NON, UnitTypes.CAPACITANCE, UnitTypes.CAPACITANCE),
                 Arguments.of(UnitTypes.NON, UnitTypes.NON, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, UnitTypes.LENGTH, UnitType.builder().componentToExponent(UnitTypes.LENGTH, 2).build()),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, 2).build()),
+                Arguments.of(UnitTypes.CAPACITANCE, UnitTypes.CAPACITANCE, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, 2).build()),
                 Arguments.of(UnitTypes.LENGTH, UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build(), UnitTypes.NON),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -1).build(), UnitTypes.NON),
+                Arguments.of(UnitTypes.CAPACITANCE, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build(), UnitTypes.NON),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, -exponent).build(), UnitTypes.NON),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -exponent).build(), UnitTypes.NON),
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -exponent).build(), UnitTypes.NON),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, Math.abs(exponent)).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, -Math.abs(exponent) + 1).build(), UnitTypes.LENGTH),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, Math.abs(exponent)).build(), UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -Math.abs(exponent) + 1).build(), UnitTypes.ENERGY_WORK_HEAT_QUANTITY),
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, Math.abs(exponent)).build(), UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -Math.abs(exponent) + 1).build(), UnitTypes.CAPACITANCE),
                 Arguments.of(UnitTypes.LENGTH, UnitType.builder().componentToExponent(UnitTypes.LENGTH, Math.abs(exponent)).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, Math.abs(exponent) + 1).build()),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, Math.abs(exponent)).build(), UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, Math.abs(exponent) + 1).build()),
+                Arguments.of(UnitTypes.CAPACITANCE, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, Math.abs(exponent)).build(), UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, Math.abs(exponent) + 1).build()),
                 Arguments.of(UnitTypes.LENGTH, UnitTypes.FORCE_WEIGHT, UnitType.builder().componentToExponent(UnitTypes.LENGTH, 1).componentToExponent(UnitTypes.FORCE_WEIGHT, 1).build())
         );
     }
@@ -86,18 +85,18 @@ public class Provider {
         int exponent = random.nextInt();
         return Stream.of(
                 Arguments.of(UnitTypes.LENGTH, UnitTypes.LENGTH, UnitTypes.NON),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitTypes.NON),
+                Arguments.of(UnitTypes.CAPACITANCE, UnitTypes.CAPACITANCE, UnitTypes.NON),
                 Arguments.of(UnitTypes.NON, UnitTypes.NON, UnitTypes.NON),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, 2).build(), UnitTypes.LENGTH, UnitTypes.LENGTH),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, 2).build(), UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitTypes.ENERGY_WORK_HEAT_QUANTITY),
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, 2).build(), UnitTypes.CAPACITANCE, UnitTypes.CAPACITANCE),
                 Arguments.of(UnitTypes.NON, UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build(), UnitTypes.LENGTH),
-                Arguments.of(UnitTypes.NON, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -1).build(), UnitTypes.ENERGY_WORK_HEAT_QUANTITY),
+                Arguments.of(UnitTypes.NON, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build(), UnitTypes.CAPACITANCE),
                 Arguments.of(UnitTypes.NON, UnitType.builder().componentToExponent(UnitTypes.LENGTH, -exponent).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, exponent).build()),
-                Arguments.of(UnitTypes.NON, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -exponent).build(), UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, exponent).build()),
+                Arguments.of(UnitTypes.NON, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -exponent).build(), UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, exponent).build()),
                 Arguments.of(UnitTypes.LENGTH, UnitType.builder().componentToExponent(UnitTypes.LENGTH, -Math.abs(exponent) + 1).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, Math.abs(exponent)).build()),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -Math.abs(exponent) + 1).build(), UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, Math.abs(exponent)).build()),
+                Arguments.of(UnitTypes.CAPACITANCE, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -Math.abs(exponent) + 1).build(), UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, Math.abs(exponent)).build()),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, Math.abs(exponent) + 1).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, Math.abs(exponent)).build(), UnitTypes.LENGTH),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, Math.abs(exponent) + 1).build(), UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, Math.abs(exponent)).build(), UnitTypes.ENERGY_WORK_HEAT_QUANTITY)
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, Math.abs(exponent) + 1).build(), UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, Math.abs(exponent)).build(), UnitTypes.CAPACITANCE)
         );
     }
 
@@ -117,12 +116,13 @@ public class Provider {
         return Stream.of(
                 Arguments.of(UnitTypes.NON, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, UnitTypes.LENGTH),
-                Arguments.of(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, UnitTypes.ENERGY_WORK_HEAT_QUANTITY),
-                Arguments.of(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH), UnitType.builder().componentToExponent(UnitTypes.MASS, 1).componentToExponent(UnitTypes.LENGTH, 2).componentToExponent(UnitTypes.TIME, -2).build()),
+                Arguments.of(UnitTypes.FORCE_WEIGHT, UnitTypes.FORCE_WEIGHT),
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.NON, -1).build(), UnitTypes.NON),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build()),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, -1).build(), UnitType.builder().componentToExponents(Maps.transformValues(UnitTypes.ENERGY_WORK_HEAT_QUANTITY.componentToExponents(), value -> -value)).build()),
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT, -1).build(), UnitType.builder().componentToExponent(UnitTypes.MASS, -1).componentToExponent(UnitTypes.LENGTH, -1).componentToExponent(UnitTypes.TIME, 2).build()),
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.NON, exponent).build(), UnitTypes.NON),
                 Arguments.of(UnitType.builder().componentToExponent(UnitTypes.LENGTH, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.LENGTH, exponent).build()),
-                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.ENERGY_WORK_HEAT_QUANTITY, exponent).build(), UnitType.builder().componentToExponents(Maps.transformValues(UnitTypes.ENERGY_WORK_HEAT_QUANTITY.componentToExponents(), value -> value * exponent)).build())
+                Arguments.of(UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT, exponent).build(), UnitType.builder().componentToExponent(UnitTypes.MASS, exponent).componentToExponent(UnitTypes.LENGTH, exponent).componentToExponent(UnitTypes.TIME, -2 * exponent).build())
         );
     }
 
@@ -130,12 +130,15 @@ public class Provider {
         Random random = new Random();
         int exponent = random.nextInt();
         return Stream.concat(recursiveEqualedOriginalAndSimplifieds()
-                        .flatMap(arguments -> Stream.of(Arguments.of(arguments.get()[0], true, arguments.get()[1]), Arguments.of(arguments.get()[0], false, arguments.get()[1]))),
+                        .flatMap(arguments -> Stream.of(Arguments.of(arguments.get()[0], true, arguments.get()[1]),
+                                Arguments.of(arguments.get()[0], false, arguments.get()[1]))),
                 Stream.of(
-                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH), -1).build(), true, UnitType.builder().componentToExponent(UnitTypes.MASS, -1).componentToExponent(UnitTypes.LENGTH, -2).componentToExponent(UnitTypes.TIME, 2).build()),
-                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH), -1).build(), false, UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT, -1).componentToExponent(UnitTypes.LENGTH, -1).build()),
-                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH), exponent).build(), true, UnitType.builder().componentToExponent(UnitTypes.MASS, exponent).componentToExponent(UnitTypes.LENGTH, 2 * exponent).componentToExponent(UnitTypes.TIME, -2 * exponent).build()),
-                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT.multiply(UnitTypes.LENGTH), exponent).build(), false, UnitType.builder().componentToExponent(UnitTypes.FORCE_WEIGHT, exponent).componentToExponent(UnitTypes.LENGTH, exponent).build())
+                        Arguments.of(UnitTypes.CAPACITANCE, true, UnitType.builder().componentToExponent(UnitTypes.TIME, 4).componentToExponent(UnitTypes.ELECTRIC_CURRENT, 2).componentToExponent(UnitTypes.LENGTH, -2).componentToExponent(UnitTypes.MASS, -1).build()),
+                        Arguments.of(UnitTypes.CAPACITANCE, false, UnitType.builder().componentToExponent(UnitTypes.TIME, 1).componentToExponent(UnitTypes.ELECTRIC_CURRENT, 2).componentToExponent(UnitTypes.POWER_RADIANT_FLUX, -1).build()),
+                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build(), true, UnitType.builder().componentToExponent(UnitTypes.TIME, -4).componentToExponent(UnitTypes.ELECTRIC_CURRENT, -2).componentToExponent(UnitTypes.LENGTH, 2).componentToExponent(UnitTypes.MASS, 1).build()),
+                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build(), false, UnitType.builder().componentToExponent(UnitTypes.ELECTRIC_CHARGE, -1).componentToExponent(UnitTypes.VOLTAGE_ELECTROMOTIVE_FORCE, 1).build()),
+                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, exponent).build(), true, UnitType.builder().componentToExponent(UnitTypes.TIME, 4 * exponent).componentToExponent(UnitTypes.ELECTRIC_CURRENT, 2 * exponent).componentToExponent(UnitTypes.LENGTH, -2 * exponent).componentToExponent(UnitTypes.MASS, -exponent).build()),
+                        Arguments.of(UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, exponent).build(), false, UnitType.builder().componentToExponent(UnitTypes.ELECTRIC_CHARGE, exponent).componentToExponent(UnitTypes.VOLTAGE_ELECTROMOTIVE_FORCE, -exponent).build())
                 ));
     }
 

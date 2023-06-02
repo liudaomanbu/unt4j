@@ -59,7 +59,8 @@ public class UnitTypes {
     public static final UnitType FORCE_WEIGHT = UnitType.builder()
             .componentToExponent(MASS, 1)
             .componentToExponent(LENGTH, 1)
-            .componentToExponent(TIME, -2).build();
+            .componentToExponent(TIME, -2)
+            .build();
     /**
      * 压强/应力
      */
@@ -78,31 +79,30 @@ public class UnitTypes {
      * 功率/辐射通量
      */
     public static final UnitType POWER_RADIANT_FLUX = UnitType.builder()
-            .componentToExponent(MASS, 1)
-            .componentToExponent(LENGTH, 2)
-            .componentToExponent(TIME, -3).build();
+            .componentToExponent(ENERGY_WORK_HEAT_QUANTITY, 1)
+            .componentToExponent(TIME, -1)
+            .build();
     /**
      * 电荷
      */
     public static final UnitType ELECTRIC_CHARGE = UnitType.builder()
             .componentToExponent(TIME, 1)
-            .componentToExponent(ELECTRIC_CURRENT, 1).build();
+            .componentToExponent(ELECTRIC_CURRENT, 1)
+            .build();
     /**
      * 电压(电势差)/电动势
      */
     public static final UnitType VOLTAGE_ELECTROMOTIVE_FORCE = UnitType.builder()
-            .componentToExponent(MASS, 1)
-            .componentToExponent(LENGTH, 2)
-            .componentToExponent(TIME, -3)
-            .componentToExponent(ELECTRIC_CURRENT, -1).build();
+            .componentToExponent(POWER_RADIANT_FLUX, 1)
+            .componentToExponent(ELECTRIC_CURRENT, -1)
+            .build();
     /**
      * 电容
      */
     public static final UnitType CAPACITANCE = UnitType.builder()
-            .componentToExponent(MASS, -1)
-            .componentToExponent(LENGTH, -2).componentToExponent(
-                    TIME, 4)
-            .componentToExponent(ELECTRIC_CURRENT, 2).build();
+            .componentToExponent(ELECTRIC_CHARGE, 1)
+            .componentToExponent(VOLTAGE_ELECTROMOTIVE_FORCE, -1)
+            .build();
     /**
      * 电阻/阻抗/电抗
      */

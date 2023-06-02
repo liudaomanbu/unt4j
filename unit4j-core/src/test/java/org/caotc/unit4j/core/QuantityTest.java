@@ -1,7 +1,6 @@
 package org.caotc.unit4j.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitConstant;
 import org.junit.jupiter.api.Assertions;
@@ -56,8 +55,8 @@ class QuantityTest {
     log.debug("{}", result);
     Quantity expected = Quantity
             .create(BigDecimal.valueOf(100), Unit.builder()
-                    .prefix(Prefix.KILO)
-                    .componentToExponent(UnitConstant.GRAM, 2)
+                    .componentToExponent(UnitConstant.KILOGRAM, 1)
+                    .componentToExponent(UnitConstant.GRAM, 1)
                     .build());
     Assertions.assertEquals(expected, result);
   }

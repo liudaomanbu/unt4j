@@ -2,6 +2,7 @@ package org.caotc.unit4j.core.unit.type;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Singular;
@@ -57,13 +58,15 @@ public class CompositeUnitType extends UnitType {
     public @NonNull UnitType simplify(boolean recursive) {
         return builder().componentToExponents(componentToExponents().entrySet().stream()
                         .map(entry -> {
-                            UnitType key = entry.getKey();
-                            if (recursive) {
-                                key = key.simplify(true);
+                            UnitType unitType = builder()
+                                    .componentToExponents(Maps.transformValues(entry.getKey().componentToExponents(), i -> i * entry.getValue()))
+                                    .build();
+                            if (recursive && unitType.componentToExponents().size() > 1) {//todo
+                                unitType = unitType.simplify(true);
                             }
-                            return key.componentToExponents().entrySet().stream()
-                                    .collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue() * entry.getValue()));
+                            return unitType;
                         })
+                        .map(UnitType::componentToExponents)
                         .map(Map::entrySet)
                         .flatMap(Collection::stream)
                         .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))

@@ -86,8 +86,31 @@ public abstract class Unit implements Identifiable, Component<Unit> {
     @NonNull
     public ImmutableMap<UnitType, Dimension> typeToDimensionElementMap() {
         return componentToExponents().entrySet().stream().collect(ImmutableMap
-                .toImmutableMap(entry -> entry.getKey().type(),
-                        entry -> Dimension.create(entry.getKey(), entry.getValue())));
+                .toImmutableMap(entry -> entry.getKey().type(), entry -> Dimension.create(entry.getKey(), entry.getValue())));
+    }
+
+    /**
+     * 倒转
+     *
+     * @return 倒转所有单位组件的指数后的单位对象
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    @NonNull
+    public Unit reciprocal() {
+        if (isEmpty()) {
+            return this;
+        }
+        /*
+            当只有一个组件时,将-1次方简化.
+            能满足X倒数两次后结果仍然为X,更符合直觉.
+         */
+        if (componentToExponents().size() == 1) {
+            Map.Entry<@NonNull Unit, @NonNull Integer> entry = Iterables.getOnlyElement(componentToExponents().entrySet());
+            return builder().componentToExponent(entry.getKey(), -entry.getValue()).build();
+        }
+        return pow(-1);
     }
 
     /**
@@ -105,17 +128,6 @@ public abstract class Unit implements Identifiable, Component<Unit> {
     }
 
     /**
-     * 倒转
-     *
-     * @return 倒转所有单位组件的指数后的单位对象
-     * @author caotc
-     * @date 2019-05-27
-     * @since 1.0.0
-     */
-    @NonNull
-    public abstract Unit reciprocal();
-
-    /**
      * 乘法{@code this * multiplicand}
      *
      * @param multiplicand 被乘数
@@ -126,69 +138,45 @@ public abstract class Unit implements Identifiable, Component<Unit> {
      */
     @NonNull
     public Unit multiply(@NonNull Unit multiplicand) {
-        //TODO 配置策略化，目前使用为最保守逻辑，单位不同就作为不同组件(考虑将同一类型单位转换为同一单位的逻辑)
-        if (multiplicand instanceof BaseStandardUnit) {
-            return multiply((BaseStandardUnit) multiplicand);
+        if (isEmpty()) {
+            return multiplicand;
         }
-        if (multiplicand instanceof BasePrefixUnit) {
-            return multiply((BasePrefixUnit) multiplicand);
+        if (multiplicand.isEmpty()) {
+            return this;
         }
-        if (multiplicand instanceof CompositeStandardUnit) {
-            return multiply((CompositeStandardUnit) multiplicand);
+        if (equals(multiplicand)) {
+            return builder().componentToExponent(this, 2).build();
         }
-        if (multiplicand instanceof CompositePrefixUnit) {
-            return multiply((CompositePrefixUnit) multiplicand);
+        if (componentToExponents().keySet().size() == 1 || multiplicand.componentToExponents().keySet().size() == 1) {
+            //(LENGTH)*(LENGTH)=(LENGTH)²
+            if (componentToExponents().keySet().equals(multiplicand.componentToExponents().keySet())) {
+                return builder()
+                        .componentToExponent(Iterables.getOnlyElement(componentToExponents().keySet()), Iterables.getOnlyElement(componentToExponents().values()) + Iterables.getOnlyElement(multiplicand.componentToExponents().values()))
+                        .build();
+            }
+            /*
+            处理如(FORCE_WEIGHT)*(FORCE_WEIGHT)⁻¹的情况.
+            FORCE_WEIGHT的componentToExponents不是(FORCE_WEIGHT)¹而是(MASS)¹(LENGTH)¹(TIME)⁻²
+            但是(FORCE_WEIGHT)⁻¹的componentToExponents是(FORCE_WEIGHT)⁻¹
+            这种情况需要把(MASS)¹(LENGTH)¹(TIME)⁻²视为(FORCE_WEIGHT)¹处理
+             */
+            if (componentToExponents().keySet().size() == 1 && componentToExponents().containsKey(multiplicand)) {
+                return builder()
+                        .componentToExponent(multiplicand, componentToExponents().get(multiplicand) + 1)
+                        .build();
+            }
+            if (multiplicand.componentToExponents().keySet().size() == 1 && multiplicand.componentToExponents().containsKey(this)) {
+                return builder()
+                        .componentToExponent(this, multiplicand.componentToExponents().get(this) + 1)
+                        .build();
+            }
         }
-        throw new IllegalArgumentException("never come");
+
+        return builder()
+                .componentToExponent(this, 1)
+                .componentToExponent(multiplicand, 1)
+                .build();
     }
-
-    /**
-     * 乘法{@code this * multiplicand}
-     *
-     * @param multiplicand 被乘数
-     * @return {@code this * multiplicand}
-     * @author caotc
-     * @date 2019-01-11
-     * @since 1.0.0
-     */
-    @NonNull
-    public abstract Unit multiply(@NonNull BaseStandardUnit multiplicand);
-
-    /**
-     * 乘法{@code this * multiplicand}
-     *
-     * @param multiplicand 被乘数
-     * @return {@code this * multiplicand}
-     * @author caotc
-     * @date 2019-01-11
-     * @since 1.0.0
-     */
-    @NonNull
-    public abstract Unit multiply(@NonNull BasePrefixUnit multiplicand);
-
-    /**
-     * 乘法{@code this * multiplicand}
-     *
-     * @param multiplicand 被乘数
-     * @return {@code this * multiplicand}
-     * @author caotc
-     * @date 2019-01-11
-     * @since 1.0.0
-     */
-    @NonNull
-    public abstract Unit multiply(@NonNull CompositeStandardUnit multiplicand);
-
-    /**
-     * 乘法{@code this * multiplicand}
-     *
-     * @param multiplicand 被乘数
-     * @return {@code this * multiplicand}
-     * @author caotc
-     * @date 2019-01-11
-     * @since 1.0.0
-     */
-    @NonNull
-    public abstract Unit multiply(@NonNull CompositePrefixUnit multiplicand);
 
     /**
      * 除法{@code (this / divisor)}

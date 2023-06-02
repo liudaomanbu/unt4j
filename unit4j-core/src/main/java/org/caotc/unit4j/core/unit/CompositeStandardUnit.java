@@ -15,7 +15,6 @@ import org.caotc.unit4j.core.unit.type.UnitType;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Stream;
 
 /**
  * 组合标准单位
@@ -68,67 +67,26 @@ public class CompositeStandardUnit extends StandardUnit {
     return builder().componentToExponents(
                     componentToExponents().entrySet().stream()
                             .map(entry -> {
-                              Unit unit = entry.getKey();
-                              Unit.Builder builder = builder();
-                              if (config.recursive()) {
-                                unit = unit.simplify(config);
-                              } //todo merge
-                              if (config.prefixUnit() && !unit.prefix().isEmpty()) {
-                                builder.prefix(unit.prefix().pow(entry.getValue()));
-                                unit = ((PrefixUnit) unit).standardUnit();
-                              }
-                              return builder
-                                      .componentToExponents(Maps.transformValues(unit.componentToExponents(), i -> i * entry.getValue()))
-                                      .build();
+                                Unit unit = entry.getKey();
+                                Unit.Builder builder = builder();
+                                //todo merge
+                                if (config.prefixUnit() && !unit.prefix().isEmpty()) {
+                                    builder.prefix(unit.prefix().pow(entry.getValue()));
+                                    unit = ((PrefixUnit) unit).standardUnit();
+                                }
+                                unit = builder
+                                        .componentToExponents(Maps.transformValues(unit.componentToExponents(), i -> i * entry.getValue()))
+                                        .build();
+                                if (config.recursive() && unit.componentToExponents().size() > 1) {//todo
+                                    unit = unit.simplify(config);
+                                }
+                                return unit;
                             })
                             .map(Unit::componentToExponents)
                             .map(Map::entrySet)
                             .flatMap(Collection::stream)
                             .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
             .build();
-  }
-
-  @Override
-  @SuppressWarnings("ConstantConditions")
-  @NonNull
-  public CompositeStandardUnit reciprocal() {
-    //todo cast remove
-    return (CompositeStandardUnit) builder().componentToExponents(
-                    Maps.transformValues(componentToExponents(), exponent -> -exponent))
-            .build();
-  }
-
-  @Override
-  public @NonNull CompositeStandardUnit multiply(@NonNull BaseStandardUnit multiplicand) {
-    return multiplicand.multiply(this);
-  }
-
-  @Override
-  public @NonNull CompositePrefixUnit multiply(@NonNull BasePrefixUnit multiplicand) {
-    return multiplicand.multiply(this);
-  }
-
-  @Override
-  public @NonNull Unit multiply(@NonNull CompositeStandardUnit multiplicand) {
-    ImmutableMap<Unit, Integer> map = Stream.of(this, multiplicand)
-            .map(Unit::componentToExponents)
-        .map(Map::entrySet)
-        .flatMap(Collection::stream)
-        .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum));
-    if (map.size() == 1 && Iterables.getOnlyElement(map.values()) == 1) {
-      return Iterables.getOnlyElement(map.keySet());
-    }
-      return CompositeStandardUnit.builder().componentToExponents(map).build();
-  }
-
-  @Override
-  public @NonNull Unit multiply(@NonNull CompositePrefixUnit multiplicand) {
-      Unit multiply = multiply(multiplicand.standardUnit());
-      if (multiply instanceof StandardUnit) {
-          return ((StandardUnit) multiply).addPrefix(prefix());
-      }
-      return CompositeStandardUnit.builder().componentToExponent(multiplicand, 1)
-              .componentToExponent(this, 1).build();
   }
 
   @Override

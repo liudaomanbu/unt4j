@@ -1,12 +1,8 @@
 package org.caotc.unit4j.core.unit;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.unit.type.UnitType;
-
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * 有词头的组合单位
@@ -49,8 +45,8 @@ public class CompositePrefixUnit extends PrefixUnit {
 
     @Override
     public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
-        throw new UnsupportedOperationException();
-//        return standardUnit().simplify(config);
+        //todo 是否根据配置进行this.prefix和standardUnit的组件中的prefix合并
+        return this;
     }
 
   /**
@@ -67,32 +63,4 @@ public class CompositePrefixUnit extends PrefixUnit {
       return multiply(divisor.reciprocal());
   }
 
-    @Override
-    @NonNull
-    public CompositePrefixUnit reciprocal() {
-        //todo cast remove
-        return (CompositePrefixUnit) builder().prefix(this.prefix().reciprocal())
-                .standardUnit(standardUnit().reciprocal()).build();
-  }
-
-  @Override
-  public @NonNull CompositePrefixUnit multiply(@NonNull BaseStandardUnit multiplicand) {
-    return multiplicand.multiply(this);
-  }
-
-  @Override
-  public @NonNull CompositeStandardUnit multiply(@NonNull BasePrefixUnit multiplicand) {
-    return multiplicand.multiply(this);
-  }
-
-  @Override
-  public @NonNull Unit multiply(@NonNull CompositeStandardUnit multiplicand) {
-    return multiplicand.multiply(this);
-  }
-
-  @Override
-  public @NonNull Unit multiply(@NonNull CompositePrefixUnit multiplicand) {
-    return CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
-            .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
-  }
 }

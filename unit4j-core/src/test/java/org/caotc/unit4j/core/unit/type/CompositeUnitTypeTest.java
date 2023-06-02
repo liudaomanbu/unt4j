@@ -40,8 +40,8 @@ class CompositeUnitTypeTest {
     @MethodSource("org.caotc.unit4j.core.unit.type.Provider#originalAndRecursiveAndSimplifieds")
     void simplify(UnitType original, boolean recursive, UnitType simplified) {
         UnitType result = original.simplify(recursive);
-        log.debug("original:{},recursive:{},result:{}", original, recursive, result);
-        Assertions.assertEquals(simplified, result);
+        log.debug("original:{},recursive:{},result:{}", original.id(), recursive, result.id());
+        Assertions.assertEquals(simplified, result, String.format("%s!=%s", simplified.id(), result.id()));
     }
 
     @Test

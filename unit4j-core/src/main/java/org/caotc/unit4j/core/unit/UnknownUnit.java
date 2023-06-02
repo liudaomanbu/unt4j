@@ -67,22 +67,7 @@ public class UnknownUnit extends Unit {
     }
 
     @Override
-    public @NonNull Unit multiply(@NonNull BaseStandardUnit multiplicand) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Unit multiply(@NonNull BasePrefixUnit multiplicand) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Unit multiply(@NonNull CompositeStandardUnit multiplicand) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Unit multiply(@NonNull CompositePrefixUnit multiplicand) {
+    public @NonNull Unit multiply(@NonNull Unit multiplicand) {
         throw new UnsupportedOperationException();
     }
 

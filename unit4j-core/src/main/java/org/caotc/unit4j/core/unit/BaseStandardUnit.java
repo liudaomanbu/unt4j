@@ -23,12 +23,6 @@ import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.unit.type.BaseUnitType;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 /**
  * 基本标准单位
  *
@@ -79,50 +73,6 @@ public class BaseStandardUnit extends StandardUnit {
         return ImmutableMap.of(this, 1);
     }
 
-    @Override
-    public @NonNull CompositeStandardUnit reciprocal() {
-        //todo cast remove
-        return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponent(this, -1).build();
-    }
-
-  @Override
-  public @NonNull CompositeStandardUnit multiply(@NonNull BaseStandardUnit multiplicand) {
-      //todo cast remove
-      return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
-              .collect(ImmutableMap.toImmutableMap(Function.identity(), (u) -> 1, Integer::sum))).build();
-//    return CompositeStandardUnit.builder().unitComponentToExponents(Stream.of(this,multiplicand)
-//        .map(Unit::unitComponentToExponents)
-//        .map(Map::entrySet)
-//        .flatMap(Collection::stream)
-//        .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum))).build();
-  }
-
-    @Override
-    public @NonNull Unit multiply(@NonNull BasePrefixUnit multiplicand) {
-        if (multiplicand.standardUnit().equals(this)) {
-            //todo 是否都走下面逻辑
-            return Unit.builder().prefix(multiplicand.prefix()).componentToExponent(this, 2).build();
-        }
-        return Unit.builder().componentToExponent(this, 1).componentToExponent(multiplicand, 1).build();
-    }
-
-  @Override
-  public @NonNull CompositeStandardUnit multiply(@NonNull CompositeStandardUnit multiplicand) {
-      //todo cast remove
-      return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(Stream.of(this, multiplicand)
-                      .map(Unit::componentToExponents)
-                      .map(Map::entrySet)
-                      .flatMap(Collection::stream)
-                      .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
-              .build();
-  }
-
-  @Override
-  public @NonNull CompositePrefixUnit multiply(@NonNull CompositePrefixUnit multiplicand) {
-      //todo cast remove
-      return (CompositePrefixUnit) CompositePrefixUnit.builder().prefix(prefix())
-              .standardUnit(multiply(multiplicand.standardUnit())).build();
-  }
 
   public @NonNull BasePrefixUnit addPrefix(@NonNull Prefix prefix) {
       return new BasePrefixUnit(prefix, this);
