@@ -28,6 +28,7 @@ import org.caotc.unit4j.api.annotation.QuantityDeserialize;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Alias.Type;
+import org.caotc.unit4j.core.Aliases;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
@@ -100,7 +101,7 @@ public class Unit4jProperties {
   /**
    * 默认单位的输出别名类型
    */
-  public static final Type DEFAULT_UNIT_ALIAS_TYPE = Type.ENGLISH_NAME;
+  public static final Type DEFAULT_UNIT_ALIAS_TYPE = Aliases.Types.ENGLISH_NAME;
   /**
    * 默认单位别名未定义策略
    */
@@ -220,7 +221,7 @@ public class Unit4jProperties {
                         .orElseGet(this::getPropertyStrategy))
                 .targetUnit(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::targetUnitId)
                         .filter(targetUnitId -> !targetUnitId.isEmpty())
-                        .map(Configuration::getUnitByIdExact).orElse(null))
+                        .map(Configuration::findUnitExact).orElse(null))
                 .outputName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::name)
                         .filter(name -> !name.isEmpty())
                         .orElse(fieldNameConverter.apply(ImmutableList.of())))

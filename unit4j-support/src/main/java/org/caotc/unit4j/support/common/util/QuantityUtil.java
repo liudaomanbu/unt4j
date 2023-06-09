@@ -218,14 +218,14 @@ public class QuantityUtil {
         return amountProperty.annotation(WithUnit.class)
                 .map(WithUnit::value)
                 //TODO 配置对象定制
-                .map(Configuration::getUnitByIdExact);
+                .map(Configuration::findUnitExact);
     }
 
     @NonNull
     public static <T> Unit readUnit(
             @NonNull WithUnit withUnit) {
         String unitId = withUnit.value();
-        return Configuration.getUnitByIdExact(unitId);
+        return Configuration.findUnitExact(unitId);
     }
 
 }

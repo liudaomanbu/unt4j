@@ -2,58 +2,94 @@ package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Map;
 
 @Slf4j
 class UnitTest {
+    @Test
+    void id() {
+        log.info("id:{}", UnitConstant.JOULE.id());
+    }
 
-  @Test
-  void typeToDimensionElementMap() {
-    Assertions.assertEquals(
-            ImmutableMap.of(UnitTypes.MASS, Dimension.create(UnitConstant.GRAM, 1)),
-            UnitConstant.GRAM.typeToDimensionElementMap());
-  }
+    @Test
+    void unitComponentToExponents() {
+        ImmutableMap<Unit, Integer> unitComponentIntegerImmutableMap = UnitConstant.GRAM
+                .componentToExponents();
+        Assertions
+                .assertEquals(ImmutableMap.of(UnitConstant.GRAM, 1), unitComponentIntegerImmutableMap);
+    }
 
-  @Test
-  void multiplyUnitComponent() {
-    Unit gram = CompositeStandardUnit
-            .builder().componentToExponent(UnitConstant.GRAM, 2).build();
-    Unit multiply = UnitConstant.GRAM.multiply(UnitConstant.GRAM);
-      Assertions.assertEquals(gram.componentToExponents(), multiply.componentToExponents());
-      Assertions.assertEquals(0, gram.prefix().compareTo(multiply.prefix()));
-    Assertions.assertEquals(gram, multiply);
-  }
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.Provider#unitAndTypes")
+    void type(Unit unit, UnitType unitType) {
+        UnitType result = unit.type();
+        log.debug("unit:{},result:{}", unit.id(), result.id());
+        Assertions.assertEquals(unitType, result, String.format("%s!=%s", unitType.id(), result.id()));
+    }
 
-  @Test
-  void rebase() {
-    Assertions.assertEquals(UnitConstant.GRAM, UnitConstant.GRAM.rebase());
-  }
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.Provider#unitAndTypeToDimensionElementMaps")
+    void typeToDimensionElementMap(Unit unit, ImmutableMap<UnitType, Dimension> typeToDimensionElementMap) {
+        ImmutableMap<UnitType, Dimension> result = unit.typeToDimensionElementMap();
+        log.debug("unit:{},result:{}", unit.id(), result);
+        Assertions.assertEquals(typeToDimensionElementMap, result, String.format("%s!=%s", typeToDimensionElementMap, result));
+    }
 
-  @Test
-  void unitComponentToExponents() {
-      ImmutableMap<Unit, Integer> unitComponentIntegerImmutableMap = UnitConstant.GRAM
-              .componentToExponents();
-    Assertions
-        .assertEquals(ImmutableMap.of(UnitConstant.GRAM, 1), unitComponentIntegerImmutableMap);
-  }
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.Provider#originalAndInverseds")
+    void reciprocal(Unit original, Unit inversed) {
+        Unit result = original.reciprocal();
+        log.debug("original:{},result:{}", original, result);
+        Assertions.assertEquals(inversed, result);
+        Assertions.assertEquals(original, result.reciprocal());
+    }
 
-  @Test
-  void pow() {
-    Unit pow = UnitConstant.GRAM.pow(3);
-    Assertions
-        .assertEquals(
-                CompositeStandardUnit.builder().componentToExponent(UnitConstant.GRAM, 3)
-                .build(), pow);
-  }
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.Provider#originalAndExponentAndPoweds")
+    void pow(Unit original, int exponent, Unit powed) {
+        Unit result = original.pow(exponent);
+        log.debug("original:{},exponent:{},result:{}", original, exponent, result);
+        Assertions.assertEquals(powed, result);
+    }
 
-  @Test
-  void id() {
-//    Unit unit = CompositeStandardUnit.builder()
-//            .componentToExponent(UnitConstant.WATT.addPrefix(Prefix.CENTI), 2)
-//            .componentToExponent(UnitConstant.NEWTON, 3).build()
-//        .addPrefix(Prefix.HECTO);
-//    log.info("id:{}", unit.id());
-    log.info("id:{}", UnitConstant.JOULE.id());
-  }
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.Provider#multiplyArguments")
+    void multiply(Unit multiplier, Unit multiplicand, Unit product) {
+        Unit result = multiplier.multiply(multiplicand);
+        log.debug("multiplier:{},multiplicand:{},result:{}", multiplier.id(), multiplicand.id(), result.id());
+        Assertions.assertEquals(product, result, String.format("%s!=%s", product.id(), result.id()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.unit.Provider#divideArguments")
+    void divide(Unit dividend, Unit divisor, Unit quotient) {
+        Unit result = dividend.divide(divisor);
+        log.debug("dividend:{},divisor:{},result:{}", dividend.id(), divisor.id(), result.id());
+        Assertions.assertEquals(quotient, result, String.format("%s!=%s", quotient.id(), result.id()));
+    }
+
+    @Slf4j
+    static class BuilderTest {
+        @ParameterizedTest
+        @MethodSource("org.caotc.unit4j.core.unit.Provider#componentAndExponentAndUnits")
+        void componentToExponent(Unit component, int exponent, Unit unit) {
+            Unit result = Unit.builder().componentToExponent(component, exponent).build();
+            log.debug("component:{},exponent:{},result:{}", component.id(), exponent, result.id());
+            Assertions.assertEquals(unit, result, String.format("%s!=%s", unit.id(), result.id()));
+        }
+
+        @ParameterizedTest
+        @MethodSource("org.caotc.unit4j.core.unit.Provider#componentMapAndUnits")
+        void build(Map<Unit, Integer> componentMap, Unit unit) {
+            Unit result = Unit.builder().componentToExponents(componentMap).build();
+            log.debug("component:{},result:{}", componentMap, result.id());
+            Assertions.assertEquals(unit, result, String.format("%s!=%s", unit.id(), result.id()));
+        }
+    }
 }

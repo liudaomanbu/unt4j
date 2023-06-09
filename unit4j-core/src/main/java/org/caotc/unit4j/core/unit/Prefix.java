@@ -11,6 +11,9 @@ import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigInteger;
 
+import java.util.Comparator;
+import java.util.stream.Stream;
+
 /**
  * 词头 //TODO 考虑将词头类改为类似基本单位类型
  *
@@ -122,8 +125,14 @@ public class Prefix implements Comparable<Prefix>, Identifiable {
    * 国际单位制SI的所有标准词头
    */
   public static final ImmutableSortedSet<Prefix> SI_UNIT_PREFIXES = ImmutableSortedSet
-      .of(YOCTO, ZEPTO, ATTO, FEMTO, PICO, NANO, MICRO, MILLI, CENTI, DECI, DECA, HECTO, KILO,
-          MEGA, GIGA, TERA, PETA, EXA, ZETTA, YOTTA);
+          .of(YOCTO, ZEPTO, ATTO, FEMTO, PICO, NANO, MICRO, MILLI, CENTI, DECI, DECA, HECTO, KILO,
+                  MEGA, GIGA, TERA, PETA, EXA, ZETTA, YOTTA);
+
+  /**
+   * 国际单位制SI的所有标准词头
+   */
+  public static final ImmutableSortedSet<Prefix> VALUES = Stream.concat(SI_UNIT_PREFIXES.stream(), Stream.of(ANGSTROM, CENTIMILLI))
+          .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
 
   //TODO 封装指数类或改成直接的number
   /**

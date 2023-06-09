@@ -3,7 +3,7 @@ package org.caotc.unit4j.support.fastjson;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.Alias.Type;
+import org.caotc.unit4j.core.Aliases;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 import org.caotc.unit4j.core.unit.BasePrefixUnit;
@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 class UnitSerializerTest {
 
-  SerializeConfig globalInstance = SerializeConfig.getGlobalInstance();
-  UnitSerializer unitSerializer = new UnitSerializer(new UnitCodecConfig(Type.ENGLISH_NAME,
-      Configuration.defaultInstance(), AliasUndefinedStrategy.THROW_EXCEPTION));
+    SerializeConfig globalInstance = SerializeConfig.getGlobalInstance();
+    UnitSerializer unitSerializer = new UnitSerializer(new UnitCodecConfig(Aliases.Types.ENGLISH_NAME,
+            Configuration.defaultInstance(), AliasUndefinedStrategy.THROW_EXCEPTION));
 
   @BeforeEach
   void init() {

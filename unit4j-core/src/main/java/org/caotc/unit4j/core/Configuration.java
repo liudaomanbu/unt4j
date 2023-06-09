@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Streams;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import lombok.AccessLevel;
@@ -73,41 +74,36 @@ import java.util.Optional;
 @Data
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 @Slf4j
-public final class Configuration implements Identifiable {
-
+public final class Configuration {
     /**
      * 默认实例的id
      */
-    public static final String DEFAULT_ID = "DEFAULT";
-
+    public static final String DEFAULT_ID = "_DEFAULT";
     /**
      * 默认的数学计算上下文对象
      */
     private static final MathContext DEFAULT_MATH_CONTEXT = MathContext.UNLIMITED;
-
     /**
      * 默认的自动转换时的目标单位选择器
      */
     private static final TargetUnitChooser DEFAULT_TARGET_UNIT_CHOOSER = TargetUnitChooser
             .create(QuantityChooser.targetValueQuantityChooser(BigInteger.ONE),
                     QuantityChooser.minQuantityChooser());
-
+    private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
     /**
      * 保存全局配置与id的map
      */
     private static final Map<String, Configuration> ID_TO_CONFIGURATIONS = Maps.newConcurrentMap();
-
-    private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
-
     /**
      * 默认实例
      */
-    private static final Configuration DEFAULT = new Configuration(DEFAULT_ID);
-    /**
-     * 主键,全局的该类对象不能重复
-     */
-    @NonNull
-    final String id;
+    private static final Configuration DEFAULT = new Configuration();
+
+    static {
+        UnitConstant.VALUES.forEach(Configuration::register);
+        register(DEFAULT_ID, DEFAULT);
+    }
+
     /**
      * 源对象与目标对象的对应转换器配置Table
      */
@@ -146,9 +142,7 @@ public final class Configuration implements Identifiable {
     @NonNull
     volatile MathContext mathContext = DEFAULT_MATH_CONTEXT;
 
-    private Configuration(@NonNull String id) {
-        log.debug("Configuration Constructor start");
-        this.id = id;
+    private Configuration() {
         register(UnitConstant.CHINESE_MILE,
                 UnitConstant.METER, UnitConvertConfig.create(BigDecimal.valueOf(500)));
         register(UnitConstant.CHINESE_MILE, UnitConstant.TANG,
@@ -210,108 +204,96 @@ public final class Configuration implements Identifiable {
         register(UnitConstant.ERA, UnitConstant.YEAR,
                 UnitConvertConfig.create(BigDecimal.valueOf(1000000000)));
 
-        registerAlias(UnitTypes.LENGTH, Alias.LENGTH_ENGLISH_NAME, Alias.LENGTH_CHINESE_NAME);
-        registerAlias(UnitTypes.MASS, Alias.MASS_ENGLISH_NAME, Alias.MASS_CHINESE_NAME);
-        registerAlias(UnitTypes.TIME, Alias.TIME_ENGLISH_NAME, Alias.TIME_CHINESE_NAME);
-        registerAlias(UnitTypes.ELECTRIC_CURRENT, Alias.ELECTRIC_CURRENT_ENGLISH_NAME,
-                Alias.ELECTRIC_CURRENT_CHINESE_NAME);
-        registerAlias(UnitTypes.TEMPERATURE, Alias.TEMPERATURE_ENGLISH_NAME,
-                Alias.TEMPERATURE_CHINESE_NAME);
-        registerAlias(UnitTypes.SUBSTANCE_AMOUNT, Alias.SUBSTANCE_AMOUNT_ENGLISH_NAME,
-                Alias.SUBSTANCE_AMOUNT_CHINESE_NAME);
-        registerAlias(UnitTypes.LUMINOUS_INTENSITY, Alias.LUMINOUS_INTENSITY_ENGLISH_NAME,
-                Alias.LUMINOUS_INTENSITY_CHINESE_NAME);
+        registerAlias(UnitTypes.LENGTH, Aliases.lengthAliases());
+        registerAlias(UnitTypes.MASS, Aliases.massAliases());
+        registerAlias(UnitTypes.TIME, Aliases.timeAliases());
+        registerAlias(UnitTypes.ELECTRIC_CURRENT, Aliases.electricCurrentAliases());
+        registerAlias(UnitTypes.TEMPERATURE, Aliases.temperatureAliases());
+        registerAlias(UnitTypes.SUBSTANCE_AMOUNT, Aliases.substanceAmountAliases());
+        registerAlias(UnitTypes.LUMINOUS_INTENSITY, Aliases.luminousIntensityAliases());
 
         //注册默认词头别名
-        registerAlias(Prefix.YOCTO, Alias.YOCTO_ENGLISH_NAME);
-        registerAlias(Prefix.ZEPTO, Alias.ZEPTO_ENGLISH_NAME);
-        registerAlias(Prefix.ATTO, Alias.ATTO_ENGLISH_NAME);
-        registerAlias(Prefix.FEMTO, Alias.FEMTO_ENGLISH_NAME);
-        registerAlias(Prefix.PICO, Alias.PICO_ENGLISH_NAME);
-        registerAlias(Prefix.NANO, Alias.NANO_ENGLISH_NAME);
-        registerAlias(Prefix.MICRO, Alias.MICRO_ENGLISH_NAME);
-        registerAlias(Prefix.MILLI, Alias.MILLI_ENGLISH_NAME);
-        registerAlias(Prefix.CENTI, Alias.CENTI_ENGLISH_NAME);
-        registerAlias(Prefix.DECI, Alias.DECI_ENGLISH_NAME);
-        registerAlias(Prefix.DECA, Alias.DECA_ENGLISH_NAME);
-        registerAlias(Prefix.HECTO, Alias.HECTO_ENGLISH_NAME);
-        registerAlias(Prefix.KILO, Alias.KILO_ENGLISH_NAME);
-        registerAlias(Prefix.MEGA, Alias.MEGA_ENGLISH_NAME);
-        registerAlias(Prefix.GIGA, Alias.GIGA_ENGLISH_NAME);
-        registerAlias(Prefix.TERA, Alias.TERA_ENGLISH_NAME);
-        registerAlias(Prefix.EXA, Alias.EXA_ENGLISH_NAME);
-        registerAlias(Prefix.ZETTA, Alias.ZETTA_ENGLISH_NAME);
-        registerAlias(Prefix.YOTTA, Alias.YOTTA_ENGLISH_NAME);
+        registerAlias(Prefix.YOCTO, Aliases.yoctoAliases());
+        registerAlias(Prefix.ZEPTO, Aliases.zeptoAliases());
+        registerAlias(Prefix.ATTO, Aliases.attoAliases());
+        registerAlias(Prefix.FEMTO, Aliases.femtoAliases());
+        registerAlias(Prefix.PICO, Aliases.picoAliases());
+        registerAlias(Prefix.NANO, Aliases.nanoAliases());
+        registerAlias(Prefix.MICRO, Aliases.microAliases());
+        registerAlias(Prefix.MILLI, Aliases.milliAliases());
+        registerAlias(Prefix.CENTI, Aliases.centiAliases());
+        registerAlias(Prefix.DECI, Aliases.deciAliases());
+        registerAlias(Prefix.DECA, Aliases.decaAliases());
+        registerAlias(Prefix.HECTO, Aliases.hectoAliases());
+        registerAlias(Prefix.KILO, Aliases.kiloAliases());
+        registerAlias(Prefix.MEGA, Aliases.megaAliases());
+        registerAlias(Prefix.GIGA, Aliases.gigaAliases());
+        registerAlias(Prefix.TERA, Aliases.teraAliases());
+        registerAlias(Prefix.EXA, Aliases.exaAliases());
+        registerAlias(Prefix.ZETTA, Aliases.zettaAliases());
+        registerAlias(Prefix.YOTTA, Aliases.yottaAliases());
 
-        registerAlias(Prefix.ANGSTROM, Alias.ANGSTROM_ENGLISH_NAME);
+        registerAlias(Prefix.ANGSTROM, Aliases.angstromAliases());
 
-        //注册Unit
-        registerAlias(UnitConstant.METER, Alias.METER_ENGLISH_NAME, Alias.METER_CHINESE_NAME,
-                Alias.METER_SYMBOL);
-        registerAlias(UnitConstant.GRAM, Alias.GRAM_ENGLISH_NAME, Alias.GRAM_CHINESE_NAME,
-                Alias.GRAM_SYMBOL);
-        registerAlias(UnitConstant.SECOND, Alias.SECOND_ENGLISH_NAME, Alias.SECOND_CHINESE_NAME,
-                Alias.SECOND_SYMBOL);
-        registerAlias(UnitConstant.AMPERE, Alias.AMPERE_ENGLISH_NAME, Alias.AMPERE_CHINESE_NAME,
-                Alias.AMPERE_SYMBOL);
-        registerAlias(UnitConstant.KELVIN, Alias.KELVIN_ENGLISH_NAME, Alias.KELVIN_CHINESE_NAME,
-                Alias.KELVIN_SYMBOL);
-        registerAlias(UnitConstant.MOLE, Alias.MOLE_ENGLISH_NAME, Alias.MOLE_CHINESE_NAME,
-                Alias.MOLE_SYMBOL);
-        registerAlias(UnitConstant.CANDELA, Alias.CANDELA_ENGLISH_NAME, Alias.CANDELA_CHINESE_NAME,
-                Alias.CANDELA_SYMBOL);
-        registerAlias(UnitConstant.CELSIUS_DEGREE, Alias.CELSIUS_DEGREE_ENGLISH_NAME,
-                Alias.CELSIUS_DEGREE_SYMBOL);
-        registerAlias(UnitConstant.FAHRENHEIT_DEGREE, Alias.FAHRENHEIT_DEGREE_ENGLISH_NAME,
-                Alias.FAHRENHEIT_DEGREE_SYMBOL);
-        registerAlias(UnitConstant.CHINESE_MILE, Alias.CHINESE_MILE_ENGLISH_NAME);
-        registerAlias(UnitConstant.TANG, Alias.TANG_ENGLISH_NAME);
-        registerAlias(UnitConstant.ZHANG, Alias.ZHANG_ENGLISH_NAME);
-        registerAlias(UnitConstant.YIN, Alias.YIN_ENGLISH_NAME);
-        registerAlias(UnitConstant.CHI, Alias.CHI_ENGLISH_NAME);
-        registerAlias(UnitConstant.CUN, Alias.CUN_ENGLISH_NAME);
-        registerAlias(UnitConstant.FEN, Alias.FEN_ENGLISH_NAME);
-        registerAlias(UnitConstant.LI, Alias.LI_ENGLISH_NAME);
-        registerAlias(UnitConstant.INCH, Alias.INCH_ENGLISH_NAME);
-        registerAlias(UnitConstant.FOOT, Alias.FOOT_ENGLISH_NAME);
-        registerAlias(UnitConstant.YARD, Alias.YARD_ENGLISH_NAME);
-        registerAlias(UnitConstant.FATHOM, Alias.FATHOM_ENGLISH_NAME);
-        registerAlias(UnitConstant.CHAIN, Alias.CHAIN_ENGLISH_NAME);
-        registerAlias(UnitConstant.FURLONG, Alias.FURLONG_ENGLISH_NAME);
-        registerAlias(UnitConstant.MILE, Alias.MILE_ENGLISH_NAME);
-        registerAlias(UnitConstant.TONNE, Alias.TONNE_ENGLISH_NAME);
-        registerAlias(UnitConstant.MINUTE, Alias.MINUTE_ENGLISH_NAME);
-        registerAlias(UnitConstant.HOUR, Alias.HOUR_ENGLISH_NAME);
-        registerAlias(UnitConstant.DAY, Alias.DAY_ENGLISH_NAME);
-        registerAlias(UnitConstant.HALF_DAY, Alias.HALF_DAY_ENGLISH_NAME);
-        registerAlias(UnitConstant.WEEK, Alias.WEEK_ENGLISH_NAME);
-        registerAlias(UnitConstant.YEAR, Alias.YEAR_ENGLISH_NAME);
-        registerAlias(UnitConstant.MONTH, Alias.MONTH_ENGLISH_NAME);
-        registerAlias(UnitConstant.DECADE, Alias.DECADE_ENGLISH_NAME);
-        registerAlias(UnitConstant.CENTURY, Alias.CENTURY_ENGLISH_NAME);
-        registerAlias(UnitConstant.MILLENNIUM, Alias.MILLENNIUM_ENGLISH_NAME);
-        registerAlias(UnitConstant.ERA, Alias.ERA_ENGLISH_NAME);
-        registerAlias(UnitConstant.NON, Alias.RADIAN_PLANE_ANGLE_ENGLISH_NAME, Alias.RADIAN_PLANE_ANGLE_SYMBOL);
-        registerAlias(UnitConstant.NON, Alias.STERADIAN_SOLID_ANGLE_ENGLISH_NAME, Alias.STERADIAN_SOLID_ANGLE_SYMBOL);
-        registerAlias(UnitConstant.HERTZ, Alias.HERTZ_ENGLISH_NAME, Alias.HERTZ_SYMBOL);
-        registerAlias(UnitConstant.NEWTON, Alias.NEWTON_ENGLISH_NAME, Alias.NEWTON_SYMBOL);
-        registerAlias(UnitConstant.PASCAL, Alias.PASCAL_ENGLISH_NAME, Alias.PASCAL_SYMBOL);
-        registerAlias(UnitConstant.JOULE, Alias.JOULE_ENGLISH_NAME, Alias.JOULE_SYMBOL);
-        registerAlias(UnitConstant.WATT, Alias.WATT_ENGLISH_NAME, Alias.WATT_SYMBOL);
-        registerAlias(UnitConstant.COULOMB, Alias.COULOMB_ENGLISH_NAME, Alias.COULOMB_SYMBOL);
-        registerAlias(UnitConstant.VOLT, Alias.VOLT_ENGLISH_NAME, Alias.VOLT_SYMBOL);
-        registerAlias(UnitConstant.FARAD, Alias.FARAD_ENGLISH_NAME, Alias.FARAD_SYMBOL);
-        registerAlias(UnitConstant.OHM, Alias.OHM_ENGLISH_NAME, Alias.OHM_SYMBOL);
-        registerAlias(UnitConstant.SIEMENS, Alias.SIEMENS_ENGLISH_NAME, Alias.SIEMENS_SYMBOL);
-        registerAlias(UnitConstant.WEBER, Alias.WEBER_ENGLISH_NAME, Alias.WEBER_SYMBOL);
-        registerAlias(UnitConstant.TESLA, Alias.TESLA_ENGLISH_NAME, Alias.TESLA_SYMBOL);
-        registerAlias(UnitConstant.HENRY, Alias.HENRY_ENGLISH_NAME, Alias.HENRY_SYMBOL);
-        registerAlias(UnitConstant.LUMEN, Alias.LUMEN_ENGLISH_NAME, Alias.LUMEN_SYMBOL);
-        registerAlias(UnitConstant.LUX, Alias.LUX_ENGLISH_NAME, Alias.LUX_SYMBOL);
-        registerAlias(UnitConstant.BECQUEREL, Alias.BECQUEREL_ENGLISH_NAME, Alias.BECQUEREL_SYMBOL);
-        registerAlias(UnitConstant.GRAY, Alias.GRAY_ENGLISH_NAME, Alias.GRAY_SYMBOL);
-        registerAlias(UnitConstant.SIEVERT, Alias.SIEVERT_ENGLISH_NAME, Alias.SIEVERT_SYMBOL);
-        registerAlias(UnitConstant.KATAL, Alias.KATAL_ENGLISH_NAME, Alias.KATAL_SYMBOL);
+        //注册Unit别名
+        registerAlias(UnitConstant.METER, Aliases.meterAliases());
+        registerAlias(UnitConstant.GRAM, Aliases.gramAliases());
+        registerAlias(UnitConstant.SECOND, Aliases.secondAliases());
+        registerAlias(UnitConstant.AMPERE, Aliases.ampereAliases());
+        registerAlias(UnitConstant.KELVIN, Aliases.kelvinAliases());
+        registerAlias(UnitConstant.MOLE, Aliases.moleAliases());
+        registerAlias(UnitConstant.CANDELA, Aliases.candelaAliases());
+        registerAlias(UnitConstant.CELSIUS_DEGREE, Aliases.celsiusDegreeAliases());
+        registerAlias(UnitConstant.FAHRENHEIT_DEGREE, Aliases.fahrenheitDegreeAliases());
+        registerAlias(UnitConstant.CHINESE_MILE, Aliases.chineseMileAliases());
+        registerAlias(UnitConstant.TANG, Aliases.tangAliases());
+        registerAlias(UnitConstant.ZHANG, Aliases.zhangAliases());
+        registerAlias(UnitConstant.YIN, Aliases.yinAliases());
+        registerAlias(UnitConstant.CHI, Aliases.chiAliases());
+        registerAlias(UnitConstant.CUN, Aliases.cunAliases());
+        registerAlias(UnitConstant.FEN, Aliases.fenAliases());
+        registerAlias(UnitConstant.LI, Aliases.liAliases());
+        registerAlias(UnitConstant.INCH, Aliases.inchAliases());
+        registerAlias(UnitConstant.FOOT, Aliases.footAliases());
+        registerAlias(UnitConstant.YARD, Aliases.yardAliases());
+        registerAlias(UnitConstant.FATHOM, Aliases.fathomAliases());
+        registerAlias(UnitConstant.CHAIN, Aliases.chainAliases());
+        registerAlias(UnitConstant.FURLONG, Aliases.furlongAliases());
+        registerAlias(UnitConstant.MILE, Aliases.mileAliases());
+        registerAlias(UnitConstant.TONNE, Aliases.tonneAliases());
+        registerAlias(UnitConstant.MINUTE, Aliases.minuteAliases());
+        registerAlias(UnitConstant.HOUR, Aliases.hourAliases());
+        registerAlias(UnitConstant.DAY, Aliases.dayAliases());
+        registerAlias(UnitConstant.HALF_DAY, Aliases.halfDayAliases());
+        registerAlias(UnitConstant.WEEK, Aliases.weekAliases());
+        registerAlias(UnitConstant.YEAR, Aliases.yearAliases());
+        registerAlias(UnitConstant.MONTH, Aliases.monthAliases());
+        registerAlias(UnitConstant.DECADE, Aliases.decadeAliases());
+        registerAlias(UnitConstant.CENTURY, Aliases.centuryAliases());
+        registerAlias(UnitConstant.MILLENNIUM, Aliases.millenniumAliases());
+        registerAlias(UnitConstant.ERA, Aliases.eraAliases());
+        //todo 确认有独立的弧度 m·m−1 平面角 球面度 m2·m−2 立体角 单位
+        registerAlias(UnitConstant.NON, Aliases.RADIAN_PLANE_ANGLE_ENGLISH_NAME, Aliases.RADIAN_PLANE_ANGLE_SYMBOL);
+        registerAlias(UnitConstant.NON, Aliases.STERADIAN_SOLID_ANGLE_ENGLISH_NAME, Aliases.STERADIAN_SOLID_ANGLE_SYMBOL);
+        registerAlias(UnitConstant.HERTZ, Aliases.hertzAliases());
+        registerAlias(UnitConstant.NEWTON, Aliases.newtonAliases());
+        registerAlias(UnitConstant.PASCAL, Aliases.pascalAliases());
+        registerAlias(UnitConstant.JOULE, Aliases.jouleAliases());
+        registerAlias(UnitConstant.WATT, Aliases.wattAliases());
+        registerAlias(UnitConstant.COULOMB, Aliases.coulombAliases());
+        registerAlias(UnitConstant.VOLT, Aliases.voltAliases());
+        registerAlias(UnitConstant.FARAD, Aliases.faradAliases());
+        registerAlias(UnitConstant.OHM, Aliases.ohmAliases());
+        registerAlias(UnitConstant.SIEMENS, Aliases.siemensAliases());
+        registerAlias(UnitConstant.WEBER, Aliases.weberAliases());
+        registerAlias(UnitConstant.TESLA, Aliases.teslaAliases());
+        registerAlias(UnitConstant.HENRY, Aliases.henryAliases());
+        registerAlias(UnitConstant.LUMEN, Aliases.lumenAliases());
+        registerAlias(UnitConstant.LUX, Aliases.luxAliases());
+        registerAlias(UnitConstant.BECQUEREL, Aliases.becquerelAliases());
+        registerAlias(UnitConstant.GRAY, Aliases.grayAliases());
+        registerAlias(UnitConstant.SIEVERT, Aliases.sievertAliases());
+        registerAlias(UnitConstant.KATAL, Aliases.katalAliases());
 
         register(UnitGroup.create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS, this::compare))
                 .register(UnitGroup.createSiUnitGroup(UnitConstant.METER, this::compare))
@@ -320,9 +302,6 @@ public final class Configuration implements Identifiable {
                 .register(UnitGroup.createSiUnitGroup(UnitConstant.CANDELA, this::compare))
                 .register(UnitGroup.createSiUnitGroup(UnitConstant.MOLE, this::compare))
                 .register(UnitGroup.createSiUnitGroup(UnitConstant.CELSIUS_DEGREE, this::compare));
-
-        register(this);
-        log.debug("Configuration Constructor end");
     }
 
     /**
@@ -336,6 +315,10 @@ public final class Configuration implements Identifiable {
     @NonNull
     public static Configuration defaultInstance() {
         return DEFAULT;
+    }
+
+    public static Configuration register(@NonNull String id, @NonNull Configuration configuration) {
+        return ID_TO_CONFIGURATIONS.put(id, configuration);
     }
 
     /**
@@ -375,18 +358,13 @@ public final class Configuration implements Identifiable {
     }
 
     @NonNull
-    public static Optional<Unit> getUnitById(@NonNull String id) {
+    public static Optional<Unit> findUnit(@NonNull String id) {
         return Optional.ofNullable(ID_TO_UNITS.get(id));
     }
 
     @NonNull
-    public static Unit getUnitByIdExact(@NonNull String id) {
-        return getUnitById(id).orElseThrow(() -> UnitNotFoundException.create(id));
-    }
-
-    private static void register(@NonNull Configuration configuration) {
-        //TODO 重复性检查
-        ID_TO_CONFIGURATIONS.putIfAbsent(configuration.id(), configuration);
+    public static Unit findUnitExact(@NonNull String id) {
+        return findUnit(id).orElseThrow(() -> UnitNotFoundException.create(id));
     }
 
     /**
@@ -525,6 +503,13 @@ public final class Configuration implements Identifiable {
     public Configuration registerAlias(@NonNull Object aliasRegistrable,
                                        @NonNull Alias... aliases) {
         Arrays.stream(aliases).forEach(alias -> registerAlias(aliasRegistrable, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull Object aliasRegistrable,
+                                       @NonNull Iterable<Alias> aliases) {
+        Streams.stream(aliases).forEach(alias -> registerAlias(aliasRegistrable, alias));
         return this;
     }
 

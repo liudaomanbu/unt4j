@@ -13,19 +13,63 @@ import org.caotc.unit4j.core.unit.UnitGroup;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Optional;
 
 @Slf4j
-class ConfigTest {
+class ConfigurationTest {
   Configuration configuration = Configuration.defaultInstance();
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#idAndUnits")
+  void findUnit(String id, Unit unit) {
+    Optional<Unit> result = Configuration.findUnit(id);
+    log.debug("id:{},result:{}", id, result);
+    Assertions.assertTrue(result.isPresent());
+    Assertions.assertEquals(unit, result.get());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#errorUnitIds")
+  void findUnitError(String id) {
+    Optional<Unit> result = Configuration.findUnit(id);
+    log.debug("id:{},result:{}", id, result);
+    Assertions.assertFalse(result.isPresent());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#idAndUnits")
+  void findUnitExact(String id, Unit unit) {
+    Unit result = Configuration.findUnitExact(id);
+    log.debug("id:{},result:{}", id, result.id());
+    Assertions.assertEquals(unit, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#errorUnitIds")
+  void findUnitExactError(String id) {
+    log.debug("id:{}", id);
+    Assertions.assertThrows(IllegalArgumentException.class, () -> Configuration.findUnitExact(id));
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#unitTypeAndAliasSets")
+  void aliases(Object object, ImmutableSet<Alias> aliases) {
+    ImmutableSet<Alias> result = configuration.aliases(object);
+    log.debug("object:{},result:{}", object, result);
+    Assertions.assertEquals(aliases, result);
+  }
 
   @Test
   void getConvertConfig() {
     Assertions.assertThrows(IllegalArgumentException.class,
-        () -> configuration.getConvertConfig(UnitConstant.GRAM,
-            UnitConstant.SECOND));
+            () -> configuration.getConvertConfig(UnitConstant.GRAM,
+                    UnitConstant.SECOND));
 
     UnitConvertConfig config = this.configuration
-        .getConvertConfig(UnitConstant.GRAM, UnitConstant.KILOGRAM);
+            .getConvertConfig(UnitConstant.GRAM, UnitConstant.KILOGRAM);
     log.debug("{}", config);
     Assertions.assertEquals(0, config.ratio().compareTo(BigDecimal.valueOf("0.001")));
 

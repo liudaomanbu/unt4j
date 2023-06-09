@@ -1,8 +1,10 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import lombok.experimental.UtilityClass;
-import org.caotc.unit4j.core.Alias;
+
+import java.util.stream.Stream;
 
 /**
  * 单位常量类
@@ -19,220 +21,233 @@ public class UnitConstant {
      * 目前(1983年)：光在1299,792,458秒内在真空中行进的距离。
      */
     public static final BaseStandardUnit METER = BaseStandardUnit
-            .create(Alias.METER_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("METER", UnitTypes.LENGTH);
     /**
      * 克,实际上国际单位制中应该为千克 最初(1793年)：最初法文名为grave，定义为在冰点下体积为一立方分米的纯水的重量(质量)/1000。
      * 目前(1889年)：国际千克原器的质量/1000。
      */
     public static final BaseStandardUnit GRAM = BaseStandardUnit
-            .create(Alias.GRAM_ENGLISH_NAME.value(), UnitTypes.MASS);
+            .create("GRAM", UnitTypes.MASS);
     /**
      * 秒 最初(中世纪)：一天时长的86,400分之一。 过渡(1956年)：1900年1月0日历书时12时算起的回归年时长的131,556,925.9747。
      * 目前(1967年)：铯-133原子基态的两个超精细能级之间跃迁所对应的辐射周期时长的9,192,631,770倍。
      */
     public static final BaseStandardUnit SECOND = BaseStandardUnit
-            .create(Alias.SECOND_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("SECOND", UnitTypes.TIME);
     /**
      * 安培 最初(1881年)：CGS电磁单位制中电流单位的十分之一。CGS电流单位的定义是，在半径为1厘米、长度为1厘米的圆弧上流通，并在圆心产生1奥斯特电场的电流。
      * 目前(1946年)：在真空中相距1米的两根横截面为圆形、粗度可忽略不计的无限长平行直导线，各通上相等的恒定电流，当两根导线之间每米长度所受力为2×10−7牛顿时，各导线上的电流定义为1安培。
      */
     public static final BaseStandardUnit AMPERE = BaseStandardUnit
-            .create(Alias.AMPERE_ENGLISH_NAME.value(), UnitTypes.ELECTRIC_CURRENT);
+            .create("AMPERE", UnitTypes.ELECTRIC_CURRENT);
     /**
      * 开尔文 最初(1743年)：摄氏温标将0 °C和100 °C分别定义为水的熔点和沸点。 过渡(1954年)：273.16 K定义为水的三相点(0.01 °C)。
      * 目前(1967年)：水的三相点热力学温度的1/273.16。
      */
     public static final BaseStandardUnit KELVIN = BaseStandardUnit
-            .create(Alias.KELVIN_ENGLISH_NAME.value(), UnitTypes.TEMPERATURE);
+            .create("KELVIN", UnitTypes.TEMPERATURE);
     /**
      * 摩尔 最初(1900年)：物质的克数等于其分子量时的数量。原 目前(1967年)：物质所含的粒子数量相等于0.012千克碳-12所含的原子数量。
      */
     public static final BaseStandardUnit MOLE = BaseStandardUnit
-            .create(Alias.MOLE_ENGLISH_NAME.value(), UnitTypes.SUBSTANCE_AMOUNT);
+            .create("MOLE", UnitTypes.SUBSTANCE_AMOUNT);
     /**
      * 坎德拉 最初(1946年)：整个辐射体在铂凝固温度下的亮度，定义为60新坎德拉每平方厘米。 目前(1979年)：频率为5.4×1014赫兹的单色光源在特定方向辐射强度为1683W/sr时的发光强度。
      */
     public static final BaseStandardUnit CANDELA = BaseStandardUnit
-            .create(Alias.CANDELA_ENGLISH_NAME.value(), UnitTypes.LUMINOUS_INTENSITY);
+            .create("CANDELA", UnitTypes.LUMINOUS_INTENSITY);
 
     /**
      * 摄氏度 K
      */
     public static final BaseStandardUnit CELSIUS_DEGREE = BaseStandardUnit
-            .create(Alias.CELSIUS_DEGREE_ENGLISH_NAME.value(), UnitTypes.TEMPERATURE);
+            .create("CELSIUS_DEGREE", UnitTypes.TEMPERATURE);
 
     /**
      * 华氏度 K
      */
     public static final BaseStandardUnit FAHRENHEIT_DEGREE = BaseStandardUnit
-            .create(Alias.FAHRENHEIT_DEGREE_ENGLISH_NAME.value(), UnitTypes.TEMPERATURE);
+            .create("FAHRENHEIT_DEGREE", UnitTypes.TEMPERATURE);
 
     /**
      * 1里=500米
      */
     public static final BaseStandardUnit CHINESE_MILE = BaseStandardUnit
-            .create(Alias.CHINESE_MILE_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("CHINESE_MILE", UnitTypes.LENGTH);
 
     /**
      * 一堂为10里
      */
     public static final BaseStandardUnit TANG = BaseStandardUnit
-            .create(Alias.TANG_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("TANG", UnitTypes.LENGTH);
 
     /**
      * 1里=150丈
      */
     public static final BaseStandardUnit ZHANG = BaseStandardUnit
-            .create(Alias.ZHANG_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("ZHANG", UnitTypes.LENGTH);
 
     /**
      * 1引=10丈
      */
     public static final BaseStandardUnit YIN = BaseStandardUnit
-            .create(Alias.YIN_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("YIN", UnitTypes.LENGTH);
 
     /**
      * 1丈=10尺
      */
     public static final BaseStandardUnit CHI = BaseStandardUnit
-            .create(Alias.CHI_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("CHI", UnitTypes.LENGTH);
 
     /**
      * 1尺=10寸
      */
     public static final BaseStandardUnit CUN = BaseStandardUnit
-            .create(Alias.CUN_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("CUN", UnitTypes.LENGTH);
 
     /**
      * 1寸=10分
      */
     public static final BaseStandardUnit FEN = BaseStandardUnit
-            .create(Alias.FEN_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("FEN", UnitTypes.LENGTH);
 
     /**
      * 1分=10厘
      */
     public static final BaseStandardUnit LI = BaseStandardUnit
-            .create(Alias.LI_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("LI", UnitTypes.LENGTH);
 
     /**
      * 英寸 in
      */
     public static final BaseStandardUnit INCH = BaseStandardUnit
-            .create(Alias.INCH_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("INCH", UnitTypes.LENGTH);
 
     /**
      * 英尺 ft
      */
     public static final BaseStandardUnit FOOT = BaseStandardUnit
-            .create(Alias.FOOT_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("FOOT", UnitTypes.LENGTH);
 
     /**
      * 码 yd
      */
     public static final BaseStandardUnit YARD = BaseStandardUnit
-            .create(Alias.YARD_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("YARD", UnitTypes.LENGTH);
 
     /**
      * 英寻 fm
      */
     public static final BaseStandardUnit FATHOM = BaseStandardUnit
-            .create(Alias.FATHOM_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("FATHOM", UnitTypes.LENGTH);
 
     /**
      * 链,锁
      */
     public static final BaseStandardUnit CHAIN = BaseStandardUnit
-            .create(Alias.CHAIN_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("CHAIN", UnitTypes.LENGTH);
 
     /**
      * 浪
      */
     public static final BaseStandardUnit FURLONG = BaseStandardUnit
-            .create(Alias.FURLONG_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("FURLONG", UnitTypes.LENGTH);
 
     /**
      * 英里 mi
      */
     public static final BaseStandardUnit MILE = BaseStandardUnit
-            .create(Alias.MILE_ENGLISH_NAME.value(), UnitTypes.LENGTH);
+            .create("MILE", UnitTypes.LENGTH);
 
     /**
      * 吨
      */
     public static final BaseStandardUnit TONNE = BaseStandardUnit
-            .create(Alias.TONNE_ENGLISH_NAME.value(), UnitTypes.MASS);
+            .create("TONNE", UnitTypes.MASS);
 
     /**
      * 分钟
      */
     public static final BaseStandardUnit MINUTE = BaseStandardUnit
-            .create(Alias.MINUTE_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("MINUTE", UnitTypes.TIME);
 
     /**
      * 小时
      */
     public static final BaseStandardUnit HOUR = BaseStandardUnit
-            .create(Alias.HOUR_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("HOUR", UnitTypes.TIME);
 
     /**
      * 天,24小时
      */
     public static final BaseStandardUnit DAY = BaseStandardUnit
-            .create(Alias.DAY_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("DAY", UnitTypes.TIME);
 
     /**
      * 半天,12小时
      */
     public static final BaseStandardUnit HALF_DAY = BaseStandardUnit
-            .create(Alias.HALF_DAY_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("HALF_DAY", UnitTypes.TIME);
 
     /**
      * 周,星期,7天
      */
     public static final BaseStandardUnit WEEK = BaseStandardUnit
-            .create(Alias.WEEK_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("WEEK", UnitTypes.TIME);
 
     /**
      * 年,以31556952秒为标准年
      */
     public static final BaseStandardUnit YEAR = BaseStandardUnit
-            .create(Alias.YEAR_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("YEAR", UnitTypes.TIME);
 
     /**
      * 月,12分之一年
      */
     public static final BaseStandardUnit MONTH = BaseStandardUnit
-            .create(Alias.MONTH_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("MONTH", UnitTypes.TIME);
 
     /**
      * 10年
      */
     public static final BaseStandardUnit DECADE = BaseStandardUnit
-            .create(Alias.DECADE_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("DECADE", UnitTypes.TIME);
 
     /**
      * 100年
      */
     public static final BaseStandardUnit CENTURY = BaseStandardUnit
-            .create(Alias.CENTURY_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("CENTURY", UnitTypes.TIME);
 
     /**
      * 1000年
      */
     public static final BaseStandardUnit MILLENNIUM = BaseStandardUnit
-            .create(Alias.MILLENNIUM_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("MILLENNIUM", UnitTypes.TIME);
 
     /**
      * 时代,1,000,000,000 Years
      */
     public static final BaseStandardUnit ERA = BaseStandardUnit
-            .create(Alias.ERA_ENGLISH_NAME.value(), UnitTypes.TIME);
+            .create("ERA", UnitTypes.TIME);
 
     /**
      * 千克
      */
     public static final BasePrefixUnit KILOGRAM = GRAM.addPrefix(Prefix.KILO);
+    /**
+     * 埃米 10−8m 不是国际制单位 Å
+     */
+    public static final BasePrefixUnit ANGSTROM_METER = METER.addPrefix(Prefix.ANGSTROM);
+    /**
+     * 忽米 10−5m cmm
+     */
+    public static final BasePrefixUnit CENTIMILLI_METER = METER.addPrefix(Prefix.CENTIMILLI);
+
+    /**
+     * 弧度 m·m−1 平面角 球面度 m2·m−2 立体角
+     */
+    public static final CompositeStandardUnit NON = CompositeStandardUnit.builderInternal().build();
 
     /**
      * 牛顿 kg·m·s−2 力 重量
@@ -312,18 +327,6 @@ public class UnitConstant {
                     UnitConstant.METER, 2)
             .componentToExponent(UnitConstant.SECOND, -2)
             .componentToExponent(UnitConstant.AMPERE, -2).build();
-    /**
-     * 埃米 10−8m 不是国际制单位 Å
-     */
-    public static final BasePrefixUnit ANGSTROM_METER = METER.addPrefix(Prefix.ANGSTROM);
-    /**
-     * 忽米 10−5m cmm
-     */
-    public static final BasePrefixUnit CENTIMILLI_METER = METER.addPrefix(Prefix.CENTIMILLI);
-    /**
-     * 弧度 m·m−1 平面角 球面度 m2·m−2 立体角
-     */
-    public static final CompositeStandardUnit NON = CompositeStandardUnit.builderInternal().build();
     /**
      * 赫兹 s−1
      */
@@ -422,4 +425,21 @@ public class UnitConstant {
                     UnitConstant.DAY, UnitConstant.HALF_DAY,
                     UnitConstant.WEEK, UnitConstant.YEAR, UnitConstant.MONTH, UnitConstant.DECADE,
                     UnitConstant.CENTURY, UnitConstant.MILLENNIUM, UnitConstant.ERA);
+
+    public static final ImmutableSet<CompositeStandardUnit> SI_COMPOSITE_STANDARD_UNITS = ImmutableSet.of(NON, NEWTON, PASCAL,
+            JOULE, WATT, VOLT, OHM, SIEMENS, WEBER, TESLA, HENRY, HERTZ, COULOMB, FARAD, LUMEN, LUX, BECQUEREL, GRAY, SIEVERT, KATAL);
+
+    public static final ImmutableSet<StandardUnit> SI_STANDARD_UNITS = Stream.concat(SI_BASE_STANDARD_UNITS.stream(),
+                    SI_COMPOSITE_STANDARD_UNITS.stream())
+            .collect(ImmutableSet.toImmutableSet());
+
+    public static final ImmutableSet<Unit> SI_UNITS = Stream.concat(SI_STANDARD_UNITS.stream(),
+                    SI_STANDARD_UNITS.stream().flatMap(unit -> Prefix.SI_UNIT_PREFIXES.stream().map(unit::addPrefix)))
+            .collect(ImmutableSet.toImmutableSet());
+
+    public static final ImmutableSet<Unit> VALUES = Streams.concat(SI_STANDARD_UNITS.stream(),
+                    Stream.of(CELSIUS_DEGREE, FAHRENHEIT_DEGREE, TONNE), EAST_ASIA_OLD_LENGTH_STANDARD_UNITS.stream()
+                    , ENGLISH_LENGTH_STANDARD_UNITS.stream(), DEFAULT_TIME_STANDARD_UNITS.stream())
+            .flatMap(unit -> Stream.concat(Stream.of(unit), Prefix.VALUES.stream().map(unit::addPrefix)))
+            .collect(ImmutableSet.toImmutableSet());
 }

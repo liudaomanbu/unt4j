@@ -27,9 +27,9 @@ public class AliasUndefinedException extends IllegalArgumentException {
                                   @NonNull Configuration configuration,
                                   @NonNull Type aliasType) {
     super(String
-            .format("%s dont't have alias that type is %s in configuration that id is %s",
+            .format("%s dont't have alias that type is %s in configuration %s",
                     undefinedAliased,
-                    aliasType.name(), configuration.id()));
+                    aliasType.name(), configuration));
     this.undefinedAliased = undefinedAliased;
     this.configuration = configuration;
     this.aliasType = aliasType;
