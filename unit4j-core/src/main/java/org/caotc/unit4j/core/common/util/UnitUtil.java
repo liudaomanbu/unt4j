@@ -9,7 +9,6 @@ import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
-import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
 
 import java.math.BigDecimal;
@@ -47,10 +46,10 @@ public class UnitUtil {
    * @since 1.0.0
    */
   @NonNull
-  public static Optional<StandardUnit> getUnitByAlias(@NonNull String alias) {
-    ImmutableSet<StandardUnit> units = DEFAULT_CONFIGURATION.standardUnitsByAlias(alias);
+  public static Optional<Unit> getUnitByAlias(@NonNull String alias) {
+    ImmutableSet<Unit> units = DEFAULT_CONFIGURATION.units(alias);
     Preconditions.checkArgument(units.size() <= 1, "%s all have this alias:%s, it's not only"
-        , units, alias);
+            , units, alias);
     return units.stream().findAny();
   }
 
@@ -66,7 +65,7 @@ public class UnitUtil {
    */
   @NonNull
   public static Unit parseUnit(@NonNull String unitString) {
-    Optional<StandardUnit> unitById = getUnitByAlias(unitString);
+    Optional<Unit> unitById = getUnitByAlias(unitString);
     if (unitById.isPresent()) {
       return unitById.get();
     }

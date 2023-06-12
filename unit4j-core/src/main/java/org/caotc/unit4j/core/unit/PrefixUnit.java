@@ -37,6 +37,20 @@ import org.caotc.unit4j.core.unit.type.UnitType;
 @Getter
 public abstract class PrefixUnit extends Unit {
     /**
+     * 组合该对象的词头和标准单位的id和别名的方法
+     *
+     * @param prefix       词头id或别名
+     * @param standardUnit 准单位id或别名
+     * @return 组合后的id或别名
+     * @author caotc
+     * @date 2019-05-27
+     * @since 1.0.0
+     */
+    public static String composite(@NonNull String prefix, @NonNull String standardUnit) {
+        return StringConstant.UNDERLINE_JOINER.join(prefix, standardUnit);
+    }
+
+    /**
      * 词头
      */
     @NonNull
@@ -75,18 +89,4 @@ public abstract class PrefixUnit extends Unit {
     public String id() {
         return composite(prefix().id(), standardUnit().id());
     }
-
-    /**
-     * 组合该对象的词头和标准单位的id和别名的方法
-     *
-     * @param prefix       词头id或别名
-     * @param standardUnit 准单位id或别名
-     * @return 组合后的id或别名
-     * @author caotc
-     * @date 2019-05-27
-     * @since 1.0.0
-     */
-    public String composite(@NonNull String prefix, @NonNull String standardUnit) {
-        return StringConstant.UNDERLINE_JOINER.join(prefix, standardUnit);
-  }
 }

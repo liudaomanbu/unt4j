@@ -11,6 +11,7 @@ import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitGroup;
 import org.caotc.unit4j.core.unit.UnitTypes;
+import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,10 +57,125 @@ class ConfigurationTest {
 
   @ParameterizedTest
   @MethodSource("org.caotc.unit4j.core.Provider#unitTypeAndAliasSets")
-  void aliases(Object object, ImmutableSet<Alias> aliases) {
-    ImmutableSet<Alias> result = configuration.aliases(object);
-    log.debug("object:{},result:{}", object, result);
+  void aliases(UnitType unitType, ImmutableSet<Alias> aliases) {
+    ImmutableSet<Alias> result = configuration.aliases(unitType);
+    log.debug("unitType:{},result:{}", unitType.id(), result);
     Assertions.assertEquals(aliases, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#prefixAndAliasSets")
+  void aliases(Prefix prefix, ImmutableSet<Alias> aliases) {
+    ImmutableSet<Alias> result = configuration.aliases(prefix);
+    log.debug("prefix:{},result:{}", prefix, result);
+    Assertions.assertEquals(aliases, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#unitAndAliasSets")
+  void aliases(Unit unit, ImmutableSet<Alias> aliases) {
+    ImmutableSet<Alias> result = configuration.aliases(unit);
+    log.debug("unit:{},result:{}", unit.id(), result);
+    Assertions.assertEquals(aliases, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#unitTypeAndAliasTypeAndAliasSets")
+  void aliases(UnitType unitType, Alias.Type type, ImmutableSet<Alias> aliases) {
+    ImmutableSet<Alias> result = configuration.aliases(unitType, type);
+    log.debug("unitType:{},type:{},result:{}", unitType.id(), type, result);
+    Assertions.assertEquals(aliases, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#prefixAndAliasTypeAndAliasSets")
+  void aliases(Prefix prefix, Alias.Type type, ImmutableSet<Alias> aliases) {
+    ImmutableSet<Alias> result = configuration.aliases(prefix, type);
+    log.debug("prefix:{},type:{},result:{}", prefix, type, result);
+    Assertions.assertEquals(aliases, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#unitAndAliasTypeAndAliasSets")
+  void aliases(Unit unit, Alias.Type type, ImmutableSet<Alias> aliases) {
+    ImmutableSet<Alias> result = configuration.aliases(unit, type);
+    log.debug("unit:{},type:{},result:{}", unit.id(), type, result);
+    Assertions.assertEquals(aliases, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#aliasAndUnitTypes")
+  void findUnitType(Alias alias, UnitType unitType) {
+    Optional<UnitType> result = configuration.findUnitType(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertTrue(result.isPresent());
+    Assertions.assertEquals(unitType, result.get());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#errorUnitTypeAliases")
+  void findUnitTypeError(Alias alias) {
+    Optional<UnitType> result = configuration.findUnitType(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertFalse(result.isPresent());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#aliasAndPrefixes")
+  void findPrefix(Alias alias, Prefix prefix) {
+    Optional<Prefix> result = configuration.findPrefix(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertTrue(result.isPresent());
+    Assertions.assertEquals(prefix, result.get());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#errorPrefixAliases")
+  void findPrefixError(Alias alias) {
+    Optional<Prefix> result = configuration.findPrefix(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertFalse(result.isPresent());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#aliasAndUnits")
+  void findUnit(Alias alias, Unit unit) {
+    Optional<? extends Unit> result = configuration.findUnit(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertTrue(result.isPresent());
+    Assertions.assertEquals(unit, result.get());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#errorUnitAliases")
+  void findUnitError(Alias alias) {
+    Optional<? extends Unit> result = configuration.findUnit(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertFalse(result.isPresent());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#aliasStringAndUnitTypes")
+  void unitTypes(String alias, UnitType unitType) {
+    ImmutableSet<UnitType> result = configuration.unitTypes(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertEquals(ImmutableSet.of(unitType), result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#aliasStringAndPrefixes")
+  void prefixes(String alias, Prefix prefix) {
+    ImmutableSet<Prefix> result = configuration.prefixes(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertEquals(ImmutableSet.of(prefix), result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#aliasStringAndUnits")
+  void units(String alias, Unit unit) {
+    ImmutableSet<Unit> result = configuration.units(alias);
+    log.debug("alias:{},result:{}", alias, result);
+    Assertions.assertEquals(ImmutableSet.of(unit), result);
   }
 
   @Test

@@ -2,6 +2,7 @@ package org.caotc.unit4j.core;
 
 import lombok.NonNull;
 import lombok.Value;
+import lombok.With;
 
 /**
  * 别名
@@ -11,6 +12,7 @@ import lombok.Value;
  * @since 1.0.0
  **/
 @Value(staticConstructor = "create")
+@With
 public class Alias {
 
   @Value(staticConstructor = "create")

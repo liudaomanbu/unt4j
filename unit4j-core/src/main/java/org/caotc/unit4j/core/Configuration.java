@@ -61,6 +61,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 配置类 //TODO 两个单位之间存在不等值的转换config检查
@@ -120,6 +121,52 @@ public final class Configuration {
      */
     @NonNull
     final Map<Unit, UnitGroup> unitToGroups = Maps.newConcurrentMap();
+    /**
+     * 可注册别名的对象与别名类型和对应的别名Table 数据与{@link #aliasToTypeToUnitTypeTable}保持对应
+     */
+    @NonNull
+    final Multimap<UnitType, Alias> unitTypeToAliases = Multimaps.synchronizedMultimap(HashMultimap.create());
+    /**
+     * 别名值与别名类型和对应的可注册别名的对象 数据与{@link #unitTypeToAliases}保持对应
+     */
+    @NonNull
+    final Table<String, Alias.Type, UnitType> aliasToTypeToUnitTypeTable = Tables
+            .synchronizedTable(HashBasedTable.create());
+    /**
+     * 可注册别名的对象与别名类型和对应的别名Table 数据与{@link #aliasToTypeToPrefixTable}保持对应
+     */
+    @NonNull
+    final Multimap<Prefix, Alias> prefixToAliases = Multimaps.synchronizedMultimap(HashMultimap.create());
+    /**
+     * 别名值与别名类型和对应的可注册别名的对象 数据与{@link #prefixToAliases}保持对应
+     */
+    @NonNull
+    final Table<String, Alias.Type, Prefix> aliasToTypeToPrefixTable = Tables
+            .synchronizedTable(HashBasedTable.create());
+    /**
+     * 可注册别名的对象与别名类型和对应的别名Table 数据与{@link #aliasToTypeToStandardUnitTable}保持对应
+     */
+    @NonNull
+    final Multimap<StandardUnit, Alias> standardUnitToAliases = Multimaps.synchronizedMultimap(HashMultimap.create());
+    /**
+     * 别名值与别名类型和对应的可注册别名的对象 数据与{@link #standardUnitToAliases}保持对应
+     */
+    @NonNull
+    final Table<String, Alias.Type, StandardUnit> aliasToTypeToStandardUnitTable = Tables
+            .synchronizedTable(HashBasedTable.create());
+
+    /**
+     * 可注册别名的对象与别名类型和对应的别名Table 数据与{@link #aliasToTypeToPrefixUnitTable}保持对应
+     */
+    @NonNull
+    final Multimap<PrefixUnit, Alias> prefixUnitToAliases = Multimaps.synchronizedMultimap(HashMultimap.create());
+    /**
+     * 别名值与别名类型和对应的可注册别名的对象 数据与{@link #prefixUnitToAliases}保持对应
+     */
+    @NonNull
+    final Table<String, Alias.Type, PrefixUnit> aliasToTypeToPrefixUnitTable = Tables
+            .synchronizedTable(HashBasedTable.create());
+
     /**
      * 可注册别名的对象与别名类型和对应的别名Table 数据与{@link #aliasToTypeToAliasRegistrableTable}保持对应
      */
@@ -367,38 +414,205 @@ public final class Configuration {
         return findUnit(id).orElseThrow(() -> UnitNotFoundException.create(id));
     }
 
-    /**
-     * 获取可注册别名对象注册的所有别名
-     *
-     * @param aliasRegistrable 可注册别名对象
-     * @return 所有别名
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
     @NonNull
-    public ImmutableSet<Alias> aliases(@NonNull Object aliasRegistrable) {
-        return ImmutableSet.copyOf(aliasRegistrableToAliases.get(aliasRegistrable));
+    public synchronized Configuration registerAlias(@NonNull UnitType unitType,
+                                                    @NonNull Alias alias) {
+        if (!unitTypeToAliases.containsEntry(unitType, alias)) {
+            unitTypeToAliases.put(unitType, alias);
+            aliasToTypeToUnitTypeTable.put(alias.value(), alias.type(), unitType);
+        }
+        return this;
+    }
+
+    @NonNull
+    public synchronized Configuration registerAlias(@NonNull Prefix prefix,
+                                                    @NonNull Alias alias) {
+        if (!prefixToAliases.containsEntry(prefix, alias)) {
+            prefixToAliases.put(prefix, alias);
+            aliasToTypeToPrefixTable.put(alias.value(), alias.type(), prefix);
+            standardUnitToAliases.entries().stream()
+                    .filter(entry -> alias.type().equals(entry.getValue().type()))
+                    .forEach(entry -> registerAlias(entry.getKey().addPrefix(prefix), Alias.create(alias.type(), PrefixUnit.composite(alias.value(), entry.getValue().value()))));
+        }
+        return this;
+    }
+
+    @NonNull
+    public synchronized Configuration registerAlias(@NonNull StandardUnit standardUnit,
+                                                    @NonNull Alias alias) {
+        if (!standardUnitToAliases.containsEntry(standardUnit, alias)) {
+            standardUnitToAliases.put(standardUnit, alias);
+            aliasToTypeToStandardUnitTable.put(alias.value(), alias.type(), standardUnit);
+            prefixToAliases.entries().stream()
+                    .filter(entry -> alias.type().equals(entry.getValue().type()))
+                    .forEach(entry -> registerAlias(standardUnit.addPrefix(entry.getKey()), Alias.create(alias.type(), PrefixUnit.composite(entry.getValue().value(), alias.value()))));
+        }
+        return this;
+    }
+
+    @NonNull
+    public synchronized Configuration registerAlias(@NonNull PrefixUnit prefixUnit,
+                                                    @NonNull Alias alias) {
+        if (!prefixUnitToAliases.containsEntry(prefixUnit, alias)) {
+            prefixUnitToAliases.put(prefixUnit, alias);
+            aliasToTypeToPrefixUnitTable.put(alias.value(), alias.type(), prefixUnit);
+        }
+        return this;
     }
 
     /**
-     * //todo 优化成非遍历模式
-     * 获取可注册别名对象注册的指定类型别名
+     * 注册别名
      *
-     * @param aliasRegistrable 可注册别名对象
-     * @param aliasType        别名类型
-     * @return 指定类型别名
+     * @param unitType 可注册别名对象
+     * @param aliases  别名集合
+     * @return {@code this}
+     * @throws IllegalArgumentException 如果要注册的别名已经存在
      * @author caotc
      * @date 2019-05-29
      * @since 1.0.0
      */
     @NonNull
-    public ImmutableSet<Alias> aliases(@NonNull Object aliasRegistrable,
+    public Configuration registerAlias(@NonNull UnitType unitType,
+                                       @NonNull Alias... aliases) {
+        Arrays.stream(aliases).forEach(alias -> registerAlias(unitType, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull Prefix unitType,
+                                       @NonNull Alias... aliases) {
+        Arrays.stream(aliases).forEach(alias -> registerAlias(unitType, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull StandardUnit standardUnit,
+                                       @NonNull Alias... aliases) {
+        Arrays.stream(aliases).forEach(alias -> registerAlias(standardUnit, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull PrefixUnit prefixUnit,
+                                       @NonNull Alias... aliases) {
+        Arrays.stream(aliases).forEach(alias -> registerAlias(prefixUnit, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull Unit unit,
+                                       @NonNull Alias... aliases) {
+        Arrays.stream(aliases).forEach(alias -> registerAlias(unit, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull UnitType unitType,
+                                       @NonNull Iterable<Alias> aliases) {
+        Streams.stream(aliases).forEach(alias -> registerAlias(unitType, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull Prefix prefix,
+                                       @NonNull Iterable<Alias> aliases) {
+        Streams.stream(aliases).forEach(alias -> registerAlias(prefix, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull StandardUnit standardUnit,
+                                       @NonNull Iterable<Alias> aliases) {
+        Streams.stream(aliases).forEach(alias -> registerAlias(standardUnit, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull PrefixUnit prefixUnit,
+                                       @NonNull Iterable<Alias> aliases) {
+        Streams.stream(aliases).forEach(alias -> registerAlias(prefixUnit, alias));
+        return this;
+    }
+
+    @NonNull
+    public Configuration registerAlias(@NonNull Unit unit,
+                                       @NonNull Iterable<Alias> aliases) {
+        Streams.stream(aliases).forEach(alias -> registerAlias(unit, alias));
+        return this;
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull UnitType unitType) {
+        return ImmutableSet.copyOf(unitTypeToAliases.get(unitType));
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull Prefix prefix) {
+        return ImmutableSet.copyOf(prefixToAliases.get(prefix));
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull StandardUnit standardUnit) {
+        return ImmutableSet.copyOf(standardUnitToAliases.get(standardUnit));
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull PrefixUnit prefixUnit) {
+        return ImmutableSet.copyOf(prefixUnitToAliases.get(prefixUnit));
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull Unit unit) {
+        if (unit instanceof PrefixUnit) {
+            return aliases((PrefixUnit) unit);
+        }
+        return aliases((StandardUnit) unit);
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull UnitType unitType,
                                        @NonNull Alias.Type aliasType) {
-        return aliasRegistrableToAliases.get(aliasRegistrable)
+        return aliases(unitType)
                 .stream()
                 .filter(alias -> alias.type().equals(aliasType))
                 .collect(ImmutableSet.toImmutableSet());
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull Prefix prefix,
+                                       @NonNull Alias.Type aliasType) {
+        return aliases(prefix)
+                .stream()
+                .filter(alias -> alias.type().equals(aliasType))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull StandardUnit standardUnit,
+                                       @NonNull Alias.Type aliasType) {
+        return aliases(standardUnit)
+                .stream()
+                .filter(alias -> alias.type().equals(aliasType))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull PrefixUnit prefixUnit,
+                                       @NonNull Alias.Type aliasType) {
+        return aliases(prefixUnit)
+                .stream()
+                .filter(alias -> alias.type().equals(aliasType))
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    //todo 优化成非遍历模式
+    @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull Unit unit,
+                                       @NonNull Alias.Type aliasType) {
+        if (unit instanceof PrefixUnit) {
+            return aliases((PrefixUnit) unit, aliasType);
+        }
+        return aliases((StandardUnit) unit, aliasType);
     }
 
     /**
@@ -411,8 +625,8 @@ public final class Configuration {
      * @since 1.0.0
      */
     @NonNull
-    public Optional<Prefix> prefixByAlias(@NonNull Alias alias) {
-        return aliasRegistrableByAlias(alias).filter(Prefix.class::isInstance).map(Prefix.class::cast);
+    public Optional<Prefix> findPrefix(@NonNull Alias alias) {
+        return Optional.ofNullable(aliasToTypeToPrefixTable.get(alias.value(), alias.type()));
     }
 
     /**
@@ -425,9 +639,8 @@ public final class Configuration {
      * @since 1.0.0
      */
     @NonNull
-    public Optional<? extends UnitType> unitTypeByAlias(@NonNull Alias alias) {
-        return aliasRegistrableByAlias(alias).filter(UnitType.class::isInstance)
-                .map(UnitType.class::cast);
+    public Optional<UnitType> findUnitType(@NonNull Alias alias) {
+        return Optional.ofNullable(aliasToTypeToUnitTypeTable.get(alias.value(), alias.type()));
     }
 
     /**
@@ -440,13 +653,36 @@ public final class Configuration {
      * @since 1.0.0
      */
     @NonNull
-    public Optional<? extends StandardUnit> standardUnitByAlias(@NonNull Alias alias) {
-        return aliasRegistrableByAlias(alias).filter(StandardUnit.class::isInstance)
-                .map(StandardUnit.class::cast);
+    public Optional<StandardUnit> findStandardUnit(@NonNull Alias alias) {
+        return Optional.ofNullable(aliasToTypeToStandardUnitTable.get(alias.value(), alias.type()));
+    }
+
+    @NonNull
+    public Optional<PrefixUnit> findPrefixUnit(@NonNull Alias alias) {
+        return Optional.ofNullable(aliasToTypeToPrefixUnitTable.get(alias.value(), alias.type()));
+    }
+
+    @NonNull
+    public Optional<? extends Unit> findUnit(@NonNull Alias alias) {
+        //todo 都有时报错并且在register时检查? 允许同一个Alias对应多个对象?
+        return Stream.of(findStandardUnit(alias), findPrefixUnit(alias))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findAny();
+    }
+
+    @NonNull
+    public ImmutableSet<UnitType> unitTypes(@NonNull String alias) {
+        return ImmutableSet.copyOf(aliasToTypeToUnitTypeTable.row(alias).values());
+    }
+
+    @NonNull
+    public ImmutableSet<Prefix> prefixes(@NonNull String alias) {
+        return ImmutableSet.copyOf(aliasToTypeToPrefixTable.row(alias).values());
     }
 
     /**
-     * 根据别名值获取对应的标准单位集合
+     * 根据别名值获取对应的单位集合
      *
      * @param alias 别名
      * @return 对应的标准单位集合
@@ -455,86 +691,11 @@ public final class Configuration {
      * @since 1.0.0
      */
     @NonNull
-    public ImmutableSet<StandardUnit> standardUnitsByAlias(@NonNull String alias) {
-        return aliasRegistrablesByAlias(alias).stream().filter(StandardUnit.class::isInstance)
-                .map(StandardUnit.class::cast).collect(ImmutableSet.toImmutableSet());
+    public ImmutableSet<Unit> units(@NonNull String alias) {
+        return Stream.concat(aliasToTypeToStandardUnitTable.row(alias).values().stream(),
+                        aliasToTypeToPrefixUnitTable.row(alias).values().stream())
+                .collect(ImmutableSet.toImmutableSet());
     }
-
-    /**
-     * 根据别名获取对应的可注册别名对象
-     *
-     * @param alias 别名
-     * @return 对应的可注册别名对象
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
-    @NonNull
-    public Optional<?> aliasRegistrableByAlias(@NonNull Alias alias) {
-        return Optional.ofNullable(aliasToTypeToAliasRegistrableTable.get(alias.value(), alias.type()));
-    }
-
-    /**
-     * 根据别名值获取对应的可注册别名对象集合
-     *
-     * @param alias 别名
-     * @return 对应的可注册别名对象集合
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
-    @NonNull
-    public ImmutableSet<?> aliasRegistrablesByAlias(@NonNull String alias) {
-        return ImmutableSet.copyOf(aliasToTypeToAliasRegistrableTable.row(alias).values());
-    }
-
-    /**
-     * 注册别名
-     *
-     * @param aliasRegistrable 可注册别名对象
-     * @param aliases          别名集合
-     * @return {@code this}
-     * @throws IllegalArgumentException 如果要注册的别名已经存在
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
-    @NonNull
-    public Configuration registerAlias(@NonNull Object aliasRegistrable,
-                                       @NonNull Alias... aliases) {
-        Arrays.stream(aliases).forEach(alias -> registerAlias(aliasRegistrable, alias));
-        return this;
-    }
-
-    @NonNull
-    public Configuration registerAlias(@NonNull Object aliasRegistrable,
-                                       @NonNull Iterable<Alias> aliases) {
-        Streams.stream(aliases).forEach(alias -> registerAlias(aliasRegistrable, alias));
-        return this;
-    }
-
-    /**
-     * 注册别名
-     *
-     * @param aliasRegistrable 可注册别名对象
-     * @param alias            别名
-     * @return {@code this}
-     * @throws IllegalArgumentException 如果要注册的别名已经存在
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
-    @NonNull
-    public synchronized Configuration registerAlias(@NonNull Object aliasRegistrable,
-                                                    @NonNull Alias alias) {
-        if (aliasRegistrableToAliases.containsEntry(aliasRegistrable, alias)) {
-            throw new IllegalArgumentException("" + aliasRegistrable + alias + "重复注册");
-        }
-        aliasRegistrableToAliases.put(aliasRegistrable, alias);
-        aliasToTypeToAliasRegistrableTable.put(alias.value(), alias.type(), aliasRegistrable);
-        return this;
-    }
-
 
     /**
      * 注册基本标准单位之间的转换关系
