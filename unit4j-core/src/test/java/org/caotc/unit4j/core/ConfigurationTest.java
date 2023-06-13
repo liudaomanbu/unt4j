@@ -7,6 +7,8 @@ import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.Prefix;
+import org.caotc.unit4j.core.unit.PrefixUnit;
+import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitGroup;
@@ -18,6 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Optional;
+import java.util.Random;
 
 @Slf4j
 class ConfigurationTest {
@@ -176,6 +179,69 @@ class ConfigurationTest {
     ImmutableSet<Unit> result = configuration.units(alias);
     log.debug("alias:{},result:{}", alias, result);
     Assertions.assertEquals(ImmutableSet.of(unit), result);
+  }
+
+  @Test
+  void registerAlias() {
+    Configuration configuration = Configuration.of();
+    Random random = new Random();
+    Prefix prefix = Prefix.create(10, random.nextInt());
+    Alias prefixAlias = Alias.create(Alias.Type.create(random.nextInt() + ""), random.nextInt() + "");
+    StandardUnit standardUnit = Unit.of(random.nextInt() + "", UnitTypes.LENGTH);
+    Alias standardUnitAlias = prefixAlias.withValue(random.nextInt() + "");
+    PrefixUnit unit = standardUnit.addPrefix(prefix);
+    Alias compositeUnitAlias = prefixAlias.withValue(PrefixUnit.composite(prefixAlias.value(), standardUnitAlias.value()));
+
+    Assertions.assertTrue(configuration.aliases(prefix).isEmpty());
+    Assertions.assertFalse(configuration.findPrefix(prefixAlias).isPresent());
+    Assertions.assertTrue(configuration.aliases(standardUnit).isEmpty());
+    Assertions.assertFalse(configuration.findUnit(standardUnitAlias).isPresent());
+    Assertions.assertTrue(configuration.aliases(unit).isEmpty());
+    Assertions.assertFalse(configuration.findUnit(compositeUnitAlias).isPresent());
+
+    configuration.registerAlias(standardUnit, standardUnitAlias);
+    ImmutableSet<Alias> standardUnitAliases = configuration.aliases(standardUnit);
+    log.debug("standardUnitAliases:{}", standardUnitAliases);
+    Assertions.assertEquals(ImmutableSet.of(standardUnitAlias), standardUnitAliases);
+    Optional<? extends Unit> standardUnitOptional = configuration.findUnit(standardUnitAlias);
+    log.debug("standardUnitOptional:{}", standardUnitOptional);
+    Assertions.assertTrue(standardUnitOptional.isPresent());
+    Assertions.assertEquals(standardUnit, standardUnitOptional.get());
+
+    configuration.registerAlias(prefix, prefixAlias);
+
+    ImmutableSet<Alias> prefixAliases = configuration.aliases(prefix);
+    log.debug("prefixAliases:{}", prefixAliases);
+    Assertions.assertEquals(ImmutableSet.of(prefixAlias), prefixAliases);
+    Optional<Prefix> prefixOptional = configuration.findPrefix(prefixAlias);
+    log.debug("prefixOptional:{}", prefixOptional);
+    Assertions.assertTrue(prefixOptional.isPresent());
+    Assertions.assertEquals(prefix, prefixOptional.get());
+    ImmutableSet<Alias> unitAliases = configuration.aliases(unit);
+    log.debug("unitAliases:{}", unitAliases);
+    Assertions.assertEquals(ImmutableSet.of(compositeUnitAlias), unitAliases);
+    Optional<? extends Unit> unitOptional = configuration.findUnit(compositeUnitAlias);
+    log.debug("unitOptional:{}", unitOptional);
+    Assertions.assertTrue(unitOptional.isPresent());
+    Assertions.assertEquals(unit, unitOptional.get());
+
+    Alias unitAlias = Alias.create(Alias.Type.create(random.nextInt() + ""), random.nextInt() + "");
+    configuration.registerAlias(unit, unitAlias);
+    unitAliases = configuration.aliases(unit);
+    log.debug("unitAliases:{}", unitAliases);
+    Assertions.assertEquals(ImmutableSet.of(compositeUnitAlias, unitAlias), unitAliases);
+    unitOptional = configuration.findUnit(unitAlias);
+    log.debug("unitOptional:{}", unitOptional);
+    Assertions.assertTrue(unitOptional.isPresent());
+    Assertions.assertEquals(unit, unitOptional.get());
+  }
+
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#getConvertConfigArguments")
+  void getConvertConfig(Unit sourceUnit, Unit targetUnit, UnitConvertConfig unitConvertConfig) {
+    UnitConvertConfig result = configuration.getConvertConfig(sourceUnit, targetUnit);
+    log.debug("sourceUnit:{},targetUnit:{},result:{}", sourceUnit.id(), targetUnit.id(), result);
+    Assertions.assertEquals(0, result.ratio().compareTo(unitConvertConfig.ratio()));
   }
 
   @Test

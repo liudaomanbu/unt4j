@@ -2,13 +2,18 @@ package org.caotc.unit4j.core;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Streams;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.convert.UnitConvertConfig;
+import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.unit.Prefix;
+import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -142,5 +147,32 @@ public class Provider {
                 .map(Alias::value)
                 .distinct()
                 .map(alias -> Arguments.of(alias, arguments.get()[0])));
+    }
+
+    static Stream<Arguments> sourceUnitAndTargetUnitAndUnitConvertConfigs() {
+        Random random = new Random();
+        int exponent = random.nextInt(100) + 1;
+        return Stream.of(
+                Arguments.of(UnitConstant.KILOGRAM, UnitConstant.GRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
+                Arguments.of(UnitConstant.NEWTON.addPrefix(Prefix.KILO), UnitConstant.NEWTON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
+                Arguments.of(UnitConstant.NON.addPrefix(Prefix.KILO), UnitConstant.NON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, 2).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), 2).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), 2).build(), Unit.builder().componentToExponent(UnitConstant.NON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), -1).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), -1).build(), Unit.builder().componentToExponent(UnitConstant.NON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, exponent).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), exponent).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), exponent).build(), Unit.builder().componentToExponent(UnitConstant.NON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent)))
+        );
+    }
+
+    static Stream<Arguments> getConvertConfigArguments() {
+        return Streams.concat(sourceUnitAndTargetUnitAndUnitConvertConfigs().flatMap(arguments -> Stream.of(arguments.get()[0], arguments.get()[1]))
+                        .distinct().map(unit -> Arguments.of(unit, unit, UnitConvertConfig.empty())),
+                sourceUnitAndTargetUnitAndUnitConvertConfigs().map(arguments -> Arguments.of(arguments.get()[1], arguments.get()[0], ((UnitConvertConfig) arguments.get()[2]).reciprocal())),
+                sourceUnitAndTargetUnitAndUnitConvertConfigs()
+        );
     }
 }

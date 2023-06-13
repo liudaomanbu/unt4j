@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
  * @date 2019-04-14
  * @since 1.0.0
  */
-@ToString
+@ToString(callSuper = false)
 @EqualsAndHashCode
 @AllArgsConstructor(staticName = "valueOf")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)

@@ -72,7 +72,7 @@ import java.util.stream.Stream;
  * @implNote
  * @since 1.0.0
  **/
-@Data
+@Data(staticConstructor = "of")
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 @Slf4j
 public final class Configuration {
@@ -500,13 +500,6 @@ public final class Configuration {
     }
 
     @NonNull
-    public Configuration registerAlias(@NonNull Unit unit,
-                                       @NonNull Alias... aliases) {
-        Arrays.stream(aliases).forEach(alias -> registerAlias(unit, alias));
-        return this;
-    }
-
-    @NonNull
     public Configuration registerAlias(@NonNull UnitType unitType,
                                        @NonNull Iterable<Alias> aliases) {
         Streams.stream(aliases).forEach(alias -> registerAlias(unitType, alias));
@@ -531,13 +524,6 @@ public final class Configuration {
     public Configuration registerAlias(@NonNull PrefixUnit prefixUnit,
                                        @NonNull Iterable<Alias> aliases) {
         Streams.stream(aliases).forEach(alias -> registerAlias(prefixUnit, alias));
-        return this;
-    }
-
-    @NonNull
-    public Configuration registerAlias(@NonNull Unit unit,
-                                       @NonNull Iterable<Alias> aliases) {
-        Streams.stream(aliases).forEach(alias -> registerAlias(unit, alias));
         return this;
     }
 
@@ -747,8 +733,14 @@ public final class Configuration {
                     target.prefix().convertToStandardUnitConfig());
         }
 
+        //todo 查表和注册转换配置逻辑
+        UnitConvertConfig unitConvertConfig = SOURCE_TO_TARGET_TO_CONFIG_TABLE.get(source, target);
+        if (unitConvertConfig != null) {
+            return unitConvertConfig;
+        }
+
         //todo 把这个变成Unit的方法?
-        if (source.componentToExponents().size() != 1 && target.componentToExponents().size() != 1) {
+        if (source.componentToExponents().size() != 1 || !source.componentToExponents().containsValue(1)) {
             CompositeStandardUnit sourceCompositeStandardUnit =
                     source instanceof CompositeStandardUnit ? (CompositeStandardUnit) source
                             : ((CompositePrefixUnit) source).standardUnit();

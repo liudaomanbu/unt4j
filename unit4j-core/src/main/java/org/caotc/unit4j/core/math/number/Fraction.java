@@ -2,9 +2,11 @@ package org.caotc.unit4j.core.math.number;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
-import java.math.MathContext;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
+
+import java.math.MathContext;
 
 /**
  * @author caotc
@@ -16,6 +18,7 @@ import lombok.Value;
  */
 @Value
 @Beta
+@ToString(callSuper = false)
 public class Fraction extends AbstractNumber {
 
   @NonNull
