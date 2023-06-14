@@ -11,6 +11,7 @@ import org.caotc.unit4j.core.unit.type.BaseUnitType;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 单位
@@ -87,6 +88,15 @@ public abstract class Unit implements Identifiable, Component<Unit> {
     public ImmutableMap<UnitType, Dimension> typeToDimensionElementMap() {
         return componentToExponents().entrySet().stream().collect(ImmutableMap
                 .toImmutableMap(entry -> entry.getKey().type(), entry -> Dimension.create(entry.getKey(), entry.getValue())));
+    }
+
+    //todo
+    @NonNull
+    public Dimension dimension(@NonNull UnitType unitType) {
+        if (type().equals(unitType)) {
+            return Dimension.create(this, 1);
+        }
+        return Optional.ofNullable(typeToDimensionElementMap().get(unitType)).orElseThrow(IllegalArgumentException::new);
     }
 
     /**
@@ -216,7 +226,7 @@ public abstract class Unit implements Identifiable, Component<Unit> {
 
         public Builder componentToExponent(@NonNull Unit key, int value) {
             //过滤无意义的数据
-            if (value == 0 || key.isEmpty()) {
+            if (value == 0) {
                 return this;
             }
             if (this.componentToExponents == null) {

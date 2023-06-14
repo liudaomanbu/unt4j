@@ -31,7 +31,7 @@ class UnitTypeTest {
     @MethodSource("org.caotc.unit4j.core.unit.type.Provider#originalAndExponentAndPoweds")
     void pow(UnitType original, int exponent, UnitType powed) {
         UnitType result = original.pow(exponent);
-        log.debug("original:{},exponent:{},result:{}", original, exponent, result);
+        log.debug("original:{},exponent:{},result:{}", original.id(), exponent, result.id());
         Assertions.assertEquals(powed, result);
     }
 

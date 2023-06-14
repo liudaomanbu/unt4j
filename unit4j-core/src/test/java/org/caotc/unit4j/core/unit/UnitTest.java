@@ -54,7 +54,7 @@ class UnitTest {
     @MethodSource("org.caotc.unit4j.core.unit.Provider#originalAndExponentAndPoweds")
     void pow(Unit original, int exponent, Unit powed) {
         Unit result = original.pow(exponent);
-        log.debug("original:{},exponent:{},result:{}", original, exponent, result);
+        log.debug("original:{},exponent:{},result:{}", original.id(), exponent, result.id());
         Assertions.assertEquals(powed, result);
     }
 

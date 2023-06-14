@@ -1,10 +1,11 @@
 package org.caotc.unit4j.core.math.number;
 
 import com.google.common.annotations.Beta;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import lombok.Data;
 import lombok.NonNull;
+
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 /**
  * @author caotc
@@ -392,7 +393,6 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-07
    * @since 1.0.0
    */
-  //TODO 增加对负数的支持
   @NonNull
   public abstract AbstractNumber pow(int exponent);
 

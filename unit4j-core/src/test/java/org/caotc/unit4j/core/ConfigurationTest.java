@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
-import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.PrefixUnit;
 import org.caotc.unit4j.core.unit.StandardUnit;
@@ -244,43 +243,12 @@ class ConfigurationTest {
     Assertions.assertEquals(0, result.ratio().compareTo(unitConvertConfig.ratio()));
   }
 
-  @Test
-  void getConvertConfig() {
+  @ParameterizedTest
+  @MethodSource("org.caotc.unit4j.core.Provider#sourceUnitAndErrorTargetUnits")
+  void getConvertConfigError(Unit sourceUnit, Unit targetUnit) {
+    log.debug("sourceUnit:{},targetUnit:{}", sourceUnit.id(), targetUnit.id());
     Assertions.assertThrows(IllegalArgumentException.class,
-            () -> configuration.getConvertConfig(UnitConstant.GRAM,
-                    UnitConstant.SECOND));
-
-    UnitConvertConfig config = this.configuration
-            .getConvertConfig(UnitConstant.GRAM, UnitConstant.KILOGRAM);
-    log.debug("{}", config);
-    Assertions.assertEquals(0, config.ratio().compareTo(BigDecimal.valueOf("0.001")));
-
-    config = this.configuration.getConvertConfig(UnitConstant.TONNE, UnitConstant.KILOGRAM);
-    log.debug("{}", config);
-    Assertions.assertEquals(0, config.ratio().compareTo(BigDecimal.valueOf(1000)));
-
-    config = this.configuration
-        .getConvertConfig(UnitConstant.WATT,
-            CompositePrefixUnit.builder().prefix(
-                Prefix.DECA).standardUnit(UnitConstant.WATT)
-                .build());
-    log.debug("{}", config);
-    Assertions.assertEquals(0,
-        Prefix.DECA.convertFromStandardUnitConfig().ratio().compareTo(config.ratio()));
-
-    Unit compositePrefixUnit1 = Unit
-            .builder().componentToExponent(UnitConstant.KILOGRAM, 1)
-            .componentToExponent(UnitConstant.METER.addPrefix(Prefix.HECTO), 2)
-            .componentToExponent(UnitConstant.SECOND, -3).build();
-    Unit compositePrefixUnit2 = Unit
-            .builder().componentToExponent(UnitConstant.GRAM, 1)
-            .componentToExponent(UnitConstant.METER, 2)
-            .componentToExponent(UnitConstant.SECOND.addPrefix(Prefix.DECA), -3).build();
-    config = this.configuration.getConvertConfig(compositePrefixUnit1, compositePrefixUnit2);
-    log.debug("{}", config);
-    Assertions
-        .assertEquals(0, config.ratio().compareTo(BigDecimal.valueOf("10000000000")));
-    Assertions.assertEquals(0, config.zeroDifference().compareTo(BigDecimal.valueOf("0")));
+            () -> configuration.getConvertConfig(sourceUnit, targetUnit));
   }
 
   @Test

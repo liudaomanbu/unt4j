@@ -183,7 +183,7 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   @NonNull
-  public UnitConvertConfig power(int exponent) {
+  public UnitConvertConfig pow(int exponent) {
     //TODO 根据指数不同,零点影响不同,需要符号计算处理或者不进行合并
     Preconditions.checkArgument(isZeroPointSame());
     return create(ratio().pow(exponent));

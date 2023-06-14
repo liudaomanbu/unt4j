@@ -42,10 +42,10 @@ public class Provider {
                 Arguments.of(UnitTypes.NON, 1, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, 1, UnitTypes.LENGTH),
                 Arguments.of(UnitTypes.CAPACITANCE, 1, UnitTypes.CAPACITANCE),
-                Arguments.of(UnitTypes.NON, -1, UnitTypes.NON),
+                Arguments.of(UnitTypes.NON, -1, UnitType.builder().componentToExponent(UnitTypes.NON, -1).build()),
                 Arguments.of(UnitTypes.LENGTH, -1, UnitType.builder().componentToExponent(UnitTypes.LENGTH, -1).build()),
                 Arguments.of(UnitTypes.CAPACITANCE, -1, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, -1).build()),
-                Arguments.of(UnitTypes.NON, exponent, UnitTypes.NON),
+                Arguments.of(UnitTypes.NON, exponent, UnitType.builder().componentToExponent(UnitTypes.NON, exponent).build()),
                 Arguments.of(UnitTypes.LENGTH, exponent, UnitType.builder().componentToExponent(UnitTypes.LENGTH, exponent).build()),
                 Arguments.of(UnitTypes.CAPACITANCE, exponent, UnitType.builder().componentToExponent(UnitTypes.CAPACITANCE, exponent).build())
         );
@@ -151,8 +151,8 @@ public class Provider {
         return Stream.of(
                 Arguments.of(UnitTypes.NON, 0, UnitTypes.NON),
                 Arguments.of(UnitTypes.NON, 1, UnitTypes.NON),
-                Arguments.of(UnitTypes.NON, -1, UnitTypes.NON),
-                Arguments.of(UnitTypes.NON, random.nextInt(), UnitTypes.NON),
+                Arguments.of(UnitTypes.NON, -1, new CompositeUnitType(ImmutableMap.of(UnitTypes.NON, -1))),
+                Arguments.of(UnitTypes.NON, exponent, new CompositeUnitType(ImmutableMap.of(UnitTypes.NON, exponent))),
                 Arguments.of(UnitTypes.LENGTH, 0, UnitTypes.NON),
                 Arguments.of(UnitTypes.LENGTH, -1, new CompositeUnitType(ImmutableMap.of(UnitTypes.LENGTH, -1))),
                 Arguments.of(UnitTypes.LENGTH, exponent, new CompositeUnitType(ImmutableMap.of(UnitTypes.LENGTH, exponent))),

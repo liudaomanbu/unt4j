@@ -190,7 +190,7 @@ public abstract class UnitType implements Identifiable, Component<UnitType> {
 
         public Builder componentToExponent(@NonNull UnitType key, int value) {
             //过滤无意义的数据
-            if (value == 0 || key.isEmpty()) {
+            if (value == 0) {
                 return this;
             }
             if (this.componentToExponents == null) {

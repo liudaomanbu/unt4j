@@ -152,19 +152,54 @@ public class Provider {
     static Stream<Arguments> sourceUnitAndTargetUnitAndUnitConvertConfigs() {
         Random random = new Random();
         int exponent = random.nextInt(100) + 1;
+        Unit tonneNewtonUnit = Unit.builder().componentToExponent(UnitConstant.TONNE, 1).componentToExponent(UnitConstant.METER, 1).componentToExponent(UnitConstant.SECOND, -2).build();
+        Unit gramNewtonUnit = Unit.builder().componentToExponent(UnitConstant.GRAM, 1).componentToExponent(UnitConstant.METER, 1).componentToExponent(UnitConstant.SECOND, -2).build();
+        Unit gramMinuteNewtonUnit = Unit.builder().componentToExponent(UnitConstant.GRAM, 1).componentToExponent(UnitConstant.METER, 1).componentToExponent(UnitConstant.MINUTE, -2).build();
         return Stream.of(
                 Arguments.of(UnitConstant.KILOGRAM, UnitConstant.GRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
+                Arguments.of(UnitConstant.KILOGRAM, UnitConstant.GRAM.addPrefix(Prefix.DECA), UnitConvertConfig.create(BigDecimal.valueOf(100))),
+                Arguments.of(UnitConstant.TONNE, UnitConstant.GRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000000))),
+                Arguments.of(UnitConstant.TONNE, UnitConstant.KILOGRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
                 Arguments.of(UnitConstant.NEWTON.addPrefix(Prefix.KILO), UnitConstant.NEWTON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
+                Arguments.of(UnitConstant.NEWTON.addPrefix(Prefix.KILO), UnitConstant.NEWTON.addPrefix(Prefix.DECA), UnitConvertConfig.create(BigDecimal.valueOf(100))),
+                Arguments.of(UnitConstant.NEWTON, gramNewtonUnit, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
+                Arguments.of(gramMinuteNewtonUnit, UnitConstant.NEWTON, UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)))),
+                Arguments.of(tonneNewtonUnit, UnitConstant.NEWTON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
                 Arguments.of(UnitConstant.NON.addPrefix(Prefix.KILO), UnitConstant.NON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
+                Arguments.of(UnitConstant.NON.addPrefix(Prefix.KILO), UnitConstant.NON.addPrefix(Prefix.DECA), UnitConvertConfig.create(BigDecimal.valueOf(100))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, 2).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, 2).build(), Unit.builder().componentToExponent(UnitConstant.GRAM.addPrefix(Prefix.DECA), 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.TONNE, 2).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.TONNE, 2).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), 2).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), 2).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.DECA), 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON, 2).build(), Unit.builder().componentToExponent(gramNewtonUnit, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, 2).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(tonneNewtonUnit, 2).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), 2).build(), Unit.builder().componentToExponent(UnitConstant.NON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), 2).build(), Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.DECA), 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build(), Unit.builder().componentToExponent(UnitConstant.GRAM.addPrefix(Prefix.DECA), -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.TONNE, -1).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.TONNE, -1).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), -1).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), -1).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.DECA), -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON, -1).build(), Unit.builder().componentToExponent(gramNewtonUnit, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, -1).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(tonneNewtonUnit, -1).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), -1).build(), Unit.builder().componentToExponent(UnitConstant.NON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), -1).build(), Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.DECA), -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(-1))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, exponent).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.KILOGRAM, exponent).build(), Unit.builder().componentToExponent(UnitConstant.GRAM.addPrefix(Prefix.DECA), exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.TONNE, exponent).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000000).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.TONNE, exponent).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), exponent).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
-                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), exponent).build(), Unit.builder().componentToExponent(UnitConstant.NON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent)))
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.KILO), exponent).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON.addPrefix(Prefix.DECA), exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NEWTON, exponent).build(), Unit.builder().componentToExponent(gramNewtonUnit, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, exponent).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(tonneNewtonUnit, exponent).build(), Unit.builder().componentToExponent(UnitConstant.NEWTON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), exponent).build(), Unit.builder().componentToExponent(UnitConstant.NON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.KILO), exponent).build(), Unit.builder().componentToExponent(UnitConstant.NON.addPrefix(Prefix.DECA), exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(exponent)))
         );
     }
 
@@ -174,5 +209,42 @@ public class Provider {
                 sourceUnitAndTargetUnitAndUnitConvertConfigs().map(arguments -> Arguments.of(arguments.get()[1], arguments.get()[0], ((UnitConvertConfig) arguments.get()[2]).reciprocal())),
                 sourceUnitAndTargetUnitAndUnitConvertConfigs()
         );
+    }
+
+    static Stream<Unit> typeNotEqualedUnits() {
+        return Stream.of(UnitConstant.METER, UnitConstant.GRAM, UnitConstant.NON, UnitConstant.NEWTON, UnitConstant.FARAD,
+                Unit.builder().componentToExponent(UnitConstant.SECOND, 4).componentToExponent(UnitConstant.AMPERE, 2).componentToExponent(UnitConstant.KILOGRAM, -1).componentToExponent(UnitConstant.METER, -2).build(),
+                Unit.builder().componentToExponent(UnitConstant.METER, 2).build(), Unit.builder().componentToExponent(UnitConstant.METER, -1).build());
+    }
+
+    static Stream<Arguments> noConvertConfigSourceUnitAndTargetUnits() {
+        Unit massNewUnit = Unit.of(Math.random() + "", UnitTypes.MASS);
+        Random random = new Random();
+        int exponent = random.nextInt();
+        if (exponent == 0 || exponent == 1) {
+            exponent += 2;
+        }
+        Unit massNewUnitNewton = Unit.builder().componentToExponent(massNewUnit, 1).componentToExponent(UnitConstant.METER, 1).componentToExponent(UnitConstant.SECOND, -2).build();
+        return Stream.of(
+                Arguments.of(massNewUnit, UnitConstant.GRAM),
+                Arguments.of(massNewUnit, UnitConstant.KILOGRAM),
+                Arguments.of(massNewUnitNewton, UnitConstant.NEWTON),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnit, 2).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, 2).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnit, 2).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, 2).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnitNewton, 2).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, 2).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnit, -1).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, -1).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnit, -1).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnitNewton, -1).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, -1).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnit, exponent).build(), Unit.builder().componentToExponent(UnitConstant.GRAM, exponent).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnit, exponent).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, exponent).build()),
+                Arguments.of(Unit.builder().componentToExponent(massNewUnitNewton, exponent).build(), Unit.builder().componentToExponent(UnitConstant.KILOGRAM, exponent).build())
+        );
+    }
+
+    static Stream<Arguments> sourceUnitAndErrorTargetUnits() {
+        return Stream.concat(typeNotEqualedUnits().flatMap(unit -> typeNotEqualedUnits()
+                        .filter(other -> !unit.equals(other))
+                        .map(other -> Arguments.of(unit, other))),
+                noConvertConfigSourceUnitAndTargetUnits().flatMap(arguments -> Stream.of(arguments, Arguments.of(arguments.get()[1], arguments.get()[0]))));
     }
 }

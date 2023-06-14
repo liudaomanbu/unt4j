@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -44,7 +43,6 @@ import org.caotc.unit4j.core.math.number.Fraction;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
-import org.caotc.unit4j.core.unit.Dimension;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.PrefixUnit;
 import org.caotc.unit4j.core.unit.StandardUnit;
@@ -713,49 +711,60 @@ public final class Configuration {
      * @date 2019-05-29
      * @since 1.0.0
      */
-    //TODO Optional?
     @NonNull
     public UnitConvertConfig getConvertConfig(@NonNull Unit source,
                                               @NonNull Unit target) {
         Preconditions.checkArgument(source.type().equals(target.type()),
                 "%s and %s can't convert,%s and %s are not type equals",
                 source, target, source, target);
-
-        addUnitConvertConfig(source, source, UnitConvertConfig.empty());
-        addUnitConvertConfig(target, target, UnitConvertConfig.empty());
-
-        if (source instanceof PrefixUnit) {
-            addUnitConvertConfig(source, ((PrefixUnit) source).standardUnit(),
-                    source.prefix().convertToStandardUnitConfig());
-        }
-        if (target instanceof PrefixUnit) {
-            addUnitConvertConfig(target, ((PrefixUnit) target).standardUnit(),
-                    target.prefix().convertToStandardUnitConfig());
-        }
-
         //todo 查表和注册转换配置逻辑
         UnitConvertConfig unitConvertConfig = SOURCE_TO_TARGET_TO_CONFIG_TABLE.get(source, target);
         if (unitConvertConfig != null) {
             return unitConvertConfig;
         }
 
-        //todo 把这个变成Unit的方法?
-        if (source.componentToExponents().size() != 1 || !source.componentToExponents().containsValue(1)) {
-            CompositeStandardUnit sourceCompositeStandardUnit =
-                    source instanceof CompositeStandardUnit ? (CompositeStandardUnit) source
-                            : ((CompositePrefixUnit) source).standardUnit();
-            CompositeStandardUnit targetCompositeStandardUnit =
-                    target instanceof CompositeStandardUnit ? (CompositeStandardUnit) target
-                            : ((CompositePrefixUnit) target).standardUnit();
-            if (!SOURCE_TO_TARGET_TO_CONFIG_TABLE
-                    .contains(sourceCompositeStandardUnit, targetCompositeStandardUnit)) {
-                addUnitConvertConfig(sourceCompositeStandardUnit, targetCompositeStandardUnit,
-                        create(sourceCompositeStandardUnit, targetCompositeStandardUnit));
+        if (source.equals(target)) {
+            unitConvertConfig = UnitConvertConfig.empty();
+        } else {
+            if (source instanceof PrefixUnit) {
+                unitConvertConfig = source.prefix().convertToStandardUnitConfig();
+                if (!SOURCE_TO_TARGET_TO_CONFIG_TABLE.contains(source, ((PrefixUnit) source).standardUnit())) {
+                    addUnitConvertConfig(source, ((PrefixUnit) source).standardUnit(), unitConvertConfig);
+                }
+            }
+            if (target instanceof PrefixUnit) {
+                UnitConvertConfig standardUnitConfig = target.prefix().convertFromStandardUnitConfig();
+                unitConvertConfig = unitConvertConfig == null ? standardUnitConfig : unitConvertConfig.reduce(standardUnitConfig);
+            }
+
+            //todo 把这个变成Unit的方法?
+            if (source instanceof CompositeStandardUnit && target instanceof CompositeStandardUnit) {
+                unitConvertConfig = create((CompositeStandardUnit) source, (CompositeStandardUnit) target);
             }
         }
 
-        return Optional.ofNullable(SOURCE_TO_TARGET_TO_CONFIG_TABLE.get(source, target))
-                .orElseThrow(IllegalArgumentException::new);
+
+//        //todo 把这个变成Unit的方法?
+//        if (source.componentToExponents().size() != 1 || !source.componentToExponents().containsValue(1)) {
+//            CompositeStandardUnit sourceCompositeStandardUnit =
+//                    source instanceof CompositeStandardUnit ? (CompositeStandardUnit) source
+//                            : ((CompositePrefixUnit) source).standardUnit();
+//            CompositeStandardUnit targetCompositeStandardUnit =
+//                    target instanceof CompositeStandardUnit ? (CompositeStandardUnit) target
+//                            : ((CompositePrefixUnit) target).standardUnit();
+//            if (!SOURCE_TO_TARGET_TO_CONFIG_TABLE
+//                    .contains(sourceCompositeStandardUnit, targetCompositeStandardUnit)) {
+//                addUnitConvertConfig(sourceCompositeStandardUnit, targetCompositeStandardUnit,
+//                        create(sourceCompositeStandardUnit, targetCompositeStandardUnit));
+//            }
+//        }
+
+        if (unitConvertConfig != null) {
+            addUnitConvertConfig(source, target, unitConvertConfig);
+            return unitConvertConfig;
+        }
+
+        throw new IllegalArgumentException(String.format("no convert config.%s to %s", source, target));
     }
 
     /**
@@ -881,6 +890,7 @@ public final class Configuration {
 
     /**
      * `增加单位转换配置
+     * todo 并发考虑
      *
      * @param source            源单位
      * @param target            目标单位
@@ -912,7 +922,7 @@ public final class Configuration {
         for (Unit directConvertUnit : directConvertUnits) {
             SOURCE_TO_TARGET_TO_CONFIG_TABLE
                     .row(directConvertUnit).keySet().stream()
-                    .filter(indirectConvertUnit -> !contains(unit, indirectConvertUnit))
+                    .filter(indirectConvertUnit -> !contains(unit, indirectConvertUnit))//todo 似乎有逻辑问题，当unit->indirectConvertUnit原来就存在转换配置时，该配置不会被刷新
                     .forEach(
                             indirectConvertUnit -> {
                                 UnitConvertConfig config = SOURCE_TO_TARGET_TO_CONFIG_TABLE
@@ -979,13 +989,8 @@ public final class Configuration {
      */
     private UnitConvertConfig create(@NonNull CompositeStandardUnit source,
                                      @NonNull CompositeStandardUnit target) {
-        ImmutableMap<UnitType, Dimension> targetRebaseTypeToDimensionElementMap = target
-                .typeToDimensionElementMap();
         return source.componentToExponents().entrySet().stream()
-                .map(entry -> getConvertConfig(entry.getKey(),
-                        targetRebaseTypeToDimensionElementMap.get(entry.getKey().type()).unit())
-                        //TODO 确认负数逻辑
-                        .power(entry.getValue()))
+                .map(entry -> getConvertConfig(entry.getKey(), target.dimension(entry.getKey().type()).unit()).pow(entry.getValue()))
                 .reduce(UnitConvertConfig::reduce).orElseGet(UnitConvertConfig::empty)
                 .multiply(source.prefix().convertToStandardUnitConfig().ratio())
                 .multiply(target.prefix().convertFromStandardUnitConfig().ratio());
