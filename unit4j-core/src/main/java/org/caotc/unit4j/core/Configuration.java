@@ -717,54 +717,44 @@ public final class Configuration {
         Preconditions.checkArgument(source.type().equals(target.type()),
                 "%s and %s can't convert,%s and %s are not type equals",
                 source, target, source, target);
-        //todo 查表和注册转换配置逻辑
         UnitConvertConfig unitConvertConfig = SOURCE_TO_TARGET_TO_CONFIG_TABLE.get(source, target);
         if (unitConvertConfig != null) {
             return unitConvertConfig;
         }
 
+        Optional<UnitConvertConfig> result = tryCreateUnitConvertConfig(source, target);
+        result.ifPresent(config -> addUnitConvertConfig(source, target, config));
+        return result.orElseThrow(() -> new IllegalArgumentException(String.format("no convert config for %s to %s", source, target)));
+    }
+
+    private Optional<UnitConvertConfig> tryCreateUnitConvertConfig(@NonNull Unit source, @NonNull Unit target) {
         if (source.equals(target)) {
-            unitConvertConfig = UnitConvertConfig.empty();
-        } else {
-            if (source instanceof PrefixUnit) {
-                unitConvertConfig = source.prefix().convertToStandardUnitConfig();
-                if (!SOURCE_TO_TARGET_TO_CONFIG_TABLE.contains(source, ((PrefixUnit) source).standardUnit())) {
-                    addUnitConvertConfig(source, ((PrefixUnit) source).standardUnit(), unitConvertConfig);
-                }
-            }
-            if (target instanceof PrefixUnit) {
-                UnitConvertConfig standardUnitConfig = target.prefix().convertFromStandardUnitConfig();
-                unitConvertConfig = unitConvertConfig == null ? standardUnitConfig : unitConvertConfig.reduce(standardUnitConfig);
-            }
-
-            //todo 把这个变成Unit的方法?
-            if (source instanceof CompositeStandardUnit && target instanceof CompositeStandardUnit) {
-                unitConvertConfig = create((CompositeStandardUnit) source, (CompositeStandardUnit) target);
-            }
+            return Optional.of(UnitConvertConfig.empty());
         }
 
-
-//        //todo 把这个变成Unit的方法?
-//        if (source.componentToExponents().size() != 1 || !source.componentToExponents().containsValue(1)) {
-//            CompositeStandardUnit sourceCompositeStandardUnit =
-//                    source instanceof CompositeStandardUnit ? (CompositeStandardUnit) source
-//                            : ((CompositePrefixUnit) source).standardUnit();
-//            CompositeStandardUnit targetCompositeStandardUnit =
-//                    target instanceof CompositeStandardUnit ? (CompositeStandardUnit) target
-//                            : ((CompositePrefixUnit) target).standardUnit();
-//            if (!SOURCE_TO_TARGET_TO_CONFIG_TABLE
-//                    .contains(sourceCompositeStandardUnit, targetCompositeStandardUnit)) {
-//                addUnitConvertConfig(sourceCompositeStandardUnit, targetCompositeStandardUnit,
-//                        create(sourceCompositeStandardUnit, targetCompositeStandardUnit));
-//            }
-//        }
-
-        if (unitConvertConfig != null) {
-            addUnitConvertConfig(source, target, unitConvertConfig);
-            return unitConvertConfig;
+        if (source instanceof PrefixUnit) {
+            StandardUnit sourceStandardUnit = ((PrefixUnit) source).standardUnit();
+            if (sourceStandardUnit.equals(target)) {
+                return Optional.of(source.prefix().convertToStandardUnitConfig());
+            }
+            return Optional.of(getConvertConfig(source, sourceStandardUnit))
+                    .map(config -> config.reduce(getConvertConfig(sourceStandardUnit, target)));
+        }
+        if (target instanceof PrefixUnit) {
+            StandardUnit targetStandardUnit = ((PrefixUnit) target).standardUnit();
+            if (targetStandardUnit.equals(source)) {
+                return Optional.of(target.prefix().convertFromStandardUnitConfig());
+            }
+            return Optional.of(getConvertConfig(source, targetStandardUnit))
+                    .map(config -> config.reduce(getConvertConfig(targetStandardUnit, target)));
         }
 
-        throw new IllegalArgumentException(String.format("no convert config.%s to %s", source, target));
+        //todo 把这个变成Unit的方法?
+        if (source instanceof CompositeStandardUnit && target instanceof CompositeStandardUnit) {
+            return Optional.of(createUnitConvertConfig((CompositeStandardUnit) source, (CompositeStandardUnit) target));
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -987,12 +977,10 @@ public final class Configuration {
      * @date 2019-05-29
      * @since 1.0.0
      */
-    private UnitConvertConfig create(@NonNull CompositeStandardUnit source,
-                                     @NonNull CompositeStandardUnit target) {
+    private UnitConvertConfig createUnitConvertConfig(@NonNull CompositeStandardUnit source,
+                                                      @NonNull CompositeStandardUnit target) {
         return source.componentToExponents().entrySet().stream()
                 .map(entry -> getConvertConfig(entry.getKey(), target.dimension(entry.getKey().type()).unit()).pow(entry.getValue()))
-                .reduce(UnitConvertConfig::reduce).orElseGet(UnitConvertConfig::empty)
-                .multiply(source.prefix().convertToStandardUnitConfig().ratio())
-                .multiply(target.prefix().convertFromStandardUnitConfig().ratio());
+                .reduce(UnitConvertConfig::reduce).orElseGet(UnitConvertConfig::empty);
     }
 }

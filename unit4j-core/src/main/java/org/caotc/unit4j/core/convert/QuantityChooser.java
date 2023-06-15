@@ -55,7 +55,7 @@ public abstract class QuantityChooser {
         @Override
         protected @NonNull Quantity chooseInternal(@NonNull Stream<Quantity> quantities,
                                                    @NonNull Configuration configuration) {
-            return quantities.min(configuration::compare).orElseThrow(AssertionError::new);
+            return quantities.max(configuration::compare).orElseThrow(AssertionError::new);
         }
     };
 
@@ -71,8 +71,9 @@ public abstract class QuantityChooser {
             Unit unit = quantityImmutableList.stream().findAny().map(Quantity::unit)
                     .orElseThrow(AssertionError::new);
             ImmutableList<AbstractNumber> values = quantityImmutableList.stream()
-                    .map(data -> data.convertTo(unit, Configuration.defaultInstance()))
-                    .map(Quantity::value).collect(ImmutableList.toImmutableList());
+                    .map(data -> data.convertTo(unit, configuration))
+                    .map(Quantity::value)
+                    .collect(ImmutableList.toImmutableList());
             AbstractNumber sum = values.stream().reduce(AbstractNumber::add)
                     .orElseThrow(AssertionError::new);
             AbstractNumber average = sum.divide(BigInteger.valueOf(values.size()));
@@ -289,6 +290,7 @@ class TargetValueQuantityChooser extends QuantityChooser {
                 .collect(ImmutableMap.toImmutableMap(Quantity::value, Function.identity()));
         ImmutableSortedSet<AbstractNumber> sortedValues = valueToQuantities.keySet().stream()
         .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
+        //todo 最接近?
     return valueToQuantities.get(sortedValues.higher(targetValue));
   }
 }

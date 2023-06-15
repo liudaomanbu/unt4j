@@ -1,9 +1,9 @@
 package org.caotc.unit4j.core.convert;
 
 import lombok.NonNull;
-
-import java.util.Collection;
-import java.util.function.Function;
+import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.unit.Unit;
 
 /**
  * @author caotc
@@ -11,12 +11,7 @@ import java.util.function.Function;
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface Chooser<E> extends Function<Collection<E>, E> {
+public interface Chooser {
     @NonNull
-    E choose(@NonNull Collection<E> elements);
-
-    @Override
-    default E apply(Collection<E> elements) {
-        return choose(elements);
-    }
+    Unit choose(@NonNull Quantity quantity, @NonNull Configuration configuration);
 }
