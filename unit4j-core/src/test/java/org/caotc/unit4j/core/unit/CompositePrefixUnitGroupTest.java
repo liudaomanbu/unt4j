@@ -10,7 +10,7 @@ class CompositePrefixUnitGroupTest {
 
   private UnitGroup timeUnitGroup = UnitGroup
           .create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS,
-                  Configuration.defaultInstance()::compare);
+                  Configuration.defaultInstance());
 
   @Test
   void previous() {
@@ -45,8 +45,8 @@ class CompositePrefixUnitGroupTest {
   @Test
   void valid() {
     Assertions.assertThrows(IllegalArgumentException.class,
-        () -> UnitGroup.builder(Configuration.defaultInstance()::compare).unit(UnitConstant.GRAM)
-            .unit(UnitConstant.SECOND)
-            .build());
+            () -> UnitGroup.builder().configuration(Configuration.defaultInstance()).unit(UnitConstant.GRAM)
+                    .unit(UnitConstant.SECOND)
+                    .build());
   }
 }

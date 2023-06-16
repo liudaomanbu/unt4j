@@ -165,12 +165,11 @@ public class Quantity {
      */
     @NonNull
     public Quantity convertTo(@NonNull Unit targetUnit, @NonNull Configuration configuration) {
-        if (targetUnit.equals(this.unit())) {
+        if (targetUnit.equals(unit())) {
             return this;
         }
 
-        UnitConvertConfig convertConfig = configuration.getConvertConfig(this.unit(),
-                targetUnit);
+        UnitConvertConfig convertConfig = configuration.getConvertConfig(unit(), targetUnit);
         return Quantity.create(convertConfig.apply(value), targetUnit);
     }
 

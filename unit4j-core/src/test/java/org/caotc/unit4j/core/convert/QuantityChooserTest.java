@@ -34,7 +34,7 @@ class QuantityChooserTest {
     @RepeatedTest(100)
     void choose() {
         Random random = new Random();
-        Provider.QuantityGroup quantityGroup = Provider.randomQuantityGroup(UnitGroup.createSiUnitGroup(UnitConstant.METER, Configuration.defaultInstance()::compare), random.nextInt(100) + 1);
+        Provider.QuantityGroup quantityGroup = Provider.randomQuantityGroup(UnitGroup.createSiUnitGroup(UnitConstant.METER, Configuration.defaultInstance()), random.nextInt(100) + 1);
         log.debug("quantities:{}", quantityGroup.quantities());
         Quantity min = QuantityChooser.minQuantityChooser().choose(quantityGroup.quantities(), Configuration.defaultInstance());
         log.debug("min:{}", min);

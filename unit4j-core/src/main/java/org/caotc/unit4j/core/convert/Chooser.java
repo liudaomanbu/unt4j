@@ -14,4 +14,8 @@ import org.caotc.unit4j.core.unit.Unit;
 public interface Chooser {
     @NonNull
     Unit choose(@NonNull Quantity quantity, @NonNull Configuration configuration);
+
+    default Unit choose(@NonNull Quantity quantity) {
+        return choose(quantity, Configuration.defaultInstance());
+    }
 }

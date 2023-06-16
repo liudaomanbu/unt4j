@@ -278,7 +278,7 @@ class ConfigurationTest {
   void getTargetUnit() {
     Assertions.assertThrows(IllegalArgumentException.class, () ->
             configuration.register(
-                    UnitGroup.builder(Configuration.defaultInstance()::compare).unit(UnitConstant.MINUTE)
+                    UnitGroup.builder().configuration(Configuration.defaultInstance()).unit(UnitConstant.MINUTE)
                             .unit(
                                     UnitConstant.SECOND).build()));
     Quantity quantity = Quantity.create(BigDecimal.valueOf("0.26"), UnitConstant.MINUTE);

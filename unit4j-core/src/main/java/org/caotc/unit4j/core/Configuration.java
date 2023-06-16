@@ -340,13 +340,13 @@ public final class Configuration {
         registerAlias(UnitConstant.SIEVERT, Aliases.sievertAliases());
         registerAlias(UnitConstant.KATAL, Aliases.katalAliases());
 
-        register(UnitGroup.create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS, this::compare))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.METER, this::compare))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.GRAM, this::compare))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.AMPERE, this::compare))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.CANDELA, this::compare))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.MOLE, this::compare))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.CELSIUS_DEGREE, this::compare));
+        register(UnitGroup.create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS, this))
+                .register(UnitGroup.createSiUnitGroup(UnitConstant.METER, this))
+                .register(UnitGroup.createSiUnitGroup(UnitConstant.GRAM, this))
+                .register(UnitGroup.createSiUnitGroup(UnitConstant.AMPERE, this))
+                .register(UnitGroup.createSiUnitGroup(UnitConstant.CANDELA, this))
+                .register(UnitGroup.createSiUnitGroup(UnitConstant.MOLE, this))
+                .register(UnitGroup.createSiUnitGroup(UnitConstant.CELSIUS_DEGREE, this));
     }
 
     /**
