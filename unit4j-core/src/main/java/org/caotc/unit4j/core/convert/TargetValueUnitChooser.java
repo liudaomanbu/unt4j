@@ -17,6 +17,7 @@
 package org.caotc.unit4j.core.convert;
 
 
+import com.google.common.collect.RangeSet;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Configuration;
@@ -35,9 +36,14 @@ public class TargetValueUnitChooser implements UnitChooser {
     @NonNull
     AbstractNumber targetValue;
     boolean higher;
+    @NonNull
+    RangeSet<AbstractNumber> valueRange;
 
     @Override
     public @NonNull Unit choose(@NonNull Quantity quantity, @NonNull Configuration configuration) {
+        if (valueRange().contains(quantity.value())) {
+            return quantity.unit();
+        }
         UnitGroup unitGroup = configuration.getUnitGroup(quantity.unit());
 
         Unit currentUnit = quantity.unit();
