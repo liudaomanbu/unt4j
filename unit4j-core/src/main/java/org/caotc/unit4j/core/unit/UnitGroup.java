@@ -1,10 +1,25 @@
+/*
+ * Copyright (C) 2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
@@ -13,13 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.SortedSet;
-import java.util.Spliterator;
 
 /**
  * 单位组
@@ -30,26 +43,7 @@ import java.util.Spliterator;
  **/
 @Value
 @Slf4j
-@Builder
-public class UnitGroup implements SortedSet<Unit>, List<Unit> {
-
-  /**
-   * 以大小排序的单位集合
-   */
-  @NonNull
-  @Singular
-  ImmutableList<Unit> units;
-  @NonNull
-  Configuration configuration;
-  @NonNull
-  @Getter(lazy = true)
-  ImmutableSortedSet<Unit> sortedUnits = ImmutableSortedSet.<Unit>orderedBy(configuration::compare).addAll(units).build();
-
-  UnitGroup(@NonNull ImmutableList<Unit> units, @NonNull Configuration configuration) {
-    this.units = units.stream().sorted(configuration::compare).collect(ImmutableList.toImmutableList());
-    this.configuration = configuration;
-    Preconditions.checkArgument(!units.isEmpty());
-  }
+public class UnitGroup implements List<Unit> {
 
   /**
    * 工厂方法
@@ -87,6 +81,24 @@ public class UnitGroup implements SortedSet<Unit>, List<Unit> {
   }
 
   /**
+   * 以大小排序的单位集合
+   */
+  @NonNull
+  ImmutableSortedSet<Unit> sortedUnits;
+  @NonNull
+  Configuration configuration;
+  @NonNull
+  @Getter(lazy = true)
+  ImmutableList<Unit> units = sortedUnits().asList();
+
+  @lombok.Builder
+  UnitGroup(@NonNull @Singular ImmutableList<Unit> units, @NonNull Configuration configuration) {
+    this.sortedUnits = units.stream().collect(ImmutableSortedSet.toImmutableSortedSet(configuration::compare));
+    this.configuration = configuration;
+    Preconditions.checkArgument(!units.isEmpty());
+  }
+
+  /**
    * 获取单位组中比传入单位小的最近单位
    *
    * @param unit 比较单位
@@ -114,41 +126,29 @@ public class UnitGroup implements SortedSet<Unit>, List<Unit> {
     return Optional.ofNullable(sortedUnits().higher(unit));
   }
 
-  @Override
-  public Comparator<? super Unit> comparator() {
-    return sortedUnits().comparator();
-  }
-
-  @Override
+  @NonNull
   public SortedSet<Unit> subSet(Unit fromElement, Unit toElement) {
     return sortedUnits().subSet(fromElement, toElement);
   }
 
-  @Override
+  @NonNull
   public SortedSet<Unit> headSet(Unit toElement) {
     return sortedUnits().headSet(toElement);
   }
 
-  @Override
+  @NonNull
   public SortedSet<Unit> tailSet(Unit fromElement) {
     return sortedUnits().tailSet(fromElement);
   }
 
-  @Override
   @NonNull
   public Unit first() {
     return sortedUnits().first();
   }
 
-  @Override
   @NonNull
   public Unit last() {
     return sortedUnits().last();
-  }
-
-  @Override
-  public Spliterator<Unit> spliterator() {
-    return sortedUnits().spliterator();
   }
 
   @Override
