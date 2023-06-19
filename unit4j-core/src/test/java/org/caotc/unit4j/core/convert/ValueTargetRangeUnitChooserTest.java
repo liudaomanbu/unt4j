@@ -90,7 +90,7 @@ class ValueTargetRangeUnitChooserTest {
         log.info("targetUnit:{}", targetUnit.id());
         log.info("targetValue:{}", configuration.convertTo(quantity, targetUnit).value().value(BigDecimal.class, MathContext.DECIMAL128));
 
-        unitChooser = ValueTargetRangeUnitChooser.of(Range.closedOpen(BigInteger.valueOf(1), BigInteger.valueOf(1)));
+        unitChooser = ValueTargetRangeUnitChooser.of(Range.singleton(BigInteger.valueOf(1)));
 
         quantity = Quantity.create(8000, UnitConstant.METER);
         targetUnit = unitChooser.choose(quantity, configuration);

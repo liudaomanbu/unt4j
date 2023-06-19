@@ -21,6 +21,7 @@ import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
@@ -36,6 +37,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @Value(staticConstructor = "of")
+@Slf4j
 public class ValueTargetRangeUnitChooser implements UnitChooser {
     @NonNull
     Range<AbstractNumber> valueTargetRange;
@@ -52,6 +54,7 @@ public class ValueTargetRangeUnitChooser implements UnitChooser {
         while (low <= high) {
             int mid = (low + high) >>> 1;
             current = configuration.convertTo(quantity, list.get(mid));
+            log.error("current value:{},unit:{}", current.bigDecimalValue(), current.unit().id());
 
             if (valueTargetRange.contains(current.value())) {
                 return current.unit();
@@ -63,7 +66,7 @@ public class ValueTargetRangeUnitChooser implements UnitChooser {
                 low = mid + 1;
             }
         }
-        return lowerRange.contains(current.value()) ? list.get(0) : list.get(list.size() - 1);  // key not found
+        return current.unit();  // key not found
     }
 
     @Override
