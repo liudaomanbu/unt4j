@@ -18,19 +18,16 @@ package org.caotc.unit4j.core.convert;
 
 
 import com.google.common.collect.BoundType;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import lombok.NonNull;
 import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
+import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.List;
 
 /**
@@ -39,7 +36,6 @@ import java.util.List;
  * @since 1.0.0
  */
 @Value(staticConstructor = "of")
-@Slf4j
 public class ValueTargetRangeUnitChooser implements UnitChooser {
     @NonNull
     Range<AbstractNumber> valueTargetRange;
@@ -50,24 +46,24 @@ public class ValueTargetRangeUnitChooser implements UnitChooser {
 
         Range<AbstractNumber> lowerRange = valueTargetRange.hasLowerBound() ?
                 Range.upTo(valueTargetRange.lowerEndpoint(), valueTargetRange.lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
-                Range.encloseAll(ImmutableList.of());
+                Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
 
+        Quantity current = quantity;
         while (low <= high) {
             int mid = (low + high) >>> 1;
-            Quantity midVal = configuration.convertTo(quantity, list.get(mid));
-            log.error("midVal value:{},unit:{}", midVal.value().value(BigDecimal.class, MathContext.DECIMAL128), midVal.unit());
+            current = configuration.convertTo(quantity, list.get(mid));
 
-            if (valueTargetRange.contains(midVal.value())) {
-                return midVal.unit();
+            if (valueTargetRange.contains(current.value())) {
+                return current.unit();
             }
 
-            if (lowerRange.contains(midVal.value())) {
+            if (lowerRange.contains(current.value())) {
                 high = mid - 1;
             } else {
                 low = mid + 1;
             }
         }
-        return list.get(-(low + 1));  // key not found
+        return lowerRange.contains(current.value()) ? list.get(0) : list.get(list.size() - 1);  // key not found
     }
 
     @Override
