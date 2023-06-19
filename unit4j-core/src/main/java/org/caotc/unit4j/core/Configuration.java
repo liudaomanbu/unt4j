@@ -785,6 +785,21 @@ public final class Configuration {
         return targetUnitChooser.targetUnit(quantities, this);
     }
 
+    @NonNull
+    public Quantity convertTo(@NonNull Quantity quantity, @NonNull Unit targetUnit) {
+        if (targetUnit.equals(quantity.unit())) {
+            return quantity;
+        }
+
+        UnitConvertConfig convertConfig = getConvertConfig(quantity.unit(), targetUnit);
+        return Quantity.create(convertConfig.apply(quantity.value()), targetUnit);
+    }
+
+    @NonNull
+    public Quantity autoConvert(@NonNull Quantity quantity) {
+        return convertTo(quantity, getTargetUnit(quantity));
+    }
+
     /**
      * 获取单位的所属单位组
      *
@@ -792,6 +807,7 @@ public final class Configuration {
      * @return 所属单位组
      * @author caotc
      * @date 2019-05-29
+     * @apiNote 返回的UnitGroup不一定包含参数unit
      * @since 1.0.0
      */
     @NonNull
