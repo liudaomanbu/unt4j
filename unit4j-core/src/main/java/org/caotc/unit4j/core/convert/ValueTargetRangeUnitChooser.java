@@ -29,7 +29,7 @@ import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
-import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * @author caotc
@@ -42,7 +42,9 @@ public class ValueTargetRangeUnitChooser implements UnitChooser {
     @NonNull
     Range<AbstractNumber> valueTargetRange;
 
-    private static Unit indexedBinarySearch(List<Unit> list, Range<AbstractNumber> valueTargetRange, Quantity quantity, Configuration configuration) {
+    private static Unit indexedBinarySearch(Range<AbstractNumber> valueTargetRange, Quantity quantity, Configuration configuration) {
+        UnitGroup list = configuration.getUnitGroup(quantity.unit());
+
         int low = 0;
         int high = list.size() - 1;
 
@@ -50,9 +52,10 @@ public class ValueTargetRangeUnitChooser implements UnitChooser {
                 Range.upTo(valueTargetRange.lowerEndpoint(), valueTargetRange.lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
                 Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
 
+        int mid = 0;
         Quantity current = quantity;
         while (low <= high) {
-            int mid = (low + high) >>> 1;
+            mid = (low + high) >>> 1;
             current = configuration.convertTo(quantity, list.get(mid));
             log.error("current value:{},unit:{}", current.bigDecimalValue(), current.unit().id());
 
@@ -66,7 +69,26 @@ public class ValueTargetRangeUnitChooser implements UnitChooser {
                 low = mid + 1;
             }
         }
-        return current.unit();  // key not found
+
+        if (!current.unit().equals(list.first()) && !current.unit().equals(list.last())) {
+            if (lowerRange.contains(current.value())) {
+                return IntStream.iterate(mid, i -> i - 1).mapToObj(list::get)
+                        .map(unit -> configuration.convertTo(quantity, unit))
+                        .filter(q -> !lowerRange.contains(q.value()))
+                        .findFirst()
+                        .map(Quantity::unit)
+                        .orElseThrow(AssertionError::new);
+            } else {
+                return list.tailSet(current.unit()).stream()
+                        .map(unit -> configuration.convertTo(quantity, unit))
+                        .filter(q -> lowerRange.contains(q.value()))
+                        .findFirst()
+                        .map(Quantity::unit)
+                        .orElseThrow(AssertionError::new);
+            }
+        } else {
+            return current.unit();  // key not found
+        }
     }
 
     @Override
@@ -74,8 +96,7 @@ public class ValueTargetRangeUnitChooser implements UnitChooser {
         if (valueTargetRange().contains(quantity.value())) {
             return quantity.unit();
         }
-        UnitGroup unitGroup = configuration.getUnitGroup(quantity.unit());
 
-        return indexedBinarySearch(unitGroup.units(), valueTargetRange(), quantity, configuration);
+        return indexedBinarySearch(valueTargetRange(), quantity, configuration);
     }
 }
