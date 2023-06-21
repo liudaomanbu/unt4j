@@ -21,6 +21,7 @@ import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
@@ -43,6 +44,7 @@ public class ValueTargetRangeSingletonUnitAutoConverter implements SingletonUnit
     Range<AbstractNumber> valueTargetRange;
     @NonNull
     @Getter(lazy = true)
+    @ToString.Exclude
     Range<AbstractNumber> valueTargetLowerRange = valueTargetRange().hasLowerBound() ?
             Range.upTo(valueTargetRange().lowerEndpoint(), valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
             Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
@@ -70,8 +72,9 @@ public class ValueTargetRangeSingletonUnitAutoConverter implements SingletonUnit
             }
         }
 
-        // key not found
+        // 没有找到符合要求的单位,并且不是由于值本身太大或太小
         if (mid != 0 && mid != (list.size() - 1)) {
+            //todo 配置higher或lower
             if (valueTargetLowerRange().contains(current.value())) {
                 return IntStream.iterate(mid, i -> i - 1).mapToObj(list::get)
                         .map(unit -> configuration.convertTo(quantity, unit))

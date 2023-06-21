@@ -16,94 +16,23 @@
 
 package org.caotc.unit4j.core.convert;
 
-import com.google.common.collect.Range;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.BigInteger;
-import org.caotc.unit4j.core.unit.UnitConstant;
-import org.caotc.unit4j.core.unit.UnitGroup;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.math.MathContext;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
 class ValueTargetRangeSingletonUnitAutoConverterTest {
 
 
-    @Test
-    void test() {
-        ValueTargetRangeSingletonUnitAutoConverter unitChooser = ValueTargetRangeSingletonUnitAutoConverter.of(Range.closedOpen(BigInteger.valueOf(1), BigInteger.valueOf(1000)));
-
-        Configuration configuration = Configuration.defaultInstance();
-        Quantity quantity = Quantity.create(8000, UnitConstant.METER);
-        UnitGroup unitGroup = configuration.getUnitGroup(quantity.unit());
-        log.info("units:{}", unitGroup.units());
-        Quantity result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create("0.1", unitGroup.first());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create(1000, unitGroup.last());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        unitChooser = ValueTargetRangeSingletonUnitAutoConverter.of(Range.atMost(BigInteger.valueOf(1000)));
-
-        quantity = Quantity.create(8000, UnitConstant.METER);
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create("0.1", unitGroup.first());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create(1000, unitGroup.last());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-
-        unitChooser = ValueTargetRangeSingletonUnitAutoConverter.of(Range.atLeast(BigInteger.valueOf(1)));
-
-        quantity = Quantity.create(8000, UnitConstant.METER);
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create("0.1", unitGroup.first());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create(1000, unitGroup.last());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        unitChooser = ValueTargetRangeSingletonUnitAutoConverter.of(Range.singleton(BigInteger.valueOf(1)));
-
-        quantity = Quantity.create(8000, UnitConstant.METER);
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create("0.1", unitGroup.first());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
-
-        quantity = Quantity.create(1000, unitGroup.last());
-        result = unitChooser.autoConvert(quantity, configuration);
-        log.info("result:{}", result.unit().id());
-        log.info("targetValue:{}", result.value(BigDecimal.class, MathContext.DECIMAL128));
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.convert.Provider#unitAutoConverterAndQuantityAndAutoConverted")
+    void autoConvert(ValueTargetRangeSingletonUnitAutoConverter converter, Quantity quantity, Quantity autoConverted) {
+        Quantity result = converter.autoConvert(quantity, Configuration.defaultInstance());
+        log.debug("converter:{},quantity:{},result:{}", converter, quantity, result);
+        Assertions.assertEquals(autoConverted.unit(), result.unit());
+        Assertions.assertEquals(autoConverted.bigDecimalValue(), autoConverted.bigDecimalValue());
     }
 }
