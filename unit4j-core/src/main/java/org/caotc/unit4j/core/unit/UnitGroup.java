@@ -26,8 +26,10 @@ import lombok.Singular;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.unit.type.UnitType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -96,6 +98,12 @@ public class UnitGroup implements List<Unit> {
     this.sortedUnits = units.stream().collect(ImmutableSortedSet.toImmutableSortedSet(configuration::compare));
     this.configuration = configuration;
     Preconditions.checkArgument(!units.isEmpty());
+    //todo check unit type
+  }
+
+  @NonNull
+  public UnitType unitType() {
+    return sortedUnits().first().type();
   }
 
   /**
@@ -254,12 +262,15 @@ public class UnitGroup implements List<Unit> {
 
   @Override
   public int indexOf(Object o) {
-    return units().indexOf(o);//todo 二分查找
+    if (o instanceof Unit) {
+      return Collections.binarySearch(units(), (Unit) o, configuration()::compare);
+    }
+    return -1;
   }
 
   @Override
   public int lastIndexOf(Object o) {
-    return units().lastIndexOf(o);//todo 二分查找
+    return indexOf(o);
   }
 
   @Override

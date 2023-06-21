@@ -818,6 +818,7 @@ public final class Configuration {
 
     /**
      * 注册单位组
+     * //todo 注册unitType to unitGroup
      *
      * @return {@code this}
      * @author caotc

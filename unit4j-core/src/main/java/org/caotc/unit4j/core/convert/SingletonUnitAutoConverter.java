@@ -19,7 +19,6 @@ package org.caotc.unit4j.core.convert;
 import lombok.NonNull;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.unit.Unit;
 
 /**
  * @author caotc
@@ -27,11 +26,11 @@ import org.caotc.unit4j.core.unit.Unit;
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface UnitChooser {
+public interface SingletonUnitAutoConverter {
     @NonNull
-    Unit choose(@NonNull Quantity quantity, @NonNull Configuration configuration);
+    Quantity autoConvert(@NonNull Quantity quantity, @NonNull Configuration configuration);
 
-    default Unit choose(@NonNull Quantity quantity) {
-        return choose(quantity, Configuration.defaultInstance());
+    default Quantity autoConvert(@NonNull Quantity quantity) {
+        return autoConvert(quantity, Configuration.defaultInstance());
     }
 }

@@ -28,6 +28,14 @@ import java.util.stream.Stream;
 @UtilityClass
 @Slf4j
 public class Provider {
+
+    static Stream<Arguments> unitAutoConverterAndQuantityAnd() {
+        return Stream.of(
+                Arguments.of()
+        );
+    }
+
+
     static QuantityGroup randomQuantityGroup(@NonNull UnitGroup unitGroup, int size) {
         ImmutableList<Unit> units = unitGroup.stream().collect(ImmutableList.toImmutableList());
         Random random = new Random();

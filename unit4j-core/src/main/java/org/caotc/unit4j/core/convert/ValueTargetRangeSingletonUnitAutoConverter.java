@@ -19,6 +19,7 @@ package org.caotc.unit4j.core.convert;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigInteger;
-import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
 import java.util.stream.IntStream;
@@ -38,65 +38,64 @@ import java.util.stream.IntStream;
  */
 @Value(staticConstructor = "of")
 @Slf4j
-public class ValueTargetRangeUnitChooser implements UnitChooser {
+public class ValueTargetRangeSingletonUnitAutoConverter implements SingletonUnitAutoConverter {
     @NonNull
     Range<AbstractNumber> valueTargetRange;
+    @NonNull
+    @Getter(lazy = true)
+    Range<AbstractNumber> valueTargetLowerRange = valueTargetRange().hasLowerBound() ?
+            Range.upTo(valueTargetRange().lowerEndpoint(), valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
+            Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
 
-    private static Unit indexedBinarySearch(Range<AbstractNumber> valueTargetRange, Quantity quantity, Configuration configuration) {
+    private Quantity indexedBinarySearch(Quantity quantity, Configuration configuration) {
         UnitGroup list = configuration.getUnitGroup(quantity.unit());
 
         int low = 0;
         int high = list.size() - 1;
-
-        Range<AbstractNumber> lowerRange = valueTargetRange.hasLowerBound() ?
-                Range.upTo(valueTargetRange.lowerEndpoint(), valueTargetRange.lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
-                Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
 
         int mid = 0;
         Quantity current = quantity;
         while (low <= high) {
             mid = (low + high) >>> 1;
             current = configuration.convertTo(quantity, list.get(mid));
-            log.error("current value:{},unit:{}", current.bigDecimalValue(), current.unit().id());
 
-            if (valueTargetRange.contains(current.value())) {
-                return current.unit();
+            if (valueTargetRange().contains(current.value())) {
+                return current;
             }
 
-            if (lowerRange.contains(current.value())) {
+            if (valueTargetLowerRange().contains(current.value())) {
                 high = mid - 1;
             } else {
                 low = mid + 1;
             }
         }
 
-        if (!current.unit().equals(list.first()) && !current.unit().equals(list.last())) {
-            if (lowerRange.contains(current.value())) {
+        // key not found
+        if (mid != 0 && mid != (list.size() - 1)) {
+            if (valueTargetLowerRange().contains(current.value())) {
                 return IntStream.iterate(mid, i -> i - 1).mapToObj(list::get)
                         .map(unit -> configuration.convertTo(quantity, unit))
-                        .filter(q -> !lowerRange.contains(q.value()))
+                        .filter(q -> !valueTargetLowerRange().contains(q.value()))
                         .findFirst()
-                        .map(Quantity::unit)
                         .orElseThrow(AssertionError::new);
             } else {
                 return list.tailSet(current.unit()).stream()
                         .map(unit -> configuration.convertTo(quantity, unit))
-                        .filter(q -> lowerRange.contains(q.value()))
+                        .filter(q -> valueTargetLowerRange().contains(q.value()))
                         .findFirst()
-                        .map(Quantity::unit)
                         .orElseThrow(AssertionError::new);
             }
         } else {
-            return current.unit();  // key not found
+            return current;
         }
     }
 
     @Override
-    public @NonNull Unit choose(@NonNull Quantity quantity, @NonNull Configuration configuration) {
+    public @NonNull Quantity autoConvert(@NonNull Quantity quantity, @NonNull Configuration configuration) {
         if (valueTargetRange().contains(quantity.value())) {
-            return quantity.unit();
+            return quantity;
         }
 
-        return indexedBinarySearch(valueTargetRange(), quantity, configuration);
+        return indexedBinarySearch(quantity, configuration);
     }
 }
