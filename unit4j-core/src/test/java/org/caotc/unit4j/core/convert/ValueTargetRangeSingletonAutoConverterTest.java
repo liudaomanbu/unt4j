@@ -24,12 +24,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
-class ValueTargetRangeSingletonUnitAutoConverterTest {
+class ValueTargetRangeSingletonAutoConverterTest {
 
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.convert.Provider#unitAutoConverterAndQuantityAndAutoConverted")
-    void autoConvert(ValueTargetRangeSingletonUnitAutoConverter converter, Quantity quantity, Quantity autoConverted) {
+    void autoConvert(ValueTargetRangeSingletonAutoConverter converter, Quantity quantity, Quantity autoConverted) {
         Quantity result = converter.autoConvert(quantity, Configuration.defaultInstance());
         log.debug("converter:{},quantity:{},result:{}", converter, quantity, result);
         Assertions.assertEquals(autoConverted.unit(), result.unit());

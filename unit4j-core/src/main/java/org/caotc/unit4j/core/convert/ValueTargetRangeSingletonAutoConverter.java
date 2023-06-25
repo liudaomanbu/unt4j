@@ -39,7 +39,7 @@ import java.util.stream.IntStream;
  */
 @Value(staticConstructor = "of")
 @Slf4j
-public class ValueTargetRangeSingletonUnitAutoConverter implements SingletonUnitAutoConverter {
+public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConverter {
     @NonNull
     Range<AbstractNumber> valueTargetRange;
     @NonNull
