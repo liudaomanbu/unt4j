@@ -30,7 +30,7 @@ class ValueTargetRangeSingletonAutoConverterTest {
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.convert.Provider#unitAutoConverterAndQuantityAndAutoConverted")
     void autoConvert(ValueTargetRangeSingletonAutoConverter converter, Quantity quantity, Quantity autoConverted) {
-        Quantity result = converter.autoConvert(quantity, Configuration.defaultInstance());
+        Quantity result = converter.autoConvert(Configuration.defaultInstance(), quantity);
         log.debug("converter:{},quantity:{},result:{}", converter, quantity, result);
         Assertions.assertEquals(autoConverted.unit(), result.unit());
         Assertions.assertEquals(autoConverted.bigDecimalValue(), autoConverted.bigDecimalValue());

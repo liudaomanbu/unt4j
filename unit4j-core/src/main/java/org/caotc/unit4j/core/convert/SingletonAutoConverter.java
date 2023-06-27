@@ -28,9 +28,5 @@ import org.caotc.unit4j.core.Quantity;
 @FunctionalInterface
 public interface SingletonAutoConverter {
     @NonNull
-    Quantity autoConvert(@NonNull Quantity quantity, @NonNull Configuration configuration);
-
-    default Quantity autoConvert(@NonNull Quantity quantity) {
-        return autoConvert(quantity, Configuration.defaultInstance());
-    }
+    Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity);
 }

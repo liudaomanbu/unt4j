@@ -21,7 +21,6 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
 import lombok.experimental.FieldNameConstants;
-import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.BigInteger;
@@ -150,7 +149,7 @@ public class Quantity {
      */
     @NonNull
     public Quantity convertTo(@NonNull Unit targetUnit) {
-        return convertTo(targetUnit, Configuration.defaultInstance());
+        return Configuration.defaultInstance().convert(this, targetUnit);
     }
 
     /**
@@ -165,42 +164,7 @@ public class Quantity {
      */
     @NonNull
     public Quantity convertTo(@NonNull Unit targetUnit, @NonNull Configuration configuration) {
-        if (targetUnit.equals(unit())) {
-            return this;
-        }
-
-        UnitConvertConfig convertConfig = configuration.getConvertConfig(unit(), targetUnit);
-        return Quantity.create(convertConfig.apply(value), targetUnit);
-    }
-
-    /**
-     * 自动转换单位
-     *
-     * @return 自动转换单位后的数量对象
-     * @author caotc
-     * @date 2018-12-01
-     * @apiNote 使用的配置为 {@link Configuration#defaultInstance()}
-     * @since 1.0.0
-     */
-    @NonNull
-    public Quantity autoConvert() {
-        return autoConvert(Configuration.defaultInstance());
-    }
-
-
-    /**
-     * 使用参数的配置,自动转换单位
-     *
-     * @param configuration 配置
-     * @return 自动转换单位后的数量对象
-     * @author caotc
-     * @date 2019-01-10
-     * @since 1.0.0
-     */
-    @NonNull
-    public Quantity autoConvert(@NonNull Configuration configuration) {
-        return convertTo(configuration.targetUnitChooser().targetUnit(this, configuration),
-                configuration);
+        return configuration.convert(this, targetUnit);
     }
 
     /**

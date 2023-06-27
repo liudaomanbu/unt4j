@@ -40,8 +40,16 @@ import java.util.stream.IntStream;
 @Value(staticConstructor = "of")
 @Slf4j
 public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConverter {
+    boolean higher;
+
     @NonNull
     Range<AbstractNumber> valueTargetRange;
+
+    @NonNull
+    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<AbstractNumber> valueTargetRange) {
+        return of(valueTargetRange, true);
+    }
+
     @NonNull
     @Getter(lazy = true)
     @ToString.Exclude
@@ -49,7 +57,7 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
             Range.upTo(valueTargetRange().lowerEndpoint(), valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
             Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
 
-    private Quantity indexedBinarySearch(Quantity quantity, Configuration configuration) {
+    private Quantity indexedBinarySearch(Configuration configuration, Quantity quantity) {
         UnitGroup list = configuration.getUnitGroup(quantity.unit());
 
         int low = 0;
@@ -59,7 +67,7 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
         Quantity current = quantity;
         while (low <= high) {
             mid = (low + high) >>> 1;
-            current = configuration.convertTo(quantity, list.get(mid));
+            current = configuration.convert(quantity, list.get(mid));
 
             if (valueTargetRange().contains(current.value())) {
                 return current;
@@ -74,16 +82,16 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
 
         // 没有找到符合要求的单位,并且不是由于值本身太大或太小
         if (mid != 0 && mid != (list.size() - 1)) {
-            //todo 配置higher或lower
-            if (valueTargetLowerRange().contains(current.value())) {
+            if ((valueTargetLowerRange().contains(current.value()) && higher)
+                    || (!valueTargetLowerRange().contains(current.value()) && !higher)) {
                 return IntStream.iterate(mid, i -> i - 1).mapToObj(list::get)
-                        .map(unit -> configuration.convertTo(quantity, unit))
+                        .map(unit -> configuration.convert(quantity, unit))
                         .filter(q -> !valueTargetLowerRange().contains(q.value()))
                         .findFirst()
                         .orElseThrow(AssertionError::new);
             } else {
                 return list.tailSet(current.unit()).stream()
-                        .map(unit -> configuration.convertTo(quantity, unit))
+                        .map(unit -> configuration.convert(quantity, unit))
                         .filter(q -> valueTargetLowerRange().contains(q.value()))
                         .findFirst()
                         .orElseThrow(AssertionError::new);
@@ -94,11 +102,11 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
     }
 
     @Override
-    public @NonNull Quantity autoConvert(@NonNull Quantity quantity, @NonNull Configuration configuration) {
+    public @NonNull Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity) {
         if (valueTargetRange().contains(quantity.value())) {
             return quantity;
         }
 
-        return indexedBinarySearch(quantity, configuration);
+        return indexedBinarySearch(configuration, quantity);
     }
 }

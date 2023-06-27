@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Range;
 import com.google.common.collect.Streams;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
@@ -31,14 +32,18 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.core.convert.AutoConverter;
+import org.caotc.unit4j.core.convert.DefaultAutoConverter;
 import org.caotc.unit4j.core.convert.QuantityChooser;
-import org.caotc.unit4j.core.convert.TargetUnitChooser;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
+import org.caotc.unit4j.core.convert.ValueTargetRangeSingletonAutoConverter;
 import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
 import org.caotc.unit4j.core.exception.UnitNotFoundException;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
+import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.math.number.Fraction;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
@@ -52,7 +57,6 @@ import org.caotc.unit4j.core.unit.UnitGroup;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
-import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collection;
@@ -83,11 +87,9 @@ public final class Configuration {
      */
     private static final MathContext DEFAULT_MATH_CONTEXT = MathContext.UNLIMITED;
     /**
-     * 默认的自动转换时的目标单位选择器
+     * 默认的单位自动转换器
      */
-    private static final TargetUnitChooser DEFAULT_TARGET_UNIT_CHOOSER = TargetUnitChooser
-            .create(QuantityChooser.targetValueQuantityChooser(BigInteger.ONE),
-                    QuantityChooser.minQuantityChooser());
+    private static final AutoConverter DEFAULT_AUTO_CONVERTER = DefaultAutoConverter.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigInteger.ONE, BigInteger.valueOf(1000))), QuantityChooser.minQuantityChooser());
     private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
     /**
      * 保存全局配置与id的map
@@ -177,10 +179,11 @@ public final class Configuration {
     final Table<String, Alias.Type, Object> aliasToTypeToAliasRegistrableTable = Tables
             .synchronizedTable(HashBasedTable.create());
     /**
-     * 自动转换时的目标单位选择器
+     * 单位自动转换器
      */
     @NonNull
-    volatile TargetUnitChooser targetUnitChooser = DEFAULT_TARGET_UNIT_CHOOSER;
+    @NonFinal
+    AutoConverter autoConverter = DEFAULT_AUTO_CONVERTER;
     /**
      * 数学计算时使用的上下文
      */
@@ -757,36 +760,8 @@ public final class Configuration {
         return Optional.empty();
     }
 
-    /**
-     * 获取数量对象的自动转换目标单位
-     *
-     * @param quantity 数量对象
-     * @return 自动转换目标单位
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
     @NonNull
-    public Unit getTargetUnit(@NonNull Quantity quantity) {
-        return targetUnitChooser.targetUnit(quantity, this);
-    }
-
-    /**
-     * 获取数量对象集合的自动转换目标单位
-     *
-     * @param quantities 数量对象集合
-     * @return 自动转换目标单位
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
-    @NonNull
-    public Unit getTargetUnit(@NonNull Collection<Quantity> quantities) {
-        return targetUnitChooser.targetUnit(quantities, this);
-    }
-
-    @NonNull
-    public Quantity convertTo(@NonNull Quantity quantity, @NonNull Unit targetUnit) {
+    public Quantity convert(@NonNull Quantity quantity, @NonNull Unit targetUnit) {
         if (targetUnit.equals(quantity.unit())) {
             return quantity;
         }
@@ -797,7 +772,17 @@ public final class Configuration {
 
     @NonNull
     public Quantity autoConvert(@NonNull Quantity quantity) {
-        return convertTo(quantity, getTargetUnit(quantity));
+        return autoConverter().autoConvert(this, quantity);
+    }
+
+    @NonNull
+    public Collection<Quantity> autoConvert(@NonNull Collection<Quantity> quantities, boolean unitConsistency) {
+        return autoConverter().autoConvert(this, quantities, unitConsistency);
+    }
+
+    @NonNull
+    public Collection<Quantity> autoConvert(@NonNull Collection<Quantity> quantities) {
+        return autoConverter().autoConvert(this, quantities);
     }
 
     /**

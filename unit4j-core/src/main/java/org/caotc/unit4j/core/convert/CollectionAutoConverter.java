@@ -30,13 +30,9 @@ import java.util.Collection;
 @FunctionalInterface
 public interface CollectionAutoConverter {
     @NonNull
-    Collection<Quantity> autoConvert(@NonNull Collection<Quantity> quantities, @NonNull Configuration configuration, boolean unitConsistency);
+    Collection<Quantity> autoConvert(@NonNull Configuration configuration, @NonNull Collection<Quantity> quantities, boolean unitConsistency);
 
-    default Collection<Quantity> autoConvert(@NonNull Collection<Quantity> quantity, @NonNull Configuration configuration) {
-        return autoConvert(quantity, configuration, true);
-    }
-
-    default Collection<Quantity> autoConvert(@NonNull Collection<Quantity> quantity) {
-        return autoConvert(quantity, Configuration.defaultInstance(), true);
+    default Collection<Quantity> autoConvert(@NonNull Configuration configuration, @NonNull Collection<Quantity> quantities) {
+        return autoConvert(Configuration.defaultInstance(), quantities, true);
     }
 }

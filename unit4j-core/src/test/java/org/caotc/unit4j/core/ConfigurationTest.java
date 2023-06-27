@@ -10,7 +10,6 @@ import org.caotc.unit4j.core.unit.PrefixUnit;
 import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitConstant;
-import org.caotc.unit4j.core.unit.UnitGroup;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Assertions;
@@ -271,22 +270,6 @@ class ConfigurationTest {
     Assertions.assertNotNull(configuration.getConvertConfig(UnitConstant.METER, testLength));
     Assertions
         .assertNotNull(configuration.getConvertConfig(testLength, UnitConstant.METER));
-  }
-
-
-  @Test
-  void getTargetUnit() {
-    Assertions.assertThrows(IllegalArgumentException.class, () ->
-            configuration.register(
-                    UnitGroup.builder().configuration(Configuration.defaultInstance()).unit(UnitConstant.MINUTE)
-                            .unit(
-                                    UnitConstant.SECOND).build()));
-    Quantity quantity = Quantity.create(BigDecimal.valueOf("0.26"), UnitConstant.MINUTE);
-    Unit targetCompositePrefixUnit = configuration.getTargetUnit(quantity);
-    Assertions.assertEquals(UnitConstant.SECOND, targetCompositePrefixUnit);
-
-    targetCompositePrefixUnit = configuration.getTargetUnit(ImmutableSet.of(quantity));
-    Assertions.assertEquals(UnitConstant.SECOND, targetCompositePrefixUnit);
   }
 
   @Test
