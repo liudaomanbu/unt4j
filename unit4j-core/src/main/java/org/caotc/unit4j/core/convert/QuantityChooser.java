@@ -2,25 +2,19 @@ package org.caotc.unit4j.core.convert;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
-import lombok.Value;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.AbstractNumber;
-import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.Unit;
 
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -161,64 +155,6 @@ public abstract class QuantityChooser {
     }
 
     /**
-     * 目标值选择器工厂方法
-     *
-     * @param targetValue 目标值
-     * @return 目标值选择器
-     * @author caotc
-     * @date 2019-05-24
-     * @since 1.0.0
-     */
-    @NonNull
-    public static QuantityChooser targetValueQuantityChooser(@NonNull AbstractNumber targetValue) {
-        return new TargetValueQuantityChooser(targetValue);
-    }
-
-    /**
-     * 目标值选择器工厂方法
-     *
-     * @param targetValue 目标值
-     * @return 目标值选择器
-     * @author caotc
-     * @date 2019-05-24
-     * @since 1.0.0
-     */
-    @NonNull
-    public static QuantityChooser targetValueQuantityChooser(long targetValue) {
-        return new TargetValueQuantityChooser(BigInteger.valueOf(targetValue));
-    }
-
-    /**
-     * 目标值选择器工厂方法
-     *
-     * @param targetValue 目标值
-     * @return 目标值选择器
-     * @author caotc
-     * @date 2019-05-24
-     * @since 1.0.0
-     */
-    @NonNull
-    public static QuantityChooser targetValueQuantityChooser(
-            @NonNull java.math.BigInteger targetValue) {
-        return new TargetValueQuantityChooser(BigInteger.valueOf(targetValue));
-    }
-
-    /**
-     * 目标值选择器工厂方法
-     *
-     * @param targetValue 目标值
-     * @return 目标值选择器
-     * @author caotc
-     * @date 2019-05-24
-     * @since 1.0.0
-     */
-    @NonNull
-    public static QuantityChooser targetValueQuantityChooser(
-            @NonNull java.math.BigDecimal targetValue) {
-        return new TargetValueQuantityChooser(BigDecimal.valueOf(targetValue));
-    }
-
-    /**
      * 从集合中选取目标对象
      *
      * @param quantities    对象集合
@@ -268,29 +204,4 @@ public abstract class QuantityChooser {
     @NonNull
   protected abstract Quantity chooseInternal(@NonNull Stream<Quantity> quantities,
                                              @NonNull Configuration configuration);
-}
-
-/**
- * 目标值选择器,选择最接近目标值的对象
- *
- * @author caotc
- * @date 2019-05-24
- * @since 1.0.0
- */
-@Value
-class TargetValueQuantityChooser extends QuantityChooser {
-
-    @NonNull
-    AbstractNumber targetValue;
-
-    @Override
-    protected @NonNull Quantity chooseInternal(@NonNull Stream<Quantity> quantities,
-                                               @NonNull Configuration configuration) {
-        ImmutableMap<@NonNull AbstractNumber, Quantity> valueToQuantities = quantities.distinct()
-                .collect(ImmutableMap.toImmutableMap(Quantity::value, Function.identity()));
-        ImmutableSortedSet<AbstractNumber> sortedValues = valueToQuantities.keySet().stream()
-        .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder()));
-        //todo 最接近?
-    return valueToQuantities.get(sortedValues.higher(targetValue));
-  }
 }
