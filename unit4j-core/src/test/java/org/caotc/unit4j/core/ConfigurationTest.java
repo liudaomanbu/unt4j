@@ -9,8 +9,8 @@ import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.PrefixUnit;
 import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitTypes;
+import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -257,24 +257,24 @@ class ConfigurationTest {
     UnitConvertConfig expected = UnitConvertConfig.create(
             BigDecimal.valueOf("3.14"));
     configuration
-        .register(testLength, UnitConstant.METER, expected);
+        .register(testLength, Units.METER, expected);
     UnitConvertConfig actual = configuration
-        .getConvertConfig(testLength, UnitConstant.METER);
+        .getConvertConfig(testLength, Units.METER);
     log.debug("{}", actual);
     Assertions.assertEquals(expected, actual);
     actual = configuration
-        .getConvertConfig(testLength, UnitConstant.METER);
+        .getConvertConfig(testLength, Units.METER);
     log.debug("{}", actual);
     Assertions.assertEquals(0, expected.ratio().compareTo(actual.ratio()));
 
-    Assertions.assertNotNull(configuration.getConvertConfig(UnitConstant.METER, testLength));
+    Assertions.assertNotNull(configuration.getConvertConfig(Units.METER, testLength));
     Assertions
-        .assertNotNull(configuration.getConvertConfig(testLength, UnitConstant.METER));
+        .assertNotNull(configuration.getConvertConfig(testLength, Units.METER));
   }
 
   @Test
   void getUnitGroup() {
-    Assertions.assertNotNull(configuration.getUnitGroup(UnitConstant.HOUR));
+    Assertions.assertNotNull(configuration.getUnitGroup(Units.HOUR));
   }
 
   @Test
@@ -305,26 +305,26 @@ class ConfigurationTest {
   @Test
   void compareTo() {
     Assertions.assertTrue(
-            configuration.compare(Quantity.create(java.math.BigDecimal.TEN, UnitConstant.KILOGRAM),
+            configuration.compare(Quantity.create(java.math.BigDecimal.TEN, Units.KILOGRAM),
                     Quantity.create(
-                            java.math.BigDecimal.ONE, UnitConstant.KILOGRAM)) > 0);
+                            java.math.BigDecimal.ONE, Units.KILOGRAM)) > 0);
 
     Assertions.assertTrue(
-            configuration.compare(Quantity.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
+            configuration.compare(Quantity.create(java.math.BigDecimal.ONE, Units.KILOGRAM),
                     Quantity.create(
-                            java.math.BigDecimal.TEN, UnitConstant.GRAM)) > 0);
+                            java.math.BigDecimal.TEN, Units.GRAM)) > 0);
 
     Assertions.assertEquals(0,
-            configuration.compare(Quantity.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
+            configuration.compare(Quantity.create(java.math.BigDecimal.ONE, Units.KILOGRAM),
                     Quantity.create(
-                            java.math.BigDecimal.valueOf(1000), UnitConstant.GRAM)));
+                            java.math.BigDecimal.valueOf(1000), Units.GRAM)));
 
     Assertions.assertThrows(IllegalArgumentException.class,
         () -> {
           int i = configuration
-                  .compare(Quantity.create(java.math.BigDecimal.ONE, UnitConstant.KILOGRAM),
+                  .compare(Quantity.create(java.math.BigDecimal.ONE, Units.KILOGRAM),
                           Quantity.create(
-                                  java.math.BigDecimal.valueOf(1000), UnitConstant.NEWTON));
+                                  java.math.BigDecimal.valueOf(1000), Units.NEWTON));
         });
   }
 }

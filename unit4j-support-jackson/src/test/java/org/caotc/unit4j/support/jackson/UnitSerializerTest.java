@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Aliases;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
-import org.caotc.unit4j.core.unit.UnitConstant;
+import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.support.UnitCodecConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class UnitSerializerTest {
 
   @Test
   void serialize() throws Exception {
-    String unitJson = mapper.writeValueAsString(UnitConstant.NEWTON);
+    String unitJson = mapper.writeValueAsString(Units.NEWTON);
     log.debug("unit:{}", unitJson);
     Assertions.assertEquals("\"NEWTON\"", unitJson);
   }

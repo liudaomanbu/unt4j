@@ -3,8 +3,8 @@ package org.caotc.unit4j.core;
 import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitTypes;
+import org.caotc.unit4j.core.unit.Units;
 
 /**
  * //todo 补齐默认别名
@@ -29,44 +29,44 @@ public class Aliases {
             UnitTypes.SUBSTANCE_AMOUNT.id());
     public static final Alias LUMINOUS_INTENSITY_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME,
             UnitTypes.LUMINOUS_INTENSITY.id());
-    public static final Alias METER_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.METER.id());
-    public static final Alias GRAM_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.GRAM.id());
-    public static final Alias SECOND_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.SECOND.id());
-    public static final Alias AMPERE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.AMPERE.id());
-    public static final Alias KELVIN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.KELVIN.id());
-    public static final Alias MOLE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.MOLE.id());
-    public static final Alias CANDELA_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.CANDELA.id());
+    public static final Alias METER_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.METER.id());
+    public static final Alias GRAM_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.GRAM.id());
+    public static final Alias SECOND_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.SECOND.id());
+    public static final Alias AMPERE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.AMPERE.id());
+    public static final Alias KELVIN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.KELVIN.id());
+    public static final Alias MOLE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.MOLE.id());
+    public static final Alias CANDELA_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.CANDELA.id());
     public static final Alias CELSIUS_DEGREE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME,
-            UnitConstant.CELSIUS_DEGREE.id());
+            Units.CELSIUS_DEGREE.id());
     public static final Alias FAHRENHEIT_DEGREE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME,
-            UnitConstant.FAHRENHEIT_DEGREE.id());
-    public static final Alias CHINESE_MILE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.CHINESE_MILE.id());
-    public static final Alias TANG_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.TANG.id());
-    public static final Alias ZHANG_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.ZHANG.id());
-    public static final Alias YIN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.YIN.id());
-    public static final Alias CHI_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.CHI.id());
-    public static final Alias CUN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.CUN.id());
-    public static final Alias FEN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.FEN.id());
-    public static final Alias LI_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.LI.id());
-    public static final Alias INCH_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.INCH.id());
-    public static final Alias FOOT_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.FOOT.id());
-    public static final Alias YARD_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.YARD.id());
-    public static final Alias FATHOM_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.FATHOM.id());
-    public static final Alias CHAIN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.CHAIN.id());
-    public static final Alias FURLONG_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.FURLONG.id());
-    public static final Alias MILE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.MILE.id());
-    public static final Alias TONNE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.TONNE.id());
-    public static final Alias MINUTE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.MINUTE.id());
-    public static final Alias HOUR_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.HOUR.id());
-    public static final Alias DAY_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.DAY.id());
-    public static final Alias HALF_DAY_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.HALF_DAY.id());
-    public static final Alias WEEK_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.WEEK.id());
-    public static final Alias YEAR_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.YEAR.id());
-    public static final Alias MONTH_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.MONTH.id());
-    public static final Alias DECADE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.DECADE.id());
-    public static final Alias CENTURY_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.CENTURY.id());
-    public static final Alias MILLENNIUM_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.MILLENNIUM.id());
-    public static final Alias ERA_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, UnitConstant.ERA.id());
+            Units.FAHRENHEIT_DEGREE.id());
+    public static final Alias CHINESE_MILE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.CHINESE_MILE.id());
+    public static final Alias TANG_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.TANG.id());
+    public static final Alias ZHANG_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.ZHANG.id());
+    public static final Alias YIN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.YIN.id());
+    public static final Alias CHI_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.CHI.id());
+    public static final Alias CUN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.CUN.id());
+    public static final Alias FEN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.FEN.id());
+    public static final Alias LI_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.LI.id());
+    public static final Alias INCH_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.INCH.id());
+    public static final Alias FOOT_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.FOOT.id());
+    public static final Alias YARD_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.YARD.id());
+    public static final Alias FATHOM_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.FATHOM.id());
+    public static final Alias CHAIN_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.CHAIN.id());
+    public static final Alias FURLONG_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.FURLONG.id());
+    public static final Alias MILE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.MILE.id());
+    public static final Alias TONNE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.TONNE.id());
+    public static final Alias MINUTE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.MINUTE.id());
+    public static final Alias HOUR_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.HOUR.id());
+    public static final Alias DAY_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.DAY.id());
+    public static final Alias HALF_DAY_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.HALF_DAY.id());
+    public static final Alias WEEK_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.WEEK.id());
+    public static final Alias YEAR_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.YEAR.id());
+    public static final Alias MONTH_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.MONTH.id());
+    public static final Alias DECADE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.DECADE.id());
+    public static final Alias CENTURY_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.CENTURY.id());
+    public static final Alias MILLENNIUM_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.MILLENNIUM.id());
+    public static final Alias ERA_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, Units.ERA.id());
     public static final Alias RADIAN_PLANE_ANGLE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME,
             "RADIAN_PLANE_ANGLE");
     public static final Alias STERADIAN_SOLID_ANGLE_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME,

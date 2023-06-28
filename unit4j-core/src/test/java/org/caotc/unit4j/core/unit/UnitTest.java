@@ -14,15 +14,15 @@ import java.util.Map;
 class UnitTest {
     @Test
     void id() {
-        log.info("id:{}", UnitConstant.JOULE.id());
+        log.info("id:{}", Units.JOULE.id());
     }
 
     @Test
     void unitComponentToExponents() {
-        ImmutableMap<Unit, Integer> unitComponentIntegerImmutableMap = UnitConstant.GRAM
+        ImmutableMap<Unit, Integer> unitComponentIntegerImmutableMap = Units.GRAM
                 .componentToExponents();
         Assertions
-                .assertEquals(ImmutableMap.of(UnitConstant.GRAM, 1), unitComponentIntegerImmutableMap);
+                .assertEquals(ImmutableMap.of(Units.GRAM, 1), unitComponentIntegerImmutableMap);
     }
 
     @ParameterizedTest

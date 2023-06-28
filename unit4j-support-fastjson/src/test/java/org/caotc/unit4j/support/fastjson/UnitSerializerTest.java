@@ -10,7 +10,7 @@ import org.caotc.unit4j.core.unit.BasePrefixUnit;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
-import org.caotc.unit4j.core.unit.UnitConstant;
+import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.support.UnitCodecConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,7 @@ class UnitSerializerTest {
 
   @Test
   void write() {
-    String unitJson = JSONObject.toJSONString(UnitConstant.NEWTON);
+    String unitJson = JSONObject.toJSONString(Units.NEWTON);
     log.debug("unit:{}", unitJson);
     Assertions.assertEquals("\"NEWTON\"", unitJson);
   }

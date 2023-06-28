@@ -25,7 +25,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.unit.UnitConstant;
+import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.support.mybatis.mapper.TestQuantityMapper;
 import org.caotc.unit4j.support.mybatis.model.TestAmountField;
 import org.caotc.unit4j.support.mybatis.model.TestQuantity;
@@ -62,7 +62,7 @@ public class MybatisTest {
       TestQuantity result = MAPPER.findByPrimaryKeyOnResultType(1L);
       log.debug("result:{}", result);
       Assertions.assertEquals(BigDecimal.ONE.negate(), result.data().bigDecimalValue());
-      Assertions.assertEquals(UnitConstant.SECOND, result.data().unit());
+      Assertions.assertEquals(Units.SECOND, result.data().unit());
   }
 
   @Test
@@ -70,12 +70,12 @@ public class MybatisTest {
       TestQuantity result = MAPPER.findByPrimaryKeyOnResultMap(1L);
       log.debug("result:{}", result);
       Assertions.assertEquals(BigDecimal.ONE.negate(), result.data().bigDecimalValue());
-      Assertions.assertEquals(UnitConstant.SECOND, result.data().unit());
+      Assertions.assertEquals(Units.SECOND, result.data().unit());
   }
 
   @Test
   void insert() {
-      Quantity quantity = Quantity.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
+      Quantity quantity = Quantity.create(BigDecimal.valueOf(RANDOM.nextDouble()), Units.HOUR);
       TestQuantity param = new TestQuantity().data(quantity);
       log.debug("param:{}", param);
       int effectRows = MAPPER.insertSelective(param);
@@ -92,7 +92,7 @@ public class MybatisTest {
 
   @Test
   void update() {
-      Quantity quantity = Quantity.create(BigDecimal.valueOf(RANDOM.nextDouble()), UnitConstant.HOUR);
+      Quantity quantity = Quantity.create(BigDecimal.valueOf(RANDOM.nextDouble()), Units.HOUR);
       TestQuantity param = new TestQuantity()
               .data(quantity).id(1L);
       int effectRows = MAPPER.updateByPrimaryKeySelective(param);

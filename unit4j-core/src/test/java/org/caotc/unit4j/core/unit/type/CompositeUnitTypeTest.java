@@ -3,8 +3,8 @@ package org.caotc.unit4j.core.unit.type;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
-import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitTypes;
+import org.caotc.unit4j.core.unit.Units;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,9 +31,9 @@ class CompositeUnitTypeTest {
     @Test
     void rebase() {
         UnitType actual = CompositeStandardUnit
-                .builder().componentToExponent(UnitConstant.NEWTON, 1)
-                .componentToExponent(UnitConstant.METER, -2).build().type();
-        Assertions.assertEquals(UnitConstant.PASCAL.type().rebase(), actual.rebase());
+                .builder().componentToExponent(Units.NEWTON, 1)
+                .componentToExponent(Units.METER, -2).build().type();
+        Assertions.assertEquals(Units.PASCAL.type().rebase(), actual.rebase());
     }
 
     @ParameterizedTest

@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.unit.UnitConstant;
+import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.QuantityValueCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
@@ -22,7 +22,7 @@ class QuantityValueSerializerTest {
 
     Unit4jProperties unit4jProperties = new Unit4jProperties();
     QuantityCodecConfig quantityCodecConfig = unit4jProperties.createAmountCodecConfig();
-    Quantity quantity = Quantity.create("123.56", UnitConstant.SECOND);
+    Quantity quantity = Quantity.create("123.56", Units.SECOND);
     QuantityValueSerializer quantityValueSerializer = new QuantityValueSerializer(
             new QuantityValueCodecConfig(
                     BigDecimal.class, MathContext.UNLIMITED));

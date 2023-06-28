@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class BasePrefixUnitTest {
     @Test
     void test() {
-        String toString = UnitConstant.KILOGRAM.toString();
+        String toString = Units.KILOGRAM.toString();
         log.debug("toString:{}", toString);
     }
 

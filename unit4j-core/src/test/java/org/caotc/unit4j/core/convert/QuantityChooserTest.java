@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitGroup;
+import org.caotc.unit4j.core.unit.Units;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -25,16 +25,16 @@ class QuantityChooserTest {
 
     private static final Collection<Quantity> EMPTY_QUANTITIES = ImmutableList.of();
     private static final Collection<Quantity> QUANTITIES = ImmutableList
-            .of(Quantity.create(BigDecimal.TEN, UnitConstant.DAY),
-                    Quantity.create(BigDecimal.TEN, UnitConstant.SECOND),
-                    Quantity.create(BigDecimal.TEN, UnitConstant.HOUR));
+            .of(Quantity.create(BigDecimal.TEN, Units.DAY),
+                    Quantity.create(BigDecimal.TEN, Units.SECOND),
+                    Quantity.create(BigDecimal.TEN, Units.HOUR));
 
     private Configuration configuration = Configuration.defaultInstance();
 
     @RepeatedTest(100)
     void choose() {
         Random random = new Random();
-        Provider.QuantityGroup quantityGroup = Provider.randomQuantityGroup(UnitGroup.createSiUnitGroup(UnitConstant.METER, Configuration.defaultInstance()), random.nextInt(100) + 1);
+        Provider.QuantityGroup quantityGroup = Provider.randomQuantityGroup(UnitGroup.createSiUnitGroup(Units.METER, Configuration.defaultInstance()), random.nextInt(100) + 1);
         log.debug("quantities:{}", quantityGroup.quantities());
         Quantity min = QuantityChooser.minQuantityChooser().choose(quantityGroup.quantities(), Configuration.defaultInstance());
         log.debug("min:{}", min);

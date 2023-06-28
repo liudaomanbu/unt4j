@@ -9,44 +9,44 @@ import java.util.Optional;
 class CompositePrefixUnitGroupTest {
 
   private UnitGroup timeUnitGroup = UnitGroup
-          .create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS,
+          .create(Units.DEFAULT_TIME_STANDARD_UNITS,
                   Configuration.defaultInstance());
 
   @Test
   void previous() {
-    Optional<Unit> previous = timeUnitGroup.lower(UnitConstant.ERA);
+    Optional<Unit> previous = timeUnitGroup.lower(Units.ERA);
     Assertions.assertTrue(previous.isPresent());
-    Assertions.assertEquals(UnitConstant.MILLENNIUM, previous.get());
+    Assertions.assertEquals(Units.MILLENNIUM, previous.get());
 
-    Assertions.assertTrue(!timeUnitGroup.lower(UnitConstant.SECOND).isPresent());
+    Assertions.assertTrue(!timeUnitGroup.lower(Units.SECOND).isPresent());
   }
 
   @Test
   void next() {
-    Optional<Unit> next = timeUnitGroup.higher(UnitConstant.SECOND);
+    Optional<Unit> next = timeUnitGroup.higher(Units.SECOND);
     Assertions.assertTrue(next.isPresent());
-    Assertions.assertEquals(UnitConstant.MINUTE, next.get());
+    Assertions.assertEquals(Units.MINUTE, next.get());
 
-    Assertions.assertTrue(!timeUnitGroup.higher(UnitConstant.ERA).isPresent());
+    Assertions.assertTrue(!timeUnitGroup.higher(Units.ERA).isPresent());
   }
 
   @Test
   void first() {
     Unit first = timeUnitGroup.first();
-    Assertions.assertEquals(UnitConstant.SECOND, first);
+    Assertions.assertEquals(Units.SECOND, first);
   }
 
   @Test
   void last() {
     Unit last = timeUnitGroup.last();
-    Assertions.assertEquals(UnitConstant.ERA, last);
+    Assertions.assertEquals(Units.ERA, last);
   }
 
   @Test
   void valid() {
     Assertions.assertThrows(IllegalArgumentException.class,
-            () -> UnitGroup.builder().configuration(Configuration.defaultInstance()).unit(UnitConstant.GRAM)
-                    .unit(UnitConstant.SECOND)
+            () -> UnitGroup.builder().configuration(Configuration.defaultInstance()).unit(Units.GRAM)
+                    .unit(Units.SECOND)
                     .build());
   }
 }

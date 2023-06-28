@@ -3,8 +3,8 @@ package org.caotc.unit4j.core.common.util;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitTypes;
+import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,11 +48,11 @@ class UtilTest {
     @Test
     void createCompositeAlias() {
         log.debug("NEWTON_ENGLISH_NAME ENGLISH_NAME:{}",
-                Util.createCompositeIdOrAlias(UnitConstant.NEWTON.componentToExponents()));
+                Util.createCompositeIdOrAlias(Units.NEWTON.componentToExponents()));
 
         Unit unit = Unit.builder()
-                .componentToExponent(UnitConstant.WATT.addPrefix(Prefix.CENTI), 2)
-                .componentToExponent(UnitConstant.NEWTON, 3)
+                .componentToExponent(Units.WATT.addPrefix(Prefix.CENTI), 2)
+                .componentToExponent(Units.NEWTON, 3)
                 .prefix(Prefix.HECTO)
                 .build();
 

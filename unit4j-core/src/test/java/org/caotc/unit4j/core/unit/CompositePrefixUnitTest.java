@@ -13,36 +13,36 @@ class CompositePrefixUnitTest {
   @Test
   void rebase() {
       Unit actual = CompositeStandardUnit
-              .builder().componentToExponent(UnitConstant.NEWTON, 1)
-              .componentToExponent(UnitConstant.METER, -2).build();
-    log.debug("PASCAL_ENGLISH_NAME:{},rebase:{}", UnitConstant.PASCAL.rebase(), actual.rebase());
-    Assertions.assertEquals(UnitConstant.PASCAL.rebase(), actual.rebase());
+              .builder().componentToExponent(Units.NEWTON, 1)
+              .componentToExponent(Units.METER, -2).build();
+    log.debug("PASCAL_ENGLISH_NAME:{},rebase:{}", Units.PASCAL.rebase(), actual.rebase());
+    Assertions.assertEquals(Units.PASCAL.rebase(), actual.rebase());
   }
 
   @Test
   void divide() {
       Unit pascalOther = CompositeStandardUnit
-              .builder().componentToExponent(UnitConstant.NEWTON, 1)
-              .componentToExponent(UnitConstant.METER, -2).build();
-      Unit result = pascalOther.divide(UnitConstant.NEWTON);
+              .builder().componentToExponent(Units.NEWTON, 1)
+              .componentToExponent(Units.METER, -2).build();
+      Unit result = pascalOther.divide(Units.NEWTON);
     log.info("pascalOther:{},result:{}", pascalOther, result);
   }
 
   @Test
   void inverse() {
-      Unit actual = UnitConstant.NEWTON.reciprocal();
+      Unit actual = Units.NEWTON.reciprocal();
       Unit expected = CompositeStandardUnit.builder()
-              .componentToExponent(UnitConstant.NEWTON, -1)
+              .componentToExponent(Units.NEWTON, -1)
               .build();
       Assertions.assertEquals(expected, actual);
   }
 
   @Test
   void compareTo() {
-    Assertions.assertTrue(configuration.compare(UnitConstant.KILOGRAM, UnitConstant.GRAM) > 0);
+    Assertions.assertTrue(configuration.compare(Units.KILOGRAM, Units.GRAM) > 0);
     Assertions.assertThrows(IllegalArgumentException.class,
         () -> {
-          int i = configuration.compare(UnitConstant.KILOGRAM, UnitConstant.SECOND);
+          int i = configuration.compare(Units.KILOGRAM, Units.SECOND);
         });
   }
 
@@ -58,8 +58,8 @@ class CompositePrefixUnitTest {
   @Test
   void sameTypeCompent() {
       Unit compositePrefixUnit = CompositeStandardUnit
-              .builder().componentToExponent(UnitConstant.SECOND, 1)
-              .componentToExponent(UnitConstant.MINUTE, 1)
+              .builder().componentToExponent(Units.SECOND, 1)
+              .componentToExponent(Units.MINUTE, 1)
               .build();
     log.info("unit:{}", compositePrefixUnit);
     log.info("type:{}", compositePrefixUnit.type().id());

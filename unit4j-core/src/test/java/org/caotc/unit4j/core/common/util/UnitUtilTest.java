@@ -3,7 +3,7 @@ package org.caotc.unit4j.core.common.util;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.core.unit.UnitConstant;
+import org.caotc.unit4j.core.unit.Units;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +17,8 @@ class UnitUtilTest {
     Unit unit = UnitUtil.parseUnit("METER/DAY");
     log.debug("parse METER/DAY:{}", unit);
       Assertions.assertEquals(CompositeStandardUnit
-              .builder().componentToExponent(UnitConstant.METER, 1)
-              .componentToExponent(UnitConstant.DAY, -1).build(), unit);
+              .builder().componentToExponent(Units.METER, 1)
+              .componentToExponent(Units.DAY, -1).build(), unit);
   }
 
   @Test

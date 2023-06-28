@@ -52,9 +52,9 @@ import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.PrefixUnit;
 import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.core.unit.UnitConstant;
 import org.caotc.unit4j.core.unit.UnitGroup;
 import org.caotc.unit4j.core.unit.UnitTypes;
+import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
 import java.math.MathContext;
@@ -101,7 +101,7 @@ public final class Configuration {
     private static final Configuration DEFAULT = new Configuration();
 
     static {
-        UnitConstant.VALUES.forEach(Configuration::register);
+        Units.VALUES.forEach(Configuration::register);
         register(DEFAULT_ID, DEFAULT);
     }
 
@@ -191,65 +191,65 @@ public final class Configuration {
     volatile MathContext mathContext = DEFAULT_MATH_CONTEXT;
 
     private Configuration() {
-        register(UnitConstant.CHINESE_MILE,
-                UnitConstant.METER, UnitConvertConfig.create(BigDecimal.valueOf(500)));
-        register(UnitConstant.CHINESE_MILE, UnitConstant.TANG,
+        register(Units.CHINESE_MILE,
+                Units.METER, UnitConvertConfig.create(BigDecimal.valueOf(500)));
+        register(Units.CHINESE_MILE, Units.TANG,
                 UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(UnitConstant.CHINESE_MILE, UnitConstant.ZHANG,
+        register(Units.CHINESE_MILE, Units.ZHANG,
                 UnitConvertConfig.create(BigDecimal.valueOf(150)));
-        register(UnitConstant.ZHANG, UnitConstant.YIN,
+        register(Units.ZHANG, Units.YIN,
                 UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(UnitConstant.CHI, UnitConstant.ZHANG,
+        register(Units.CHI, Units.ZHANG,
                 UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(UnitConstant.CUN, UnitConstant.CHI,
+        register(Units.CUN, Units.CHI,
                 UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(UnitConstant.FEN, UnitConstant.CUN,
+        register(Units.FEN, Units.CUN,
                 UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(UnitConstant.LI, UnitConstant.FEN, UnitConvertConfig.create(
+        register(Units.LI, Units.FEN, UnitConvertConfig.create(
                 BigDecimal.valueOf("0.1")));
 
-        register(UnitConstant.INCH, UnitConstant.METER,
+        register(Units.INCH, Units.METER,
                 UnitConvertConfig.create(BigDecimal.valueOf("0.0254")));
-        register(UnitConstant.FOOT, UnitConstant.INCH,
+        register(Units.FOOT, Units.INCH,
                 UnitConvertConfig.create(BigDecimal.valueOf(12)));
-        register(UnitConstant.YARD, UnitConstant.FOOT,
+        register(Units.YARD, Units.FOOT,
                 UnitConvertConfig.create(BigDecimal.valueOf(3)));
-        register(UnitConstant.FATHOM, UnitConstant.INCH,
+        register(Units.FATHOM, Units.INCH,
                 UnitConvertConfig.create(BigDecimal.valueOf(72)));
-        register(UnitConstant.CHAIN, UnitConstant.YARD,
+        register(Units.CHAIN, Units.YARD,
                 UnitConvertConfig.create(BigDecimal.valueOf(22)));
-        register(UnitConstant.FURLONG, UnitConstant.YARD,
+        register(Units.FURLONG, Units.YARD,
                 UnitConvertConfig.create(BigDecimal.valueOf(220)));
-        register(UnitConstant.MILE, UnitConstant.YARD,
+        register(Units.MILE, Units.YARD,
                 UnitConvertConfig.create(BigDecimal.valueOf(1760)));
 
         register(
-                UnitConstant.TONNE, UnitConstant.GRAM,
+                Units.TONNE, Units.GRAM,
                 UnitConvertConfig.create(BigDecimal.valueOf("1000000")));
 
-        register(UnitConstant.MINUTE, UnitConstant.SECOND,
+        register(Units.MINUTE, Units.SECOND,
                 UnitConvertConfig.create(BigDecimal.valueOf(60)));
-        register(UnitConstant.HOUR, UnitConstant.MINUTE,
+        register(Units.HOUR, Units.MINUTE,
                 UnitConvertConfig.create(BigDecimal.valueOf(60)));
-        register(UnitConstant.DAY, UnitConstant.HOUR,
+        register(Units.DAY, Units.HOUR,
                 UnitConvertConfig.create(BigDecimal.valueOf(24)));
-        register(UnitConstant.HALF_DAY, UnitConstant.DAY,
+        register(Units.HALF_DAY, Units.DAY,
                 UnitConvertConfig.create(BigDecimal.valueOf("0.5")));
-        register(UnitConstant.WEEK, UnitConstant.DAY,
+        register(Units.WEEK, Units.DAY,
                 UnitConvertConfig.create(BigDecimal.valueOf(7)));
-        register(UnitConstant.YEAR, UnitConstant.SECOND,
+        register(Units.YEAR, Units.SECOND,
                 UnitConvertConfig.create(BigDecimal.valueOf(31556952L)));
-        register(UnitConstant.MONTH, UnitConstant.YEAR,
+        register(Units.MONTH, Units.YEAR,
                 UnitConvertConfig
                         .create(Fraction.valueOf(1L, 12L)));
-        register(UnitConstant.DECADE, UnitConstant.YEAR,
+        register(Units.DECADE, Units.YEAR,
                 UnitConvertConfig.create(BigDecimal.TEN));
-        register(UnitConstant.CENTURY, UnitConstant.YEAR,
+        register(Units.CENTURY, Units.YEAR,
                 UnitConvertConfig.create(BigDecimal.valueOf(100)));
         register(
-                UnitConstant.MILLENNIUM, UnitConstant.YEAR,
+                Units.MILLENNIUM, Units.YEAR,
                 UnitConvertConfig.create(BigDecimal.valueOf(1000)));
-        register(UnitConstant.ERA, UnitConstant.YEAR,
+        register(Units.ERA, Units.YEAR,
                 UnitConvertConfig.create(BigDecimal.valueOf(1000000000)));
 
         registerAlias(UnitTypes.LENGTH, Aliases.lengthAliases());
@@ -284,72 +284,72 @@ public final class Configuration {
         registerAlias(Prefix.ANGSTROM, Aliases.angstromAliases());
 
         //注册Unit别名
-        registerAlias(UnitConstant.METER, Aliases.meterAliases());
-        registerAlias(UnitConstant.GRAM, Aliases.gramAliases());
-        registerAlias(UnitConstant.SECOND, Aliases.secondAliases());
-        registerAlias(UnitConstant.AMPERE, Aliases.ampereAliases());
-        registerAlias(UnitConstant.KELVIN, Aliases.kelvinAliases());
-        registerAlias(UnitConstant.MOLE, Aliases.moleAliases());
-        registerAlias(UnitConstant.CANDELA, Aliases.candelaAliases());
-        registerAlias(UnitConstant.CELSIUS_DEGREE, Aliases.celsiusDegreeAliases());
-        registerAlias(UnitConstant.FAHRENHEIT_DEGREE, Aliases.fahrenheitDegreeAliases());
-        registerAlias(UnitConstant.CHINESE_MILE, Aliases.chineseMileAliases());
-        registerAlias(UnitConstant.TANG, Aliases.tangAliases());
-        registerAlias(UnitConstant.ZHANG, Aliases.zhangAliases());
-        registerAlias(UnitConstant.YIN, Aliases.yinAliases());
-        registerAlias(UnitConstant.CHI, Aliases.chiAliases());
-        registerAlias(UnitConstant.CUN, Aliases.cunAliases());
-        registerAlias(UnitConstant.FEN, Aliases.fenAliases());
-        registerAlias(UnitConstant.LI, Aliases.liAliases());
-        registerAlias(UnitConstant.INCH, Aliases.inchAliases());
-        registerAlias(UnitConstant.FOOT, Aliases.footAliases());
-        registerAlias(UnitConstant.YARD, Aliases.yardAliases());
-        registerAlias(UnitConstant.FATHOM, Aliases.fathomAliases());
-        registerAlias(UnitConstant.CHAIN, Aliases.chainAliases());
-        registerAlias(UnitConstant.FURLONG, Aliases.furlongAliases());
-        registerAlias(UnitConstant.MILE, Aliases.mileAliases());
-        registerAlias(UnitConstant.TONNE, Aliases.tonneAliases());
-        registerAlias(UnitConstant.MINUTE, Aliases.minuteAliases());
-        registerAlias(UnitConstant.HOUR, Aliases.hourAliases());
-        registerAlias(UnitConstant.DAY, Aliases.dayAliases());
-        registerAlias(UnitConstant.HALF_DAY, Aliases.halfDayAliases());
-        registerAlias(UnitConstant.WEEK, Aliases.weekAliases());
-        registerAlias(UnitConstant.YEAR, Aliases.yearAliases());
-        registerAlias(UnitConstant.MONTH, Aliases.monthAliases());
-        registerAlias(UnitConstant.DECADE, Aliases.decadeAliases());
-        registerAlias(UnitConstant.CENTURY, Aliases.centuryAliases());
-        registerAlias(UnitConstant.MILLENNIUM, Aliases.millenniumAliases());
-        registerAlias(UnitConstant.ERA, Aliases.eraAliases());
+        registerAlias(Units.METER, Aliases.meterAliases());
+        registerAlias(Units.GRAM, Aliases.gramAliases());
+        registerAlias(Units.SECOND, Aliases.secondAliases());
+        registerAlias(Units.AMPERE, Aliases.ampereAliases());
+        registerAlias(Units.KELVIN, Aliases.kelvinAliases());
+        registerAlias(Units.MOLE, Aliases.moleAliases());
+        registerAlias(Units.CANDELA, Aliases.candelaAliases());
+        registerAlias(Units.CELSIUS_DEGREE, Aliases.celsiusDegreeAliases());
+        registerAlias(Units.FAHRENHEIT_DEGREE, Aliases.fahrenheitDegreeAliases());
+        registerAlias(Units.CHINESE_MILE, Aliases.chineseMileAliases());
+        registerAlias(Units.TANG, Aliases.tangAliases());
+        registerAlias(Units.ZHANG, Aliases.zhangAliases());
+        registerAlias(Units.YIN, Aliases.yinAliases());
+        registerAlias(Units.CHI, Aliases.chiAliases());
+        registerAlias(Units.CUN, Aliases.cunAliases());
+        registerAlias(Units.FEN, Aliases.fenAliases());
+        registerAlias(Units.LI, Aliases.liAliases());
+        registerAlias(Units.INCH, Aliases.inchAliases());
+        registerAlias(Units.FOOT, Aliases.footAliases());
+        registerAlias(Units.YARD, Aliases.yardAliases());
+        registerAlias(Units.FATHOM, Aliases.fathomAliases());
+        registerAlias(Units.CHAIN, Aliases.chainAliases());
+        registerAlias(Units.FURLONG, Aliases.furlongAliases());
+        registerAlias(Units.MILE, Aliases.mileAliases());
+        registerAlias(Units.TONNE, Aliases.tonneAliases());
+        registerAlias(Units.MINUTE, Aliases.minuteAliases());
+        registerAlias(Units.HOUR, Aliases.hourAliases());
+        registerAlias(Units.DAY, Aliases.dayAliases());
+        registerAlias(Units.HALF_DAY, Aliases.halfDayAliases());
+        registerAlias(Units.WEEK, Aliases.weekAliases());
+        registerAlias(Units.YEAR, Aliases.yearAliases());
+        registerAlias(Units.MONTH, Aliases.monthAliases());
+        registerAlias(Units.DECADE, Aliases.decadeAliases());
+        registerAlias(Units.CENTURY, Aliases.centuryAliases());
+        registerAlias(Units.MILLENNIUM, Aliases.millenniumAliases());
+        registerAlias(Units.ERA, Aliases.eraAliases());
         //todo 确认有独立的弧度 m·m−1 平面角 球面度 m2·m−2 立体角 单位
-        registerAlias(UnitConstant.NON, Aliases.RADIAN_PLANE_ANGLE_ENGLISH_NAME, Aliases.RADIAN_PLANE_ANGLE_SYMBOL);
-        registerAlias(UnitConstant.NON, Aliases.STERADIAN_SOLID_ANGLE_ENGLISH_NAME, Aliases.STERADIAN_SOLID_ANGLE_SYMBOL);
-        registerAlias(UnitConstant.HERTZ, Aliases.hertzAliases());
-        registerAlias(UnitConstant.NEWTON, Aliases.newtonAliases());
-        registerAlias(UnitConstant.PASCAL, Aliases.pascalAliases());
-        registerAlias(UnitConstant.JOULE, Aliases.jouleAliases());
-        registerAlias(UnitConstant.WATT, Aliases.wattAliases());
-        registerAlias(UnitConstant.COULOMB, Aliases.coulombAliases());
-        registerAlias(UnitConstant.VOLT, Aliases.voltAliases());
-        registerAlias(UnitConstant.FARAD, Aliases.faradAliases());
-        registerAlias(UnitConstant.OHM, Aliases.ohmAliases());
-        registerAlias(UnitConstant.SIEMENS, Aliases.siemensAliases());
-        registerAlias(UnitConstant.WEBER, Aliases.weberAliases());
-        registerAlias(UnitConstant.TESLA, Aliases.teslaAliases());
-        registerAlias(UnitConstant.HENRY, Aliases.henryAliases());
-        registerAlias(UnitConstant.LUMEN, Aliases.lumenAliases());
-        registerAlias(UnitConstant.LUX, Aliases.luxAliases());
-        registerAlias(UnitConstant.BECQUEREL, Aliases.becquerelAliases());
-        registerAlias(UnitConstant.GRAY, Aliases.grayAliases());
-        registerAlias(UnitConstant.SIEVERT, Aliases.sievertAliases());
-        registerAlias(UnitConstant.KATAL, Aliases.katalAliases());
+        registerAlias(Units.NON, Aliases.RADIAN_PLANE_ANGLE_ENGLISH_NAME, Aliases.RADIAN_PLANE_ANGLE_SYMBOL);
+        registerAlias(Units.NON, Aliases.STERADIAN_SOLID_ANGLE_ENGLISH_NAME, Aliases.STERADIAN_SOLID_ANGLE_SYMBOL);
+        registerAlias(Units.HERTZ, Aliases.hertzAliases());
+        registerAlias(Units.NEWTON, Aliases.newtonAliases());
+        registerAlias(Units.PASCAL, Aliases.pascalAliases());
+        registerAlias(Units.JOULE, Aliases.jouleAliases());
+        registerAlias(Units.WATT, Aliases.wattAliases());
+        registerAlias(Units.COULOMB, Aliases.coulombAliases());
+        registerAlias(Units.VOLT, Aliases.voltAliases());
+        registerAlias(Units.FARAD, Aliases.faradAliases());
+        registerAlias(Units.OHM, Aliases.ohmAliases());
+        registerAlias(Units.SIEMENS, Aliases.siemensAliases());
+        registerAlias(Units.WEBER, Aliases.weberAliases());
+        registerAlias(Units.TESLA, Aliases.teslaAliases());
+        registerAlias(Units.HENRY, Aliases.henryAliases());
+        registerAlias(Units.LUMEN, Aliases.lumenAliases());
+        registerAlias(Units.LUX, Aliases.luxAliases());
+        registerAlias(Units.BECQUEREL, Aliases.becquerelAliases());
+        registerAlias(Units.GRAY, Aliases.grayAliases());
+        registerAlias(Units.SIEVERT, Aliases.sievertAliases());
+        registerAlias(Units.KATAL, Aliases.katalAliases());
 
-        register(UnitGroup.create(UnitConstant.DEFAULT_TIME_STANDARD_UNITS, this))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.METER, this))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.GRAM, this))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.AMPERE, this))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.CANDELA, this))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.MOLE, this))
-                .register(UnitGroup.createSiUnitGroup(UnitConstant.CELSIUS_DEGREE, this));
+        register(UnitGroup.create(Units.DEFAULT_TIME_STANDARD_UNITS, this))
+                .register(UnitGroup.createSiUnitGroup(Units.METER, this))
+                .register(UnitGroup.createSiUnitGroup(Units.GRAM, this))
+                .register(UnitGroup.createSiUnitGroup(Units.AMPERE, this))
+                .register(UnitGroup.createSiUnitGroup(Units.CANDELA, this))
+                .register(UnitGroup.createSiUnitGroup(Units.MOLE, this))
+                .register(UnitGroup.createSiUnitGroup(Units.CELSIUS_DEGREE, this));
     }
 
     /**
