@@ -38,11 +38,6 @@ public class UnitConvertConfig {
   public static UnitConvertConfig empty() {
     return EMPTY;
   }
-  /**
-   * 单位之间的常量差值(以源单位为标准)
-   */
-  @NonNull
-  AbstractNumber constantDifference;
 
   /**
    * 工厂方法
@@ -91,12 +86,6 @@ public class UnitConvertConfig {
   }
 
   /**
-   * 单位转换比例
-   */
-  @NonNull
-  AbstractNumber ratio;
-
-  /**
    * 工厂方法
    *
    * @param ratio 单位转换比例
@@ -112,6 +101,17 @@ public class UnitConvertConfig {
       @NonNull AbstractNumber zeroDifference) {
     return builder().ratio(ratio).constantDifference(zeroDifference).build();
   }
+
+  /**
+   * 单位转换比例
+   */
+  @NonNull
+  AbstractNumber ratio;
+  /**
+   * 单位之间的常量差值(以源单位为标准,所以先加常数运算再比例运算)
+   */
+  @NonNull
+  AbstractNumber constantDifference;
 
   /**
    * 该类对象的合并方法
