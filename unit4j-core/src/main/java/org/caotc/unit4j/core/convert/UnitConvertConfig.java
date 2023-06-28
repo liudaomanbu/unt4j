@@ -24,7 +24,7 @@ public class UnitConvertConfig {
    * 空对象
    */
   private static final UnitConvertConfig EMPTY = builder().ratio(BigDecimal.ONE)
-          .zeroDifference(BigDecimal.ZERO).build();
+          .constantDifference(BigDecimal.ZERO).build();
 
   /**
    * 空对象
@@ -38,6 +38,11 @@ public class UnitConvertConfig {
   public static UnitConvertConfig empty() {
     return EMPTY;
   }
+  /**
+   * 单位之间的常量差值(以源单位为标准)
+   */
+  @NonNull
+  AbstractNumber constantDifference;
 
   /**
    * 工厂方法
@@ -50,7 +55,7 @@ public class UnitConvertConfig {
    */
   @NonNull
   public static UnitConvertConfig create(@NonNull java.math.BigDecimal ratio) {
-    return builder().ratio(BigDecimal.valueOf(ratio)).zeroDifference(BigDecimal.ZERO).build();
+    return builder().ratio(BigDecimal.valueOf(ratio)).constantDifference(BigDecimal.ZERO).build();
   }
 
   /**
@@ -64,7 +69,7 @@ public class UnitConvertConfig {
    */
   @NonNull
   public static UnitConvertConfig create(@NonNull AbstractNumber ratio) {
-    return builder().ratio(ratio).zeroDifference(BigDecimal.ZERO).build();
+    return builder().ratio(ratio).constantDifference(BigDecimal.ZERO).build();
   }
 
   /**
@@ -82,8 +87,14 @@ public class UnitConvertConfig {
   public static UnitConvertConfig create(@NonNull java.math.BigDecimal ratio,
       @NonNull java.math.BigDecimal zeroDifference) {
     return builder().ratio(BigDecimal.valueOf(ratio))
-        .zeroDifference(BigDecimal.valueOf(zeroDifference)).build();
+        .constantDifference(BigDecimal.valueOf(zeroDifference)).build();
   }
+
+  /**
+   * 单位转换比例
+   */
+  @NonNull
+  AbstractNumber ratio;
 
   /**
    * 工厂方法
@@ -99,19 +110,8 @@ public class UnitConvertConfig {
   @NonNull
   public static UnitConvertConfig create(@NonNull AbstractNumber ratio,
       @NonNull AbstractNumber zeroDifference) {
-    return builder().ratio(ratio).zeroDifference(zeroDifference).build();
+    return builder().ratio(ratio).constantDifference(zeroDifference).build();
   }
-
-  /**
-   * 单位转换比例
-   */
-  @NonNull
-  AbstractNumber ratio;
-  /**
-   * 单位之间的零点差值(以源单位为标准)
-   */
-  @NonNull
-  AbstractNumber zeroDifference;
 
   /**
    * 该类对象的合并方法
@@ -124,9 +124,9 @@ public class UnitConvertConfig {
    */
   @NonNull
   public UnitConvertConfig reduce(@NonNull UnitConvertConfig other) {
-    AbstractNumber newZeroDifference = zeroDifference().add(other.zeroDifference().divide(ratio()));
+    AbstractNumber newZeroDifference = constantDifference().add(other.constantDifference().divide(ratio()));
     AbstractNumber newRatio = ratio().multiply(other.ratio());
-    return builder().ratio(newRatio).zeroDifference(newZeroDifference).build();
+    return builder().ratio(newRatio).constantDifference(newZeroDifference).build();
   }
 
   /**
@@ -140,7 +140,7 @@ public class UnitConvertConfig {
   @NonNull
   public UnitConvertConfig reciprocal() {
     AbstractNumber newRatio = ratio().reciprocal();
-    return builder().ratio(newRatio).zeroDifference(zeroDifference().negate().multiply(newRatio))
+    return builder().ratio(newRatio).constantDifference(constantDifference().negate().multiply(newRatio))
         .build();
   }
 
@@ -155,7 +155,7 @@ public class UnitConvertConfig {
    */
   @NonNull
   public UnitConvertConfig multiply(@NonNull AbstractNumber multiplicand) {
-    return create(ratio().multiply(multiplicand), zeroDifference().multiply(multiplicand));
+    return create(ratio().multiply(multiplicand), constantDifference().multiply(multiplicand));
   }
 
   /**
@@ -170,7 +170,7 @@ public class UnitConvertConfig {
   @NonNull
   public UnitConvertConfig divide(@NonNull AbstractNumber divisor) {
     return create(ratio().divide(divisor),
-        zeroDifference().divide(divisor));
+        constantDifference().divide(divisor));
   }
 
   /**
@@ -200,7 +200,7 @@ public class UnitConvertConfig {
    */
   @NonNull
   public AbstractNumber apply(@NonNull AbstractNumber value) {
-    return value.add(zeroDifference()).multiply(ratio());
+    return value.add(constantDifference()).multiply(ratio());
   }
 
   /**
@@ -212,7 +212,7 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   public boolean isZeroPointSame() {
-    return BigDecimal.ZERO.compareTo(zeroDifference()) == 0;
+    return BigDecimal.ZERO.compareTo(constantDifference()) == 0;
   }
 
   /**
@@ -225,7 +225,7 @@ public class UnitConvertConfig {
    */
   public boolean isEmpty() {
     return BigDecimal.ONE.compareTo(ratio()) == 0
-        && BigDecimal.ZERO.compareTo(zeroDifference()) == 0;
+        && BigDecimal.ZERO.compareTo(constantDifference()) == 0;
   }
 
 }
