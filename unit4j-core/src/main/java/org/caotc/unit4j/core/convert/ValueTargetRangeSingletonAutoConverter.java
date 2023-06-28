@@ -40,15 +40,14 @@ import java.util.stream.IntStream;
 @Value(staticConstructor = "of")
 @Slf4j
 public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConverter {
-    boolean higher;
-
-    @NonNull
-    Range<AbstractNumber> valueTargetRange;
-
     @NonNull
     public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<AbstractNumber> valueTargetRange) {
         return of(valueTargetRange, true);
     }
+
+    @NonNull
+    Range<AbstractNumber> valueTargetRange;
+    boolean fallbackHigher;
 
     @NonNull
     @Getter(lazy = true)
@@ -82,8 +81,8 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
 
         // 没有找到符合要求的单位,并且不是由于值本身太大或太小
         if (mid != 0 && mid != (list.size() - 1)) {
-            if ((valueTargetLowerRange().contains(current.value()) && higher)
-                    || (!valueTargetLowerRange().contains(current.value()) && !higher)) {
+            if ((valueTargetLowerRange().contains(current.value()) && fallbackHigher)
+                    || (!valueTargetLowerRange().contains(current.value()) && !fallbackHigher)) {
                 return IntStream.iterate(mid, i -> i - 1).mapToObj(list::get)
                         .map(unit -> configuration.convert(quantity, unit))
                         .filter(q -> !valueTargetLowerRange().contains(q.value()))

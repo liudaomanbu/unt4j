@@ -11,6 +11,7 @@ import java.util.Optional;
  * @date 2023-04-17
  * @since 1.0.0
  */
+@FunctionalInterface
 public interface AliasFinder<E> {
     @NonNull
     Optional<Alias> find(@NonNull Configuration configuration, @NonNull E element);
