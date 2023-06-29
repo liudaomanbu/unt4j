@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2020 the original author or authors.
+  ~ Copyright (C) 2023 the original author or authors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -66,8 +66,26 @@
     </dependency>
 
     <dependency>
-        <groupId>org.caotc</groupId>
-        <artifactId>common-util</artifactId>
+      <groupId>org.caotc</groupId>
+      <artifactId>common-util</artifactId>
+    </dependency>
+
+    <!--    <dependency>-->
+    <!--      <groupId>net.objecthunter</groupId>-->
+    <!--      <artifactId>exp4j</artifactId>-->
+    <!--      <version>0.4.8</version>-->
+    <!--    </dependency>-->
+
+    <dependency>
+      <groupId>org.mariuszgromada.math</groupId>
+      <artifactId>MathParser.org-mXparser</artifactId>
+      <version>5.2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apfloat</groupId>
+      <artifactId>apfloat</artifactId>
+      <version>1.10.1</version>
     </dependency>
   </dependencies>
 

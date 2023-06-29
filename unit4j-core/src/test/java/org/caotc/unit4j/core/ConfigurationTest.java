@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core;
 
 import com.google.common.collect.ImmutableSet;
@@ -16,6 +32,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mariuszgromada.math.mxparser.Expression;
+import org.mariuszgromada.math.mxparser.License;
+import org.mariuszgromada.math.mxparser.mXparser;
 
 import java.util.Optional;
 import java.util.Random;
@@ -320,11 +339,37 @@ class ConfigurationTest {
                             java.math.BigDecimal.valueOf(1000), Units.GRAM)));
 
     Assertions.assertThrows(IllegalArgumentException.class,
-        () -> {
-          int i = configuration
-                  .compare(Quantity.create(java.math.BigDecimal.ONE, Units.KILOGRAM),
-                          Quantity.create(
-                                  java.math.BigDecimal.valueOf(1000), Units.NEWTON));
-        });
+            () -> {
+              int i = configuration
+                      .compare(Quantity.create(java.math.BigDecimal.ONE, Units.KILOGRAM),
+                              Quantity.create(
+                                      java.math.BigDecimal.valueOf(1000), Units.NEWTON));
+            });
+  }
+
+  @Test
+  void test() {
+//    Expression e = new ExpressionBuilder("3 * sin(y) - 2 / (x - 2)")
+//            .variables("x", "y")
+//            .build()
+//            .setVariable("x", 2.3)
+//            .setVariable("y", 3.14);
+//    double result = e.evaluate();
+//    log.info("result:{}",result);
+  }
+
+  @Test
+  void test1() {
+    License.iConfirmCommercialUse("aaaaa");
+    Expression eh = new Expression("5^2 * 7^3 * 11^1 * 67^1 * 49201^1");
+    Expression ew = new Expression("71^1 * 218549^1 * 6195547^1");
+    String h = mXparser.numberToAsciiString(eh.calculate());
+    String w = mXparser.numberToAsciiString(ew.calculate());
+    mXparser.consolePrintln(h + " " + w);
+  }
+
+  @Test
+  void test2() {
+
   }
 }
