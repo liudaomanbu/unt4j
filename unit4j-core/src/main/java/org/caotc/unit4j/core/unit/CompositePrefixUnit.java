@@ -2,7 +2,6 @@ package org.caotc.unit4j.core.unit;
 
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.unit.type.UnitType;
 
 /**
  * 有词头的组合单位
@@ -13,12 +12,6 @@ import org.caotc.unit4j.core.unit.type.UnitType;
  **/
 @Value
 public class CompositePrefixUnit extends PrefixUnit {
-//  /**
-//   * 词头
-//   */
-//  @NonNull
-//  Prefix prefix;
-
     /**
      * 组合标准单位
      */
@@ -28,19 +21,6 @@ public class CompositePrefixUnit extends PrefixUnit {
     CompositePrefixUnit(@NonNull Prefix prefix, @NonNull CompositeStandardUnit standardUnit) {
         super(prefix);
         this.standardUnit = standardUnit;
-    }
-
-    @NonNull
-    @Override
-    public UnitType type() {
-        return standardUnit().type();
-    }
-
-    @NonNull
-    @Override
-    public CompositePrefixUnit rebase() {
-        //todo cast remove
-        return (CompositePrefixUnit) builder().prefix(prefix()).standardUnit(standardUnit().rebase()).build();
     }
 
     @Override

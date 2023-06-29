@@ -56,12 +56,6 @@ public class BaseStandardUnit extends StandardUnit {
       this.type = type;
   }
 
-    @NonNull
-    @Override
-    public Unit rebase() {
-        return this;
-    }
-
     @Override
     public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
         return this;

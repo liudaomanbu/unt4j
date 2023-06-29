@@ -50,19 +50,6 @@ public class CompositeStandardUnit extends StandardUnit {
   }
 
   @Override
-  public @NonNull CompositeStandardUnit rebase() {
-    //todo cast remove
-    return (CompositeStandardUnit) CompositeStandardUnit.builder().componentToExponents(
-                    componentToExponents().entrySet().stream()
-                            .map(entry -> entry.getKey().rebase().pow(entry.getValue()))
-                            .map(Unit::componentToExponents)
-                            .map(Map::entrySet)
-                            .flatMap(Collection::stream)
-                            .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue, Integer::sum)))
-            .build();
-  }
-
-  @Override
   public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
     return builder().componentToExponents(
                     componentToExponents().entrySet().stream()

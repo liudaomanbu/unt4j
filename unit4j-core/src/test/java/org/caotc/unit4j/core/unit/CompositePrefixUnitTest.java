@@ -11,15 +11,6 @@ class CompositePrefixUnitTest {
   Configuration configuration = Configuration.defaultInstance();
 
   @Test
-  void rebase() {
-      Unit actual = CompositeStandardUnit
-              .builder().componentToExponent(Units.NEWTON, 1)
-              .componentToExponent(Units.METER, -2).build();
-    log.debug("PASCAL_ENGLISH_NAME:{},rebase:{}", Units.PASCAL.rebase(), actual.rebase());
-    Assertions.assertEquals(Units.PASCAL.rebase(), actual.rebase());
-  }
-
-  @Test
   void divide() {
       Unit pascalOther = CompositeStandardUnit
               .builder().componentToExponent(Units.NEWTON, 1)

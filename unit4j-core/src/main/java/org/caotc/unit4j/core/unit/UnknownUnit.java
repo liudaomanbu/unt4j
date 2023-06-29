@@ -42,11 +42,6 @@ public class UnknownUnit extends Unit {
     }
 
     @Override
-    public @NonNull Unit rebase() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
         throw new UnsupportedOperationException();
     }

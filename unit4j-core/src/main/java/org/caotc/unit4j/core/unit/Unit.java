@@ -64,9 +64,6 @@ public abstract class Unit implements Identifiable, Component<Unit> {
      * @date 2018-08-17
      * @since 1.0.0
      */
-    @NonNull
-    public abstract Unit rebase();
-
     public @NonNull Unit simplify() {
         return simplify(new SimplifyConfig(true, true, true, true));
     }

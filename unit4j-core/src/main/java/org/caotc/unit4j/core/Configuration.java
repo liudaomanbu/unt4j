@@ -29,7 +29,7 @@ import com.google.common.collect.Streams;
 import com.google.common.collect.Table;
 import com.google.common.collect.Tables;
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
@@ -74,7 +74,9 @@ import java.util.stream.Stream;
  * @implNote
  * @since 1.0.0
  **/
-@Data(staticConstructor = "of")
+//todo toString方法处理和判断
+//@Data(staticConstructor = "of")
+@Getter
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 @Slf4j
 public final class Configuration {
@@ -100,6 +102,10 @@ public final class Configuration {
      */
     private static final Configuration DEFAULT = new Configuration();
 
+    @NonNull
+    public static Configuration of(){
+        return new Configuration();
+    }
     static {
         Units.VALUES.forEach(Configuration::register);
         register(DEFAULT_ID, DEFAULT);
@@ -982,6 +988,7 @@ public final class Configuration {
     private UnitConvertConfig createUnitConvertConfig(@NonNull CompositeStandardUnit source,
                                                       @NonNull CompositeStandardUnit target) {
         return source.componentToExponents().entrySet().stream()
+                //todo 当转换除了比例还有常量差值时可能不能直接reduce为一个UnitConvertConfig
                 .map(entry -> getConvertConfig(entry.getKey(), target.dimension(entry.getKey().type()).unit()).pow(entry.getValue()))
                 .reduce(UnitConvertConfig::reduce).orElseGet(UnitConvertConfig::empty);
     }
