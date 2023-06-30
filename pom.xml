@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2020 the original author or authors.
+  ~ Copyright (C) 2023 the original author or authors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@
     <maven.source.version>2.2.1</maven.source.version>
     <maven.javadoc.version>2.9.1</maven.javadoc.version>
     <junit.jupiter.version>5.9.1</junit.jupiter.version>
-    <junit.platform.version>1.1.0</junit.platform.version>
+    <junit.platform.version>1.3.2</junit.platform.version>
     <h2.version>1.4.199</h2.version>
     <logback.version>1.2.3</logback.version>
 
@@ -251,6 +251,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven.surefire.version}</version>
         <configuration>
+          <forkedProcessExitTimeoutInSeconds>100</forkedProcessExitTimeoutInSeconds>
           <includes>
             <include>**/Test*.java</include>
             <include>**/*Test.java</include>
@@ -276,6 +277,11 @@
           <dependency>
             <groupId>org.apache.maven.surefire</groupId>
             <artifactId>surefire-api</artifactId>
+            <version>${maven.surefire.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>common-java5</artifactId>
             <version>${maven.surefire.version}</version>
           </dependency>
         </dependencies>

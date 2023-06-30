@@ -32,6 +32,7 @@ hs_err_pid*
 
 *rebel.xml
 
+common-util/target
 unit4j-api/target
 unit4j-core/target
 unit4j-spring-boot-starter/target
