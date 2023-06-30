@@ -4,8 +4,8 @@ import com.google.common.reflect.TypeToken;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.Delegate;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedType;
 
 /**
@@ -16,7 +16,6 @@ import java.lang.reflect.AnnotatedType;
 @AllArgsConstructor(staticName = "of", access = AccessLevel.MODULE)
 @SuppressWarnings("UnstableApiUsage")
 public class GuavaParameterProxy implements Parameter {
-    @Delegate
     @NonNull
     com.google.common.reflect.Parameter delegate;
     @NonNull
@@ -40,5 +39,20 @@ public class GuavaParameterProxy implements Parameter {
     @Override
     public String toString() {
         return delegate.toString();
+    }
+
+    @Override
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        return delegate.getAnnotation(annotationClass);
+    }
+
+    @Override
+    public Annotation[] getAnnotations() {
+        return delegate.getAnnotations();
+    }
+
+    @Override
+    public Annotation[] getDeclaredAnnotations() {
+        return delegate.getDeclaredAnnotations();
     }
 }
