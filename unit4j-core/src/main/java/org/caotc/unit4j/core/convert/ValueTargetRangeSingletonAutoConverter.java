@@ -50,12 +50,21 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
     boolean fallbackHigher;
 
     @NonNull
-    @Getter(lazy = true)
+//    @Getter(lazy = true)todo lombok bug
+    @Getter
     @ToString.Exclude
     Range<AbstractNumber> valueTargetLowerRange = valueTargetRange().hasLowerBound() ?
             Range.upTo(valueTargetRange().lowerEndpoint(), valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
             Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
 
+    @Override
+    public @NonNull Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity) {
+        if (valueTargetRange().contains(quantity.value())) {
+            return quantity;
+        }
+
+        return indexedBinarySearch(configuration, quantity);
+    }
     private Quantity indexedBinarySearch(Configuration configuration, Quantity quantity) {
         UnitGroup list = configuration.getUnitGroup(quantity.unit());
 
@@ -98,14 +107,5 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
         } else {
             return current;
         }
-    }
-
-    @Override
-    public @NonNull Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity) {
-        if (valueTargetRange().contains(quantity.value())) {
-            return quantity;
-        }
-
-        return indexedBinarySearch(configuration, quantity);
     }
 }

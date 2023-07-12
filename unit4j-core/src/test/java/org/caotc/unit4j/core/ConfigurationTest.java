@@ -16,6 +16,8 @@
 
 package org.caotc.unit4j.core;
 
+import com.ezylang.evalex.Expression;
+import com.ezylang.evalex.data.EvaluationValue;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
@@ -447,12 +449,12 @@ class ConfigurationTest {
 //    }
   }
 
-//  @Test
-//  void testEvalEx() throws EvaluationException, ParseException {
-//    Expression expression = new Expression("(1.8 * C + 32)^2");
-//
-//    EvaluationValue result = expression.evaluate();
-//
-//    System.out.println(result.getNumberValue()); // prints 1.25
-//  }
+  @Test
+  void testEvalEx() throws  com.ezylang.evalex.EvaluationException, com.ezylang.evalex.parser.ParseException {
+    Expression expression = new Expression("(1.8 * C + 32)^2");
+
+    EvaluationValue result = expression.evaluate();
+
+    System.out.println(result.getNumberValue()); // prints 1.25
+  }
 }
