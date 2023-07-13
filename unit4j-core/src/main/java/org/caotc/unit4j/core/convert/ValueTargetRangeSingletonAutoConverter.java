@@ -19,7 +19,7 @@ package org.caotc.unit4j.core.convert;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
@@ -30,6 +30,7 @@ import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 /**
@@ -50,12 +51,10 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
     boolean fallbackHigher;
 
     @NonNull
-//    @Getter(lazy = true)todo lombok bug
-    @Getter
+//    @Getter(lazy = true)//todo lombok bug
+    @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    Range<AbstractNumber> valueTargetLowerRange = valueTargetRange().hasLowerBound() ?
-            Range.upTo(valueTargetRange().lowerEndpoint(), valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) :
-            Range.closedOpen((AbstractNumber) BigInteger.ZERO, BigInteger.ZERO);
+    AtomicReference<Range<AbstractNumber>> valueTargetLowerRange = new AtomicReference<>();
 
     @Override
     public @NonNull Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity) {
@@ -107,5 +106,20 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
         } else {
             return current;
         }
+    }
+
+    public @NonNull Range<AbstractNumber> valueTargetLowerRange() {
+        Range<AbstractNumber> value = this.valueTargetLowerRange.get();
+        if (value == null) {
+            synchronized(this.valueTargetLowerRange) {
+                value = this.valueTargetLowerRange.get();
+                if (value == null) {
+                    value = this.valueTargetRange().hasLowerBound() ? Range.upTo(this.valueTargetRange().lowerEndpoint(), this.valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) : Range.closedOpen(BigInteger.ZERO, BigInteger.ZERO);
+                    this.valueTargetLowerRange.set(value);
+                }
+            }
+        }
+
+        return value;
     }
 }
