@@ -258,6 +258,9 @@ public final class Configuration {
         register(Units.ERA, Units.YEAR,
                 UnitConvertConfig.create(BigDecimal.valueOf(1000000000)));
 
+        register(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE,
+                UnitConvertConfig.create(BigDecimal.valueOf("1.8"),BigDecimal.valueOf(32)));
+
         registerAlias(UnitTypes.LENGTH, Aliases.lengthAliases());
         registerAlias(UnitTypes.MASS, Aliases.massAliases());
         registerAlias(UnitTypes.TIME, Aliases.timeAliases());
@@ -721,8 +724,8 @@ public final class Configuration {
      * @since 1.0.0
      */
     @NonNull
-    public UnitConvertConfig getConvertConfig(@NonNull Unit source,
-                                              @NonNull Unit target) {
+    public UnitConvertConfig convertConfig(@NonNull Unit source,
+                                           @NonNull Unit target) {
         Preconditions.checkArgument(source.type().equals(target.type()),
                 "%s and %s can't convert,%s and %s are not type equals",
                 source, target, source, target);
@@ -746,16 +749,16 @@ public final class Configuration {
             if (sourceStandardUnit.equals(target)) {
                 return Optional.of(source.prefix().convertToStandardUnitConfig());
             }
-            return Optional.of(getConvertConfig(source, sourceStandardUnit))
-                    .map(config -> config.reduce(getConvertConfig(sourceStandardUnit, target)));
+            return Optional.of(convertConfig(source, sourceStandardUnit))
+                    .map(config -> config.reduce(convertConfig(sourceStandardUnit, target)));
         }
         if (target instanceof PrefixUnit) {
             StandardUnit targetStandardUnit = ((PrefixUnit) target).standardUnit();
             if (targetStandardUnit.equals(source)) {
                 return Optional.of(target.prefix().convertFromStandardUnitConfig());
             }
-            return Optional.of(getConvertConfig(source, targetStandardUnit))
-                    .map(config -> config.reduce(getConvertConfig(targetStandardUnit, target)));
+            return Optional.of(convertConfig(source, targetStandardUnit))
+                    .map(config -> config.reduce(convertConfig(targetStandardUnit, target)));
         }
 
         //todo 把这个变成Unit的方法?
@@ -772,7 +775,7 @@ public final class Configuration {
             return quantity;
         }
 
-        UnitConvertConfig convertConfig = getConvertConfig(quantity.unit(), targetUnit);
+        UnitConvertConfig convertConfig = convertConfig(quantity.unit(), targetUnit);
         return Quantity.create(convertConfig.apply(quantity.value()), targetUnit);
     }
 
@@ -859,7 +862,7 @@ public final class Configuration {
                 "%s and %s can't compare,%s and %s are not type equals",
                 unit1, unit2, this, unit1);
 
-        UnitConvertConfig unitConvertConfig = getConvertConfig(unit1,
+        UnitConvertConfig unitConvertConfig = convertConfig(unit1,
                 unit2);
         AbstractNumber value = unitConvertConfig.apply(BigDecimal.ONE);
         return value.compareTo(BigDecimal.ONE);
@@ -988,8 +991,8 @@ public final class Configuration {
     private UnitConvertConfig createUnitConvertConfig(@NonNull CompositeStandardUnit source,
                                                       @NonNull CompositeStandardUnit target) {
         return source.componentToExponents().entrySet().stream()
-                //todo 当转换除了比例还有常量差值时可能不能直接reduce为一个UnitConvertConfig
-                .map(entry -> getConvertConfig(entry.getKey(), target.dimension(entry.getKey().type()).unit()).pow(entry.getValue()))
+                //todo 当转换除了比例还有常量差值时不能直接reduce为一个UnitConvertConfig
+                .map(entry -> convertConfig(entry.getKey(), target.dimension(entry.getKey().type()).unit()).pow(entry.getValue()))
                 .reduce(UnitConvertConfig::reduce).orElseGet(UnitConvertConfig::empty);
     }
 }

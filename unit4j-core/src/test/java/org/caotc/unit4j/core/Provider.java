@@ -156,6 +156,7 @@ public class Provider {
         Unit gramNewtonUnit = Unit.builder().componentToExponent(Units.GRAM, 1).componentToExponent(Units.METER, 1).componentToExponent(Units.SECOND, -2).build();
         Unit gramMinuteNewtonUnit = Unit.builder().componentToExponent(Units.GRAM, 1).componentToExponent(Units.METER, 1).componentToExponent(Units.MINUTE, -2).build();
         return Stream.of(
+                Arguments.of(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE, UnitConvertConfig.create(BigDecimal.valueOf("1.8"),BigDecimal.valueOf(32))),
                 Arguments.of(Units.KILOGRAM, Units.GRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.KILOGRAM, Units.GRAM.addPrefix(Prefix.DECA), UnitConvertConfig.create(BigDecimal.valueOf(100))),
                 Arguments.of(Units.TONNE, Units.GRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000000))),
@@ -241,10 +242,27 @@ public class Provider {
         );
     }
 
+    static Stream<Arguments> componentConvertConfigConstantDifferenceNotZeroSourceUnitAndTargetUnits() {
+        Random random = new Random();
+        int exponent = random.nextInt();
+        if (exponent == 0 || exponent == 1) {
+            exponent += 2;
+        }
+        return Stream.of(
+                Arguments.of(Unit.builder().componentToExponent(Units.FAHRENHEIT_DEGREE, 1).componentToExponent(Units.GRAM, 1).build(), Unit.builder().componentToExponent(Units.CELSIUS_DEGREE, 1).componentToExponent(Units.GRAM, 1).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.FAHRENHEIT_DEGREE, 2).build(), Unit.builder().componentToExponent(Units.CELSIUS_DEGREE, 2).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.FAHRENHEIT_DEGREE, 2).componentToExponent(Units.GRAM, 1).build(), Unit.builder().componentToExponent(Units.CELSIUS_DEGREE, 2).componentToExponent(Units.GRAM, 1).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.FAHRENHEIT_DEGREE, -1).build(), Unit.builder().componentToExponent(Units.CELSIUS_DEGREE, -1).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.FAHRENHEIT_DEGREE, -1).componentToExponent(Units.GRAM, 1).build(), Unit.builder().componentToExponent(Units.CELSIUS_DEGREE, -1).componentToExponent(Units.GRAM, 1).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.FAHRENHEIT_DEGREE, exponent).build(), Unit.builder().componentToExponent(Units.CELSIUS_DEGREE, exponent).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.FAHRENHEIT_DEGREE, exponent).componentToExponent(Units.GRAM, 1).build(), Unit.builder().componentToExponent(Units.CELSIUS_DEGREE, exponent).componentToExponent(Units.GRAM, 1).build())
+        );
+    }
+
     static Stream<Arguments> sourceUnitAndErrorTargetUnits() {
         return Stream.concat(typeNotEqualedUnits().flatMap(unit -> typeNotEqualedUnits()
                         .filter(other -> !unit.equals(other))
                         .map(other -> Arguments.of(unit, other))),
-                noConvertConfigSourceUnitAndTargetUnits().flatMap(arguments -> Stream.of(arguments, Arguments.of(arguments.get()[1], arguments.get()[0]))));
+                Stream.concat(noConvertConfigSourceUnitAndTargetUnits(),componentConvertConfigConstantDifferenceNotZeroSourceUnitAndTargetUnits()).flatMap(arguments -> Stream.of(arguments, Arguments.of(arguments.get()[1], arguments.get()[0]))));
     }
 }

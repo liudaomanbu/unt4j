@@ -185,7 +185,7 @@ public class UnitConvertConfig {
   @NonNull
   public UnitConvertConfig pow(int exponent) {
     //TODO 根据指数不同,零点影响不同,需要符号计算处理或者不进行合并
-    Preconditions.checkArgument(isZeroPointSame());
+    Preconditions.checkArgument(isConstantDifferenceZero());
     return create(ratio().pow(exponent));
   }
 
@@ -205,13 +205,14 @@ public class UnitConvertConfig {
 
   /**
    * 单位之间零点是否相同
+   * todo
    *
    * @return 单位之间零点是否相同
    * @author caotc
    * @date 2019-05-25
    * @since 1.0.0
    */
-  public boolean isZeroPointSame() {
+  public boolean isConstantDifferenceZero() {
     return BigDecimal.ZERO.compareTo(constantDifference()) == 0;
   }
 
