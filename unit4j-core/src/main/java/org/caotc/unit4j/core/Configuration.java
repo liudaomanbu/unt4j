@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -990,9 +991,18 @@ public final class Configuration {
      */
     private UnitConvertConfig createUnitConvertConfig(@NonNull CompositeStandardUnit source,
                                                       @NonNull CompositeStandardUnit target) {
-        return source.componentToExponents().entrySet().stream()
-                //todo 当转换除了比例还有常量差值时不能直接reduce为一个UnitConvertConfig
-                .map(entry -> convertConfig(entry.getKey(), target.dimension(entry.getKey().type()).unit()).pow(entry.getValue()))
-                .reduce(UnitConvertConfig::reduce).orElseGet(UnitConvertConfig::empty);
+        ImmutableList<UnitConvertConfig> unitConvertConfigs = source.componentToExponents().entrySet().stream()
+                .map(entry -> {
+                    UnitConvertConfig componentUnitConvertConfig = convertConfig(entry.getKey(), target.dimension(entry.getKey().type()).unit());
+                    // 当转换关系不只是比例而是有常量差值时，其作为组合单位的一部分时无法正常推导组合单位的转换关系
+                    if(!componentUnitConvertConfig.isConstantDifferenceZero() && (entry.getValue()!=1 || source.componentToExponents().size()>1)){//todo 封装为unit方法？
+                        throw new IllegalArgumentException(String.format("%s for %s to %s.component UnitConvertConfig ConstantDifference must be 0.",componentUnitConvertConfig,entry.getKey(),target.dimension(entry.getKey().type())));
+                    }
+                    return componentUnitConvertConfig.pow(entry.getValue());
+                })
+                .collect(ImmutableList.toImmutableList());
+        return unitConvertConfigs.stream()
+                .reduce(UnitConvertConfig::reduce)
+                .orElseGet(UnitConvertConfig::empty);
     }
 }

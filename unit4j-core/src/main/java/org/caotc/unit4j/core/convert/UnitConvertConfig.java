@@ -184,8 +184,11 @@ public class UnitConvertConfig {
    */
   @NonNull
   public UnitConvertConfig pow(int exponent) {
-    //TODO 根据指数不同,零点影响不同,需要符号计算处理或者不进行合并
-    Preconditions.checkArgument(isConstantDifferenceZero());
+    if(exponent==1){
+      return this;
+    }
+    //有常量差值时不能指数计算
+    Preconditions.checkState(isConstantDifferenceZero(),"constant difference is not 0");
     return create(ratio().pow(exponent));
   }
 
