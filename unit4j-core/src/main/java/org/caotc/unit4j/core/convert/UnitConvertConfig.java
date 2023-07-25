@@ -9,7 +9,7 @@ import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 
 /**
- * 单位转换配置类 //TODO UnitConvert接口
+ * 单位转换配置类
  *
  * @author caotc
  * @date 2018-03-29
@@ -208,7 +208,7 @@ public class UnitConvertConfig {
 
   /**
    * 单位之间零点是否相同
-   * todo
+   * todo 方法命名
    *
    * @return 单位之间零点是否相同
    * @author caotc
