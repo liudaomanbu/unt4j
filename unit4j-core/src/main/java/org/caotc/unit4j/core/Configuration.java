@@ -42,7 +42,6 @@ import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.convert.ValueTargetRangeSingletonAutoConverter;
 import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
 import org.caotc.unit4j.core.exception.UnitNotFoundException;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.math.number.Fraction;
@@ -863,10 +862,8 @@ public final class Configuration {
                 "%s and %s can't compare,%s and %s are not type equals",
                 unit1, unit2, this, unit1);
 
-        UnitConvertConfig unitConvertConfig = convertConfig(unit1,
-                unit2);
-        AbstractNumber value = unitConvertConfig.apply(BigDecimal.ONE);
-        return value.compareTo(BigDecimal.ONE);
+        UnitConvertConfig unitConvertConfig = convertConfig(unit1, unit2);
+        return unitConvertConfig.ratio().compareTo(BigDecimal.ONE);
     }
 
     /**
