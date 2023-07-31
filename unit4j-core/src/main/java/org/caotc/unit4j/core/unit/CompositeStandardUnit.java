@@ -58,7 +58,7 @@ public class CompositeStandardUnit extends StandardUnit {
                                 Unit.Builder builder = builder();
                                 //todo merge
                                 if (config.prefixUnit() && !unit.prefix().isEmpty()) {
-                                    builder.prefix(unit.prefix().pow(entry.getValue()));
+                                    builder.prefix(unit.prefix().pow(entry.getValue()));//todo 前缀是允许的吗
                                     unit = ((PrefixUnit) unit).standardUnit();
                                 }
                                 unit = builder

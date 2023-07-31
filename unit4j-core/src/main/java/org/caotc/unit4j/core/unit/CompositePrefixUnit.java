@@ -25,7 +25,6 @@ public class CompositePrefixUnit extends PrefixUnit {
 
     @Override
     public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
-        //todo 是否根据配置进行this.prefix和standardUnit的组件中的prefix合并
         return this;
     }
 

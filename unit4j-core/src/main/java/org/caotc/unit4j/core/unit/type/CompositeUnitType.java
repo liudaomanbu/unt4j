@@ -61,7 +61,7 @@ public class CompositeUnitType extends UnitType {
                             UnitType unitType = builder()
                                     .componentToExponents(Maps.transformValues(entry.getKey().componentToExponents(), i -> i * entry.getValue()))
                                     .build();
-                            if (recursive && unitType.componentToExponents().size() > 1) {//todo
+                            if (recursive && unitType.componentToExponents().size() > 1) {//todo 封装为unit方法？
                                 unitType = unitType.simplify(true);
                             }
                             return unitType;

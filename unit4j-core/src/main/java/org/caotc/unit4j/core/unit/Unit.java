@@ -65,7 +65,7 @@ public abstract class Unit implements Identifiable, Component<Unit> {
      * @since 1.0.0
      */
     public @NonNull Unit simplify() {
-        return simplify(new SimplifyConfig(true, true, true, true));
+        return simplify(SimplifyConfig.of());
     }
 
     public abstract @NonNull Unit simplify(@NonNull SimplifyConfig config);
