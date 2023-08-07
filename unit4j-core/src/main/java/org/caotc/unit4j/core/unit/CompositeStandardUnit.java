@@ -50,22 +50,17 @@ public class CompositeStandardUnit extends StandardUnit {
   }
 
   @Override
-  public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+  public @NonNull Unit simplify(boolean recursive) {
     return builder().componentToExponents(
                     componentToExponents().entrySet().stream()
                             .map(entry -> {
                                 Unit unit = entry.getKey();
                                 Unit.Builder builder = builder();
-                                //todo merge
-                                if (config.prefixUnit() && !unit.prefix().isEmpty()) {
-                                    builder.prefix(unit.prefix().pow(entry.getValue()));//todo 前缀是允许的吗
-                                    unit = ((PrefixUnit) unit).standardUnit();
-                                }
                                 unit = builder
                                         .componentToExponents(Maps.transformValues(unit.componentToExponents(), i -> i * entry.getValue()))
                                         .build();
-                                if (config.recursive() && unit.componentToExponents().size() > 1) {//todo
-                                    unit = unit.simplify(config);
+                                if (recursive && unit.componentToExponents().size() > 1) {//todo
+                                    unit = unit.simplify(true);
                                 }
                                 return unit;
                             })

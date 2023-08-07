@@ -65,10 +65,10 @@ public abstract class Unit implements Identifiable, Component<Unit> {
      * @since 1.0.0
      */
     public @NonNull Unit simplify() {
-        return simplify(SimplifyConfig.of());
+        return simplify(true);
     }
 
-    public abstract @NonNull Unit simplify(@NonNull SimplifyConfig config);
+    public abstract @NonNull Unit simplify(boolean recursive);
 
     /**
      * 获取组成该对象的单位组件与对应指数

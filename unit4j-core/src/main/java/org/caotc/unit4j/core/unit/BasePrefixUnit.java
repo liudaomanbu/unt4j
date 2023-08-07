@@ -24,7 +24,7 @@ public class BasePrefixUnit extends PrefixUnit {
   }
 
   @Override
-  public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+  public @NonNull Unit simplify(boolean recursive) {
     return this;
   }
 }

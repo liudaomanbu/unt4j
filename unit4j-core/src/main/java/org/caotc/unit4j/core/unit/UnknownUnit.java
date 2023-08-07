@@ -42,7 +42,7 @@ public class UnknownUnit extends Unit {
     }
 
     @Override
-    public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+    public @NonNull Unit simplify(boolean recursive) {
         throw new UnsupportedOperationException();
     }
 

@@ -102,57 +102,28 @@ public class Provider {
                 Arguments.of(Unit.builder().componentToExponent(Units.NON, -1).build(), Units.NON),
                 Arguments.of(Unit.builder().componentToExponent(Units.METER, -1).build(), Unit.builder().componentToExponent(Units.METER, -1).build()),
                 Arguments.of(Unit.builder().componentToExponent(Units.NON, exponent).build(), Units.NON),
-                Arguments.of(Unit.builder().componentToExponent(Units.METER, exponent).build(), Unit.builder().componentToExponent(Units.METER, exponent).build())
+                Arguments.of(Unit.builder().componentToExponent(Units.METER, exponent).build(), Unit.builder().componentToExponent(Units.METER, exponent).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), Unit.builder().componentToExponent(Units.KILOGRAM, -1).build()),
+                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, exponent).build(), Unit.builder().componentToExponent(Units.KILOGRAM, exponent).build())
         );
     }
 
-    static Stream<Arguments> recursiveEqualedOriginalAndPrefixUnitAndSimplifieds() {
-        Random random = new Random();
-        int exponent = random.nextInt();
-        return Stream.of(
-                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), true, Unit.builder().componentToExponent(Unit.builder().prefix(Prefix.KILO.pow(-1)).componentToExponent(Units.GRAM, -1).build(), 1).build()),
-                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), false, Unit.builder().componentToExponent(Units.KILOGRAM, -1).build()),
-                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, exponent).build(), true, Unit.builder().prefix(Prefix.KILO.pow(exponent)).componentToExponent(Units.GRAM, exponent).build()),
-                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, exponent).build(), false, Unit.builder().componentToExponent(Units.KILOGRAM, exponent).build())
-        );
-    }
 
-    static Stream<Arguments> prefixUnitEqualedOriginalAndRecursiveAndSimplifieds() {
-        Random random = new Random();
-        int exponent = random.nextInt();
-        return Stream.of(
-                Arguments.of(Unit.builder().componentToExponent(Units.FARAD, -1).build(), true, Unit.builder().componentToExponent(Units.KILOGRAM, 1).componentToExponent(Units.METER, 2).componentToExponent(Units.SECOND, -4).componentToExponent(Units.AMPERE, -2).build()),
-                Arguments.of(Unit.builder().componentToExponent(Units.FARAD, -1).build(), false, Unit.builder().componentToExponent(Units.COULOMB, -1).componentToExponent(Units.VOLT, 1).build())
-        );
-    }
-
-    static Stream<Arguments> originalAndSimplifyConfigAndSimplifieds() {
+    static Stream<Arguments> originalAndRecursiveAndSimplifieds() {
         Random random = new Random();
         int exponent = random.nextInt();
         return Streams.concat(
                 allEqualedOriginalAndSimplifieds()
-                        .flatMap(arguments -> Stream.of(Arguments.of(arguments.get()[0], SimplifyConfig.of(), arguments.get()[1]),
-                                Arguments.of(arguments.get()[0], SimplifyConfig.builder().prefixUnit(true).recursive(false).build(), arguments.get()[1]),
-                                Arguments.of(arguments.get()[0], SimplifyConfig.builder().prefixUnit(false).recursive(true).build(), arguments.get()[1]),
-                                Arguments.of(arguments.get()[0], SimplifyConfig.builder().prefixUnit(false).recursive(false).build(), arguments.get()[1])
-                        )),
-                recursiveEqualedOriginalAndPrefixUnitAndSimplifieds()
-                        .flatMap(arguments -> Stream.of(Arguments.of(arguments.get()[0], SimplifyConfig.builder().prefixUnit((Boolean) arguments.get()[1]).recursive(true).build(), arguments.get()[2]),
-                                Arguments.of(arguments.get()[0], SimplifyConfig.builder().prefixUnit((Boolean) arguments.get()[1]).recursive(false).build(), arguments.get()[2])
-                        )),
-                prefixUnitEqualedOriginalAndRecursiveAndSimplifieds()
-                        .flatMap(arguments -> Stream.of(Arguments.of(arguments.get()[0], SimplifyConfig.builder().prefixUnit(true).recursive( (Boolean) arguments.get()[1]).build(), arguments.get()[2]),
-                                Arguments.of(arguments.get()[0],SimplifyConfig.builder().prefixUnit(false).recursive( (Boolean) arguments.get()[1]).build(), arguments.get()[2])
+                        .flatMap(arguments -> Stream.of(Arguments.of(arguments.get()[0], true, arguments.get()[1]),
+                                Arguments.of(arguments.get()[0], false, arguments.get()[1])
                         )),
                 Stream.of(
-                        Arguments.of(Units.FARAD, SimplifyConfig.of(), Unit.builder().componentToExponent(Unit.builder().prefix(Prefix.KILO.pow(-1)).componentToExponent(Units.GRAM, -1).build(), 1).componentToExponent(Units.METER, -2).componentToExponent(Units.SECOND, 4).componentToExponent(Units.AMPERE, 2).build()),
-                        Arguments.of(Units.FARAD, SimplifyConfig.builder().prefixUnit(true).recursive(false).build(), Unit.builder().componentToExponent(Units.WATT, -1).componentToExponent(Units.SECOND, 1).componentToExponent(Units.AMPERE, 2).build()),
-                        Arguments.of(Units.FARAD, SimplifyConfig.builder().prefixUnit(false).recursive(true).build(), Unit.builder().componentToExponent(Units.KILOGRAM, -1).componentToExponent(Units.METER, -2).componentToExponent(Units.SECOND, 4).componentToExponent(Units.AMPERE, 2).build()),
-                        Arguments.of(Units.FARAD, SimplifyConfig.builder().prefixUnit(false).recursive(false).build(), Unit.builder().componentToExponent(Units.WATT, -1).componentToExponent(Units.SECOND, 1).componentToExponent(Units.AMPERE, 2).build()),
-                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, exponent).build(), SimplifyConfig.of(), Unit.builder().componentToExponent(Unit.builder().prefix(Prefix.KILO.pow(-exponent)).componentToExponent(Units.GRAM, -exponent).build(), 1).componentToExponent(Units.METER, -2 * exponent).componentToExponent(Units.SECOND, 4 * exponent).componentToExponent(Units.AMPERE, 2 * exponent).build()),
-                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, exponent).build(), SimplifyConfig.builder().prefixUnit(true).recursive(false).build(), Unit.builder().componentToExponent(Units.COULOMB, exponent).componentToExponent(Units.VOLT, -exponent).build()),
-                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, exponent).build(), SimplifyConfig.builder().prefixUnit(false).recursive(true).build(), Unit.builder().componentToExponent(Units.KILOGRAM, -exponent).componentToExponent(Units.METER, -2 * exponent).componentToExponent(Units.SECOND, 4 * exponent).componentToExponent(Units.AMPERE, 2 * exponent).build()),
-                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, exponent).build(), SimplifyConfig.builder().prefixUnit(false).recursive(false).build(), Unit.builder().componentToExponent(Units.COULOMB, exponent).componentToExponent(Units.VOLT, -exponent).build())
+                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, -1).build(), true, Unit.builder().componentToExponent(Units.KILOGRAM, 1).componentToExponent(Units.METER, 2).componentToExponent(Units.SECOND, -4).componentToExponent(Units.AMPERE, -2).build()),
+                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, -1).build(), false, Unit.builder().componentToExponent(Units.COULOMB, -1).componentToExponent(Units.VOLT, 1).build()),
+                        Arguments.of(Units.FARAD, true, Unit.builder().componentToExponent(Units.KILOGRAM, -1).componentToExponent(Units.METER, -2).componentToExponent(Units.SECOND, 4).componentToExponent(Units.AMPERE, 2).build()),
+                        Arguments.of(Units.FARAD, false, Unit.builder().componentToExponent(Units.WATT, -1).componentToExponent(Units.SECOND, 1).componentToExponent(Units.AMPERE, 2).build()),
+                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, exponent).build(), true, Unit.builder().componentToExponent(Units.KILOGRAM, -exponent).componentToExponent(Units.METER, -2 * exponent).componentToExponent(Units.SECOND, 4 * exponent).componentToExponent(Units.AMPERE, 2 * exponent).build()),
+                        Arguments.of(Unit.builder().componentToExponent(Units.FARAD, exponent).build(), false, Unit.builder().componentToExponent(Units.COULOMB, exponent).componentToExponent(Units.VOLT, -exponent).build())
                 ));
     }
 

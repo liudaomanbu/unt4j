@@ -57,7 +57,7 @@ public class BaseStandardUnit extends StandardUnit {
   }
 
     @Override
-    public @NonNull Unit simplify(@NonNull SimplifyConfig config) {
+    public @NonNull Unit simplify(boolean recursive) {
         return this;
     }
 
