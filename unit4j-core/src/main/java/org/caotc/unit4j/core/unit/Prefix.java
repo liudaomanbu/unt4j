@@ -5,7 +5,7 @@ import lombok.Value;
 import org.caotc.unit4j.core.Identifiable;
 
 /**
- * 词头 //TODO 考虑将词头类改为类似基本单位类型
+ * 词头
  *
  * @author caotc
  * @date 2018-04-13
