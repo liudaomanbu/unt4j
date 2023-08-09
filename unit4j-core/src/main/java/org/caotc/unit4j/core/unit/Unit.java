@@ -57,7 +57,7 @@ public abstract class Unit implements Identifiable, Component<Unit> {
     public abstract UnitType type();
 
     /**
-     * 重定基准,将所有非基本类型拆解合并,返回结果的类型Map中不存在非基本类型Key //TODO 组件只有BaseStandardUnit还是包括BasePrefixUnit？
+     * 重定基准,将所有非基本类型拆解合并,返回结果的类型Map中不存在非基本类型Key
      *
      * @return 等价于原对象但是组件仅为基本单位的单位
      * @author caotc
