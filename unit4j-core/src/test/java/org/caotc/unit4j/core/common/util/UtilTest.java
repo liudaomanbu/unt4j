@@ -1,7 +1,7 @@
 package org.caotc.unit4j.core.common.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.unit.Prefix;
+import org.caotc.unit4j.core.unit.Prefixes;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.Units;
@@ -51,9 +51,9 @@ class UtilTest {
                 Util.createCompositeIdOrAlias(Units.NEWTON.componentToExponents()));
 
         Unit unit = Unit.builder()
-                .componentToExponent(Units.WATT.addPrefix(Prefix.CENTI), 2)
+                .componentToExponent(Units.WATT.addPrefix(Prefixes.CENTI), 2)
                 .componentToExponent(Units.NEWTON, 3)
-                .prefix(Prefix.HECTO)
+                .prefix(Prefixes.HECTO)
                 .build();
 
         Util.createCompositeIdOrAlias(unit.componentToExponents());

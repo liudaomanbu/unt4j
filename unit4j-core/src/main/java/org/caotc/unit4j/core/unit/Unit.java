@@ -199,13 +199,19 @@ public abstract class Unit implements Identifiable, Component<Unit> {
         return multiply(divisor.reciprocal());
     }
 
+    @NonNull
     public Builder toBuilder() {
         return builder().componentToExponents(componentToExponents());
     }
 
+    @NonNull
+    public String toString(){
+        return id();
+    }
+
     public static class Builder {//todo
         @NonFinal
-        Prefix prefix = Prefix.EMPTY;
+        Prefix prefix = Prefixes.EMPTY;
         @NonFinal
         ImmutableMap.Builder<Unit, Integer> componentToExponents;
 

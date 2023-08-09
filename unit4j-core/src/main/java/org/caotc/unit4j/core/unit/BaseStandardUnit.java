@@ -19,7 +19,6 @@ package org.caotc.unit4j.core.unit;
 import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.unit.type.BaseUnitType;
 
@@ -32,7 +31,6 @@ import org.caotc.unit4j.core.unit.type.BaseUnitType;
  **/
 @Value
 @EqualsAndHashCode(callSuper = false)
-@ToString(callSuper = false)
 public class BaseStandardUnit extends StandardUnit {
 
     @NonNull

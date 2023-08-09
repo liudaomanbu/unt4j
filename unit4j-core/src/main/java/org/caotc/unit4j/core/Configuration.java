@@ -42,6 +42,7 @@ import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.convert.ValueTargetRangeSingletonAutoConverter;
 import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
 import org.caotc.unit4j.core.exception.UnitNotFoundException;
+import org.caotc.unit4j.core.math.number.AbstractNumber;
 import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.math.number.Fraction;
@@ -50,6 +51,7 @@ import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.PrefixUnit;
+import org.caotc.unit4j.core.unit.Prefixes;
 import org.caotc.unit4j.core.unit.StandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
@@ -184,6 +186,8 @@ public final class Configuration {
     @NonNull
     final Table<String, Alias.Type, Object> aliasToTypeToAliasRegistrableTable = Tables
             .synchronizedTable(HashBasedTable.create());
+    @NonNull
+    final Map<Prefix, AbstractNumber> prefixToNumbers=Maps.newConcurrentMap();
     /**
      * 单位自动转换器
      */
@@ -270,27 +274,52 @@ public final class Configuration {
         registerAlias(UnitTypes.LUMINOUS_INTENSITY, Aliases.luminousIntensityAliases());
 
         //注册默认词头别名
-        registerAlias(Prefix.YOCTO, Aliases.yoctoAliases());
-        registerAlias(Prefix.ZEPTO, Aliases.zeptoAliases());
-        registerAlias(Prefix.ATTO, Aliases.attoAliases());
-        registerAlias(Prefix.FEMTO, Aliases.femtoAliases());
-        registerAlias(Prefix.PICO, Aliases.picoAliases());
-        registerAlias(Prefix.NANO, Aliases.nanoAliases());
-        registerAlias(Prefix.MICRO, Aliases.microAliases());
-        registerAlias(Prefix.MILLI, Aliases.milliAliases());
-        registerAlias(Prefix.CENTI, Aliases.centiAliases());
-        registerAlias(Prefix.DECI, Aliases.deciAliases());
-        registerAlias(Prefix.DECA, Aliases.decaAliases());
-        registerAlias(Prefix.HECTO, Aliases.hectoAliases());
-        registerAlias(Prefix.KILO, Aliases.kiloAliases());
-        registerAlias(Prefix.MEGA, Aliases.megaAliases());
-        registerAlias(Prefix.GIGA, Aliases.gigaAliases());
-        registerAlias(Prefix.TERA, Aliases.teraAliases());
-        registerAlias(Prefix.EXA, Aliases.exaAliases());
-        registerAlias(Prefix.ZETTA, Aliases.zettaAliases());
-        registerAlias(Prefix.YOTTA, Aliases.yottaAliases());
+        registerAlias(Prefixes.YOCTO, Aliases.yoctoAliases());
+        registerAlias(Prefixes.ZEPTO, Aliases.zeptoAliases());
+        registerAlias(Prefixes.ATTO, Aliases.attoAliases());
+        registerAlias(Prefixes.FEMTO, Aliases.femtoAliases());
+        registerAlias(Prefixes.PICO, Aliases.picoAliases());
+        registerAlias(Prefixes.NANO, Aliases.nanoAliases());
+        registerAlias(Prefixes.MICRO, Aliases.microAliases());
+        registerAlias(Prefixes.MILLI, Aliases.milliAliases());
+        registerAlias(Prefixes.CENTI, Aliases.centiAliases());
+        registerAlias(Prefixes.DECI, Aliases.deciAliases());
+        registerAlias(Prefixes.DECA, Aliases.decaAliases());
+        registerAlias(Prefixes.HECTO, Aliases.hectoAliases());
+        registerAlias(Prefixes.KILO, Aliases.kiloAliases());
+        registerAlias(Prefixes.MEGA, Aliases.megaAliases());
+        registerAlias(Prefixes.GIGA, Aliases.gigaAliases());
+        registerAlias(Prefixes.TERA, Aliases.teraAliases());
+        registerAlias(Prefixes.EXA, Aliases.exaAliases());
+        registerAlias(Prefixes.ZETTA, Aliases.zettaAliases());
+        registerAlias(Prefixes.YOTTA, Aliases.yottaAliases());
 
-        registerAlias(Prefix.ANGSTROM, Aliases.angstromAliases());
+        registerAlias(Prefixes.ANGSTROM, Aliases.angstromAliases());
+        registerAlias(Prefixes.CENTIMILLI, Aliases.centimilliAliases());
+
+        registerValue(Prefixes.YOCTO,BigInteger.valueOf(10).pow(-24));
+        registerValue(Prefixes.ZEPTO,BigInteger.valueOf(10).pow(-21));
+        registerValue(Prefixes.ATTO,BigInteger.valueOf(10).pow(-18));
+        registerValue(Prefixes.FEMTO,BigInteger.valueOf(10).pow(-15));
+        registerValue(Prefixes.PICO,BigInteger.valueOf(10).pow(-12));
+        registerValue(Prefixes.NANO,BigInteger.valueOf(10).pow(-9));
+        registerValue(Prefixes.MICRO,BigInteger.valueOf(10).pow(-6));
+        registerValue(Prefixes.MILLI,BigInteger.valueOf(10).pow(-3));
+        registerValue(Prefixes.CENTI,BigInteger.valueOf(10).pow(-2));
+        registerValue(Prefixes.DECI,BigInteger.valueOf(10).pow(-1));
+        registerValue(Prefixes.DECA,BigInteger.valueOf(10).pow(1));
+        registerValue(Prefixes.HECTO,BigInteger.valueOf(10).pow(2));
+        registerValue(Prefixes.KILO,BigInteger.valueOf(10).pow(3));
+        registerValue(Prefixes.MEGA,BigInteger.valueOf(10).pow(6));
+        registerValue(Prefixes.GIGA,BigInteger.valueOf(10).pow(9));
+        registerValue(Prefixes.TERA,BigInteger.valueOf(10).pow(12));
+        registerValue(Prefixes.PETA,BigInteger.valueOf(10).pow(15));
+        registerValue(Prefixes.EXA,BigInteger.valueOf(10).pow(18));
+        registerValue(Prefixes.ZETTA,BigInteger.valueOf(10).pow(21));
+        registerValue(Prefixes.YOTTA,BigInteger.valueOf(10).pow(24));
+
+        registerValue(Prefixes.ANGSTROM,BigInteger.valueOf(10).pow(-8));
+        registerValue(Prefixes.CENTIMILLI,BigInteger.valueOf(10).pow(-5));
 
         //注册Unit别名
         registerAlias(Units.METER, Aliases.meterAliases());
@@ -739,6 +768,16 @@ public final class Configuration {
         return result.orElseThrow(() -> new IllegalArgumentException(String.format("no convert config for %s to %s", source, target)));
     }
 
+    //todo
+    void registerValue(@NonNull Prefix prefix,@NonNull AbstractNumber value){
+        prefixToNumbers.put(prefix,value);
+    }
+
+    private Optional<AbstractNumber> findPrefixValue(@NonNull Prefix prefix){
+        return Optional.ofNullable(prefixToNumbers.get(prefix));
+    }
+
+    //todo try还是会报错
     private Optional<UnitConvertConfig> tryCreateUnitConvertConfig(@NonNull Unit source, @NonNull Unit target) {
         if (source.equals(target)) {
             return Optional.of(UnitConvertConfig.empty());
@@ -747,7 +786,8 @@ public final class Configuration {
         if (source instanceof PrefixUnit) {
             StandardUnit sourceStandardUnit = ((PrefixUnit) source).standardUnit();
             if (sourceStandardUnit.equals(target)) {
-                return Optional.of(source.prefix().convertToStandardUnitConfig());
+                return findPrefixValue(source.prefix())
+                        .map(UnitConvertConfig::create);
             }
             return Optional.of(convertConfig(source, sourceStandardUnit))
                     .map(config -> config.reduce(convertConfig(sourceStandardUnit, target)));
@@ -755,7 +795,9 @@ public final class Configuration {
         if (target instanceof PrefixUnit) {
             StandardUnit targetStandardUnit = ((PrefixUnit) target).standardUnit();
             if (targetStandardUnit.equals(source)) {
-                return Optional.of(target.prefix().convertFromStandardUnitConfig());
+                return findPrefixValue(target.prefix())
+                        .map(AbstractNumber::reciprocal)
+                        .map(UnitConvertConfig::create);
             }
             return Optional.of(convertConfig(source, targetStandardUnit))
                     .map(config -> config.reduce(convertConfig(targetStandardUnit, target)));

@@ -199,7 +199,7 @@ class ConfigurationTest {
     void registerAlias() {
         Configuration configuration = Configuration.of();
         Random random = new Random();
-        Prefix prefix = Prefix.create(10, random.nextInt());
+        Prefix prefix = Prefix.of(random.nextInt()+"");
         Alias prefixAlias = Alias.create(Alias.Type.create(random.nextInt() + ""), random.nextInt() + "");
         StandardUnit standardUnit = Unit.of(random.nextInt() + "", UnitTypes.LENGTH);
         Alias standardUnitAlias = prefixAlias.withValue(random.nextInt() + "");

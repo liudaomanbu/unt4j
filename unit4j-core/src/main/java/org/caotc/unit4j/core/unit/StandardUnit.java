@@ -14,7 +14,7 @@ public abstract class StandardUnit extends Unit {
   @Override
   @NonNull
   public final Prefix prefix() {
-    return Prefix.EMPTY;
+    return Prefixes.EMPTY;
   }
 
   /**

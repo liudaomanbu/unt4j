@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Singular;
-import lombok.ToString;
 import lombok.Value;
 import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.unit.type.UnitType;
@@ -25,7 +24,6 @@ import java.util.Map.Entry;
  */
 @Value
 @EqualsAndHashCode(callSuper = false)
-@ToString(callSuper = false)
 @lombok.Builder(builderMethodName = "builderInternal", access = AccessLevel.MODULE)
 public class CompositeStandardUnit extends StandardUnit {
 
@@ -81,7 +79,12 @@ public class CompositeStandardUnit extends StandardUnit {
     return Util.createCompositeIdOrAlias(componentToExponents());
   }
 
-  private void validate() {
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    private void validate() {
     if (componentToExponents().size() == 1 && Iterables.getOnlyElement(componentToExponents().values()) == 1) {
       throw new IllegalArgumentException(String.format("Unit only and Exponent is 1.%s is not a CompositeStandardUnit", componentToExponents()));
     }

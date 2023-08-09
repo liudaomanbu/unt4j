@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
 import org.caotc.unit4j.core.constant.StringConstant;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
@@ -33,7 +32,6 @@ import org.caotc.unit4j.core.unit.type.UnitType;
  * @since 1.0.0
  */
 @EqualsAndHashCode(callSuper = false)
-@ToString(callSuper = false)
 @Getter
 public abstract class PrefixUnit extends Unit {
     /**

@@ -111,6 +111,7 @@ public class Aliases {
     public static final Alias ZETTA_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, "ZETTA");
     public static final Alias YOTTA_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, "YOTTA");
     public static final Alias ANGSTROM_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, "ANGSTROM");
+    public static final Alias CENTIMILLI_ENGLISH_NAME = Alias.create(Types.ENGLISH_NAME, "CENTIMILLI");
     /**
      * 默认中文别名
      */
@@ -192,6 +193,7 @@ public class Aliases {
     public static final ImmutableSet<Alias> ZETTA_ALIASES = ImmutableSet.of(ZETTA_ENGLISH_NAME);
     public static final ImmutableSet<Alias> YOTTA_ALIASES = ImmutableSet.of(YOTTA_ENGLISH_NAME);
     public static final ImmutableSet<Alias> ANGSTROM_ALIASES = ImmutableSet.of(ANGSTROM_ENGLISH_NAME);
+    public static final ImmutableSet<Alias> CENTIMILLI_ALIASES = ImmutableSet.of(CENTIMILLI_ENGLISH_NAME);
     public static final ImmutableSet<Alias> METER_ALIASES = ImmutableSet.of(METER_ENGLISH_NAME, METER_CHINESE_NAME,
             METER_SYMBOL);
     public static final ImmutableSet<Alias> GRAM_ALIASES = ImmutableSet.of(GRAM_ENGLISH_NAME, GRAM_CHINESE_NAME,
@@ -391,7 +393,10 @@ public class Aliases {
     public static ImmutableSet<Alias> angstromAliases() {
         return ANGSTROM_ALIASES;
     }
-
+    @NonNull
+    public static ImmutableSet<Alias> centimilliAliases() {
+        return CENTIMILLI_ALIASES;
+    }
     @NonNull
     public static ImmutableSet<Alias> meterAliases() {
         return METER_ALIASES;

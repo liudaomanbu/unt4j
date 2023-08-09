@@ -42,4 +42,8 @@ public class CompositePrefixUnit extends PrefixUnit {
       return multiply(divisor.reciprocal());
   }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

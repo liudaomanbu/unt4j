@@ -234,15 +234,15 @@ public class Units {
     /**
      * 千克
      */
-    public static final BasePrefixUnit KILOGRAM = GRAM.addPrefix(Prefix.KILO);
+    public static final BasePrefixUnit KILOGRAM = GRAM.addPrefix(Prefixes.KILO);
     /**
      * 埃米 10−8m 不是国际制单位 Å
      */
-    public static final BasePrefixUnit ANGSTROM_METER = METER.addPrefix(Prefix.ANGSTROM);
+    public static final BasePrefixUnit ANGSTROM_METER = METER.addPrefix(Prefixes.ANGSTROM);
     /**
      * 忽米 10−5m cmm
      */
-    public static final BasePrefixUnit CENTIMILLI_METER = METER.addPrefix(Prefix.CENTIMILLI);
+    public static final BasePrefixUnit CENTIMILLI_METER = METER.addPrefix(Prefixes.CENTIMILLI);
 
     /**
      * 弧度 m·m−1 平面角 球面度 m2·m−2 立体角
@@ -434,12 +434,12 @@ public class Units {
             .collect(ImmutableSet.toImmutableSet());
 
     public static final ImmutableSet<Unit> SI_UNITS = Stream.concat(SI_STANDARD_UNITS.stream(),
-                    SI_STANDARD_UNITS.stream().flatMap(unit -> Prefix.SI_UNIT_PREFIXES.stream().map(unit::addPrefix)))
+                    SI_STANDARD_UNITS.stream().flatMap(unit -> Prefixes.SI_UNIT_PREFIXES.stream().map(unit::addPrefix)))
             .collect(ImmutableSet.toImmutableSet());
 
     public static final ImmutableSet<Unit> VALUES = Streams.concat(SI_STANDARD_UNITS.stream(),
                     Stream.of(CELSIUS_DEGREE, FAHRENHEIT_DEGREE, TONNE), EAST_ASIA_OLD_LENGTH_STANDARD_UNITS.stream()
                     , ENGLISH_LENGTH_STANDARD_UNITS.stream(), DEFAULT_TIME_STANDARD_UNITS.stream())
-            .flatMap(unit -> Stream.concat(Stream.of(unit), Prefix.VALUES.stream().map(unit::addPrefix)))
+            .flatMap(unit -> Stream.concat(Stream.of(unit), Prefixes.VALUES.stream().map(unit::addPrefix)))
             .collect(ImmutableSet.toImmutableSet());
 }

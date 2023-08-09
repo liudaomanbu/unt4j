@@ -62,7 +62,7 @@ public class UnitGroup implements List<Unit> {
                                             @NonNull Configuration configuration) {
     return builder().configuration(configuration)
             .unit(standardUnit)
-            .units(Prefix.SI_UNIT_PREFIXES.stream().map(standardUnit::addPrefix)
+            .units(Prefixes.SI_UNIT_PREFIXES.stream().map(standardUnit::addPrefix)
                     .collect(ImmutableSet.toImmutableSet())).build();
   }
 
