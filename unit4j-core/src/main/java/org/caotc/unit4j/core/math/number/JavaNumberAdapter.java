@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.caotc.unit4j.core.math.number;
 
 import lombok.NonNull;
@@ -21,41 +5,41 @@ import lombok.Value;
 
 /**
  * @author caotc
- * @date 2020-06-25
+ * @date 2023-08-11
  * @since 1.0.0
  */
 @Value
-public class UnkownNumber implements Number {
-    public static final UnkownNumber INSTANCE = new UnkownNumber();
+public class JavaNumberAdapter implements Number{
+    @NonNull java.lang.Number delegate;
 
     @Override
     public @NonNull BigInteger toBigInteger() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull BigInteger toBigIntegerExact() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull BigDecimal toBigDecimal() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull BigDecimal toBigDecimalExact() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Fraction toFraction() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Fraction toFractionExact() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -75,57 +59,57 @@ public class UnkownNumber implements Number {
 
     @Override
     public @NonNull Number add(@NonNull Fraction augend) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number add(@NonNull BigDecimal augend) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number add(@NonNull BigInteger augend) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number multiply(@NonNull Fraction multiplicand) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number multiply(@NonNull BigDecimal multiplicand) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number multiply(@NonNull BigInteger multiplicand) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number divide(@NonNull Fraction divisor) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number divide(@NonNull BigDecimal divisor) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number divide(@NonNull BigInteger divisor) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number pow(int exponent) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public @NonNull Number negate() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -141,5 +125,47 @@ public class UnkownNumber implements Number {
     @Override
     public int compareTo(@NonNull BigInteger o) {
         return 0;
+    }
+
+    @Override
+    public byte byteValue() {
+        return delegate.byteValue();
+    }
+
+    @Override
+    public short shortValue() {
+        return delegate.shortValue();
+    }
+
+    @Override
+    public int intValue() {
+        return delegate.intValue();
+    }
+
+    @Override
+    public long longValue() {
+        return delegate.longValue();
+    }
+
+    @Override
+    public float floatValue() {
+        return delegate.floatValue();
+    }
+
+    @Override
+    public double doubleValue() {
+        return delegate.doubleValue();
+    }
+
+    @NonNull
+    @Override
+    public java.math.BigInteger bigIntegerValue() {
+        return Number.super.bigIntegerValue();
+    }
+
+    @NonNull
+    @Override
+    public java.math.BigDecimal bigDecimalValue() {
+        return Number.super.bigDecimalValue();
     }
 }

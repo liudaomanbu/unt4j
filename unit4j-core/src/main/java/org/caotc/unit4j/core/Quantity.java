@@ -21,13 +21,11 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
 import lombok.experimental.FieldNameConstants;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
-import org.caotc.unit4j.core.math.number.BigDecimal;
-import org.caotc.unit4j.core.math.number.BigInteger;
-import org.caotc.unit4j.core.math.number.UnkownNumber;
+import org.apache.commons.math3.fraction.BigFraction;
+import org.caotc.unit4j.core.common.util.MathUtil;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.core.unit.UnknownUnit;
 
+import java.math.BigDecimal;
 import java.math.MathContext;
 
 /**
@@ -41,7 +39,10 @@ import java.math.MathContext;
 @Value(staticConstructor = "create")
 @FieldNameConstants
 public class Quantity {
-    public static final Quantity UNKNOWN = create(UnkownNumber.INSTANCE, UnknownUnit.INSTANCE);
+//    public static final Quantity UNKNOWN = create(UnkownNumber.INSTANCE, UnknownUnit.INSTANCE);
+
+    @NonNull
+    BigFraction value;
 
     @NonNull
     public static Quantity create(@NonNull Object value, @NonNull Unit unit) {
@@ -66,8 +67,8 @@ public class Quantity {
         if (value instanceof String) {
             return create((String) value, unit);
         }
-        if (value instanceof AbstractNumber) {
-            return create((AbstractNumber) value, unit);
+        if (value instanceof BigFraction) {
+            return create((BigFraction) value, unit);
         }
         throw new IllegalArgumentException(value + " can't convert to Number");
     }
@@ -84,7 +85,7 @@ public class Quantity {
      */
     @NonNull
     public static Quantity create(@NonNull java.math.BigDecimal value, @NonNull Unit unit) {
-        return create(BigDecimal.valueOf(value), unit);
+        return create(MathUtil.toBigFraction(value), unit);
     }
 
     /**
@@ -99,7 +100,7 @@ public class Quantity {
      */
     @NonNull
     public static Quantity create(@NonNull java.math.BigInteger value, @NonNull Unit unit) {
-        return create(BigInteger.valueOf(value), unit);
+        return create(new BigFraction(value), unit);
     }
 
     /**
@@ -114,7 +115,7 @@ public class Quantity {
      */
     @NonNull
     public static Quantity create(long value, @NonNull Unit unit) {
-        return create(BigInteger.valueOf(value), unit);
+        return create(new BigFraction(value), unit);
     }
 
     /**
@@ -129,11 +130,8 @@ public class Quantity {
      */
     @NonNull
     public static Quantity create(@NonNull String value, @NonNull Unit unit) {
-        return create(BigDecimal.valueOf(value), unit);
+        return create(MathUtil.toBigFraction(new BigDecimal(value)), unit);
     }
-
-    @NonNull
-    AbstractNumber value;
     @NonNull
     Unit unit;
 
@@ -327,7 +325,11 @@ public class Quantity {
      * @since 1.0.0
      */
     public byte byteValueExact() {
-        return value.byteValueExact();
+        byte val = value.byteValue();
+        if(new BigFraction(val).equals(value)){
+            return val;
+        }
+        throw new ArithmeticException();
     }
 
     /**
@@ -352,7 +354,11 @@ public class Quantity {
      * @since 1.0.0
      */
     public short shortValueExact() {
-        return value.shortValueExact();
+        short val = value.shortValue();
+        if(new BigFraction(val).equals(value)){
+            return val;
+        }
+        throw new ArithmeticException();
     }
 
     /**
@@ -377,7 +383,11 @@ public class Quantity {
      * @since 1.0.0
      */
     public int intValueExact() {
-        return value.intValueExact();
+        int val = value.intValue();
+        if(new BigFraction(val).equals(value)){
+            return val;
+        }
+        throw new ArithmeticException();
     }
 
     /**
@@ -402,7 +412,11 @@ public class Quantity {
      * @since 1.0.0
      */
     public long longValueExact() {
-        return value.longValueExact();
+        long val = value.longValue();
+        if(new BigFraction(val).equals(value)){
+            return val;
+        }
+        throw new ArithmeticException();
     }
 
     /**
@@ -415,7 +429,7 @@ public class Quantity {
      */
     @NonNull
     public java.math.BigInteger bigIntegerValue() {
-        return value.bigIntegerValue();
+        return value.bigDecimalValue().toBigInteger();
     }
 
     /**
@@ -429,7 +443,7 @@ public class Quantity {
      */
     @NonNull
     public java.math.BigInteger bigIntegerValueExact() {
-        return value.bigIntegerValueExact();
+        return value.bigDecimalValue().toBigIntegerExact();
     }
 
     /**
@@ -454,7 +468,11 @@ public class Quantity {
      * @since 1.0.0
      */
     public float floatValueExact() {
-        return value.floatValueExact();
+        float val = value.floatValue();
+        if(new BigFraction(val).equals(value)){
+            return val;
+        }
+        throw new ArithmeticException();
     }
 
     /**
@@ -479,7 +497,11 @@ public class Quantity {
      * @since 1.0.0
      */
     public double doubleValueExact() {
-        return value.doubleValueExact();
+        double val = value.doubleValue();
+        if(new BigFraction(val).equals(value)){
+            return val;
+        }
+        throw new ArithmeticException();
     }
 
     /**
@@ -505,7 +527,7 @@ public class Quantity {
      */
     @NonNull
     public java.math.BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
-        return value.bigDecimalValue(mathContext);
+        return value.bigDecimalValue(mathContext.getPrecision(),mathContext.getRoundingMode().ordinal());
     }
 
     /**
@@ -519,7 +541,11 @@ public class Quantity {
      */
     @NonNull
     public java.math.BigDecimal bigDecimalValueExact() {
-        return value.bigDecimalValueExact();
+        java.math.BigDecimal val = value.bigDecimalValue();
+        if(MathUtil.toBigFraction(val).equals(value)){
+            return val;
+        }
+        throw new ArithmeticException();
     }
 
     /**
@@ -536,6 +562,34 @@ public class Quantity {
      */
     @NonNull
     public <T> T value(@NonNull Class<T> valueType, @NonNull MathContext mathContext) {
-        return value.value(valueType, mathContext);
+//        if (byte.class.equals(valueType) || Byte.class.equals(valueType)) {
+//            return (T) Byte.valueOf(byteValue(mathContext.getRoundingMode()));
+//        }
+//        if (short.class.equals(valueType) || Short.class.equals(valueType)) {
+//            return (T) Short.valueOf(shortValue(mathContext.getRoundingMode()));
+//        }
+//        if (int.class.equals(valueType) || Integer.class.equals(valueType)) {
+//            return (T) Integer.valueOf(intValue(mathContext.getRoundingMode()));
+//        }
+//        if (long.class.equals(valueType) || Long.class.equals(valueType)) {
+//            return (T) Long.valueOf(longValue(mathContext.getRoundingMode()));
+//        }
+//        if (java.math.BigInteger.class.equals(valueType)) {
+//            return (T) bigIntegerValue(mathContext.getRoundingMode());
+//        }
+//        if (float.class.equals(valueType) || Float.class.equals(valueType)) {
+//            return (T) Float.valueOf(floatValue(mathContext));
+//        }
+//        if (double.class.equals(valueType) || Double.class.equals(valueType)) {
+//            return (T) Double.valueOf(doubleValue(mathContext));
+//        }
+//        if (java.math.BigDecimal.class.equals(valueType)) {
+//            return (T) bigDecimalValue(mathContext);
+//        }
+//        if (String.class.equals(valueType)) {
+//            return (T) bigDecimalValue(mathContext).toPlainString();
+//        }
+        //todo
+        throw new IllegalArgumentException("can't convert to " + valueType);
     }
 }

@@ -23,8 +23,6 @@ public class SimplifyConfig {
     //(10³_GRAM)⁻¹->10⁻³_(GRAM)⁻¹ todo prefixUnit ? name
     @lombok.Builder.Default
     boolean prefixUnit =true;
-    @lombok.Builder.Default
-    boolean recursive=true;
 
     @NonNull
     public static SimplifyConfig of(){

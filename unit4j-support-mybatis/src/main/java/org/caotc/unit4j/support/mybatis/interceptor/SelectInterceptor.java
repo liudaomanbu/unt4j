@@ -39,7 +39,7 @@ import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
+import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
@@ -170,10 +170,10 @@ public class SelectInterceptor implements Interceptor {
                         "database strategy can't use " + CodecStrategy.OBJECT);
             case VALUE:
                 //TODO outputName
-                ResultMapping amountResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputName(), AbstractNumber.class).build();
+                ResultMapping amountResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputName(), Number.class).build();
                 return Stream.of(amountResultMapping);
             case FLAT:
-                ResultMapping amountValueResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputValueName(), AbstractNumber.class).build();
+                ResultMapping amountValueResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputValueName(), Number.class).build();
                 ResultMapping amountUnitResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.UNIT, quantityCodecConfig.outputUnitName(), Unit.class).build();
                 return Stream.of(amountValueResultMapping, amountUnitResultMapping);
             default:

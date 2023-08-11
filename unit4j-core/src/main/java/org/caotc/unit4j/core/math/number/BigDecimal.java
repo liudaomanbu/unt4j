@@ -22,7 +22,7 @@ import java.math.MathContext;
 @ToString(callSuper = false)
 @AllArgsConstructor(staticName = "valueOf")
 @Beta
-public class BigDecimal extends AbstractNumber {
+public class BigDecimal implements Number {
 
   public static final BigDecimal ZERO = valueOf(java.math.BigDecimal.ZERO);
   public static final BigDecimal ONE = valueOf(java.math.BigDecimal.ONE);
@@ -138,7 +138,7 @@ public class BigDecimal extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber add(@NonNull Fraction augend) {
+  public @NonNull Number add(@NonNull Fraction augend) {
     return toFractionExact().add(augend);
   }
 
@@ -159,12 +159,12 @@ public class BigDecimal extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber add(@NonNull BigInteger augend) {
+  public @NonNull Number add(@NonNull BigInteger augend) {
     return valueOf(value.add(augend.bigDecimalValue()));
   }
 
   @Override
-  public @NonNull AbstractNumber subtract(@NonNull Fraction subtrahend) {
+  public @NonNull Number subtract(@NonNull Fraction subtrahend) {
     return toFractionExact().subtract(subtrahend);
   }
 
@@ -242,7 +242,7 @@ public class BigDecimal extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber multiply(@NonNull Fraction multiplicand) {
+  public @NonNull Number multiply(@NonNull Fraction multiplicand) {
     return toFractionExact().multiply(multiplicand);
   }
 
@@ -320,7 +320,7 @@ public class BigDecimal extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber multiply(@NonNull BigInteger multiplicand) {
+  public @NonNull Number multiply(@NonNull BigInteger multiplicand) {
     return valueOf(value.multiply(multiplicand.bigDecimalValue()));
   }
 
@@ -390,17 +390,17 @@ public class BigDecimal extends AbstractNumber {
    */
   @Override
   @NonNull
-  public AbstractNumber divide(@NonNull BigDecimal divisor) {
+  public Number divide(@NonNull BigDecimal divisor) {
     return toFractionExact().divide(divisor.toFractionExact());
   }
 
   @Override
-  public @NonNull AbstractNumber divide(@NonNull BigInteger divisor) {
+  public @NonNull Number divide(@NonNull BigInteger divisor) {
     return toFractionExact().divide(divisor.toFractionExact());
   }
 
   @Override
-  public @NonNull AbstractNumber divide(@NonNull Fraction divisor) {
+  public @NonNull Number divide(@NonNull Fraction divisor) {
     return toFractionExact().divide(divisor);
   }
 
@@ -671,7 +671,7 @@ public class BigDecimal extends AbstractNumber {
    */
   @Override
   @NonNull
-  public AbstractNumber pow(int exponent) {
+  public Number pow(int exponent) {
     if (exponent > 0) {
       return valueOf(value.pow(exponent));
     }
@@ -695,7 +695,7 @@ public class BigDecimal extends AbstractNumber {
 
   //TODO 是否仅在除不尽时才返回分数
   @Override
-  public @NonNull AbstractNumber reciprocal() {
+  public @NonNull Number reciprocal() {
     return toFractionExact().reciprocal();
   }
 

@@ -24,12 +24,12 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
-import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
+import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
@@ -42,19 +42,28 @@ import java.util.stream.IntStream;
 @Slf4j
 public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConverter {
     @NonNull
-    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<AbstractNumber> valueTargetRange) {
-        return of(valueTargetRange, true);
-    }
-
-    @NonNull
-    Range<AbstractNumber> valueTargetRange;
-    boolean fallbackHigher;
-
+    Range<BigFraction> valueTargetRange;
     @NonNull
 //    @Getter(lazy = true)//todo lombok bug
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    AtomicReference<Range<AbstractNumber>> valueTargetLowerRange = new AtomicReference<>();
+    AtomicReference<Range<BigFraction>> valueTargetLowerRange = new AtomicReference<>();
+
+    @NonNull
+    public static ValueTargetRangeSingletonAutoConverter ofBigIntegerRange(@NonNull Range<BigInteger> valueTargetRange,boolean fallbackHigher) {
+        return of(Range.range(new BigFraction(valueTargetRange.lowerEndpoint()),valueTargetRange.lowerBoundType(),new BigFraction(valueTargetRange.upperEndpoint()),valueTargetRange.upperBoundType()),fallbackHigher);
+    }
+
+    @NonNull
+    public static ValueTargetRangeSingletonAutoConverter ofBigIntegerRange(@NonNull Range<BigInteger> valueTargetRange) {
+        return ofBigIntegerRange(valueTargetRange,true);
+    }
+    boolean fallbackHigher;
+
+    @NonNull
+    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<BigFraction> valueTargetRange) {
+        return of(valueTargetRange, true);
+    }
 
     @Override
     public @NonNull Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity) {
@@ -108,13 +117,13 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
         }
     }
 
-    public @NonNull Range<AbstractNumber> valueTargetLowerRange() {
-        Range<AbstractNumber> value = this.valueTargetLowerRange.get();
+    public @NonNull Range<BigFraction> valueTargetLowerRange() {
+        Range<BigFraction> value = this.valueTargetLowerRange.get();
         if (value == null) {
             synchronized(this.valueTargetLowerRange) {
                 value = this.valueTargetLowerRange.get();
                 if (value == null) {
-                    value = this.valueTargetRange().hasLowerBound() ? Range.upTo(this.valueTargetRange().lowerEndpoint(), this.valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) : Range.closedOpen(BigInteger.ZERO, BigInteger.ZERO);
+                    value = this.valueTargetRange().hasLowerBound() ? Range.upTo(this.valueTargetRange().lowerEndpoint(), this.valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) : Range.closedOpen(BigFraction.ZERO, BigFraction.ZERO);
                     this.valueTargetLowerRange.set(value);
                 }
             }

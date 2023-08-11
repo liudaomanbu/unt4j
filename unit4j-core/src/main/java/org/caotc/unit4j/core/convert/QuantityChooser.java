@@ -8,10 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.ToString;
+import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
-import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.Unit;
 
 import java.util.Iterator;
@@ -64,13 +63,13 @@ public abstract class QuantityChooser {
             ImmutableList<Quantity> quantityImmutableList = quantities.collect(ImmutableList.toImmutableList());
             Unit unit = quantityImmutableList.stream().findAny().map(Quantity::unit)
                     .orElseThrow(AssertionError::new);
-            ImmutableList<AbstractNumber> values = quantityImmutableList.stream()
+            ImmutableList<BigFraction> values = quantityImmutableList.stream()
                     .map(data -> data.convertTo(unit, configuration))
                     .map(Quantity::value)
                     .collect(ImmutableList.toImmutableList());
-            AbstractNumber sum = values.stream().reduce(AbstractNumber::add)
+            BigFraction sum = values.stream().reduce(BigFraction::add)
                     .orElseThrow(AssertionError::new);
-            AbstractNumber average = sum.divide(BigInteger.valueOf(values.size()));
+            BigFraction average = sum.divide(values.size());
       return Quantity.create(average, unit);
         }
     };

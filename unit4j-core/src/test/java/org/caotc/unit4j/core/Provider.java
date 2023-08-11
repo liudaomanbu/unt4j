@@ -5,14 +5,15 @@ import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Streams;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
-import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.unit.Prefixes;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.Units;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.math.BigDecimal;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
@@ -156,7 +157,7 @@ public class Provider {
         Unit gramNewtonUnit = Unit.builder().componentToExponent(Units.GRAM, 1).componentToExponent(Units.METER, 1).componentToExponent(Units.SECOND, -2).build();
         Unit gramMinuteNewtonUnit = Unit.builder().componentToExponent(Units.GRAM, 1).componentToExponent(Units.METER, 1).componentToExponent(Units.MINUTE, -2).build();
         return Stream.of(
-                Arguments.of(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE, UnitConvertConfig.create(BigDecimal.valueOf("1.8"),BigDecimal.valueOf(32))),
+                Arguments.of(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE, UnitConvertConfig.create(BigFraction.getReducedFraction(18,10),new BigFraction(32))),
                 Arguments.of(Units.KILOGRAM, Units.GRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.KILOGRAM, Units.GRAM.addPrefix(Prefixes.DECA), UnitConvertConfig.create(BigDecimal.valueOf(100))),
                 Arguments.of(Units.TONNE, Units.GRAM, UnitConvertConfig.create(BigDecimal.valueOf(1000000))),
@@ -164,7 +165,7 @@ public class Provider {
                 Arguments.of(Units.NEWTON.addPrefix(Prefixes.KILO), Units.NEWTON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.NEWTON.addPrefix(Prefixes.KILO), Units.NEWTON.addPrefix(Prefixes.DECA), UnitConvertConfig.create(BigDecimal.valueOf(100))),
                 Arguments.of(Units.NEWTON, gramNewtonUnit, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
-                Arguments.of(gramMinuteNewtonUnit, Units.NEWTON, UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)))),
+                Arguments.of(gramMinuteNewtonUnit, Units.NEWTON, UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000).multiply(BigFraction.getReducedFraction(1,3600)))),
                 Arguments.of(tonneNewtonUnit, Units.NEWTON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.NON.addPrefix(Prefixes.KILO), Units.NON, UnitConvertConfig.create(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.NON.addPrefix(Prefixes.KILO), Units.NON.addPrefix(Prefixes.DECA), UnitConvertConfig.create(BigDecimal.valueOf(100))),
@@ -175,21 +176,21 @@ public class Provider {
                 Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), 2).build(), Unit.builder().componentToExponent(Units.NEWTON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), 2).build(), Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.DECA), 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NEWTON, 2).build(), Unit.builder().componentToExponent(gramNewtonUnit, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
-                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, 2).build(), Unit.builder().componentToExponent(Units.NEWTON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)).pow(2))),
+                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, 2).build(), Unit.builder().componentToExponent(Units.NEWTON, 2).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000).multiply(BigFraction.getReducedFraction(1,3600)).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(tonneNewtonUnit, 2).build(), Unit.builder().componentToExponent(Units.NEWTON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), 2).build(), Unit.builder().componentToExponent(Units.NON, 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(2))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), 2).build(), Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.DECA), 2).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(2))),
-                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), Unit.builder().componentToExponent(Units.GRAM, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), Unit.builder().componentToExponent(Units.GRAM.addPrefix(Prefixes.DECA), -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.TONNE, -1).build(), Unit.builder().componentToExponent(Units.GRAM, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000000).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.TONNE, -1).build(), Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NEWTON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.DECA), -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.NEWTON, -1).build(), Unit.builder().componentToExponent(gramNewtonUnit, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, -1).build(), Unit.builder().componentToExponent(Units.NEWTON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(tonneNewtonUnit, -1).build(), Unit.builder().componentToExponent(Units.NEWTON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NON, -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(-1))),
-                Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.DECA), -1).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), Unit.builder().componentToExponent(Units.GRAM, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000))),
+                Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), Unit.builder().componentToExponent(Units.GRAM.addPrefix(Prefixes.DECA), -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,100))),
+                Arguments.of(Unit.builder().componentToExponent(Units.TONNE, -1).build(), Unit.builder().componentToExponent(Units.GRAM, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000000))),
+                Arguments.of(Unit.builder().componentToExponent(Units.TONNE, -1).build(), Unit.builder().componentToExponent(Units.KILOGRAM, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000))),
+                Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NEWTON, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000))),
+                Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.DECA), -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,100))),
+                Arguments.of(Unit.builder().componentToExponent(Units.NEWTON, -1).build(), Unit.builder().componentToExponent(gramNewtonUnit, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000))),
+                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, -1).build(), Unit.builder().componentToExponent(Units.NEWTON, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000).multiply(BigFraction.getReducedFraction(1,3600)).pow(-1))),
+                Arguments.of(Unit.builder().componentToExponent(tonneNewtonUnit, -1).build(), Unit.builder().componentToExponent(Units.NEWTON, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000))),
+                Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NON, -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000))),
+                Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), -1).build(), Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.DECA), -1).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,100))),
                 Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, exponent).build(), Unit.builder().componentToExponent(Units.GRAM, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(Units.KILOGRAM, exponent).build(), Unit.builder().componentToExponent(Units.GRAM.addPrefix(Prefixes.DECA), exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(Units.TONNE, exponent).build(), Unit.builder().componentToExponent(Units.GRAM, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000000).pow(exponent))),
@@ -197,7 +198,7 @@ public class Provider {
                 Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), exponent).build(), Unit.builder().componentToExponent(Units.NEWTON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.KILO), exponent).build(), Unit.builder().componentToExponent(Units.NEWTON.addPrefix(Prefixes.DECA), exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NEWTON, exponent).build(), Unit.builder().componentToExponent(gramNewtonUnit, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
-                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, exponent).build(), Unit.builder().componentToExponent(Units.NEWTON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(0.001).multiply(BigDecimal.valueOf(60).pow(-2)).pow(exponent))),
+                Arguments.of(Unit.builder().componentToExponent(gramMinuteNewtonUnit, exponent).build(), Unit.builder().componentToExponent(Units.NEWTON, exponent).build(), UnitConvertConfig.create(BigFraction.getReducedFraction(1,1000).multiply(BigFraction.getReducedFraction(1,3600)).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(tonneNewtonUnit, exponent).build(), Unit.builder().componentToExponent(Units.NEWTON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), exponent).build(), Unit.builder().componentToExponent(Units.NON, exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(1000).pow(exponent))),
                 Arguments.of(Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.KILO), exponent).build(), Unit.builder().componentToExponent(Units.NON.addPrefix(Prefixes.DECA), exponent).build(), UnitConvertConfig.create(BigDecimal.valueOf(100).pow(exponent)))

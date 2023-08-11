@@ -19,7 +19,7 @@ import java.math.MathContext;
 @Value
 @Beta
 @ToString(callSuper = false)
-public class Fraction extends AbstractNumber {
+public class Fraction implements Number {
 
   @NonNull
   public static Fraction valueOf(long numerator, long denominator) {
@@ -30,7 +30,7 @@ public class Fraction extends AbstractNumber {
   public static Fraction valueOf(BigInteger numerator, BigInteger denominator) {
     return new Fraction(numerator, denominator);
   }
-
+  private static final MathContext DEFAULT_MATH_CONTEXT = MathContext.DECIMAL128;
   /**
    * 分子
    */
@@ -73,7 +73,7 @@ public class Fraction extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber negate() {
+  public @NonNull Number negate() {
     return valueOf(numerator.negate(), denominator);
   }
 
@@ -157,12 +157,12 @@ public class Fraction extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber add(@NonNull BigDecimal augend) {
+  public @NonNull Number add(@NonNull BigDecimal augend) {
     return add(augend.toFractionExact());
   }
 
   @Override
-  public @NonNull AbstractNumber add(@NonNull BigInteger augend) {
+  public @NonNull Number add(@NonNull BigInteger augend) {
     return valueOf(numerator().add(denominator().multiply(augend)), denominator());
   }
 
@@ -200,7 +200,7 @@ public class Fraction extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber subtract(@NonNull BigDecimal subtrahend) {
+  public @NonNull Number subtract(@NonNull BigDecimal subtrahend) {
     return subtract(subtrahend.toFractionExact());
   }
 
@@ -239,12 +239,12 @@ public class Fraction extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber multiply(@NonNull BigDecimal multiplicand) {
+  public @NonNull Number multiply(@NonNull BigDecimal multiplicand) {
     return multiply(multiplicand.toFractionExact());
   }
 
   @Override
-  public @NonNull AbstractNumber multiply(@NonNull BigInteger multiplicand) {
+  public @NonNull Number multiply(@NonNull BigInteger multiplicand) {
     return valueOf(numerator().multiply(multiplicand), denominator());
   }
 

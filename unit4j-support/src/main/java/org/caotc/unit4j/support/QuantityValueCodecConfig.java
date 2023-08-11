@@ -22,7 +22,7 @@ import org.caotc.unit4j.api.annotation.SerializeCommand;
 import org.caotc.unit4j.api.annotation.SerializeCommand.Type;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
+import org.caotc.unit4j.core.math.number.Number;
 
 import java.math.MathContext;
 
@@ -57,7 +57,7 @@ public class QuantityValueCodecConfig {
    * @since 1.0.0
    */
   @NonNull
-  public SerializeCommands createSerializeCommands(@NonNull AbstractNumber number) {
+  public SerializeCommands createSerializeCommands(@NonNull Number number) {
     return SerializeCommands.builder()
         .command(SerializeCommand
             .create(Type.WRITE_VALUE, null, number.value(valueType(), mathContext())))

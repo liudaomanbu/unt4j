@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
-import org.caotc.unit4j.core.math.number.BigDecimal;
+import org.apache.commons.math3.fraction.BigFraction;
+import org.caotc.unit4j.core.common.util.MathUtil;
 
 /**
  * 单位转换配置类
@@ -23,8 +23,8 @@ public class UnitConvertConfig {
   /**
    * 空对象
    */
-  private static final UnitConvertConfig EMPTY = builder().ratio(BigDecimal.ONE)
-          .constantDifference(BigDecimal.ZERO).build();
+  private static final UnitConvertConfig EMPTY = builder().ratio(BigFraction.ONE)
+          .constantDifference(BigFraction.ZERO).build();
 
   /**
    * 空对象
@@ -38,6 +38,16 @@ public class UnitConvertConfig {
   public static UnitConvertConfig empty() {
     return EMPTY;
   }
+  /**
+   * 单位转换比例
+   */
+  @NonNull
+  BigFraction ratio;
+  /**
+   * 单位之间的常量差值(以源单位为标准,所以先加常数运算再比例运算)
+   */
+  @NonNull
+  BigFraction constantDifference;
 
   /**
    * 工厂方法
@@ -50,7 +60,7 @@ public class UnitConvertConfig {
    */
   @NonNull
   public static UnitConvertConfig create(@NonNull java.math.BigDecimal ratio) {
-    return builder().ratio(BigDecimal.valueOf(ratio)).constantDifference(BigDecimal.ZERO).build();
+    return builder().ratio(MathUtil.toBigFraction(ratio)).constantDifference(BigFraction.ZERO).build();
   }
 
   /**
@@ -63,8 +73,8 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   @NonNull
-  public static UnitConvertConfig create(@NonNull AbstractNumber ratio) {
-    return builder().ratio(ratio).constantDifference(BigDecimal.ZERO).build();
+  public static UnitConvertConfig create(@NonNull BigFraction ratio) {
+    return builder().ratio(ratio).constantDifference(BigFraction.ZERO).build();
   }
 
   /**
@@ -81,8 +91,8 @@ public class UnitConvertConfig {
   @NonNull
   public static UnitConvertConfig create(@NonNull java.math.BigDecimal ratio,
       @NonNull java.math.BigDecimal zeroDifference) {
-    return builder().ratio(BigDecimal.valueOf(ratio))
-        .constantDifference(BigDecimal.valueOf(zeroDifference)).build();
+    return builder().ratio(MathUtil.toBigFraction(ratio))
+        .constantDifference(MathUtil.toBigFraction(zeroDifference)).build();
   }
 
   /**
@@ -97,21 +107,10 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   @NonNull
-  public static UnitConvertConfig create(@NonNull AbstractNumber ratio,
-      @NonNull AbstractNumber zeroDifference) {
+  public static UnitConvertConfig create(@NonNull BigFraction ratio,
+      @NonNull BigFraction zeroDifference) {
     return builder().ratio(ratio).constantDifference(zeroDifference).build();
   }
-
-  /**
-   * 单位转换比例
-   */
-  @NonNull
-  AbstractNumber ratio;
-  /**
-   * 单位之间的常量差值(以源单位为标准,所以先加常数运算再比例运算)
-   */
-  @NonNull
-  AbstractNumber constantDifference;
 
   /**
    * 该类对象的合并方法
@@ -124,8 +123,8 @@ public class UnitConvertConfig {
    */
   @NonNull
   public UnitConvertConfig reduce(@NonNull UnitConvertConfig other) {
-    AbstractNumber newZeroDifference = constantDifference().add(other.constantDifference().divide(ratio()));
-    AbstractNumber newRatio = ratio().multiply(other.ratio());
+    BigFraction newZeroDifference = constantDifference().add(other.constantDifference().divide(ratio()));
+    BigFraction newRatio = ratio().multiply(other.ratio());
     return builder().ratio(newRatio).constantDifference(newZeroDifference).build();
   }
 
@@ -139,7 +138,7 @@ public class UnitConvertConfig {
    */
   @NonNull
   public UnitConvertConfig reciprocal() {
-    AbstractNumber newRatio = ratio().reciprocal();
+    BigFraction newRatio = ratio().reciprocal();
     return builder().ratio(newRatio).constantDifference(constantDifference().negate().multiply(newRatio))
         .build();
   }
@@ -154,7 +153,7 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   @NonNull
-  public UnitConvertConfig multiply(@NonNull AbstractNumber multiplicand) {
+  public UnitConvertConfig multiply(@NonNull BigFraction multiplicand) {
     return create(ratio().multiply(multiplicand), constantDifference().multiply(multiplicand));
   }
 
@@ -168,7 +167,7 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   @NonNull
-  public UnitConvertConfig divide(@NonNull AbstractNumber divisor) {
+  public UnitConvertConfig divide(@NonNull BigFraction divisor) {
     return create(ratio().divide(divisor),
         constantDifference().divide(divisor));
   }
@@ -202,7 +201,7 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber apply(@NonNull AbstractNumber value) {
+  public BigFraction apply(@NonNull BigFraction value) {
     return value.add(constantDifference()).multiply(ratio());
   }
 
@@ -216,7 +215,7 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   public boolean isConstantDifferenceZero() {
-    return BigDecimal.ZERO.compareTo(constantDifference()) == 0;
+    return BigFraction.ZERO.compareTo(constantDifference()) == 0;
   }
 
   /**
@@ -228,8 +227,8 @@ public class UnitConvertConfig {
    * @since 1.0.0
    */
   public boolean isEmpty() {
-    return BigDecimal.ONE.compareTo(ratio()) == 0
-        && BigDecimal.ZERO.compareTo(constantDifference()) == 0;
+    return BigFraction.ONE.compareTo(ratio()) == 0
+        && BigFraction.ZERO.compareTo(constantDifference()) == 0;
   }
 
 }

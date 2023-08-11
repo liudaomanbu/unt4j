@@ -18,7 +18,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor(staticName = "valueOf")
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Beta
-public class BigInteger extends AbstractNumber {
+public class BigInteger implements Number {
 
   public static final BigInteger ZERO = valueOf(java.math.BigInteger.ZERO);
 
@@ -247,7 +247,7 @@ public class BigInteger extends AbstractNumber {
   }
 
   @Override
-  public @NonNull AbstractNumber pow(int exponent) {
+  public @NonNull Number pow(int exponent) {
     if (exponent > 0) {
       return valueOf(value.pow(exponent));
     }

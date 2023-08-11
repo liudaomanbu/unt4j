@@ -1,7 +1,6 @@
 package org.caotc.unit4j.core.math.number;
 
 import com.google.common.annotations.Beta;
-import lombok.Data;
 import lombok.NonNull;
 
 import java.math.MathContext;
@@ -15,11 +14,8 @@ import java.math.RoundingMode;
  * @apiNote
  * @since 1.0.0
  */
-@Data
 @Beta
-public abstract class AbstractNumber extends Number implements Comparable<AbstractNumber> {
-
-  protected static final MathContext DEFAULT_MATH_CONTEXT = MathContext.DECIMAL128;
+public interface Number extends Comparable<Number> {
 
   /**
    * Returns the value of the specified number as a {@code BigInteger}, which may involve rounding
@@ -31,8 +27,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-02
    * @since 1.0.0
    */
-  @NonNull
-  public abstract BigInteger toBigInteger();
+  @NonNull BigInteger toBigInteger();
 
   /**
    * Converts this {@code AbstractNumber} to a {@code BigInteger}, checking for lost information. If
@@ -46,8 +41,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-02
    * @since 1.0.0
    */
-  @NonNull
-  public abstract BigInteger toBigIntegerExact();
+  @NonNull BigInteger toBigIntegerExact();
 
   /**
    * Returns the value of the specified number as a {@code BigDecimal}, which may involve rounding
@@ -59,8 +53,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-03
    * @since 1.0.0
    */
-  @NonNull
-  public abstract BigDecimal toBigDecimal();
+  @NonNull BigDecimal toBigDecimal();
 
   /**
    * Converts this {@code AbstractNumber} to a {@code BigDecimal}, checking for lost information. If
@@ -74,8 +67,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-03
    * @since 1.0.0
    */
-  @NonNull
-  public abstract BigDecimal toBigDecimalExact();
+  @NonNull BigDecimal toBigDecimalExact();
 
   /**
    * Returns the value of the specified number as a {@code abstract}, which may involve rounding or
@@ -86,8 +78,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-03
    * @since 1.0.0
    */
-  @NonNull
-  public abstract Fraction toFraction();
+  @NonNull Fraction toFraction();
 
   /**
    * Converts this {@code AbstractNumber} to a {@code Fraction}, checking for lost information.  If
@@ -101,8 +92,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-03
    * @since 1.0.0
    */
-  @NonNull
-  public abstract Fraction toFractionExact();
+  @NonNull Fraction toFractionExact();
 
   /**
    * Indicates if this rational number is equal to zero.
@@ -112,7 +102,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-04
    * @since 1.0.0
    */
-  public abstract boolean isZero();
+  boolean isZero();
 
   /**
    * Indicates if this rational number is greater than zero.
@@ -122,7 +112,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-04
    * @since 1.0.0
    */
-  public abstract boolean isPositive();
+  boolean isPositive();
 
   /**
    * Indicates if this rational number is less than zero.
@@ -132,7 +122,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-04
    * @since 1.0.0
    */
-  public abstract boolean isNegative();
+  boolean isNegative();
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this + augend)}.
@@ -144,7 +134,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber add(@NonNull AbstractNumber augend) {
+  default Number add(@NonNull Number augend) {
     if (augend instanceof Fraction) {
       return add((Fraction) augend);
     }
@@ -166,8 +156,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber add(@NonNull Fraction augend);
+  @NonNull Number add(@NonNull Fraction augend);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this + augend)}.
@@ -178,8 +167,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber add(@NonNull BigDecimal augend);
+  @NonNull Number add(@NonNull BigDecimal augend);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this + augend)}.
@@ -190,8 +178,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber add(@NonNull BigInteger augend);
+  @NonNull Number add(@NonNull BigInteger augend);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this - subtrahend)}.
@@ -203,7 +190,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber subtract(@NonNull AbstractNumber subtrahend) {
+  default Number subtract(@NonNull Number subtrahend) {
     if (subtrahend instanceof Fraction) {
       return subtract((Fraction) subtrahend);
     }
@@ -226,7 +213,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber subtract(@NonNull Fraction subtrahend) {
+  default Number subtract(@NonNull Fraction subtrahend) {
     return add(subtrahend.negate());
   }
 
@@ -240,7 +227,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber subtract(@NonNull BigDecimal subtrahend) {
+  default Number subtract(@NonNull BigDecimal subtrahend) {
     return add(subtrahend.negate());
   }
 
@@ -254,7 +241,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber subtract(@NonNull BigInteger subtrahend) {
+  default Number subtract(@NonNull BigInteger subtrahend) {
     return add(subtrahend.negate());
   }
 
@@ -268,7 +255,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber multiply(@NonNull AbstractNumber multiplicand) {
+  default Number multiply(@NonNull Number multiplicand) {
     if (multiplicand instanceof Fraction) {
       return multiply((Fraction) multiplicand);
     }
@@ -290,8 +277,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber multiply(@NonNull Fraction multiplicand);
+  @NonNull Number multiply(@NonNull Fraction multiplicand);
 
   /**
    * Returns a {@code AbstractNumber} whose value is <tt>(this &times; multiplicand)</tt>.
@@ -302,8 +288,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber multiply(@NonNull BigDecimal multiplicand);
+  @NonNull Number multiply(@NonNull BigDecimal multiplicand);
 
   /**
    * Returns a {@code AbstractNumber} whose value is <tt>(this &times; multiplicand)</tt>.
@@ -314,8 +299,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber multiply(@NonNull BigInteger multiplicand);
+  @NonNull Number multiply(@NonNull BigInteger multiplicand);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this / divisor)}.
@@ -327,7 +311,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber divide(@NonNull AbstractNumber divisor) {
+  default Number divide(@NonNull Number divisor) {
     if (divisor instanceof Fraction) {
       return divide((Fraction) divisor);
     }
@@ -349,8 +333,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber divide(@NonNull Fraction divisor);
+  @NonNull Number divide(@NonNull Fraction divisor);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this / divisor)}.
@@ -361,8 +344,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber divide(@NonNull BigDecimal divisor);
+  @NonNull Number divide(@NonNull BigDecimal divisor);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this / divisor)}.
@@ -373,8 +355,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-4-6
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber divide(@NonNull BigInteger divisor);
+  @NonNull Number divide(@NonNull BigInteger divisor);
 
   /**
    * Returns a {@code AbstractNumber} whose value is
@@ -393,8 +374,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-07
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber pow(int exponent);
+  @NonNull Number pow(int exponent);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (-this)}, and whose scale is {@code
@@ -405,8 +385,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-07
    * @since 1.0.0
    */
-  @NonNull
-  public abstract AbstractNumber negate();
+  @NonNull Number negate();
 
   /**
    * Returns a {@code AbstractNumber} whose value is the absolute value of this {@code
@@ -418,7 +397,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber abs() {
+  default Number abs() {
     return isNegative() ? negate() : this;
   }
 
@@ -430,12 +409,12 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public AbstractNumber reciprocal() {
+  default Number reciprocal() {
     return toFractionExact().reciprocal();
   }
 
   @Override
-  public int compareTo(@NonNull AbstractNumber o) {
+  default int compareTo(@NonNull Number o) {
     if (o instanceof Fraction) {
       return compareTo((Fraction) o);
     }
@@ -445,14 +424,13 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
     return compareTo(o.toFraction());
   }
 
-  public abstract int compareTo(@NonNull Fraction o);
+  int compareTo(@NonNull Fraction o);
 
-  public abstract int compareTo(@NonNull BigDecimal o);
+  int compareTo(@NonNull BigDecimal o);
 
-  public abstract int compareTo(@NonNull BigInteger o);
+  int compareTo(@NonNull BigInteger o);
 
-  @Override
-  public byte byteValue() {
+  default byte byteValue() {
     return bigIntegerValue().byteValue();
   }
 
@@ -466,7 +444,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-24
    * @since 1.0.0
    */
-  public byte byteValue(@NonNull RoundingMode roundingMode) {
+  default byte byteValue(@NonNull RoundingMode roundingMode) {
     return bigDecimalValue().setScale(0, roundingMode).byteValueExact();
   }
 
@@ -482,12 +460,11 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-03
    * @since 1.0.0
    */
-  public byte byteValueExact() {
+  default byte byteValueExact() {
     return bigIntegerValueExact().byteValueExact();
   }
 
-  @Override
-  public short shortValue() {
+  default short shortValue() {
     return bigIntegerValue().shortValue();
   }
 
@@ -502,7 +479,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-24
    * @since 1.0.0
    */
-  public short shortValue(@NonNull RoundingMode roundingMode) {
+  default short shortValue(@NonNull RoundingMode roundingMode) {
     return bigDecimalValue().setScale(0, roundingMode).shortValueExact();
   }
 
@@ -518,12 +495,11 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-02
    * @since 1.0.0
    */
-  public short shortValueExact() {
+  default short shortValueExact() {
     return bigIntegerValueExact().shortValueExact();
   }
 
-  @Override
-  public int intValue() {
+  default int intValue() {
     return bigIntegerValue().intValue();
   }
 
@@ -537,7 +513,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-24
    * @since 1.0.0
    */
-  public int intValue(@NonNull RoundingMode roundingMode) {
+  default int intValue(@NonNull RoundingMode roundingMode) {
     return bigDecimalValue().setScale(0, roundingMode).intValueExact();
   }
 
@@ -553,12 +529,11 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-02
    * @since 1.0.0
    */
-  public int intValueExact() {
+  default int intValueExact() {
     return bigIntegerValueExact().intValueExact();
   }
 
-  @Override
-  public long longValue() {
+  default long longValue() {
     return bigIntegerValue().longValue();
   }
 
@@ -572,7 +547,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-24
    * @since 1.0.0
    */
-  public long longValue(@NonNull RoundingMode roundingMode) {
+  default long longValue(@NonNull RoundingMode roundingMode) {
     return bigDecimalValue().setScale(0, roundingMode).longValueExact();
   }
 
@@ -588,7 +563,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-02
    * @since 1.0.0
    */
-  public long longValueExact() {
+  default long longValueExact() {
     return bigIntegerValueExact().longValueExact();
   }
 
@@ -603,7 +578,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public java.math.BigInteger bigIntegerValue() {
+  default java.math.BigInteger bigIntegerValue() {
     return toBigInteger().bigIntegerValue();
   }
 
@@ -618,7 +593,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public java.math.BigInteger bigIntegerValue(@NonNull RoundingMode roundingMode) {
+  default java.math.BigInteger bigIntegerValue(@NonNull RoundingMode roundingMode) {
     return bigDecimalValue().setScale(0, roundingMode).toBigIntegerExact();
   }
 
@@ -635,12 +610,11 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public java.math.BigInteger bigIntegerValueExact() {
+  default java.math.BigInteger bigIntegerValueExact() {
     return toBigIntegerExact().bigIntegerValue();
   }
 
-  @Override
-  public float floatValue() {
+  default float floatValue() {
     return bigDecimalValue().floatValue();
   }
 
@@ -654,7 +628,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-24
    * @since 1.0.0
    */
-  public float floatValue(@NonNull MathContext mathContext) {
+  default float floatValue(@NonNull MathContext mathContext) {
     java.math.BigDecimal value = bigDecimalValue(mathContext);
     float floatValue = value.floatValue();
     if (BigDecimal.valueOf(String.valueOf(floatValue)).compareTo(value) != 0) {
@@ -675,7 +649,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-02
    * @since 1.0.0
    */
-  public float floatValueExact() {
+  default float floatValueExact() {
     BigDecimal value = toBigDecimalExact();
     float floatValue = value.floatValue();
     if (BigDecimal.valueOf(String.valueOf(floatValue)).compareTo(value) != 0) {
@@ -684,8 +658,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
     return floatValue;
   }
 
-  @Override
-  public double doubleValue() {
+  default double doubleValue() {
     return bigDecimalValue().doubleValue();
   }
 
@@ -699,7 +672,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-24
    * @since 1.0.0
    */
-  public double doubleValue(@NonNull MathContext mathContext) {
+  default double doubleValue(@NonNull MathContext mathContext) {
     java.math.BigDecimal value = bigDecimalValue(mathContext);
     double doubleValue = value.doubleValue();
     if (BigDecimal.valueOf(String.valueOf(doubleValue)).compareTo(value) != 0) {
@@ -720,7 +693,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @date 2019-04-02
    * @since 1.0.0
    */
-  public double doubleValueExact() {
+  default double doubleValueExact() {
     BigDecimal value = toBigDecimalExact();
     double doubleValue = value.doubleValue();
     if (BigDecimal.valueOf(String.valueOf(doubleValue)).compareTo(value) != 0) {
@@ -740,7 +713,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public java.math.BigDecimal bigDecimalValue() {
+  default java.math.BigDecimal bigDecimalValue() {
     return toBigDecimal().bigDecimalValue();
   }
 
@@ -756,7 +729,7 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public java.math.BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
+  default java.math.BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
     return toBigDecimal().bigDecimalValue(mathContext);
   }
 
@@ -773,14 +746,14 @@ public abstract class AbstractNumber extends Number implements Comparable<Abstra
    * @since 1.0.0
    */
   @NonNull
-  public java.math.BigDecimal bigDecimalValueExact() {
+  default java.math.BigDecimal bigDecimalValueExact() {
     return toBigDecimalExact().bigDecimalValue();
   }
 
   //TODO 封装MathContext，增加属性超出范围时的处理方式
   @NonNull
   @SuppressWarnings("unchecked")
-  public <T> T value(@NonNull Class<T> valueType, @NonNull MathContext mathContext) {
+  default  <T> T value(@NonNull Class<T> valueType, @NonNull MathContext mathContext) {
     if (byte.class.equals(valueType) || Byte.class.equals(valueType)) {
       return (T) Byte.valueOf(byteValue(mathContext.getRoundingMode()));
     }

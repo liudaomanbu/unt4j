@@ -35,6 +35,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.convert.AutoConverter;
 import org.caotc.unit4j.core.convert.DefaultAutoConverter;
 import org.caotc.unit4j.core.convert.QuantityChooser;
@@ -42,10 +43,6 @@ import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.convert.ValueTargetRangeSingletonAutoConverter;
 import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
 import org.caotc.unit4j.core.exception.UnitNotFoundException;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
-import org.caotc.unit4j.core.math.number.BigDecimal;
-import org.caotc.unit4j.core.math.number.BigInteger;
-import org.caotc.unit4j.core.math.number.Fraction;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
@@ -59,6 +56,8 @@ import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.core.unit.type.UnitType;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collection;
@@ -93,7 +92,7 @@ public final class Configuration {
     /**
      * 默认的单位自动转换器
      */
-    private static final AutoConverter DEFAULT_AUTO_CONVERTER = DefaultAutoConverter.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigInteger.ONE, BigInteger.valueOf(1000))), QuantityChooser.minQuantityChooser());
+    private static final AutoConverter DEFAULT_AUTO_CONVERTER = DefaultAutoConverter.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigFraction.ONE, new BigFraction(1000))), QuantityChooser.minQuantityChooser());
     private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
     /**
      * 保存全局配置与id的map
@@ -187,7 +186,7 @@ public final class Configuration {
     final Table<String, Alias.Type, Object> aliasToTypeToAliasRegistrableTable = Tables
             .synchronizedTable(HashBasedTable.create());
     @NonNull
-    final Map<Prefix, AbstractNumber> prefixToNumbers=Maps.newConcurrentMap();
+    final Map<Prefix, BigFraction> prefixToValues =Maps.newConcurrentMap();
     /**
      * 单位自动转换器
      */
@@ -203,23 +202,23 @@ public final class Configuration {
     private Configuration() {
         register(Units.CHINESE_MILE,
                 Units.METER, UnitConvertConfig.create(BigDecimal.valueOf(500)));
-        register(Units.CHINESE_MILE, Units.TANG,
-                UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
+        register(Units.TANG,Units.CHINESE_MILE,
+                UnitConvertConfig.create(BigDecimal.valueOf(10)));
         register(Units.CHINESE_MILE, Units.ZHANG,
                 UnitConvertConfig.create(BigDecimal.valueOf(150)));
-        register(Units.ZHANG, Units.YIN,
-                UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(Units.CHI, Units.ZHANG,
-                UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(Units.CUN, Units.CHI,
-                UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(Units.FEN, Units.CUN,
-                UnitConvertConfig.create(BigDecimal.valueOf("0.1")));
-        register(Units.LI, Units.FEN, UnitConvertConfig.create(
-                BigDecimal.valueOf("0.1")));
+        register(Units.YIN,Units.ZHANG,
+                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+        register(Units.ZHANG,Units.CHI,
+                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+        register(Units.CHI,Units.CUN,
+                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+        register(Units.CUN,Units.FEN,
+                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+        register(Units.FEN,Units.LI,  UnitConvertConfig.create(
+                BigDecimal.valueOf(10)));
 
         register(Units.INCH, Units.METER,
-                UnitConvertConfig.create(BigDecimal.valueOf("0.0254")));
+                UnitConvertConfig.create(BigFraction.getReducedFraction(254,10000)));
         register(Units.FOOT, Units.INCH,
                 UnitConvertConfig.create(BigDecimal.valueOf(12)));
         register(Units.YARD, Units.FOOT,
@@ -235,7 +234,7 @@ public final class Configuration {
 
         register(
                 Units.TONNE, Units.GRAM,
-                UnitConvertConfig.create(BigDecimal.valueOf("1000000")));
+                UnitConvertConfig.create(BigDecimal.valueOf(1000000)));
 
         register(Units.MINUTE, Units.SECOND,
                 UnitConvertConfig.create(BigDecimal.valueOf(60)));
@@ -244,14 +243,14 @@ public final class Configuration {
         register(Units.DAY, Units.HOUR,
                 UnitConvertConfig.create(BigDecimal.valueOf(24)));
         register(Units.HALF_DAY, Units.DAY,
-                UnitConvertConfig.create(BigDecimal.valueOf("0.5")));
+                UnitConvertConfig.create(BigFraction.ONE_HALF));
         register(Units.WEEK, Units.DAY,
                 UnitConvertConfig.create(BigDecimal.valueOf(7)));
         register(Units.YEAR, Units.SECOND,
                 UnitConvertConfig.create(BigDecimal.valueOf(31556952L)));
         register(Units.MONTH, Units.YEAR,
                 UnitConvertConfig
-                        .create(Fraction.valueOf(1L, 12L)));
+                        .create(new BigFraction(1, 12)));
         register(Units.DECADE, Units.YEAR,
                 UnitConvertConfig.create(BigDecimal.TEN));
         register(Units.CENTURY, Units.YEAR,
@@ -263,7 +262,7 @@ public final class Configuration {
                 UnitConvertConfig.create(BigDecimal.valueOf(1000000000)));
 
         register(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE,
-                UnitConvertConfig.create(BigDecimal.valueOf("1.8"),BigDecimal.valueOf(32)));
+                UnitConvertConfig.create(BigFraction.getReducedFraction(18,10),new BigFraction(32)));
 
         registerAlias(UnitTypes.LENGTH, Aliases.lengthAliases());
         registerAlias(UnitTypes.MASS, Aliases.massAliases());
@@ -297,16 +296,16 @@ public final class Configuration {
         registerAlias(Prefixes.ANGSTROM, Aliases.angstromAliases());
         registerAlias(Prefixes.CENTIMILLI, Aliases.centimilliAliases());
 
-        registerValue(Prefixes.YOCTO,BigInteger.valueOf(10).pow(-24));
-        registerValue(Prefixes.ZEPTO,BigInteger.valueOf(10).pow(-21));
-        registerValue(Prefixes.ATTO,BigInteger.valueOf(10).pow(-18));
-        registerValue(Prefixes.FEMTO,BigInteger.valueOf(10).pow(-15));
-        registerValue(Prefixes.PICO,BigInteger.valueOf(10).pow(-12));
-        registerValue(Prefixes.NANO,BigInteger.valueOf(10).pow(-9));
-        registerValue(Prefixes.MICRO,BigInteger.valueOf(10).pow(-6));
-        registerValue(Prefixes.MILLI,BigInteger.valueOf(10).pow(-3));
-        registerValue(Prefixes.CENTI,BigInteger.valueOf(10).pow(-2));
-        registerValue(Prefixes.DECI,BigInteger.valueOf(10).pow(-1));
+        registerValue(Prefixes.YOCTO, new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(24)));
+        registerValue(Prefixes.ZEPTO,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(21)));
+        registerValue(Prefixes.ATTO,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(18)));
+        registerValue(Prefixes.FEMTO,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(15)));
+        registerValue(Prefixes.PICO,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(12)));
+        registerValue(Prefixes.NANO,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(9)));
+        registerValue(Prefixes.MICRO,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(6)));
+        registerValue(Prefixes.MILLI,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(3)));
+        registerValue(Prefixes.CENTI,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(2)));
+        registerValue(Prefixes.DECI,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(1)));
         registerValue(Prefixes.DECA,BigInteger.valueOf(10).pow(1));
         registerValue(Prefixes.HECTO,BigInteger.valueOf(10).pow(2));
         registerValue(Prefixes.KILO,BigInteger.valueOf(10).pow(3));
@@ -318,8 +317,8 @@ public final class Configuration {
         registerValue(Prefixes.ZETTA,BigInteger.valueOf(10).pow(21));
         registerValue(Prefixes.YOTTA,BigInteger.valueOf(10).pow(24));
 
-        registerValue(Prefixes.ANGSTROM,BigInteger.valueOf(10).pow(-8));
-        registerValue(Prefixes.CENTIMILLI,BigInteger.valueOf(10).pow(-5));
+        registerValue(Prefixes.ANGSTROM,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(8)));
+        registerValue(Prefixes.CENTIMILLI,new BigFraction(BigInteger.ONE,BigInteger.valueOf(10).pow(5)));
 
         //注册Unit别名
         registerAlias(Units.METER, Aliases.meterAliases());
@@ -768,13 +767,16 @@ public final class Configuration {
         return result.orElseThrow(() -> new IllegalArgumentException(String.format("no convert config for %s to %s", source, target)));
     }
 
+    void registerValue(@NonNull Prefix prefix,@NonNull BigInteger value){
+        registerValue(prefix, new BigFraction(value));
+    }
     //todo
-    void registerValue(@NonNull Prefix prefix,@NonNull AbstractNumber value){
-        prefixToNumbers.put(prefix,value);
+    void registerValue(@NonNull Prefix prefix,@NonNull BigFraction value){
+        prefixToValues.put(prefix,value);
     }
 
-    private Optional<AbstractNumber> findPrefixValue(@NonNull Prefix prefix){
-        return Optional.ofNullable(prefixToNumbers.get(prefix));
+    private Optional<BigFraction> findPrefixValue(@NonNull Prefix prefix){
+        return Optional.ofNullable(prefixToValues.get(prefix));
     }
 
     //todo try还是会报错
@@ -796,7 +798,7 @@ public final class Configuration {
             StandardUnit targetStandardUnit = ((PrefixUnit) target).standardUnit();
             if (targetStandardUnit.equals(source)) {
                 return findPrefixValue(target.prefix())
-                        .map(AbstractNumber::reciprocal)
+                        .map(BigFraction::reciprocal)
                         .map(UnitConvertConfig::create);
             }
             return Optional.of(convertConfig(source, targetStandardUnit))
@@ -905,7 +907,7 @@ public final class Configuration {
                 unit1, unit2, this, unit1);
 
         UnitConvertConfig unitConvertConfig = convertConfig(unit1, unit2);
-        return unitConvertConfig.ratio().compareTo(BigDecimal.ONE);
+        return unitConvertConfig.ratio().compareTo(BigFraction.ONE);
     }
 
     /**

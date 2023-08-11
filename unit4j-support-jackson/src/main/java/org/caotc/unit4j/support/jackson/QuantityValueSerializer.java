@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
+import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.support.QuantityValueCodecConfig;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.io.IOException;
  * @since 1.0.0
  */
 @Value
-public class QuantityValueSerializer extends StdSerializer<AbstractNumber> {
+public class QuantityValueSerializer extends StdSerializer<Number> {
 
     /**
      * {@link Quantity#value()}的序列化反序列化配置
@@ -28,12 +28,12 @@ public class QuantityValueSerializer extends StdSerializer<AbstractNumber> {
     QuantityValueCodecConfig quantityValueCodecConfig;
 
     public QuantityValueSerializer(@NonNull QuantityValueCodecConfig quantityValueCodecConfig) {
-        super(AbstractNumber.class);
+        super(Number.class);
         this.quantityValueCodecConfig = quantityValueCodecConfig;
     }
 
   @Override
-  public void serialize(AbstractNumber value, JsonGenerator gen, SerializerProvider provider)
+  public void serialize(Number value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
       gen.writeObject(quantityValueCodecConfig.createSerializeCommands(value));
   }

@@ -24,16 +24,16 @@ import lombok.NonNull;
 import lombok.Singular;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.AbstractNumber;
-import org.caotc.unit4j.core.math.number.BigInteger;
 import org.caotc.unit4j.core.unit.Prefixes;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
 import org.caotc.unit4j.core.unit.Units;
 import org.junit.jupiter.params.provider.Arguments;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -50,51 +50,51 @@ public class Provider {
 
     static Stream<Arguments> unitAutoConverterAndQuantityAndAutoConverted() {
         return Stream.of(
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(8000, Units.METER), Quantity.create(80, Units.METER.addPrefix(Prefixes.HECTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(8000, Units.METER), Quantity.create(80, Units.METER.addPrefix(Prefixes.HECTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(1000, Units.METER), Quantity.create(10, Units.METER.addPrefix(Prefixes.HECTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(8000, Units.METER), Quantity.create(80, Units.METER.addPrefix(Prefixes.HECTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(1, Units.METER), Quantity.create(1000, Units.METER.addPrefix(Prefixes.MILLI))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigInteger.ONE, BigInteger.valueOf(1000))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(BigInteger.valueOf(1000))), Quantity.create(8000, Units.METER), Quantity.create("0.000008", Units.METER.addPrefix(Prefixes.GIGA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(BigInteger.valueOf(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(BigInteger.valueOf(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(BigInteger.valueOf(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(BigInteger.valueOf(1000))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(BigInteger.valueOf(1000))), Quantity.create(8000, Units.METER), Quantity.create("0.000008", Units.METER.addPrefix(Prefixes.GIGA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(BigInteger.valueOf(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(BigInteger.valueOf(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(BigInteger.valueOf(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(BigInteger.valueOf(1000))), Quantity.create(1000, Units.METER), Quantity.create("0.00001", Units.METER.addPrefix(Prefixes.GIGA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(BigInteger.valueOf(1))), Quantity.create(8000, Units.METER), Quantity.create(8000, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(BigInteger.valueOf(1))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(BigInteger.valueOf(1))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(BigInteger.valueOf(1))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(BigInteger.valueOf(1))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(BigInteger.valueOf(1))), Quantity.create(8000, Units.METER), Quantity.create(8000, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(BigInteger.valueOf(1))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(BigInteger.valueOf(1))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(BigInteger.valueOf(1))), Quantity.create(1, Units.METER), Quantity.create(BigInteger.TEN.pow(12), Units.METER.addPrefix(Prefixes.PICO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(BigInteger.valueOf(1))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE)), Quantity.create(8000, Units.METER), Quantity.create(8, Units.METER.addPrefix(Prefixes.KILO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE)), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE)), Quantity.create(1000, Units.METER), Quantity.create(1, Units.METER.addPrefix(Prefixes.KILO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE), false), Quantity.create(8000, Units.METER), Quantity.create("0.008", Units.METER.addPrefix(Prefixes.MEGA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE), false), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE), false), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE), false), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
-                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigInteger.ONE), false), Quantity.create(1000, Units.METER), Quantity.create(1, Units.METER.addPrefix(Prefixes.KILO)))
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigFraction.ONE, new BigFraction(1000))), Quantity.create(8000, Units.METER), Quantity.create(80, Units.METER.addPrefix(Prefixes.HECTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigFraction.ONE, new BigFraction(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigFraction.ONE, new BigFraction(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigFraction.ONE, new BigFraction(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closed(BigFraction.ONE, new BigFraction(1000))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigFraction.ONE, new BigFraction(1000))), Quantity.create(8000, Units.METER), Quantity.create(80, Units.METER.addPrefix(Prefixes.HECTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigFraction.ONE, new BigFraction(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigFraction.ONE, new BigFraction(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigFraction.ONE, new BigFraction(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigFraction.ONE, new BigFraction(1000))), Quantity.create(1000, Units.METER), Quantity.create(10, Units.METER.addPrefix(Prefixes.HECTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigFraction.ONE, new BigFraction(1000))), Quantity.create(8000, Units.METER), Quantity.create(80, Units.METER.addPrefix(Prefixes.HECTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigFraction.ONE, new BigFraction(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigFraction.ONE, new BigFraction(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigFraction.ONE, new BigFraction(1000))), Quantity.create(1, Units.METER), Quantity.create(1000, Units.METER.addPrefix(Prefixes.MILLI))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.openClosed(BigFraction.ONE, new BigFraction(1000))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(new BigFraction(1000))), Quantity.create(8000, Units.METER), Quantity.create("0.000008", Units.METER.addPrefix(Prefixes.GIGA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(new BigFraction(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(new BigFraction(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(new BigFraction(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atMost(new BigFraction(1000))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(new BigFraction(1000))), Quantity.create(8000, Units.METER), Quantity.create("0.000008", Units.METER.addPrefix(Prefixes.GIGA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(new BigFraction(1000))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(new BigFraction(1000))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(new BigFraction(1000))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.lessThan(new BigFraction(1000))), Quantity.create(1000, Units.METER), Quantity.create("0.00001", Units.METER.addPrefix(Prefixes.GIGA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(new BigFraction(1))), Quantity.create(8000, Units.METER), Quantity.create(8000, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(new BigFraction(1))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(new BigFraction(1))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(new BigFraction(1))), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.atLeast(new BigFraction(1))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(new BigFraction(1))), Quantity.create(8000, Units.METER), Quantity.create(8000, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(new BigFraction(1))), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(new BigFraction(1))), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(new BigFraction(1))), Quantity.create(1, Units.METER), Quantity.create(BigInteger.TEN.pow(12), Units.METER.addPrefix(Prefixes.PICO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.greaterThan(new BigFraction(1))), Quantity.create(1000, Units.METER), Quantity.create(1000, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE)), Quantity.create(8000, Units.METER), Quantity.create(8, Units.METER.addPrefix(Prefixes.KILO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE)), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE)), Quantity.create(1000, Units.METER), Quantity.create(1, Units.METER.addPrefix(Prefixes.KILO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE), false), Quantity.create(8000, Units.METER), Quantity.create("0.008", Units.METER.addPrefix(Prefixes.MEGA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE), false), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO)), Quantity.create("0.1", Units.METER.addPrefix(Prefixes.YOCTO))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE), false), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA)), Quantity.create("1000.1", Units.METER.addPrefix(Prefixes.YOTTA))),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE), false), Quantity.create(1, Units.METER), Quantity.create(1, Units.METER)),
+                Arguments.of(ValueTargetRangeSingletonAutoConverter.of(Range.singleton(BigFraction.ONE), false), Quantity.create(1000, Units.METER), Quantity.create(1, Units.METER.addPrefix(Prefixes.KILO)))
         );
     }
 
@@ -142,7 +142,7 @@ public class Provider {
                 //偶数时中位数为中位的两个数值的平均数
                 Quantity quantity1 = sortedQuantities.get(medianIndex - 1);
                 Quantity quantity2 = sortedQuantities.get(medianIndex);
-                return Quantity.create(quantity1.value().add(quantity2.convertTo(quantity1.unit()).value()).divide(BigInteger.valueOf(2)), quantity1.unit());
+                return Quantity.create(quantity1.value().add(quantity2.convertTo(quantity1.unit()).value()).divide(new BigFraction(2)), quantity1.unit());
             }
             return sortedQuantities.get(medianIndex);
         }
@@ -152,8 +152,8 @@ public class Provider {
             return quantities.stream()
                     .map(quantity -> quantity.convertTo(unit))
                     .map(Quantity::value)
-                    .reduce(AbstractNumber::add)
-                    .map(num -> num.divide(BigInteger.valueOf(quantities.size())))
+                    .reduce(BigFraction::add)
+                    .map(num -> num.divide(new BigFraction(quantities.size())))
                     .map(num -> Quantity.create(num, unit))
                     .orElseThrow(AssertionError::new);
         }

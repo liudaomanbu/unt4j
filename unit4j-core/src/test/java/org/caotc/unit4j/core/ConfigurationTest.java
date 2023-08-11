@@ -18,8 +18,9 @@ package org.caotc.unit4j.core;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.fraction.BigFraction;
+import org.apache.commons.math3.fraction.Fraction;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
-import org.caotc.unit4j.core.math.number.BigDecimal;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.Prefix;
 import org.caotc.unit4j.core.unit.PrefixUnit;
@@ -272,7 +273,7 @@ class ConfigurationTest {
         BaseStandardUnit testLength = BaseStandardUnit
                 .create("testLength", UnitTypes.LENGTH);
         UnitConvertConfig expected = UnitConvertConfig.create(
-                BigDecimal.valueOf("3.14"));
+                BigFraction.getReducedFraction(314,100));
         configuration
                 .register(testLength, Units.METER, expected);
         UnitConvertConfig actual = configuration
@@ -343,5 +344,15 @@ class ConfigurationTest {
                                     Quantity.create(
                                             java.math.BigDecimal.valueOf(1000), Units.NEWTON));
                 });
+    }
+
+
+    @Test
+    void commons_math3() {
+        Fraction x = new Fraction(1);
+        Fraction y = x.divide(3);
+        System.out.println(y);
+        Fraction z = y.multiply(3);
+        System.out.println(z);
     }
 }
