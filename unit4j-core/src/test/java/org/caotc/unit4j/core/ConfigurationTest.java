@@ -272,7 +272,7 @@ class ConfigurationTest {
     void registerConvertConfig() {
         BaseStandardUnit testLength = BaseStandardUnit
                 .create("testLength", UnitTypes.LENGTH);
-        UnitConvertConfig expected = UnitConvertConfig.create(
+        UnitConvertConfig expected = UnitConvertConfig.of(
                 BigFraction.getReducedFraction(314,100));
         configuration
                 .register(testLength, Units.METER, expected);

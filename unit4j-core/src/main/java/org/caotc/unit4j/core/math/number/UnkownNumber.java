@@ -18,6 +18,7 @@ package org.caotc.unit4j.core.math.number;
 
 import lombok.NonNull;
 import lombok.Value;
+import org.apache.commons.math3.fraction.BigFraction;
 
 /**
  * @author caotc
@@ -27,36 +28,6 @@ import lombok.Value;
 @Value
 public class UnkownNumber implements Number {
     public static final UnkownNumber INSTANCE = new UnkownNumber();
-
-    @Override
-    public @NonNull BigInteger toBigInteger() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull BigInteger toBigIntegerExact() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull BigDecimal toBigDecimal() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull BigDecimal toBigDecimalExact() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Fraction toFraction() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Fraction toFractionExact() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public boolean isZero() {
@@ -74,49 +45,15 @@ public class UnkownNumber implements Number {
     }
 
     @Override
-    public @NonNull Number add(@NonNull Fraction augend) {
-        throw new UnsupportedOperationException();
+    public @NonNull Number add(@NonNull Number augend) {
+        return null;
     }
 
     @Override
-    public @NonNull Number add(@NonNull BigDecimal augend) {
-        throw new UnsupportedOperationException();
+    public @NonNull Number multiply(@NonNull Number multiplicand) {
+        return null;
     }
 
-    @Override
-    public @NonNull Number add(@NonNull BigInteger augend) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Number multiply(@NonNull Fraction multiplicand) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Number multiply(@NonNull BigDecimal multiplicand) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Number multiply(@NonNull BigInteger multiplicand) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Number divide(@NonNull Fraction divisor) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Number divide(@NonNull BigDecimal divisor) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public @NonNull Number divide(@NonNull BigInteger divisor) {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public @NonNull Number pow(int exponent) {
@@ -129,17 +66,24 @@ public class UnkownNumber implements Number {
     }
 
     @Override
-    public int compareTo(@NonNull Fraction o) {
+    public @NonNull Number reciprocal() {
+        return null;
+    }
+
+    @Override
+    public int compareTo(@NonNull Number o) {
         return 0;
     }
 
     @Override
-    public int compareTo(@NonNull BigDecimal o) {
-        return 0;
+    public @NonNull BigFraction bigFractionValue() {
+        return null;
     }
 
     @Override
-    public int compareTo(@NonNull BigInteger o) {
-        return 0;
+    public @NonNull BigFraction bigFractionValueExact() {
+        return null;
     }
+
+
 }

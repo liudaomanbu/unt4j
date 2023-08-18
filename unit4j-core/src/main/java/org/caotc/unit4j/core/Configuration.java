@@ -201,68 +201,68 @@ public final class Configuration {
 
     private Configuration() {
         register(Units.CHINESE_MILE,
-                Units.METER, UnitConvertConfig.create(BigDecimal.valueOf(500)));
+                Units.METER, UnitConvertConfig.of(BigDecimal.valueOf(500)));
         register(Units.TANG,Units.CHINESE_MILE,
-                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+                UnitConvertConfig.of(BigDecimal.valueOf(10)));
         register(Units.CHINESE_MILE, Units.ZHANG,
-                UnitConvertConfig.create(BigDecimal.valueOf(150)));
+                UnitConvertConfig.of(BigDecimal.valueOf(150)));
         register(Units.YIN,Units.ZHANG,
-                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+                UnitConvertConfig.of(BigDecimal.valueOf(10)));
         register(Units.ZHANG,Units.CHI,
-                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+                UnitConvertConfig.of(BigDecimal.valueOf(10)));
         register(Units.CHI,Units.CUN,
-                UnitConvertConfig.create(BigDecimal.valueOf(10)));
+                UnitConvertConfig.of(BigDecimal.valueOf(10)));
         register(Units.CUN,Units.FEN,
-                UnitConvertConfig.create(BigDecimal.valueOf(10)));
-        register(Units.FEN,Units.LI,  UnitConvertConfig.create(
+                UnitConvertConfig.of(BigDecimal.valueOf(10)));
+        register(Units.FEN,Units.LI,  UnitConvertConfig.of(
                 BigDecimal.valueOf(10)));
 
         register(Units.INCH, Units.METER,
-                UnitConvertConfig.create(BigFraction.getReducedFraction(254,10000)));
+                UnitConvertConfig.of(BigFraction.getReducedFraction(254,10000)));
         register(Units.FOOT, Units.INCH,
-                UnitConvertConfig.create(BigDecimal.valueOf(12)));
+                UnitConvertConfig.of(BigDecimal.valueOf(12)));
         register(Units.YARD, Units.FOOT,
-                UnitConvertConfig.create(BigDecimal.valueOf(3)));
+                UnitConvertConfig.of(BigDecimal.valueOf(3)));
         register(Units.FATHOM, Units.INCH,
-                UnitConvertConfig.create(BigDecimal.valueOf(72)));
+                UnitConvertConfig.of(BigDecimal.valueOf(72)));
         register(Units.CHAIN, Units.YARD,
-                UnitConvertConfig.create(BigDecimal.valueOf(22)));
+                UnitConvertConfig.of(BigDecimal.valueOf(22)));
         register(Units.FURLONG, Units.YARD,
-                UnitConvertConfig.create(BigDecimal.valueOf(220)));
+                UnitConvertConfig.of(BigDecimal.valueOf(220)));
         register(Units.MILE, Units.YARD,
-                UnitConvertConfig.create(BigDecimal.valueOf(1760)));
+                UnitConvertConfig.of(BigDecimal.valueOf(1760)));
 
         register(
                 Units.TONNE, Units.GRAM,
-                UnitConvertConfig.create(BigDecimal.valueOf(1000000)));
+                UnitConvertConfig.of(BigDecimal.valueOf(1000000)));
 
         register(Units.MINUTE, Units.SECOND,
-                UnitConvertConfig.create(BigDecimal.valueOf(60)));
+                UnitConvertConfig.of(BigDecimal.valueOf(60)));
         register(Units.HOUR, Units.MINUTE,
-                UnitConvertConfig.create(BigDecimal.valueOf(60)));
+                UnitConvertConfig.of(BigDecimal.valueOf(60)));
         register(Units.DAY, Units.HOUR,
-                UnitConvertConfig.create(BigDecimal.valueOf(24)));
+                UnitConvertConfig.of(BigDecimal.valueOf(24)));
         register(Units.HALF_DAY, Units.DAY,
-                UnitConvertConfig.create(BigFraction.ONE_HALF));
+                UnitConvertConfig.of(BigFraction.ONE_HALF));
         register(Units.WEEK, Units.DAY,
-                UnitConvertConfig.create(BigDecimal.valueOf(7)));
+                UnitConvertConfig.of(BigDecimal.valueOf(7)));
         register(Units.YEAR, Units.SECOND,
-                UnitConvertConfig.create(BigDecimal.valueOf(31556952L)));
+                UnitConvertConfig.of(BigDecimal.valueOf(31556952L)));
         register(Units.MONTH, Units.YEAR,
                 UnitConvertConfig
-                        .create(new BigFraction(1, 12)));
+                        .of(new BigFraction(1, 12)));
         register(Units.DECADE, Units.YEAR,
-                UnitConvertConfig.create(BigDecimal.TEN));
+                UnitConvertConfig.of(BigDecimal.TEN));
         register(Units.CENTURY, Units.YEAR,
-                UnitConvertConfig.create(BigDecimal.valueOf(100)));
+                UnitConvertConfig.of(BigDecimal.valueOf(100)));
         register(
                 Units.MILLENNIUM, Units.YEAR,
-                UnitConvertConfig.create(BigDecimal.valueOf(1000)));
+                UnitConvertConfig.of(BigDecimal.valueOf(1000)));
         register(Units.ERA, Units.YEAR,
-                UnitConvertConfig.create(BigDecimal.valueOf(1000000000)));
+                UnitConvertConfig.of(BigDecimal.valueOf(1000000000)));
 
         register(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE,
-                UnitConvertConfig.create(BigFraction.getReducedFraction(18,10),new BigFraction(32)));
+                UnitConvertConfig.of(BigFraction.getReducedFraction(18,10),new BigFraction(32)));
 
         registerAlias(UnitTypes.LENGTH, Aliases.lengthAliases());
         registerAlias(UnitTypes.MASS, Aliases.massAliases());
@@ -789,7 +789,7 @@ public final class Configuration {
             StandardUnit sourceStandardUnit = ((PrefixUnit) source).standardUnit();
             if (sourceStandardUnit.equals(target)) {
                 return findPrefixValue(source.prefix())
-                        .map(UnitConvertConfig::create);
+                        .map(UnitConvertConfig::of);
             }
             return Optional.of(convertConfig(source, sourceStandardUnit))
                     .map(config -> config.reduce(convertConfig(sourceStandardUnit, target)));
@@ -799,7 +799,7 @@ public final class Configuration {
             if (targetStandardUnit.equals(source)) {
                 return findPrefixValue(target.prefix())
                         .map(BigFraction::reciprocal)
-                        .map(UnitConvertConfig::create);
+                        .map(UnitConvertConfig::of);
             }
             return Optional.of(convertConfig(source, targetStandardUnit))
                     .map(config -> config.reduce(convertConfig(targetStandardUnit, target)));

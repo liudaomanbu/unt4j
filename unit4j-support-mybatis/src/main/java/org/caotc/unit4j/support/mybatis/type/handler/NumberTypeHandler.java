@@ -22,10 +22,9 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
-import org.caotc.unit4j.core.math.number.BigDecimal;
-import org.caotc.unit4j.core.math.number.BigInteger;
-import org.caotc.unit4j.core.math.number.Fraction;
+import org.caotc.unit4j.core.math.number.BigFractionAdapter;
 import org.caotc.unit4j.core.math.number.Number;
+import org.caotc.unit4j.core.math.number.Numbers;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -44,8 +43,7 @@ import java.util.Objects;
  * @since 1.0.0
  **/
 @Value
-@MappedTypes(value = {Number.class, BigDecimal.class, BigInteger.class,
-    Fraction.class})
+@MappedTypes(value = {Number.class, BigFractionAdapter.class})
 @Slf4j
 public class NumberTypeHandler extends BaseTypeHandler<Number> {
 
@@ -65,17 +63,17 @@ public class NumberTypeHandler extends BaseTypeHandler<Number> {
       //TODO 指定类型
     java.math.BigDecimal value = rs.getBigDecimal(columnName);
       log.debug("columnName:{},value:{}", columnName, value);
-    return BigDecimal.valueOf(value);
+    return Numbers.valueOf(value);
   }
 
   @Override
   public Number getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-    return BigDecimal.valueOf(rs.getBigDecimal(columnIndex));
+    return Numbers.valueOf(rs.getBigDecimal(columnIndex));
   }
 
   @Override
   public Number getNullableResult(CallableStatement cs, int columnIndex)
       throws SQLException {
-    return BigDecimal.valueOf(cs.getBigDecimal(columnIndex));
+    return Numbers.valueOf(cs.getBigDecimal(columnIndex));
   }
 }

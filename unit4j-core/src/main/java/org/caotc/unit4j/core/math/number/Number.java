@@ -2,6 +2,7 @@ package org.caotc.unit4j.core.math.number;
 
 import com.google.common.annotations.Beta;
 import lombok.NonNull;
+import org.apache.commons.math3.fraction.BigFraction;
 
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -16,84 +17,6 @@ import java.math.RoundingMode;
  */
 @Beta
 public interface Number extends Comparable<Number> {
-
-  /**
-   * Returns the value of the specified number as a {@code BigInteger}, which may involve rounding
-   * or truncation.
-   *
-   * @return the numeric value represented by this object after conversion to type {@code
-   * BigInteger}.
-   * @author caotc
-   * @date 2019-04-02
-   * @since 1.0.0
-   */
-  @NonNull BigInteger toBigInteger();
-
-  /**
-   * Converts this {@code AbstractNumber} to a {@code BigInteger}, checking for lost information. If
-   * this {@code AbstractNumber} has a nonzero fractional part or is out of the possible range for a
-   * {@code BigInteger} result then an {@code ArithmeticException} is thrown.
-   *
-   * @return this {@code AbstractNumber} converted to a {@code BigInteger}.
-   * @throws ArithmeticException if {@code this} has a nonzero fractional part, or will not fit in a
-   * {@code BigInteger}.
-   * @author caotc
-   * @date 2019-04-02
-   * @since 1.0.0
-   */
-  @NonNull BigInteger toBigIntegerExact();
-
-  /**
-   * Returns the value of the specified number as a {@code BigDecimal}, which may involve rounding
-   * or truncation.
-   *
-   * @return the numeric value represented by this object after conversion to type {@code
-   * BigDecimal}.
-   * @author caotc
-   * @date 2019-04-03
-   * @since 1.0.0
-   */
-  @NonNull BigDecimal toBigDecimal();
-
-  /**
-   * Converts this {@code AbstractNumber} to a {@code BigDecimal}, checking for lost information. If
-   * this {@code AbstractNumber} has a nonzero fractional part or is out of the possible range for a
-   * {@code BigDecimal} result then an {@code ArithmeticException} is thrown.
-   *
-   * @return this {@code AbstractNumber} converted to a {@code BigDecimal}.
-   * @throws ArithmeticException if {@code this} has a nonzero fractional part, or will not fit in a
-   * {@code BigDecimal}.
-   * @author caotc
-   * @date 2019-04-03
-   * @since 1.0.0
-   */
-  @NonNull BigDecimal toBigDecimalExact();
-
-  /**
-   * Returns the value of the specified number as a {@code abstract}, which may involve rounding or
-   * truncation.
-   *
-   * @return the numeric value represented by this object after conversion to type {@code abstract}.
-   * @author caotc
-   * @date 2019-04-03
-   * @since 1.0.0
-   */
-  @NonNull Fraction toFraction();
-
-  /**
-   * Converts this {@code AbstractNumber} to a {@code Fraction}, checking for lost information.  If
-   * this {@code AbstractNumber} has a nonzero fractional part or is out of the possible range for a
-   * {@code Fraction} result then an {@code ArithmeticException} is thrown.
-   *
-   * @return this {@code AbstractNumber} converted to a {@code Fraction}.
-   * @throws ArithmeticException if {@code this} has a nonzero fractional part, or will not fit in a
-   * {@code Fraction}.
-   * @author caotc
-   * @date 2019-04-03
-   * @since 1.0.0
-   */
-  @NonNull Fraction toFractionExact();
-
   /**
    * Indicates if this rational number is equal to zero.
    *
@@ -134,51 +57,7 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   @NonNull
-  default Number add(@NonNull Number augend) {
-    if (augend instanceof Fraction) {
-      return add((Fraction) augend);
-    }
-    if (augend instanceof BigDecimal) {
-      return add((BigDecimal) augend);
-    }
-    if (augend instanceof BigInteger) {
-      return add((BigInteger) augend);
-    }
-    throw new IllegalArgumentException("this add method can't analyze " + augend);
-  }
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this + augend)}.
-   *
-   * @param augend value to be added to this {@code AbstractNumber}.
-   * @return {@code this + augend}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number add(@NonNull Fraction augend);
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this + augend)}.
-   *
-   * @param augend value to be added to this {@code AbstractNumber}.
-   * @return {@code this + augend}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number add(@NonNull BigDecimal augend);
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this + augend)}.
-   *
-   * @param augend value to be added to this {@code AbstractNumber}.
-   * @return {@code this + augend}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number add(@NonNull BigInteger augend);
+  Number add(@NonNull Number augend);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this - subtrahend)}.
@@ -190,58 +69,7 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   @NonNull
-  default Number subtract(@NonNull Number subtrahend) {
-    if (subtrahend instanceof Fraction) {
-      return subtract((Fraction) subtrahend);
-    }
-    if (subtrahend instanceof BigDecimal) {
-      return subtract((BigDecimal) subtrahend);
-    }
-    if (subtrahend instanceof BigInteger) {
-      return subtract((BigInteger) subtrahend);
-    }
-    throw new IllegalArgumentException("this subtract method can't analyze " + subtrahend);
-  }
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this - subtrahend)}.
-   *
-   * @param subtrahend value to be subtracted from this {@code AbstractNumber}.
-   * @return {@code this - subtrahend}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull
-  default Number subtract(@NonNull Fraction subtrahend) {
-    return add(subtrahend.negate());
-  }
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this - subtrahend)}.
-   *
-   * @param subtrahend value to be subtracted from this {@code AbstractNumber}.
-   * @return {@code this - subtrahend}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull
-  default Number subtract(@NonNull BigDecimal subtrahend) {
-    return add(subtrahend.negate());
-  }
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this - subtrahend)}.
-   *
-   * @param subtrahend value to be subtracted from this {@code AbstractNumber}.
-   * @return {@code this - subtrahend}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull
-  default Number subtract(@NonNull BigInteger subtrahend) {
+  default Number subtract(@NonNull Number subtrahend){
     return add(subtrahend.negate());
   }
 
@@ -255,51 +83,7 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   @NonNull
-  default Number multiply(@NonNull Number multiplicand) {
-    if (multiplicand instanceof Fraction) {
-      return multiply((Fraction) multiplicand);
-    }
-    if (multiplicand instanceof BigDecimal) {
-      return multiply((BigDecimal) multiplicand);
-    }
-    if (multiplicand instanceof BigInteger) {
-      return multiply((BigInteger) multiplicand);
-    }
-    throw new IllegalArgumentException("this multiply method can't analyze " + multiplicand);
-  }
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is <tt>(this &times; multiplicand)</tt>.
-   *
-   * @param multiplicand value to be multiplied by this {@code AbstractNumber}.
-   * @return {@code this * multiplicand}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number multiply(@NonNull Fraction multiplicand);
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is <tt>(this &times; multiplicand)</tt>.
-   *
-   * @param multiplicand value to be multiplied by this {@code AbstractNumber}.
-   * @return {@code this * multiplicand}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number multiply(@NonNull BigDecimal multiplicand);
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is <tt>(this &times; multiplicand)</tt>.
-   *
-   * @param multiplicand value to be multiplied by this {@code AbstractNumber}.
-   * @return {@code this * multiplicand}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number multiply(@NonNull BigInteger multiplicand);
+  Number multiply(@NonNull Number multiplicand);
 
   /**
    * Returns a {@code AbstractNumber} whose value is {@code (this / divisor)}.
@@ -312,50 +96,8 @@ public interface Number extends Comparable<Number> {
    */
   @NonNull
   default Number divide(@NonNull Number divisor) {
-    if (divisor instanceof Fraction) {
-      return divide((Fraction) divisor);
-    }
-    if (divisor instanceof BigDecimal) {
-      return divide((BigDecimal) divisor);
-    }
-    if (divisor instanceof BigInteger) {
-      return divide((BigInteger) divisor);
-    }
-    throw new IllegalArgumentException("this divide method can't analyze " + divisor);
+    return multiply(divisor.reciprocal());
   }
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this / divisor)}.
-   *
-   * @param divisor value by which this {@code AbstractNumber} is to be divided.
-   * @return {@code this / divisor}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number divide(@NonNull Fraction divisor);
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this / divisor)}.
-   *
-   * @param divisor value by which this {@code AbstractNumber} is to be divided.
-   * @return {@code this / divisor}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number divide(@NonNull BigDecimal divisor);
-
-  /**
-   * Returns a {@code AbstractNumber} whose value is {@code (this / divisor)}.
-   *
-   * @param divisor value by which this {@code AbstractNumber} is to be divided.
-   * @return {@code this / divisor}
-   * @author caotc
-   * @date 2019-4-6
-   * @since 1.0.0
-   */
-  @NonNull Number divide(@NonNull BigInteger divisor);
 
   /**
    * Returns a {@code AbstractNumber} whose value is
@@ -409,29 +151,13 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   @NonNull
-  default Number reciprocal() {
-    return toFractionExact().reciprocal();
-  }
+  Number reciprocal();
 
   @Override
-  default int compareTo(@NonNull Number o) {
-    if (o instanceof Fraction) {
-      return compareTo((Fraction) o);
-    }
-    if (o instanceof BigDecimal) {
-      return compareTo((BigDecimal) o);
-    }
-    return compareTo(o.toFraction());
-  }
-
-  int compareTo(@NonNull Fraction o);
-
-  int compareTo(@NonNull BigDecimal o);
-
-  int compareTo(@NonNull BigInteger o);
+  int compareTo(@NonNull Number o);
 
   default byte byteValue() {
-    return bigIntegerValue().byteValue();
+    return bigDecimalValue().byteValue();
   }
 
   /**
@@ -461,11 +187,11 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   default byte byteValueExact() {
-    return bigIntegerValueExact().byteValueExact();
+    return bigDecimalValueExact().byteValueExact();
   }
 
   default short shortValue() {
-    return bigIntegerValue().shortValue();
+    return bigDecimalValue().shortValue();
   }
 
   /**
@@ -496,11 +222,11 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   default short shortValueExact() {
-    return bigIntegerValueExact().shortValueExact();
+    return bigDecimalValueExact().shortValueExact();
   }
 
   default int intValue() {
-    return bigIntegerValue().intValue();
+    return bigDecimalValue().intValue();
   }
 
   /**
@@ -530,11 +256,11 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   default int intValueExact() {
-    return bigIntegerValueExact().intValueExact();
+    return bigDecimalValueExact().intValueExact();
   }
 
   default long longValue() {
-    return bigIntegerValue().longValue();
+    return bigDecimalValue().longValue();
   }
 
   /**
@@ -564,7 +290,7 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   default long longValueExact() {
-    return bigIntegerValueExact().longValueExact();
+    return bigDecimalValueExact().longValueExact();
   }
 
   /**
@@ -579,7 +305,7 @@ public interface Number extends Comparable<Number> {
    */
   @NonNull
   default java.math.BigInteger bigIntegerValue() {
-    return toBigInteger().bigIntegerValue();
+    return bigDecimalValue().toBigInteger();
   }
 
   /**
@@ -611,30 +337,11 @@ public interface Number extends Comparable<Number> {
    */
   @NonNull
   default java.math.BigInteger bigIntegerValueExact() {
-    return toBigIntegerExact().bigIntegerValue();
+    return bigDecimalValueExact().toBigIntegerExact();
   }
 
   default float floatValue() {
     return bigDecimalValue().floatValue();
-  }
-
-  /**
-   * 将该数字对象转换为{@code float}
-   *
-   * @param mathContext 数学运算配置
-   * @return 转换后的{@code float}
-   * @throws ArithmeticException 如果值范围超过了{@code float}范围或者{@code float}无法精确表示舍入后的该值
-   * @author caotc
-   * @date 2019-04-24
-   * @since 1.0.0
-   */
-  default float floatValue(@NonNull MathContext mathContext) {
-    java.math.BigDecimal value = bigDecimalValue(mathContext);
-    float floatValue = value.floatValue();
-    if (BigDecimal.valueOf(String.valueOf(floatValue)).compareTo(value) != 0) {
-      throw new ArithmeticException("精度不够");
-    }
-    return floatValue;
   }
 
   /**
@@ -650,35 +357,16 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   default float floatValueExact() {
-    BigDecimal value = toBigDecimalExact();
+    java.math.BigDecimal value = bigDecimalValueExact();
     float floatValue = value.floatValue();
-    if (BigDecimal.valueOf(String.valueOf(floatValue)).compareTo(value) != 0) {
-      throw new ArithmeticException("精度不够");
+    if (new java.math.BigDecimal(String.valueOf(floatValue)).compareTo(value) != 0) {
+      throw new ArithmeticException("Precision loss when converting BigDecimal to float");
     }
     return floatValue;
   }
 
   default double doubleValue() {
     return bigDecimalValue().doubleValue();
-  }
-
-  /**
-   * 将该数字对象转换为{@code double}
-   *
-   * @param mathContext 数学运算配置
-   * @return 转换后的{@code double}
-   * @throws ArithmeticException 如果值范围超过了{@code double}范围或者{@code double}无法精确表示舍入后的该值
-   * @author caotc
-   * @date 2019-04-24
-   * @since 1.0.0
-   */
-  default double doubleValue(@NonNull MathContext mathContext) {
-    java.math.BigDecimal value = bigDecimalValue(mathContext);
-    double doubleValue = value.doubleValue();
-    if (BigDecimal.valueOf(String.valueOf(doubleValue)).compareTo(value) != 0) {
-      throw new ArithmeticException("精度不够");
-    }
-    return doubleValue;
   }
 
   /**
@@ -694,10 +382,10 @@ public interface Number extends Comparable<Number> {
    * @since 1.0.0
    */
   default double doubleValueExact() {
-    BigDecimal value = toBigDecimalExact();
+    java.math.BigDecimal value = bigDecimalValueExact();
     double doubleValue = value.doubleValue();
-    if (BigDecimal.valueOf(String.valueOf(doubleValue)).compareTo(value) != 0) {
-      throw new ArithmeticException("精度不够");
+    if (new java.math.BigDecimal(String.valueOf(doubleValue)).compareTo(value) != 0) {
+      throw new ArithmeticException("Precision loss when converting BigDecimal to double");
     }
     return doubleValue;
   }
@@ -714,7 +402,7 @@ public interface Number extends Comparable<Number> {
    */
   @NonNull
   default java.math.BigDecimal bigDecimalValue() {
-    return toBigDecimal().bigDecimalValue();
+    return bigFractionValue().bigDecimalValue();
   }
 
   /**
@@ -730,7 +418,10 @@ public interface Number extends Comparable<Number> {
    */
   @NonNull
   default java.math.BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
-    return toBigDecimal().bigDecimalValue(mathContext);
+    BigFraction value = bigFractionValue();
+    int bigIntegerPrecision = new java.math.BigDecimal(value.getNumerator().divide(value.getDenominator())).precision();
+    int scale=mathContext.getPrecision()-bigIntegerPrecision;
+    return value.bigDecimalValue(scale,mathContext.getRoundingMode().ordinal());
   }
 
   /**
@@ -747,8 +438,14 @@ public interface Number extends Comparable<Number> {
    */
   @NonNull
   default java.math.BigDecimal bigDecimalValueExact() {
-    return toBigDecimalExact().bigDecimalValue();
+    return bigFractionValueExact().bigDecimalValue(RoundingMode.UNNECESSARY.ordinal());
   }
+
+  @NonNull
+   BigFraction bigFractionValue();
+
+  @NonNull
+  BigFraction bigFractionValueExact();
 
   //TODO 封装MathContext，增加属性超出范围时的处理方式
   @NonNull
@@ -770,16 +467,19 @@ public interface Number extends Comparable<Number> {
       return (T) bigIntegerValue(mathContext.getRoundingMode());
     }
     if (float.class.equals(valueType) || Float.class.equals(valueType)) {
-      return (T) Float.valueOf(floatValue(mathContext));
+      return (T) Float.valueOf(floatValue());
     }
     if (double.class.equals(valueType) || Double.class.equals(valueType)) {
-      return (T) Double.valueOf(doubleValue(mathContext));
+      return (T) Double.valueOf(doubleValue());
     }
     if (java.math.BigDecimal.class.equals(valueType)) {
       return (T) bigDecimalValue(mathContext);
     }
     if (String.class.equals(valueType)) {
       return (T) bigDecimalValue(mathContext).toPlainString();
+    }
+    if (BigFraction.class.equals(valueType)) {
+      return (T) bigFractionValue();
     }
     throw new IllegalArgumentException("can't convert to " + valueType);
   }

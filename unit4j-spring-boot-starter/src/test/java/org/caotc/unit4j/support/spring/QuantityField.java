@@ -23,8 +23,8 @@ import org.caotc.unit4j.api.annotation.DataType;
 import org.caotc.unit4j.api.annotation.QuantityDeserialize;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.BigDecimal;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 

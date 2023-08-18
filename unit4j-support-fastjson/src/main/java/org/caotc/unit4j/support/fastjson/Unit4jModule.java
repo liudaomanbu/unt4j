@@ -21,6 +21,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.math.number.BigFractionAdapter;
 import org.caotc.unit4j.core.unit.BasePrefixUnit;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
@@ -85,11 +86,7 @@ public class Unit4jModule {
    */
   public void registerTo(@NonNull SerializeConfig serializeConfig, @NonNull Class<?>... classes) {
       serializeConfig.put(Quantity.class, quantitySerializer());
-      serializeConfig.put(org.caotc.unit4j.core.math.number.BigDecimal.class,
-              quantitySerializer().quantityValueSerializer());
-      serializeConfig.put(org.caotc.unit4j.core.math.number.BigInteger.class,
-              quantitySerializer().quantityValueSerializer());
-      serializeConfig.put(org.caotc.unit4j.core.math.number.Fraction.class,
+      serializeConfig.put(BigFractionAdapter.class,
               quantitySerializer().quantityValueSerializer());
       serializeConfig.put(BaseStandardUnit.class, quantitySerializer().unitSerializer());
       serializeConfig.put(BasePrefixUnit.class, quantitySerializer().unitSerializer());

@@ -21,8 +21,8 @@ import lombok.experimental.Accessors;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.BigDecimal;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Value(staticConstructor = "create")

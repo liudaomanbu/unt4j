@@ -21,6 +21,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.math.number.BigFractionAdapter;
 import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.QuantityValueCodecConfig;
@@ -43,9 +44,7 @@ class QuantityValueSerializerTest {
 
     @BeforeEach
     void init() {
-        globalInstance.put(org.caotc.unit4j.core.math.number.BigDecimal.class, quantityValueSerializer);
-        globalInstance.put(org.caotc.unit4j.core.math.number.BigInteger.class, quantityValueSerializer);
-        globalInstance.put(org.caotc.unit4j.core.math.number.Fraction.class, quantityValueSerializer);
+        globalInstance.put(BigFractionAdapter.class, quantityValueSerializer);
         globalInstance.put(SerializeCommands.class, new SerializeCommandsSerializer());
     }
 

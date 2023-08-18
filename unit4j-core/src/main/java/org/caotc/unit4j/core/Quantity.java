@@ -22,7 +22,8 @@ import lombok.Value;
 import lombok.With;
 import lombok.experimental.FieldNameConstants;
 import org.apache.commons.math3.fraction.BigFraction;
-import org.caotc.unit4j.core.common.util.MathUtil;
+import org.caotc.unit4j.core.math.number.Number;
+import org.caotc.unit4j.core.math.number.Numbers;
 import org.caotc.unit4j.core.unit.Unit;
 
 import java.math.BigDecimal;
@@ -42,7 +43,7 @@ public class Quantity {
 //    public static final Quantity UNKNOWN = create(UnkownNumber.INSTANCE, UnknownUnit.INSTANCE);
 
     @NonNull
-    BigFraction value;
+    Number value;
 
     @NonNull
     public static Quantity create(@NonNull Object value, @NonNull Unit unit) {
@@ -85,7 +86,7 @@ public class Quantity {
      */
     @NonNull
     public static Quantity create(@NonNull java.math.BigDecimal value, @NonNull Unit unit) {
-        return create(MathUtil.toBigFraction(value), unit);
+        return create(Numbers.valueOf(value), unit);
     }
 
     /**
@@ -130,7 +131,7 @@ public class Quantity {
      */
     @NonNull
     public static Quantity create(@NonNull String value, @NonNull Unit unit) {
-        return create(MathUtil.toBigFraction(new BigDecimal(value)), unit);
+        return create(Numbers.valueOf(new BigDecimal(value)), unit);
     }
     @NonNull
     Unit unit;
@@ -527,7 +528,7 @@ public class Quantity {
      */
     @NonNull
     public java.math.BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
-        return value.bigDecimalValue(mathContext.getPrecision(),mathContext.getRoundingMode().ordinal());
+        return value().bigDecimalValue(mathContext);
     }
 
     /**
@@ -541,11 +542,7 @@ public class Quantity {
      */
     @NonNull
     public java.math.BigDecimal bigDecimalValueExact() {
-        java.math.BigDecimal val = value.bigDecimalValue();
-        if(MathUtil.toBigFraction(val).equals(value)){
-            return val;
-        }
-        throw new ArithmeticException();
+        return value().bigDecimalValueExact();
     }
 
     /**
