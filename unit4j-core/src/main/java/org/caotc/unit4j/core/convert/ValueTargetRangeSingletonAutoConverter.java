@@ -24,9 +24,10 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.math.number.Number;
+import org.caotc.unit4j.core.math.number.Numbers;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
 import java.math.BigInteger;
@@ -42,16 +43,16 @@ import java.util.stream.IntStream;
 @Slf4j
 public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConverter {
     @NonNull
-    Range<BigFraction> valueTargetRange;
+    Range<Number> valueTargetRange;
     @NonNull
 //    @Getter(lazy = true)//todo lombok bug
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    AtomicReference<Range<BigFraction>> valueTargetLowerRange = new AtomicReference<>();
+    AtomicReference<Range<Number>> valueTargetLowerRange = new AtomicReference<>();
 
     @NonNull
     public static ValueTargetRangeSingletonAutoConverter ofBigIntegerRange(@NonNull Range<BigInteger> valueTargetRange,boolean fallbackHigher) {
-        return of(Range.range(new BigFraction(valueTargetRange.lowerEndpoint()),valueTargetRange.lowerBoundType(),new BigFraction(valueTargetRange.upperEndpoint()),valueTargetRange.upperBoundType()),fallbackHigher);
+        return of(Range.range(Numbers.valueOf(valueTargetRange.lowerEndpoint()), valueTargetRange.lowerBoundType(), Numbers.valueOf(valueTargetRange.upperEndpoint()), valueTargetRange.upperBoundType()), fallbackHigher);
     }
 
     @NonNull
@@ -61,7 +62,7 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
     boolean fallbackHigher;
 
     @NonNull
-    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<BigFraction> valueTargetRange) {
+    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<Number> valueTargetRange) {
         return of(valueTargetRange, true);
     }
 
@@ -117,13 +118,13 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
         }
     }
 
-    public @NonNull Range<BigFraction> valueTargetLowerRange() {
-        Range<BigFraction> value = this.valueTargetLowerRange.get();
+    public @NonNull Range<Number> valueTargetLowerRange() {
+        Range<Number> value = this.valueTargetLowerRange.get();
         if (value == null) {
-            synchronized(this.valueTargetLowerRange) {
+            synchronized (this.valueTargetLowerRange) {
                 value = this.valueTargetLowerRange.get();
                 if (value == null) {
-                    value = this.valueTargetRange().hasLowerBound() ? Range.upTo(this.valueTargetRange().lowerEndpoint(), this.valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) : Range.closedOpen(BigFraction.ZERO, BigFraction.ZERO);
+                    value = this.valueTargetRange().hasLowerBound() ? Range.upTo(this.valueTargetRange().lowerEndpoint(), this.valueTargetRange().lowerBoundType() == BoundType.CLOSED ? BoundType.OPEN : BoundType.CLOSED) : Range.closedOpen(Numbers.ZERO, Numbers.ZERO);
                     this.valueTargetLowerRange.set(value);
                 }
             }

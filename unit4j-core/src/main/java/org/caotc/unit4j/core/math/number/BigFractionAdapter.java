@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core.math.number;
 
 import lombok.NonNull;
@@ -35,7 +51,7 @@ public class BigFractionAdapter implements Number{
 
     @Override
     public @NonNull Number multiply(@NonNull Number multiplicand) {
-        return of(adaptee().add(multiplicand.bigFractionValueExact()));
+        return of(adaptee().multiply(multiplicand.bigFractionValueExact()));
     }
 
     @Override
@@ -66,5 +82,10 @@ public class BigFractionAdapter implements Number{
     @Override
     public @NonNull BigFraction bigFractionValueExact() {
         return adaptee();
+    }
+
+    @Override
+    public String toString() {
+        return adaptee.toString();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.caotc.unit4j.support.mybatis.factory;
 import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.reflection.wrapper.BeanWrapper;
@@ -29,6 +28,7 @@ import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.constant.StringConstant;
+import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.common.util.QuantityUtil;
 import org.caotc.unit4j.support.mybatis.constant.AmountPropertyConstant;
@@ -72,7 +72,7 @@ public class AmountPropertyObjectWrapperFactory implements ObjectWrapperFactory 
                     Quantity quantity = property.read(metaObject.getOriginalObject()).orElse(Quantity.UNKNOWN);
                     if (prop.getChildren().equals(Quantity.Fields.VALUE)) {
                         //TODO value类型处理
-                        quantity = quantity.withValue((BigFraction) value);
+                        quantity = quantity.withValue((Number) value);
                     }
                     if (prop.getChildren().equals(Quantity.Fields.UNIT)) {
                         quantity = quantity.withUnit((Unit) value);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import org.caotc.unit4j.core.convert.UnitConvertConfig;
 import org.caotc.unit4j.core.convert.ValueTargetRangeSingletonAutoConverter;
 import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
 import org.caotc.unit4j.core.exception.UnitNotFoundException;
+import org.caotc.unit4j.core.math.number.Numbers;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
@@ -92,7 +93,7 @@ public final class Configuration {
     /**
      * 默认的单位自动转换器
      */
-    private static final AutoConverter DEFAULT_AUTO_CONVERTER = DefaultAutoConverter.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(BigFraction.ONE, new BigFraction(1000))), QuantityChooser.minQuantityChooser());
+    private static final AutoConverter DEFAULT_AUTO_CONVERTER = DefaultAutoConverter.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(Numbers.ONE, Numbers.valueOf(1000))), QuantityChooser.minQuantityChooser());
     private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
     /**
      * 保存全局配置与id的map
@@ -907,7 +908,7 @@ public final class Configuration {
                 unit1, unit2, this, unit1);
 
         UnitConvertConfig unitConvertConfig = convertConfig(unit1, unit2);
-        return unitConvertConfig.ratio().compareTo(BigFraction.ONE);
+        return unitConvertConfig.ratio().compareTo(Numbers.ONE);
     }
 
     /**

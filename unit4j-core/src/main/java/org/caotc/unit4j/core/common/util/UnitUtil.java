@@ -1,13 +1,30 @@
+/*
+ * Copyright (C) 2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core.common.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.constant.StringConstant;
+import org.caotc.unit4j.core.math.number.Number;
+import org.caotc.unit4j.core.math.number.Numbers;
 import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
 
@@ -92,12 +109,12 @@ public class UnitUtil {
    * @since 1.0.0
    */
   @NonNull
-  private static BigFraction convertUnit(@NonNull BigFraction value,
-                                         @NonNull String currentUnit,
-                                         @NonNull String targetUnit) {
+  private static Number convertUnit(@NonNull Number value,
+                                    @NonNull String currentUnit,
+                                    @NonNull String targetUnit) {
     Unit current = parseUnit(currentUnit);
     Unit target = parseUnit(targetUnit);
-      return Quantity.create(value, current).convertTo(target).value();
+    return Quantity.create(value, current).convertTo(target).value();
   }
 
   /**
@@ -132,8 +149,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull BigDecimal value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(MathUtil.toBigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -150,8 +167,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull BigInteger value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -168,8 +185,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(byte value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -186,8 +203,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull Byte value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -204,8 +221,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(short value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -222,8 +239,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull Short value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -240,8 +257,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(int value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -258,8 +275,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull Integer value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -276,8 +293,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(long value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -294,8 +311,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull Long value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -312,8 +329,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(float value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -330,8 +347,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull Float value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -348,8 +365,8 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(double value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 
   /**
@@ -366,7 +383,7 @@ public class UnitUtil {
   @NonNull
   public static BigDecimal convertUnit(@NonNull Double value, @NonNull String currentUnit,
       @NonNull String targetUnit) {
-    return convertUnit(new BigFraction(value), currentUnit,
-        targetUnit).bigDecimalValue();
+    return convertUnit(Numbers.valueOf(value), currentUnit,
+            targetUnit).bigDecimalValue();
   }
 }

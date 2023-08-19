@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,12 @@ import lombok.experimental.FieldNameConstants;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.core.math.number.Numbers;
+import org.caotc.unit4j.core.math.number.UnkownNumber;
 import org.caotc.unit4j.core.unit.Unit;
+import org.caotc.unit4j.core.unit.UnknownUnit;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 
 /**
@@ -40,18 +43,18 @@ import java.math.MathContext;
 @Value(staticConstructor = "create")
 @FieldNameConstants
 public class Quantity {
-//    public static final Quantity UNKNOWN = create(UnkownNumber.INSTANCE, UnknownUnit.INSTANCE);
+    public static final Quantity UNKNOWN = create(UnkownNumber.INSTANCE, UnknownUnit.INSTANCE);
 
     @NonNull
     Number value;
 
     @NonNull
     public static Quantity create(@NonNull Object value, @NonNull Unit unit) {
-        if (value instanceof java.math.BigDecimal) {
-            return create((java.math.BigDecimal) value, unit);
+        if (value instanceof BigDecimal) {
+            return create((BigDecimal) value, unit);
         }
-        if (value instanceof java.math.BigInteger) {
-            return create((java.math.BigInteger) value, unit);
+        if (value instanceof BigInteger) {
+            return create((BigInteger) value, unit);
         }
         if (value instanceof Long) {
             return create(((Long) value).longValue(), unit);
@@ -85,7 +88,7 @@ public class Quantity {
      * @since 1.0.0
      */
     @NonNull
-    public static Quantity create(@NonNull java.math.BigDecimal value, @NonNull Unit unit) {
+    public static Quantity create(@NonNull BigFraction value, @NonNull Unit unit) {
         return create(Numbers.valueOf(value), unit);
     }
 
@@ -100,7 +103,22 @@ public class Quantity {
      * @since 1.0.0
      */
     @NonNull
-    public static Quantity create(@NonNull java.math.BigInteger value, @NonNull Unit unit) {
+    public static Quantity create(@NonNull BigDecimal value, @NonNull Unit unit) {
+        return create(Numbers.valueOf(value), unit);
+    }
+
+    /**
+     * 工厂方法
+     *
+     * @param value 数值
+     * @param unit  单位
+     * @return 创建的数量对象
+     * @author caotc
+     * @date 2019-04-23
+     * @since 1.0.0
+     */
+    @NonNull
+    public static Quantity create(@NonNull BigInteger value, @NonNull Unit unit) {
         return create(new BigFraction(value), unit);
     }
 
@@ -429,7 +447,7 @@ public class Quantity {
      * @since 1.0.0
      */
     @NonNull
-    public java.math.BigInteger bigIntegerValue() {
+    public BigInteger bigIntegerValue() {
         return value.bigDecimalValue().toBigInteger();
     }
 
@@ -443,7 +461,7 @@ public class Quantity {
      * @since 1.0.0
      */
     @NonNull
-    public java.math.BigInteger bigIntegerValueExact() {
+    public BigInteger bigIntegerValueExact() {
         return value.bigDecimalValue().toBigIntegerExact();
     }
 
@@ -514,7 +532,7 @@ public class Quantity {
      * @since 1.0.0
      */
     @NonNull
-    public java.math.BigDecimal bigDecimalValue() {
+    public BigDecimal bigDecimalValue() {
         return value.bigDecimalValue();
     }
 
@@ -527,7 +545,7 @@ public class Quantity {
      * @since 1.0.0
      */
     @NonNull
-    public java.math.BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
+    public BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
         return value().bigDecimalValue(mathContext);
     }
 
@@ -541,7 +559,7 @@ public class Quantity {
      * @since 1.0.0
      */
     @NonNull
-    public java.math.BigDecimal bigDecimalValueExact() {
+    public BigDecimal bigDecimalValueExact() {
         return value().bigDecimalValueExact();
     }
 
@@ -554,7 +572,7 @@ public class Quantity {
      * @throws IllegalArgumentException 如果不支持传入的目标类型
      * @author caotc
      * @date 2019-05-29
-     * @apiNote 目前只支持数字的基本类型和对应包装类, 以及 {@link java.math.BigInteger}和{@link java.math.BigDecimal}
+     * @apiNote 目前只支持数字的基本类型和对应包装类, 以及 {@link BigInteger}和{@link BigDecimal}
      * @since 1.0.0
      */
     @NonNull
@@ -571,7 +589,7 @@ public class Quantity {
 //        if (long.class.equals(valueType) || Long.class.equals(valueType)) {
 //            return (T) Long.valueOf(longValue(mathContext.getRoundingMode()));
 //        }
-//        if (java.math.BigInteger.class.equals(valueType)) {
+//        if (BigInteger.class.equals(valueType)) {
 //            return (T) bigIntegerValue(mathContext.getRoundingMode());
 //        }
 //        if (float.class.equals(valueType) || Float.class.equals(valueType)) {
@@ -580,7 +598,7 @@ public class Quantity {
 //        if (double.class.equals(valueType) || Double.class.equals(valueType)) {
 //            return (T) Double.valueOf(doubleValue(mathContext));
 //        }
-//        if (java.math.BigDecimal.class.equals(valueType)) {
+//        if (BigDecimal.class.equals(valueType)) {
 //            return (T) bigDecimalValue(mathContext);
 //        }
 //        if (String.class.equals(valueType)) {

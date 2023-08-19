@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 package org.caotc.unit4j.core.unit;
 
 import com.google.common.collect.ImmutableMap;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.experimental.FieldDefaults;
 import org.caotc.unit4j.core.unit.type.BaseUnitType;
 
 /**
@@ -29,7 +32,9 @@ import org.caotc.unit4j.core.unit.type.BaseUnitType;
  * @date 2018-03-27
  * @since 1.0.0
  **/
-@Value
+@Getter
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = false)
 public class BaseStandardUnit extends StandardUnit {
 
@@ -47,12 +52,6 @@ public class BaseStandardUnit extends StandardUnit {
    */
   @NonNull
   BaseUnitType type;
-
-  private BaseStandardUnit(@NonNull String id,
-      @NonNull BaseUnitType type) {
-      this.id = id;
-      this.type = type;
-  }
 
     @Override
     public @NonNull Unit simplify(boolean recursive) {
