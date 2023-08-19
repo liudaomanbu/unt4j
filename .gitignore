@@ -10,6 +10,9 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+# Ignore IDEA project files
+.idea
+
 # Package Files #
 *.jar
 *.war
@@ -26,7 +29,7 @@ hs_err_pid*
 /*.project
 /*.classpath
 /*.checkstyle
-.idea
+/.idea
 *.iml
 *.eml
 
