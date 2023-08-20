@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core;
 
 import com.google.common.collect.ImmutableSet;
@@ -157,7 +173,7 @@ public class Provider {
         Unit gramNewtonUnit = Unit.builder().componentToExponent(Units.GRAM, 1).componentToExponent(Units.METER, 1).componentToExponent(Units.SECOND, -2).build();
         Unit gramMinuteNewtonUnit = Unit.builder().componentToExponent(Units.GRAM, 1).componentToExponent(Units.METER, 1).componentToExponent(Units.MINUTE, -2).build();
         return Stream.of(
-                Arguments.of(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE, UnitConvertConfig.of(BigFraction.getReducedFraction(18,10),new BigFraction(32))),
+                Arguments.of(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE, UnitConvertConfig.builder().ratio("1.8").constantDifference(32).build()),
                 Arguments.of(Units.KILOGRAM, Units.GRAM, UnitConvertConfig.of(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.KILOGRAM, Units.GRAM.addPrefix(Prefixes.DECA), UnitConvertConfig.of(BigDecimal.valueOf(100))),
                 Arguments.of(Units.TONNE, Units.GRAM, UnitConvertConfig.of(BigDecimal.valueOf(1000000))),
@@ -165,7 +181,7 @@ public class Provider {
                 Arguments.of(Units.NEWTON.addPrefix(Prefixes.KILO), Units.NEWTON, UnitConvertConfig.of(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.NEWTON.addPrefix(Prefixes.KILO), Units.NEWTON.addPrefix(Prefixes.DECA), UnitConvertConfig.of(BigDecimal.valueOf(100))),
                 Arguments.of(Units.NEWTON, gramNewtonUnit, UnitConvertConfig.of(BigDecimal.valueOf(1000))),
-                Arguments.of(gramMinuteNewtonUnit, Units.NEWTON, UnitConvertConfig.of(BigFraction.getReducedFraction(1,1000).multiply(BigFraction.getReducedFraction(1,3600)))),
+                Arguments.of(gramMinuteNewtonUnit, Units.NEWTON, UnitConvertConfig.of(BigFraction.getReducedFraction(1, 1000).multiply(BigFraction.getReducedFraction(1, 3600)))),
                 Arguments.of(tonneNewtonUnit, Units.NEWTON, UnitConvertConfig.of(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.NON.addPrefix(Prefixes.KILO), Units.NON, UnitConvertConfig.of(BigDecimal.valueOf(1000))),
                 Arguments.of(Units.NON.addPrefix(Prefixes.KILO), Units.NON.addPrefix(Prefixes.DECA), UnitConvertConfig.of(BigDecimal.valueOf(100))),

@@ -262,8 +262,9 @@ public final class Configuration {
         register(Units.ERA, Units.YEAR,
                 UnitConvertConfig.of(BigDecimal.valueOf(1000000000)));
 
+
         register(Units.FAHRENHEIT_DEGREE, Units.CELSIUS_DEGREE,
-                UnitConvertConfig.of(BigFraction.getReducedFraction(18,10),new BigFraction(32)));
+                UnitConvertConfig.builder().ratio("1.8").constantDifference(32).build());
 
         registerAlias(UnitTypes.LENGTH, Aliases.lengthAliases());
         registerAlias(UnitTypes.MASS, Aliases.massAliases());
