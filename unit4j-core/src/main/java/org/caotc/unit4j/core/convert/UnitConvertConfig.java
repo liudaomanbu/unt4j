@@ -224,7 +224,6 @@ public class UnitConvertConfig {
      * @since 1.0.0
      */
     public boolean isEmpty() {
-        builder().ratio(1).ratio(1).ratio(Numbers.ONE);
         return Numbers.ONE.compareTo(ratio()) == 0
                 && Numbers.ZERO.compareTo(constantDifference()) == 0;
     }
