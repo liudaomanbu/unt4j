@@ -41,8 +41,8 @@ public class Numbers {
     }
 
     @NonNull
-    public static Number valueOf(double value) {
-        return valueOf(new BigFraction(value));
+    public static Number valueOf(@NonNull String value) {
+        return valueOf(new BigDecimal(value));
     }
 
     @NonNull
