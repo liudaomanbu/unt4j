@@ -59,9 +59,9 @@ public class Numbers {
     public static Number valueOf(BigDecimal decimal) {
         int scale = decimal.scale();
         if (scale <= 0) {
-            return valueOf(new BigFraction(decimal.toBigInteger(), java.math.BigInteger.ONE));
+            return valueOf(new BigFraction(decimal.toBigInteger(), BigInteger.ONE));
         } else {
-            java.math.BigInteger denominator = java.math.BigInteger.TEN.pow(scale);
+            BigInteger denominator = BigInteger.TEN.pow(scale);
             BigInteger numerator = decimal.unscaledValue();
             return valueOf(new BigFraction(numerator, denominator));
         }
