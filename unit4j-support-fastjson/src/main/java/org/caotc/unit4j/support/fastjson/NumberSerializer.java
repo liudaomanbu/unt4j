@@ -35,7 +35,7 @@ import java.lang.reflect.Type;
  * @since 1.0.0
  */
 @Value
-public class QuantityValueSerializer implements ObjectSerializer {
+public class NumberSerializer implements ObjectSerializer {
 
     /**
      * {@link Quantity#value()}的序列化反序列化配置

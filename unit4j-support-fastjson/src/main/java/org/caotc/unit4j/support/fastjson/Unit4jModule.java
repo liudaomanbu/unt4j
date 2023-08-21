@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public class Unit4jModule {
   public void registerTo(@NonNull SerializeConfig serializeConfig, @NonNull Class<?>... classes) {
       serializeConfig.put(Quantity.class, quantitySerializer());
       serializeConfig.put(BigFractionAdapter.class,
-              quantitySerializer().quantityValueSerializer());
+              quantitySerializer().numberSerializer());
       serializeConfig.put(BaseStandardUnit.class, quantitySerializer().unitSerializer());
       serializeConfig.put(BasePrefixUnit.class, quantitySerializer().unitSerializer());
       serializeConfig.put(CompositeStandardUnit.class, quantitySerializer().unitSerializer());

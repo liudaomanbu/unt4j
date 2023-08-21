@@ -33,18 +33,18 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 @Slf4j
-class QuantityValueSerializerTest {
+class NumberSerializerTest {
 
     Unit4jProperties unit4jProperties = new Unit4jProperties();
     QuantityCodecConfig quantityCodecConfig = unit4jProperties.createAmountCodecConfig();
     SerializeConfig globalInstance = SerializeConfig.getGlobalInstance();
     Quantity quantity = Quantity.create("123.56", Units.SECOND);
-    QuantityValueSerializer quantityValueSerializer = new QuantityValueSerializer(
+    NumberSerializer numberSerializer = new NumberSerializer(
             new NumberCodecConfig(BigDecimal.class, MathContext.UNLIMITED));
 
     @BeforeEach
     void init() {
-        globalInstance.put(BigFractionAdapter.class, quantityValueSerializer);
+        globalInstance.put(BigFractionAdapter.class, numberSerializer);
         globalInstance.put(SerializeCommands.class, new SerializeCommandsSerializer());
     }
 

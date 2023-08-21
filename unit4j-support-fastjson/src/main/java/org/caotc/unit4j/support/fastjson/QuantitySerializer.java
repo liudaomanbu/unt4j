@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class QuantitySerializer implements ObjectSerializer {
      * 数值序列化器
      */
     @NonNull
-    QuantityValueSerializer quantityValueSerializer;
+    NumberSerializer numberSerializer;
     /**
      * 单位序列化器
      */
@@ -57,7 +57,7 @@ public class QuantitySerializer implements ObjectSerializer {
 
     public QuantitySerializer(@NonNull QuantityCodecConfig quantityCodecConfig) {
         this.quantityCodecConfig = quantityCodecConfig;
-        quantityValueSerializer = new QuantityValueSerializer(quantityCodecConfig().valueCodecConfig());
+        numberSerializer = new NumberSerializer(quantityCodecConfig().valueCodecConfig());
         unitSerializer = new UnitSerializer(quantityCodecConfig().unitCodecConfig());
     }
 
