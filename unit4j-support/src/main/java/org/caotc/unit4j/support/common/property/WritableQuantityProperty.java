@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,7 @@ public class WritableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, W
 
     @Override
     public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
-        //TODO value类型处理
-        return delegate.write(target, (P) value.convertTo(unit()).value().value(delegate.type().getRawType(), MathContext.UNLIMITED));
+        return delegate.write(target, value.convertTo(unit()).value().value(delegate.type(), MathContext.UNLIMITED));
     }
 
     @Override

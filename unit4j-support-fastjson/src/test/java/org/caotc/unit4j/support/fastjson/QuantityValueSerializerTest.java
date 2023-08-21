@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.BigFractionAdapter;
 import org.caotc.unit4j.core.unit.Units;
+import org.caotc.unit4j.support.NumberCodecConfig;
 import org.caotc.unit4j.support.QuantityCodecConfig;
-import org.caotc.unit4j.support.QuantityValueCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class QuantityValueSerializerTest {
     SerializeConfig globalInstance = SerializeConfig.getGlobalInstance();
     Quantity quantity = Quantity.create("123.56", Units.SECOND);
     QuantityValueSerializer quantityValueSerializer = new QuantityValueSerializer(
-            new QuantityValueCodecConfig(BigDecimal.class, MathContext.UNLIMITED));
+            new NumberCodecConfig(BigDecimal.class, MathContext.UNLIMITED));
 
     @BeforeEach
     void init() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class QuantityCodecConfig {
      * 数值的序列化和反序列化配置
      */
     @NonNull
-    QuantityValueCodecConfig valueCodecConfig;
+    NumberCodecConfig valueCodecConfig;
     /**
      * 单位的序列化和反序列化配置
      */

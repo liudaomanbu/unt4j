@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,7 +188,7 @@ public class Unit4jProperties {
                 .outputName(getNameJoiner().apply(ImmutableList.of()))
                 .outputValueName(getNameJoiner().apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
                 .outputUnitName(getNameJoiner().apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
-                .valueCodecConfig(new QuantityValueCodecConfig(getValueType(), getMathContext()))
+                .valueCodecConfig(new NumberCodecConfig(getValueType(), getMathContext()))
                 .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
                         getUnitAliasUndefinedStrategy())).build();
     }
@@ -231,7 +231,7 @@ public class Unit4jProperties {
                 .outputUnitName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::unitName)
                         .filter(name -> !name.isEmpty())
                         .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
-                .valueCodecConfig(new QuantityValueCodecConfig(
+                .valueCodecConfig(new NumberCodecConfig(
                         Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueType)
                                 .orElseGet(() -> (Class) getValueType()),
                         Optional.ofNullable(quantitySerialize)
@@ -270,7 +270,7 @@ public class Unit4jProperties {
                 .outputUnitName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::unitName)
                         .filter(name -> !name.isEmpty())
                         .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
-                .valueCodecConfig(new QuantityValueCodecConfig(
+                .valueCodecConfig(new NumberCodecConfig(
                         Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueType)
                                 .orElseGet(() -> (Class) getValueType()),
                         Optional.ofNullable(quantityDeserialize)

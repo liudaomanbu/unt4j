@@ -17,9 +17,12 @@
 package org.caotc.unit4j.core.math.number;
 
 import com.google.common.annotations.Beta;
+import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
@@ -463,43 +466,48 @@ public interface Number extends Comparable<Number> {
   }
 
   @NonNull
-   BigFraction bigFractionValue();
+  BigFraction bigFractionValue();
 
   @NonNull
   BigFraction bigFractionValueExact();
 
+  @NonNull
+  default <T> T value(@NonNull Class<T> valueType, @NonNull MathContext mathContext) {
+    return value(TypeToken.of(valueType), mathContext);
+  }
+
   //TODO 封装MathContext，增加属性超出范围时的处理方式
   @NonNull
   @SuppressWarnings("unchecked")
-  default  <T> T value(@NonNull Class<T> valueType, @NonNull MathContext mathContext) {
-    if (byte.class.equals(valueType) || Byte.class.equals(valueType)) {
+  default <T> T value(@NonNull TypeToken<T> valueType, @NonNull MathContext mathContext) {
+    if (byte.class.equals(valueType.getRawType()) || Byte.class.equals(valueType.getRawType())) {
       return (T) Byte.valueOf(byteValue(mathContext.getRoundingMode()));
     }
-    if (short.class.equals(valueType) || Short.class.equals(valueType)) {
+    if (short.class.equals(valueType.getRawType()) || Short.class.equals(valueType.getRawType())) {
       return (T) Short.valueOf(shortValue(mathContext.getRoundingMode()));
     }
-    if (int.class.equals(valueType) || Integer.class.equals(valueType)) {
+    if (int.class.equals(valueType.getRawType()) || Integer.class.equals(valueType.getRawType())) {
       return (T) Integer.valueOf(intValue(mathContext.getRoundingMode()));
     }
-    if (long.class.equals(valueType) || Long.class.equals(valueType)) {
+    if (long.class.equals(valueType.getRawType()) || Long.class.equals(valueType.getRawType())) {
       return (T) Long.valueOf(longValue(mathContext.getRoundingMode()));
     }
-    if (java.math.BigInteger.class.equals(valueType)) {
+    if (BigInteger.class.equals(valueType.getRawType())) {
       return (T) bigIntegerValue(mathContext.getRoundingMode());
     }
-    if (float.class.equals(valueType) || Float.class.equals(valueType)) {
+    if (float.class.equals(valueType.getRawType()) || Float.class.equals(valueType.getRawType())) {
       return (T) Float.valueOf(floatValue());
     }
-    if (double.class.equals(valueType) || Double.class.equals(valueType)) {
+    if (double.class.equals(valueType.getRawType()) || Double.class.equals(valueType.getRawType())) {
       return (T) Double.valueOf(doubleValue());
     }
-    if (java.math.BigDecimal.class.equals(valueType)) {
+    if (BigDecimal.class.equals(valueType.getRawType())) {
       return (T) bigDecimalValue(mathContext);
     }
-    if (String.class.equals(valueType)) {
+    if (String.class.equals(valueType.getRawType())) {
       return (T) bigDecimalValue(mathContext).toPlainString();
     }
-    if (BigFraction.class.equals(valueType)) {
+    if (BigFraction.class.equals(valueType.getRawType())) {
       return (T) bigFractionValue();
     }
     throw new IllegalArgumentException("can't convert to " + valueType);
