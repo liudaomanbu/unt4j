@@ -382,7 +382,7 @@ public final class Configuration {
         registerAlias(Units.SIEVERT, Aliases.sievertAliases());
         registerAlias(Units.KATAL, Aliases.katalAliases());
 
-        register(UnitGroup.create(Units.DEFAULT_TIME_STANDARD_UNITS, this))
+        register(UnitGroup.builder().units(Units.DEFAULT_TIME_STANDARD_UNITS).configuration(this).build())
                 .register(UnitGroup.createSiUnitGroup(Units.METER, this))
                 .register(UnitGroup.createSiUnitGroup(Units.GRAM, this))
                 .register(UnitGroup.createSiUnitGroup(Units.AMPERE, this))

@@ -577,34 +577,6 @@ public class Quantity {
      */
     @NonNull
     public <T> T value(@NonNull Class<T> valueType, @NonNull MathContext mathContext) {
-//        if (byte.class.equals(valueType) || Byte.class.equals(valueType)) {
-//            return (T) Byte.valueOf(byteValue(mathContext.getRoundingMode()));
-//        }
-//        if (short.class.equals(valueType) || Short.class.equals(valueType)) {
-//            return (T) Short.valueOf(shortValue(mathContext.getRoundingMode()));
-//        }
-//        if (int.class.equals(valueType) || Integer.class.equals(valueType)) {
-//            return (T) Integer.valueOf(intValue(mathContext.getRoundingMode()));
-//        }
-//        if (long.class.equals(valueType) || Long.class.equals(valueType)) {
-//            return (T) Long.valueOf(longValue(mathContext.getRoundingMode()));
-//        }
-//        if (BigInteger.class.equals(valueType)) {
-//            return (T) bigIntegerValue(mathContext.getRoundingMode());
-//        }
-//        if (float.class.equals(valueType) || Float.class.equals(valueType)) {
-//            return (T) Float.valueOf(floatValue(mathContext));
-//        }
-//        if (double.class.equals(valueType) || Double.class.equals(valueType)) {
-//            return (T) Double.valueOf(doubleValue(mathContext));
-//        }
-//        if (BigDecimal.class.equals(valueType)) {
-//            return (T) bigDecimalValue(mathContext);
-//        }
-//        if (String.class.equals(valueType)) {
-//            return (T) bigDecimalValue(mathContext).toPlainString();
-//        }
-        //todo
-        throw new IllegalArgumentException("can't convert to " + valueType);
+        return value().value(valueType, mathContext);
     }
 }

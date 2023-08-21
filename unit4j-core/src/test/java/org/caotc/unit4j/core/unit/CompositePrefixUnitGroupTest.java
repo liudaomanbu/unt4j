@@ -8,9 +8,7 @@ import java.util.Optional;
 
 class CompositePrefixUnitGroupTest {
 
-  private UnitGroup timeUnitGroup = UnitGroup
-          .create(Units.DEFAULT_TIME_STANDARD_UNITS,
-                  Configuration.defaultInstance());
+  private UnitGroup timeUnitGroup = UnitGroup.builder().units(Units.DEFAULT_TIME_STANDARD_UNITS).configuration(Configuration.defaultInstance()).build();
 
   @Test
   void previous() {

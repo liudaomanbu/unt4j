@@ -17,7 +17,7 @@ public class Prefix implements Identifiable {
   @NonNull
   String id;//todo id check？
   /**
-   * 是否是空词头(即值是否为1)
+   * 是否是空词头 todo
    *
    * @return 是否是空词头
    * @author caotc
@@ -25,7 +25,6 @@ public class Prefix implements Identifiable {
    * @since 1.0.0
    */
   public boolean isEmpty() {
-//    return radix == 1;
-    return id.isEmpty();//todo
+    return id.isEmpty();
   }
 }
