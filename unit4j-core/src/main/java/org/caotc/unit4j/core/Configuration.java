@@ -94,6 +94,7 @@ public final class Configuration {
      * 默认的单位自动转换器
      */
     private static final AutoConverter DEFAULT_AUTO_CONVERTER = DefaultAutoConverter.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(Numbers.ONE, Numbers.valueOf(1000))), QuantityChooser.minQuantityChooser());
+    //todo 应该是static还是对象?
     private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
     /**
      * 保存全局配置与id的map

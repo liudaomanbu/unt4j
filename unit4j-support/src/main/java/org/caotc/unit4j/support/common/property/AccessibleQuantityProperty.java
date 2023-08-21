@@ -24,6 +24,7 @@ import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
 
+import java.math.MathContext;
 import java.util.Optional;
 
 /**
@@ -51,7 +52,7 @@ public class AccessibleQuantityProperty<O, P> extends BaseQuantityProperty<O, P,
     @Override
     public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
         //TODO value类型处理
-        return delegate.write(target, (P) value.convertTo(unit()).value());
+        return delegate.write(target, (P) value.convertTo(unit()).value().value(delegate.type().getRawType(), MathContext.UNLIMITED));
     }
 
     @Override
@@ -71,11 +72,11 @@ public class AccessibleQuantityProperty<O, P> extends BaseQuantityProperty<O, P,
 
     @Override
     public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
-        return false;
+        return delegate.checkOwnerType(newOwnerType);
     }
 
     @Override
     public @NonNull <O1> AccessibleProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return null;
+        return new AccessibleQuantityProperty<>(delegate.ownerType(ownerType));
     }
 }

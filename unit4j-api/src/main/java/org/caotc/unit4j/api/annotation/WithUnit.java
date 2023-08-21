@@ -41,5 +41,4 @@ public @interface WithUnit {
      * 单位值,为id或者别名
      */
     String value();
-
 }

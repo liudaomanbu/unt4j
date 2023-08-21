@@ -111,7 +111,7 @@ public abstract class BaseQuantityProperty<O, P, D extends Property<O, P>> imple
 
     @Override
     public AccessibleProperty<O, Quantity> toAccessible() {
-        return (AccessibleProperty<O, Quantity>) delegate.toAccessible();
+        return new AccessibleQuantityProperty<>(delegate.toAccessible());
     }
 
     @Override

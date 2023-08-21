@@ -65,11 +65,11 @@ public class ReadableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, R
 
     @Override
     public @NonNull <O1> ReadableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return null;
+        return new ReadableQuantityProperty<>(delegate.ownerType(ownerType));
     }
 
     @Override
     public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
-        return false;
+        return delegate.checkOwnerType(newOwnerType);
     }
 }

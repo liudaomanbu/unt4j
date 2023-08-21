@@ -23,6 +23,8 @@ import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 
+import java.math.MathContext;
+
 /**
  * @author caotc
  * @date 2020-07-02
@@ -38,7 +40,7 @@ public class WritableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, W
     @Override
     public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
         //TODO value类型处理
-        return delegate.write(target, (P) value.convertTo(unit()).value());
+        return delegate.write(target, (P) value.convertTo(unit()).value().value(delegate.type().getRawType(), MathContext.UNLIMITED));
     }
 
     @Override
@@ -58,11 +60,11 @@ public class WritableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, W
 
     @Override
     public @NonNull <O1> WritableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return null;
+        return new WritableQuantityProperty<>(delegate.ownerType(ownerType));
     }
 
     @Override
     public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
-        return false;
+        return delegate.checkOwnerType(newOwnerType);
     }
 }

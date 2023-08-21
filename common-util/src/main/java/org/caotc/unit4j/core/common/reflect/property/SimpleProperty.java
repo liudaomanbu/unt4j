@@ -153,7 +153,7 @@ public class SimpleProperty<O, P> implements AccessibleProperty<O, P> {
 
     @Override
     public @NonNull <O1> AccessibleProperty<O1, P> ownerType(@NonNull TypeToken<O1> ownerType) {
-        Preconditions.checkArgument(checkOwnerType(ownerType), "%s can not owner by %s", ownerType);
+        Preconditions.checkArgument(checkOwnerType(ownerType), "%s can not owner by %s", this, ownerType);
         return new SimpleProperty<>(propertyElements()
                 .map(propertyElement -> propertyElement.ownerType(ownerType))
                 .collect(Collectors.toSet()));
