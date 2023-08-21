@@ -30,7 +30,6 @@ import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.core.math.number.Numbers;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
-import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
@@ -43,28 +42,19 @@ import java.util.stream.IntStream;
 @Slf4j
 public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConverter {
     @NonNull
+    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<Number> valueTargetRange) {
+        return of(valueTargetRange, true);
+    }
+
+    @NonNull
     Range<Number> valueTargetRange;
+    boolean fallbackHigher;
+
     @NonNull
 //    @Getter(lazy = true)//todo lombok bug
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     AtomicReference<Range<Number>> valueTargetLowerRange = new AtomicReference<>();
-
-    @NonNull
-    public static ValueTargetRangeSingletonAutoConverter ofBigIntegerRange(@NonNull Range<BigInteger> valueTargetRange,boolean fallbackHigher) {
-        return of(Range.range(Numbers.valueOf(valueTargetRange.lowerEndpoint()), valueTargetRange.lowerBoundType(), Numbers.valueOf(valueTargetRange.upperEndpoint()), valueTargetRange.upperBoundType()), fallbackHigher);
-    }
-
-    @NonNull
-    public static ValueTargetRangeSingletonAutoConverter ofBigIntegerRange(@NonNull Range<BigInteger> valueTargetRange) {
-        return ofBigIntegerRange(valueTargetRange,true);
-    }
-    boolean fallbackHigher;
-
-    @NonNull
-    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<Number> valueTargetRange) {
-        return of(valueTargetRange, true);
-    }
 
     @Override
     public @NonNull Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity) {
