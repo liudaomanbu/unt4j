@@ -38,15 +38,6 @@ class CompositePrefixUnitTest {
   }
 
   @Test
-  void valid() {
-      //todo Unit build 自动判断返回UnitConstant.SECOND本身
-//    Assertions.assertThrows(IllegalArgumentException.class,
-//        () -> CompositeStandardUnit
-//                .builder().componentToExponent(UnitConstant.SECOND, 1)
-//            .build());
-  }
-
-  @Test
   void sameTypeCompent() {
       Unit compositePrefixUnit = CompositeStandardUnit
               .builder().componentToExponent(Units.SECOND, 1)

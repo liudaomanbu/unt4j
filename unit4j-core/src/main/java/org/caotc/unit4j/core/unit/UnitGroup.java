@@ -76,7 +76,7 @@ public class UnitGroup implements List<Unit> {
   UnitGroup(@NonNull @Singular ImmutableList<Unit> units, @NonNull Configuration configuration) {
     this.units = units.stream().collect(ImmutableSortedSet.toImmutableSortedSet(configuration::compare));
     this.configuration = configuration;
-    Preconditions.checkArgument(!units.isEmpty() && units.stream().map(Unit::type).count() ==1);
+    Preconditions.checkArgument(!units.isEmpty() && units.stream().map(Unit::type).distinct().count() == 1);
   }
 
   @NonNull
