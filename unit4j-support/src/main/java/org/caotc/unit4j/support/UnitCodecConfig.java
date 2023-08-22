@@ -16,8 +16,10 @@
 
 package org.caotc.unit4j.support;
 
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.With;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
@@ -31,6 +33,8 @@ import org.caotc.unit4j.core.unit.Unit;
  * @since 1.0.0
  */
 @Value
+@Builder(toBuilder = true)
+@With
 public class UnitCodecConfig {
 
   /**
@@ -61,7 +65,8 @@ public class UnitCodecConfig {
   @NonNull
   public String serialize(@NonNull Unit unit) {
     //TODO 增加UnitSerializeStrategy
-    return configuration().aliases(unit, type()).stream().map(Alias::value).findFirst()
-            .orElseGet(() -> aliasUndefinedStrategy().execute(unit, configuration(), type()));
+//    return configuration().aliases(unit, type()).stream().map(Alias::value).findFirst()
+//            .orElseGet(() -> aliasUndefinedStrategy().execute(unit, configuration(), type()));
+    return "";
   }
 }
