@@ -51,5 +51,6 @@ class NumberSerializerTest {
     @Test
   void serialize() throws Exception {
         log.info("value:{}", JSONObject.toJSONString(quantity.value()));
+        log.info("value:{}", JSONObject.toJSONString(quantity));
   }
 }
