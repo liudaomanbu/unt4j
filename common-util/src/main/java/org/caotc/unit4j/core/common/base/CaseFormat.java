@@ -117,7 +117,9 @@ public enum CaseFormat {
             if (wordBoundary.matches(chars[i])) {
                 currentWordEndIndex = i;
                 if (currentWordStartIndex >= currentWordEndIndex) {
-                    return false;
+                    if (i != 0) {
+                        return false;
+                    }
                 }
                 currentWordStartIndex = i + wordSeparator.length();
             }
@@ -127,23 +129,24 @@ public enum CaseFormat {
     }
 
     public static void main(String[] args) {
-//        System.out.println(!LOWER_HYPHEN.matches("-"));
-//        System.out.println(!LOWER_HYPHEN.matches("--"));
+        System.out.println(!LOWER_HYPHEN.matches("-"));
+        System.out.println(!LOWER_HYPHEN.matches("--"));
         System.out.println(!LOWER_HYPHEN.matches("-abc"));
-//        System.out.println(!LOWER_HYPHEN.matches("-abc-"));
-//        System.out.println(!LOWER_HYPHEN.matches("-abc--"));
-//        System.out.println(!LOWER_HYPHEN.matches("abc--abc"));
-//        System.out.println(!LOWER_HYPHEN.matches("-abc--abc"));
-//        System.out.println(LOWER_HYPHEN.matches("a"));
-//        System.out.println(LOWER_HYPHEN.matches("a-b"));
-//        System.out.println(LOWER_HYPHEN.matches("abc"));
-//        System.out.println(LOWER_HYPHEN.matches("abc-def"));
-//
-//        System.out.println(LOWER_CAMEL.matches("a"));
-//        System.out.println(LOWER_CAMEL.matches("ab"));
-//        System.out.println(LOWER_CAMEL.matches("aB"));
-//        System.out.println(LOWER_CAMEL.matches("aBc"));
-//        System.out.println(LOWER_CAMEL.matches("abCd"));
+        System.out.println(!LOWER_HYPHEN.matches("-abc-"));
+        System.out.println(!LOWER_HYPHEN.matches("-abc--"));
+        System.out.println(!LOWER_HYPHEN.matches("abc--abc"));
+        System.out.println(!LOWER_HYPHEN.matches("-abc--abc"));
+        System.out.println(LOWER_HYPHEN.matches("a"));
+        System.out.println(LOWER_HYPHEN.matches("a-b"));
+        System.out.println(LOWER_HYPHEN.matches("abc"));
+        System.out.println(LOWER_HYPHEN.matches("abc-def"));
+
+        System.out.println(LOWER_CAMEL.matches("a"));
+        System.out.println(LOWER_CAMEL.matches("ab"));
+        System.out.println(LOWER_CAMEL.matches("aB"));
+        System.out.println(LOWER_CAMEL.matches("aBc"));
+        System.out.println(LOWER_CAMEL.matches("abCd"));
+        System.out.println(LOWER_CAMEL.matches("A"));
         System.out.println(LOWER_CAMEL.matches("ABC"));
     }
 
