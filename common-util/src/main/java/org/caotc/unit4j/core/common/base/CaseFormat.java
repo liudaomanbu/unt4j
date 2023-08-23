@@ -38,13 +38,13 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#LOWER_HYPHEN}
      */
-    LOWER_HYPHEN(CharMatcher.is('-'), "-") {
+    LOWER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z')).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toLowerCase(word);
         }
     },
-    UPPER_HYPHEN(CharMatcher.is('-'), "-") {
+    UPPER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z')).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toUpperCase(word);
@@ -53,7 +53,7 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#LOWER_UNDERSCORE}
      */
-    LOWER_UNDERSCORE(CharMatcher.is('_'), "_") {
+    LOWER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z')).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toLowerCase(word);
@@ -62,7 +62,7 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#UPPER_UNDERSCORE}
      */
-    UPPER_UNDERSCORE(CharMatcher.is('_'), "_") {
+    UPPER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z')).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toUpperCase(word);
@@ -71,7 +71,7 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#LOWER_CAMEL}
      */
-    LOWER_CAMEL(CharMatcher.inRange('A', 'Z'), "") {
+    LOWER_CAMEL(CharMatcher.inRange('A', 'Z'), "", CharMatcher.any()) {
         @Override
         String normalizeWord(String word) {
             return firstCharOnlyToUpper(word);
@@ -81,21 +81,32 @@ public enum CaseFormat {
         String normalizeFirstWord(String word) {
             return Ascii.toLowerCase(word);
         }
+
+        @Override
+        public boolean matches(@NonNull String string) {
+            if (!string.isEmpty() && Ascii.isUpperCase(string.charAt(0))) {
+                return false;
+            }
+            return super.matches(string);
+        }
     },
     /**
      * {@link com.google.common.base.CaseFormat#UPPER_CAMEL}
      */
-    UPPER_CAMEL(CharMatcher.inRange('A', 'Z'), "") {
+    UPPER_CAMEL(CharMatcher.inRange('A', 'Z'), "", CharMatcher.any()) {
         @Override
         String normalizeWord(String word) {
             return firstCharOnlyToUpper(word);
         }
-    };
 
-    @NonNull
-    private static final CharMatcher NOT_LOWER_MATCHER = CharMatcher.forPredicate(CharMatcher.inRange('a', 'z')).negate();
-    @NonNull
-    private static final CharMatcher NOT_UPPER_MATCHER = CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z')).negate();
+        @Override
+        public boolean matches(@NonNull String string) {
+            if (!string.isEmpty() && Ascii.isLowerCase(string.charAt(0))) {
+                return false;
+            }
+            return super.matches(string);
+        }
+    };
 
     private static String firstCharOnlyToUpper(String word) {
         return word.isEmpty()
@@ -107,6 +118,8 @@ public enum CaseFormat {
     CharMatcher wordBoundary;
     @NonNull
     String wordSeparator;
+    @NonNull
+    CharMatcher charMatcher;
 
     public boolean matches(@NonNull String string) {
         char[] chars = string.toCharArray();
@@ -114,6 +127,9 @@ public enum CaseFormat {
         int currentWordStartIndex = 0;
         int currentWordEndIndex;
         for (int i = 0; i < chars.length; i++) {
+            if (!charMatcher.matches(chars[i])) {
+                return false;
+            }
             if (wordBoundary.matches(chars[i])) {
                 currentWordEndIndex = i;
                 if (currentWordStartIndex >= currentWordEndIndex) {
@@ -127,28 +143,6 @@ public enum CaseFormat {
         }
         currentWordEndIndex = chars.length;
         return currentWordStartIndex < currentWordEndIndex;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(!LOWER_HYPHEN.matches("-"));
-        System.out.println(!LOWER_HYPHEN.matches("--"));
-        System.out.println(!LOWER_HYPHEN.matches("-abc"));
-        System.out.println(!LOWER_HYPHEN.matches("-abc-"));
-        System.out.println(!LOWER_HYPHEN.matches("-abc--"));
-        System.out.println(!LOWER_HYPHEN.matches("abc--abc"));
-        System.out.println(!LOWER_HYPHEN.matches("-abc--abc"));
-        System.out.println(LOWER_HYPHEN.matches("a"));
-        System.out.println(LOWER_HYPHEN.matches("a-b"));
-        System.out.println(LOWER_HYPHEN.matches("abc"));
-        System.out.println(LOWER_HYPHEN.matches("abc-def"));
-
-        System.out.println(LOWER_CAMEL.matches("a"));
-        System.out.println(LOWER_CAMEL.matches("ab"));
-        System.out.println(LOWER_CAMEL.matches("aB"));
-        System.out.println(LOWER_CAMEL.matches("aBc"));
-        System.out.println(LOWER_CAMEL.matches("abCd"));
-        System.out.println(LOWER_CAMEL.matches("A"));
-        System.out.println(LOWER_CAMEL.matches("ABC"));
     }
 
     /**
