@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2023 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.caotc.unit4j.core.common.base.provider;
 
 import com.google.common.collect.Lists;
@@ -99,15 +115,15 @@ public class CaseFormatProvider {
                 Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_CAMEL_STRING, Lists.newArrayList(UPPER_CAMEL_STRING)),
 
                 Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_HYPHEN_STRING, Lists.newArrayList(LOWER_HYPHEN_STRING)),
-                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_HYPHEN_STRING, Lists.newArrayList(UPPER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_HYPHEN_STRING, Lists.newArrayList("C", "A", "S", "E-", "F", "O", "R", "M", "A", "T")),
                 Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_UNDERSCORE_STRING)),
-                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_UNDERSCORE_STRING, Lists.newArrayList("C", "A", "S", "E_", "F", "O", "R", "M", "A", "T")),
                 Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_CAMEL_STRING, Lists.newArrayList("Case", "Format")),
 
                 Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_HYPHEN_STRING, Lists.newArrayList(LOWER_HYPHEN_STRING)),
-                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_HYPHEN_STRING, Lists.newArrayList(UPPER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_HYPHEN_STRING, Lists.newArrayList("C", "A", "S", "E-", "F", "O", "R", "M", "A", "T")),
                 Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_UNDERSCORE_STRING)),
-                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_UNDERSCORE_STRING, Lists.newArrayList("C", "A", "S", "E_", "F", "O", "R", "M", "A", "T")),
                 Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_CAMEL_STRING, Lists.newArrayList("case", "Format")),
 
                 Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
@@ -126,11 +142,11 @@ public class CaseFormatProvider {
                 Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
 
                 Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
-                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_SINGLE_STRING, Lists.newArrayList("C", "A", "S", "E")),
                 Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
 
                 Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
-                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_SINGLE_STRING, Lists.newArrayList("C", "A", "S", "E")),
                 Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)));
     }
 
