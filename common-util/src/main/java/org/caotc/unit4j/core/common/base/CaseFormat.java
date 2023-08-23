@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,8 @@ public enum CaseFormat {
             if (wordBoundary.matches(chars[i])) {
                 currentWordEndIndex = i;
                 if (currentWordStartIndex >= currentWordEndIndex) {
-                    if (i != 0) {
+                    //大驼峰可以大写字母开头,但是中横线或者下划线风格不能以分隔符开头
+                    if (i != 0 || wordSeparator.length() > 0) {
                         return false;
                     }
                 }
