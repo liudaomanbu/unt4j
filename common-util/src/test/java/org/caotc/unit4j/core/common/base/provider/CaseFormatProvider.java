@@ -23,6 +23,9 @@ public class CaseFormatProvider {
     private static final String UPPER_UNDERSCORE_STRING = "CASE_FORMAT";
     private static final String LOWER_CAMEL_STRING = "caseFormat";
     private static final String UPPER_CAMEL_STRING = "CaseFormat";
+    private static final String LOWER_SINGLE_STRING = "case";
+    private static final String UPPER_SINGLE_STRING = "CASE";
+    private static final String UPPER_CAMEL_SINGLE_STRING = "Case";
 
     static Stream<Arguments> toArguments() {
         return Stream.of(Arguments.of(CaseFormat.LOWER_HYPHEN, CaseFormat.LOWER_HYPHEN, LOWER_HYPHEN_STRING, LOWER_HYPHEN_STRING),
@@ -69,7 +72,66 @@ public class CaseFormatProvider {
                 Arguments.of(CaseFormat.LOWER_UNDERSCORE, LOWER_UNDERSCORE_STRING, Lists.newArrayList("case", "format")),
                 Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_UNDERSCORE_STRING, Lists.newArrayList("CASE", "FORMAT")),
                 Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_CAMEL_STRING, Lists.newArrayList("case", "Format")),
-                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_STRING, Lists.newArrayList("Case", "Format")));
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_STRING, Lists.newArrayList("Case", "Format")),
+
+                Arguments.of(CaseFormat.LOWER_HYPHEN, UPPER_HYPHEN_STRING, Lists.newArrayList("CASE", "FORMAT")),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_UNDERSCORE_STRING)),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, UPPER_UNDERSCORE_STRING, Lists.newArrayList(UPPER_UNDERSCORE_STRING)),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_CAMEL_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, UPPER_CAMEL_STRING, Lists.newArrayList(UPPER_CAMEL_STRING)),
+
+                Arguments.of(CaseFormat.UPPER_HYPHEN, LOWER_HYPHEN_STRING, Lists.newArrayList("case", "format")),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, LOWER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_UNDERSCORE_STRING)),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, UPPER_UNDERSCORE_STRING, Lists.newArrayList(UPPER_UNDERSCORE_STRING)),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, LOWER_CAMEL_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, UPPER_CAMEL_STRING, Lists.newArrayList(UPPER_CAMEL_STRING)),
+
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, LOWER_HYPHEN_STRING, Lists.newArrayList(LOWER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, UPPER_HYPHEN_STRING, Lists.newArrayList(UPPER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, UPPER_UNDERSCORE_STRING, Lists.newArrayList("CASE", "FORMAT")),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, LOWER_CAMEL_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, UPPER_CAMEL_STRING, Lists.newArrayList(UPPER_CAMEL_STRING)),
+
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, LOWER_HYPHEN_STRING, Lists.newArrayList(LOWER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_HYPHEN_STRING, Lists.newArrayList(UPPER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, LOWER_UNDERSCORE_STRING, Lists.newArrayList("case", "format")),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, LOWER_CAMEL_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_CAMEL_STRING, Lists.newArrayList(UPPER_CAMEL_STRING)),
+
+                Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_HYPHEN_STRING, Lists.newArrayList(LOWER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_HYPHEN_STRING, Lists.newArrayList(UPPER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_UNDERSCORE_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_CAMEL_STRING, Lists.newArrayList("Case", "Format")),
+
+                Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_HYPHEN_STRING, Lists.newArrayList(LOWER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_HYPHEN_STRING, Lists.newArrayList(UPPER_HYPHEN_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_UNDERSCORE_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_UNDERSCORE_STRING, Lists.newArrayList(LOWER_CAMEL_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_CAMEL_STRING, Lists.newArrayList("case", "Format")),
+
+                Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
+
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
+
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
+
+                Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.LOWER_CAMEL, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
+
+                Arguments.of(CaseFormat.UPPER_CAMEL, LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)));
     }
 
     static Stream<Arguments> joinToArguments() {
