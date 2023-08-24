@@ -105,6 +105,7 @@ public enum CaseFormat {
                 if (Ascii.isLowerCase(string.charAt(0))) {
                     return false;
                 }
+                //单个大写字母视为匹配
                 if (string.length() == 1 && Ascii.isUpperCase(string.charAt(0))) {
                     return true;
                 }

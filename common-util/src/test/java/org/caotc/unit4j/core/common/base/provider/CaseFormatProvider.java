@@ -70,7 +70,45 @@ public class CaseFormatProvider {
 
                 Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_STRING, true),
                 Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_SINGLE_STRING, true),
-                Arguments.of(CaseFormat.UPPER_CAMEL, "A", true)
+                Arguments.of(CaseFormat.UPPER_CAMEL, "A", true),
+
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "A", false),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "aB", false),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "-", false),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "-ab", false),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "ab-", false),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "ab--cd", false),
+
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "a", false),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "aB", false),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "-", false),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "-AB", false),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "AB-", false),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "AB--CD", false),
+
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "A", false),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "aB", false),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "_", false),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "_ab", false),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "ab_", false),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "ab__cd", false),
+
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "a", false),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "aB", false),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "_", false),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "_AB", false),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "AB_", false),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "AB__CD", false),
+
+                Arguments.of(CaseFormat.LOWER_CAMEL, "A", false),
+                Arguments.of(CaseFormat.LOWER_CAMEL, "ABC", false),
+                Arguments.of(CaseFormat.LOWER_CAMEL, "ab-Cd", false),
+                Arguments.of(CaseFormat.LOWER_CAMEL, "ab_Cd", false),
+
+                Arguments.of(CaseFormat.UPPER_CAMEL, "a", false),
+                Arguments.of(CaseFormat.UPPER_CAMEL, "ABC", false),
+                Arguments.of(CaseFormat.UPPER_CAMEL, "Ab-Cd", false),
+                Arguments.of(CaseFormat.UPPER_CAMEL, "Ab_Cd", false)
         );
     }
 
