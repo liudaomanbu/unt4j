@@ -11,6 +11,14 @@ import java.util.List;
 class CaseFormatTest {
 
     @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.base.provider.CaseFormatProvider#matchesArguments")
+    void matches(CaseFormat format, String str, boolean matched) {
+        boolean result = format.matches(str);
+        log.debug("format:{},str:{},result:{}", format, str, result);
+        Assertions.assertEquals(matched, result);
+    }
+
+    @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.base.provider.CaseFormatProvider#toArguments")
     void to(CaseFormat sourceFormat, CaseFormat targetFormat, String source, String target) {
         String result = sourceFormat.to(targetFormat, source);

@@ -71,7 +71,7 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#LOWER_CAMEL}
      */
-    LOWER_CAMEL(CharMatcher.inRange('A', 'Z'), "", CharMatcher.any()) {
+    LOWER_CAMEL(CharMatcher.inRange('A', 'Z'), "", CharMatcher.noneOf("-_")) {
         @Override
         String normalizeWord(String word) {
             return firstCharOnlyToUpper(word);
@@ -93,7 +93,7 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#UPPER_CAMEL}
      */
-    UPPER_CAMEL(CharMatcher.inRange('A', 'Z'), "", CharMatcher.any()) {
+    UPPER_CAMEL(CharMatcher.inRange('A', 'Z'), "", CharMatcher.noneOf("-_")) {
         @Override
         String normalizeWord(String word) {
             return firstCharOnlyToUpper(word);
@@ -104,7 +104,7 @@ public enum CaseFormat {
             if (!string.isEmpty() && Ascii.isLowerCase(string.charAt(0))) {
                 return false;
             }
-            return super.matches(string);
+            return super.matches(string) && !string.toUpperCase().equals(string);
         }
     };
 
@@ -122,15 +122,15 @@ public enum CaseFormat {
     CharMatcher charMatcher;
 
     public boolean matches(@NonNull String string) {
-        char[] chars = string.toCharArray();
         //[currentWordStartIndex,currentWordEndIndex)
         int currentWordStartIndex = 0;
         int currentWordEndIndex;
-        for (int i = 0; i < chars.length; i++) {
-            if (!charMatcher.matches(chars[i])) {
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (!charMatcher.matches(c)) {
                 return false;
             }
-            if (wordBoundary.matches(chars[i])) {
+            if (wordBoundary.matches(c)) {
                 currentWordEndIndex = i;
                 if (currentWordStartIndex >= currentWordEndIndex) {
                     //大驼峰可以大写字母开头,但是中横线或者下划线风格不能以分隔符开头
@@ -141,7 +141,7 @@ public enum CaseFormat {
                 currentWordStartIndex = i + wordSeparator.length();
             }
         }
-        currentWordEndIndex = chars.length;
+        currentWordEndIndex = string.length();
         return currentWordStartIndex < currentWordEndIndex;
     }
 

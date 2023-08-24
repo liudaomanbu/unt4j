@@ -43,6 +43,37 @@ public class CaseFormatProvider {
     private static final String UPPER_SINGLE_STRING = "CASE";
     private static final String UPPER_CAMEL_SINGLE_STRING = "Case";
 
+    static Stream<Arguments> matchesArguments() {
+        return Stream.of(Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_HYPHEN_STRING, true),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_SINGLE_STRING, true),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "a", true),
+                Arguments.of(CaseFormat.LOWER_HYPHEN, "a-b", true),
+
+                Arguments.of(CaseFormat.UPPER_HYPHEN, UPPER_HYPHEN_STRING, true),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, UPPER_SINGLE_STRING, true),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "A", true),
+                Arguments.of(CaseFormat.UPPER_HYPHEN, "A-B", true),
+
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, LOWER_UNDERSCORE_STRING, true),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, LOWER_SINGLE_STRING, true),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "a", true),
+                Arguments.of(CaseFormat.LOWER_UNDERSCORE, "a_b", true),
+
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_UNDERSCORE_STRING, true),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, UPPER_SINGLE_STRING, true),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "A", true),
+                Arguments.of(CaseFormat.UPPER_UNDERSCORE, "A_B", true),
+
+                Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_CAMEL_STRING, true),
+                Arguments.of(CaseFormat.LOWER_CAMEL, LOWER_SINGLE_STRING, true),
+                Arguments.of(CaseFormat.LOWER_CAMEL, "a", true),
+
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_STRING, true),
+                Arguments.of(CaseFormat.UPPER_CAMEL, UPPER_CAMEL_SINGLE_STRING, true),
+                Arguments.of(CaseFormat.UPPER_CAMEL, "A", true)
+        );
+    }
+
     static Stream<Arguments> toArguments() {
         return Stream.of(Arguments.of(CaseFormat.LOWER_HYPHEN, CaseFormat.LOWER_HYPHEN, LOWER_HYPHEN_STRING, LOWER_HYPHEN_STRING),
                 Arguments.of(CaseFormat.LOWER_HYPHEN, CaseFormat.UPPER_HYPHEN, LOWER_HYPHEN_STRING, UPPER_HYPHEN_STRING),
