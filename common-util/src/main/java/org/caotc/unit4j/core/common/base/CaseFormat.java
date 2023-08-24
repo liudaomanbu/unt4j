@@ -101,8 +101,13 @@ public enum CaseFormat {
 
         @Override
         public boolean matches(@NonNull String string) {
-            if (!string.isEmpty() && Ascii.isLowerCase(string.charAt(0))) {
-                return false;
+            if (!string.isEmpty()) {
+                if (Ascii.isLowerCase(string.charAt(0))) {
+                    return false;
+                }
+                if (string.length() == 1 && Ascii.isUpperCase(string.charAt(0))) {
+                    return true;
+                }
             }
             return super.matches(string) && !string.toUpperCase().equals(string);
         }
