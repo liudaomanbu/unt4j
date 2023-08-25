@@ -38,13 +38,13 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#LOWER_HYPHEN}
      */
-    LOWER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z')).negate()) {
+    LOWER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z').or(CharMatcher.is('_'))).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toLowerCase(word);
         }
     },
-    UPPER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z')).negate()) {
+    UPPER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z').or(CharMatcher.is('_'))).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toUpperCase(word);
@@ -53,7 +53,7 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#LOWER_UNDERSCORE}
      */
-    LOWER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z')).negate()) {
+    LOWER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z').or(CharMatcher.is('-'))).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toLowerCase(word);
@@ -62,7 +62,7 @@ public enum CaseFormat {
     /**
      * {@link com.google.common.base.CaseFormat#UPPER_UNDERSCORE}
      */
-    UPPER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z')).negate()) {
+    UPPER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z').or(CharMatcher.is('-'))).negate()) {
         @Override
         String normalizeWord(String word) {
             return Ascii.toUpperCase(word);
@@ -118,6 +118,14 @@ public enum CaseFormat {
         return word.isEmpty()
                 ? word
                 : Ascii.toUpperCase(word.charAt(0)) + Ascii.toLowerCase(word.substring(1));
+    }
+
+    @NonNull
+    public static List<String> matchSplit(@NonNull String s) {
+        return Arrays.stream(values()).filter(caseFormat -> caseFormat.matches(s))
+                .findFirst()
+                .map(caseFormat -> caseFormat.split(s))
+                .orElseGet(() -> Lists.newArrayList(s));
     }
 
     @NonNull

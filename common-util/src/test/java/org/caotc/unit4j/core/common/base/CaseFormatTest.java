@@ -11,6 +11,14 @@ import java.util.List;
 class CaseFormatTest {
 
     @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.core.common.base.provider.CaseFormatProvider#matchSplitArguments")
+    void matchSplit(String str, List<String> words) {
+        List<String> result = CaseFormat.matchSplit(str);
+        log.debug("str:{},result:{}", str, result);
+        Assertions.assertEquals(words, result);
+    }
+
+    @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.common.base.provider.CaseFormatProvider#matchesArguments")
     void matches(CaseFormat format, String str, boolean matched) {
         boolean result = format.matches(str);
@@ -27,7 +35,7 @@ class CaseFormatTest {
     }
 
     @ParameterizedTest
-    @MethodSource("org.caotc.unit4j.core.common.base.provider.CaseFormatProvider#splitToArguments")
+    @MethodSource("org.caotc.unit4j.core.common.base.provider.CaseFormatProvider#splitArguments")
     void split(CaseFormat format, String str, List<String> words) {
         List<String> result = format.split(str);
         log.debug("format:{},str:{},result:{}", format, str, result);

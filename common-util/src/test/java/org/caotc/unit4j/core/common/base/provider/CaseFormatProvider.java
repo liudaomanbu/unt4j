@@ -43,6 +43,20 @@ public class CaseFormatProvider {
     private static final String UPPER_SINGLE_STRING = "CASE";
     private static final String UPPER_CAMEL_SINGLE_STRING = "Case";
 
+    static Stream<Arguments> matchSplitArguments() {
+        return Stream.of(Arguments.of(LOWER_HYPHEN_STRING, Lists.newArrayList("case", "format")),
+                Arguments.of(UPPER_HYPHEN_STRING, Lists.newArrayList("CASE", "FORMAT")),
+                Arguments.of(LOWER_UNDERSCORE_STRING, Lists.newArrayList("case", "format")),
+                Arguments.of(UPPER_UNDERSCORE_STRING, Lists.newArrayList("CASE", "FORMAT")),
+                Arguments.of(LOWER_CAMEL_STRING, Lists.newArrayList("case", "Format")),
+                Arguments.of(UPPER_CAMEL_STRING, Lists.newArrayList("Case", "Format")),
+                Arguments.of(LOWER_SINGLE_STRING, Lists.newArrayList(LOWER_SINGLE_STRING)),
+                Arguments.of(UPPER_SINGLE_STRING, Lists.newArrayList(UPPER_SINGLE_STRING)),
+                Arguments.of(UPPER_CAMEL_SINGLE_STRING, Lists.newArrayList(UPPER_CAMEL_SINGLE_STRING)),
+                Arguments.of("A", Lists.newArrayList("A"))
+        );
+    }
+
     static Stream<Arguments> matchesArguments() {
         return Stream.of(Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_HYPHEN_STRING, true),
                 Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_SINGLE_STRING, true),
@@ -151,7 +165,7 @@ public class CaseFormatProvider {
                 Arguments.of(CaseFormat.UPPER_CAMEL, CaseFormat.UPPER_CAMEL, UPPER_CAMEL_STRING, UPPER_CAMEL_STRING));
     }
 
-    static Stream<Arguments> splitToArguments() {
+    static Stream<Arguments> splitArguments() {
         return Stream.of(Arguments.of(CaseFormat.LOWER_HYPHEN, LOWER_HYPHEN_STRING, Lists.newArrayList("case", "format")),
                 Arguments.of(CaseFormat.UPPER_HYPHEN, UPPER_HYPHEN_STRING, Lists.newArrayList("CASE", "FORMAT")),
                 Arguments.of(CaseFormat.LOWER_UNDERSCORE, LOWER_UNDERSCORE_STRING, Lists.newArrayList("case", "format")),
