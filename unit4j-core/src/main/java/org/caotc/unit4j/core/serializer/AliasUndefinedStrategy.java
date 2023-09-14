@@ -19,4 +19,8 @@ public enum AliasUndefinedStrategy {
      */
     AUTO_COMPOSITE,
     ID;
+
+    public <E> Serializer<E> create() {
+        return null;
+    }
 }
