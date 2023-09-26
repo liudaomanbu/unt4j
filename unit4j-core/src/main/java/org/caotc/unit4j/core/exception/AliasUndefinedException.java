@@ -3,7 +3,6 @@ package org.caotc.unit4j.core.exception;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Alias.Type;
 import org.caotc.unit4j.core.Configuration;
 
 /**
@@ -23,18 +22,6 @@ public class AliasUndefinedException extends IllegalArgumentException {
   @NonNull
   Object undefinedAliased;
 
-  private AliasUndefinedException(@NonNull Object undefinedAliased,
-                                  @NonNull Configuration configuration,
-                                  @NonNull Type aliasType) {
-    super(String
-            .format("%s dont't have alias that type is %s in configuration %s",
-                    undefinedAliased,
-                    aliasType.name(), configuration));
-    this.undefinedAliased = undefinedAliased;
-    this.configuration = configuration;
-    this.aliasType = aliasType;
-  }
-
   /**
    * 存储别名的配置环境
    */
@@ -46,6 +33,18 @@ public class AliasUndefinedException extends IllegalArgumentException {
    */
   @NonNull
   Alias.Type aliasType;
+
+  private AliasUndefinedException(@NonNull Object undefinedAliased,
+                                  @NonNull Configuration configuration,
+                                  @NonNull Alias.Type aliasType) {
+    super(String
+            .format("%s dont't have alias that type is %s in configuration %s",
+                    undefinedAliased,
+                    aliasType.name(), configuration));
+    this.undefinedAliased = undefinedAliased;
+    this.configuration = configuration;
+    this.aliasType = aliasType;
+  }
 
   /**
    * 工厂方法

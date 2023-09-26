@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.serializer;
 
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
@@ -11,14 +12,14 @@ import org.caotc.unit4j.core.Configuration;
  * @since 1.0.0
  */
 @Value
-public class CompositeSerializer<E> implements Serializer<E> {
+@Builder
+public class AliasSerializer<E> implements Serializer<E> {
     @NonNull
     Configuration configuration;
     @NonNull
     AliasFinder<E> aliasFinder;
     @NonNull
-    Serializer<? super E> aliasUndefinedSerializer;
-    AliasUndefinedStrategy aliasUndefinedStrategy = null;
+    Serializer<E> aliasUndefinedSerializer;
 
     @Override
     public @NonNull String serialize(@NonNull E element) {

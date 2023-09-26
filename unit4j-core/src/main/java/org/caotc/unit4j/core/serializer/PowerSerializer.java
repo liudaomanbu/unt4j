@@ -1,5 +1,6 @@
 package org.caotc.unit4j.core.serializer;
 
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Power;
@@ -11,7 +12,8 @@ import org.caotc.unit4j.core.constant.StringConstant;
  * @since 1.0.0
  */
 @Value
-public class PowerSerializer<E> implements Serializer<Power<E>> {
+@Builder
+public class PowerSerializer<E> implements Serializer<Power<? extends E>> {
     @NonNull
     Serializer<E> baseSerializer;
     @NonNull
@@ -24,7 +26,7 @@ public class PowerSerializer<E> implements Serializer<Power<E>> {
     Serializer<Integer> exponentSerializer;
 
     @Override
-    public @NonNull String serialize(@NonNull Power<E> power) {
+    public @NonNull String serialize(@NonNull Power<? extends E> power) {
         return StringConstant.EMPTY_JOINER.join(baseLeftDelimiter(), baseSerializer().serialize(power.base())
                 , baseRightDelimiter(), operator(), exponentSerializer().serialize(power.exponent()));
     }

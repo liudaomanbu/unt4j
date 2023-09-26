@@ -13,10 +13,17 @@ class ComponentSerializerTest {
     @Test
     void test() {
         AliasFinder<UnitType> aliasFinder = (config, unitType) -> config.aliases(unitType, Aliases.Types.SYMBOL).stream().findFirst();
-        Serializer<? super UnitType> aliasUndefinedSerializer = new IdentifiableSerializer();
-        Serializer<UnitType> unitTypeSerializer = new ComponentSerializer<>(
-                new PowerSerializer<>(new CompositeSerializer<>(Configuration.defaultInstance(), aliasFinder
-                        , aliasUndefinedSerializer), "(", ")", "", Util::getSuperscript));
+        Serializer<UnitType> aliasUndefinedSerializer = new IdentifiableSerializer<>();
+        Serializer<UnitType> unitTypeSerializer = ComponentSerializer.<UnitType>builder()
+                .configuration(Configuration.defaultInstance())
+                .aliasFinder(aliasFinder)
+                .aliasUndefinedStrategy(AliasUndefinedStrategy.AUTO_COMPOSITE)
+                .powerSerializer(PowerSerializer.<UnitType>builder()
+                        .baseLeftDelimiter("(")
+                        .baseRightDelimiter(")")
+                        .exponentSerializer(Util::getSuperscript)
+                        .operator(""))
+                .build();
 
         log.info("unitType:{}", unitTypeSerializer.serialize(UnitTypes.ENERGY_WORK_HEAT_QUANTITY));
         log.info("unitType:{}", aliasUndefinedSerializer.serialize(UnitTypes.ENERGY_WORK_HEAT_QUANTITY));

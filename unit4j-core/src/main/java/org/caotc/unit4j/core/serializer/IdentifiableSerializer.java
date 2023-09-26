@@ -10,9 +10,9 @@ import org.caotc.unit4j.core.Identifiable;
  * @since 1.0.0
  */
 @Value
-public class IdentifiableSerializer implements Serializer<Identifiable> {
+public class IdentifiableSerializer<E extends Identifiable> implements Serializer<E> {
     @Override
-    public @NonNull String serialize(@NonNull Identifiable identifiable) {
+    public @NonNull String serialize(@NonNull E identifiable) {
         return identifiable.id();
     }
 }
