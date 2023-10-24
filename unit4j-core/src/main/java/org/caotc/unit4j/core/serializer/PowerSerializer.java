@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Power;
+import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.constant.StringConstant;
 
 /**
@@ -17,13 +18,17 @@ public class PowerSerializer<E> implements Serializer<Power<? extends E>> {
     @NonNull
     Serializer<E> baseSerializer;
     @NonNull
-    String baseLeftDelimiter;
+    @Builder.Default
+    String baseLeftDelimiter = StringConstant.HALF_WIDTH_LEFT_PARENTHESIS;
     @NonNull
-    String baseRightDelimiter;
+    @Builder.Default
+    String baseRightDelimiter = StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS;
     @NonNull
-    String operator;
+    @Builder.Default
+    String operator = StringConstant.EMPTY;
     @NonNull
-    Serializer<Integer> exponentSerializer;
+    @Builder.Default
+    Serializer<Integer> exponentSerializer = Util::getSuperscript;
 
     @Override
     public @NonNull String serialize(@NonNull Power<? extends E> power) {

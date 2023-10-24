@@ -30,7 +30,7 @@ class UtilTest {
     @Test
     void createCompositeId() {
         String compositeId = Util
-                .createCompositeIdOrAlias(UnitTypes.PRESSURE_STRESS.componentToExponents());
+                .createCompositeId(UnitTypes.PRESSURE_STRESS.componentToExponents());
         log.info(compositeId);
         Assertions.assertEquals("(MASS)¹(LENGTH)⁻¹(TIME)⁻²", compositeId);
         UnitType compositeUnitType = UnitType
@@ -38,7 +38,7 @@ class UtilTest {
                 .componentToExponent(UnitTypes.RESISTANCE_ELECTRICAL_IMPEDANCE_REACTANCE, 3)
                 .build();
         compositeId = Util
-                .createCompositeIdOrAlias(compositeUnitType.componentToExponents());
+                .createCompositeId(compositeUnitType.componentToExponents());
         log.info(compositeId);
         Assertions
                 .assertEquals("((MASS)¹(LENGTH)⁻¹(TIME)⁻²)²((MASS)¹(LENGTH)²(TIME)⁻³(ELECTRIC_CURRENT)⁻²)³",
@@ -48,7 +48,7 @@ class UtilTest {
     @Test
     void createCompositeAlias() {
         log.debug("NEWTON_ENGLISH_NAME ENGLISH_NAME:{}",
-                Util.createCompositeIdOrAlias(Units.NEWTON.componentToExponents()));
+                Util.createCompositeId(Units.NEWTON.componentToExponents()));
 
         Unit unit = Unit.builder()
                 .componentToExponent(Units.WATT.addPrefix(Prefixes.CENTI), 2)
@@ -56,7 +56,7 @@ class UtilTest {
                 .prefix(Prefixes.HECTO)
                 .build();
 
-        Util.createCompositeIdOrAlias(unit.componentToExponents());
+        Util.createCompositeId(unit.componentToExponents());
     }
 
 }

@@ -3,7 +3,6 @@ package org.caotc.unit4j.core.serializer;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Aliases;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.common.util.Util;
 import org.caotc.unit4j.core.unit.UnitTypes;
 import org.caotc.unit4j.core.unit.type.UnitType;
 import org.junit.jupiter.api.Test;
@@ -12,17 +11,17 @@ import org.junit.jupiter.api.Test;
 class ComponentSerializerTest {
     @Test
     void test() {
-        AliasFinder<UnitType> aliasFinder = (config, unitType) -> config.aliases(unitType, Aliases.Types.SYMBOL).stream().findFirst();
+        AliasFinder<UnitType> aliasFinder = DefaultAliasFinder.of(Aliases.Types.SYMBOL);
         Serializer<UnitType> aliasUndefinedSerializer = new IdentifiableSerializer<>();
         Serializer<UnitType> unitTypeSerializer = ComponentSerializer.<UnitType>builder()
                 .configuration(Configuration.defaultInstance())
                 .aliasFinder(aliasFinder)
-                .aliasUndefinedStrategy(AliasUndefinedStrategy.AUTO_COMPOSITE)
-                .powerSerializer(PowerSerializer.<UnitType>builder()
-                        .baseLeftDelimiter("(")
-                        .baseRightDelimiter(")")
-                        .exponentSerializer(Util::getSuperscript)
-                        .operator(""))
+                .aliasUndefinedStrategy(AliasUndefinedStrategy.ID)
+                .baseSerializer(AliasSerializer.<UnitType>builder()
+                        .configuration(Configuration.defaultInstance())
+                        .aliasFinder(aliasFinder)
+                        .aliasUndefinedSerializer(aliasUndefinedSerializer)
+                        .build())
                 .build();
 
         log.info("unitType:{}", unitTypeSerializer.serialize(UnitTypes.ENERGY_WORK_HEAT_QUANTITY));

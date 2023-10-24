@@ -3,12 +3,14 @@ package org.caotc.unit4j.core.serializer;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.NonFinal;
+import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Component;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Identifiable;
 import org.caotc.unit4j.core.Power;
-import org.caotc.unit4j.core.exception.AliasUndefinedException;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -22,45 +24,72 @@ public class ComponentSerializer<E extends Component<E> & Identifiable> implemen
     Configuration configuration;
     @NonNull
     AliasFinder<? super E> aliasFinder;
-    @NonNull
     Serializer<E> aliasUndefinedSerializer;
-    @NonNull
-    PowerSerializer<E> powerSerializer;
-
-//    AliasUndefinedStrategy aliasUndefinedStrategy = null;
 
     @Builder
     private ComponentSerializer(@NonNull Configuration configuration, @NonNull AliasFinder<? super E> aliasFinder,
-                                @NonNull PowerSerializer.PowerSerializerBuilder<E> powerSerializer, @NonNull AliasUndefinedStrategy aliasUndefinedStrategy) {
-
+                                Serializer<E> aliasUndefinedSerializer, @NonNull PowerSerializer.PowerSerializerBuilder<E> powerSerializerBuilder
+            , @NonNull AliasUndefinedStrategy aliasUndefinedStrategy) {
         this.configuration = configuration;
         this.aliasFinder = aliasFinder;
-        this.powerSerializer = powerSerializer.baseSerializer(this).build();
-        switch (aliasUndefinedStrategy) {
-            case ID:
-                this.aliasUndefinedSerializer = new IdentifiableSerializer<>();
-                break;
-            case THROW_EXCEPTION:
-                this.aliasUndefinedSerializer = (o) -> {
-                    throw AliasUndefinedException.create(o, configuration(), null);
-                };
-                break;
-            case AUTO_COMPOSITE:
-            default:
-                this.aliasUndefinedSerializer = (element) -> element.componentToExponents().entrySet().stream()
-                        .map(entry -> new Power<>(entry.getKey(), entry.getValue()))
-                        .map(this.powerSerializer::serialize)
-                        .collect(Collectors.joining());
+        if (Objects.isNull(aliasUndefinedSerializer)) {
+            switch (aliasUndefinedStrategy) {
+                case ID:
+//                    aliasUndefinedSerializer = new IdentifiableSerializer<>();
+                    aliasUndefinedSerializer = IdentifiableSerializer.INSTANCE::serialize;
+                    break;
+                case THROW_EXCEPTION:
+                    aliasUndefinedSerializer = (o) -> aliasFinder.findExact(configuration(), o).value();
+                    break;
+                case AUTO_COMPOSITE:
+                default:
+                    PowerSerializer<E> powerSerializer = powerSerializerBuilder.build();
+//                    PowerSerializer<E> powerSerializer = powerSerializerBuilder.baseSerializer(element -> aliasFinder.findExact(configuration,element).value()).build();
+                    aliasUndefinedSerializer = (element) -> element.componentToExponents().entrySet().stream()
+                            .map(entry -> {
+                                System.out.println("key:" + entry.getKey() + ",value:" + entry.getValue());
+                                return new Power<>(entry.getKey(), entry.getValue());
+                            })
+                            .map(powerSerializer::serialize)
+                            .collect(Collectors.joining());
+            }
         }
+        this.aliasUndefinedSerializer = aliasUndefinedSerializer;
     }
 
     @Override
     public @NonNull String serialize(@NonNull E element) {
-        return element.componentToExponents().entrySet().stream()
-                .map(entry -> new Power<>(entry.getKey(), entry.getValue()))
-                .map(powerSerializer::serialize)
-                .collect(Collectors.joining());
+        return aliasFinder.find(configuration, element).map(Alias::value)
+                .orElseGet(() -> aliasUndefinedSerializer.serialize(element));
     }
 
+    public static class ComponentSerializerBuilder<E extends Component<E> & Identifiable> {
+        @NonFinal
+        PowerSerializer.PowerSerializerBuilder<E> powerSerializerBuilder = PowerSerializer.builder();
 
+        public ComponentSerializerBuilder<E> baseSerializer(Serializer<E> baseSerializer) {
+            this.powerSerializerBuilder.baseSerializer(baseSerializer);
+            return this;
+        }
+
+        public ComponentSerializerBuilder<E> powerBaseLeftDelimiter(String baseLeftDelimiter) {
+            this.powerSerializerBuilder.baseLeftDelimiter(baseLeftDelimiter);
+            return this;
+        }
+
+        public ComponentSerializerBuilder<E> powerBaseRightDelimiter(String baseRightDelimiter) {
+            this.powerSerializerBuilder.baseRightDelimiter(baseRightDelimiter);
+            return this;
+        }
+
+        public ComponentSerializerBuilder<E> powerOperator(String operator) {
+            this.powerSerializerBuilder.operator(operator);
+            return this;
+        }
+
+        public ComponentSerializerBuilder<E> powerExponentSerializer(Serializer<Integer> exponentSerializer) {
+            this.powerSerializerBuilder.exponentSerializer(exponentSerializer);
+            return this;
+        }
+    }
 }

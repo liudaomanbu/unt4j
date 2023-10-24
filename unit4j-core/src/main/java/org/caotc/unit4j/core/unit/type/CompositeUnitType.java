@@ -25,6 +25,12 @@ import java.util.Map.Entry;
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = false)
 public class CompositeUnitType extends UnitType {
+    //todo
+//    private static final Serializer<UnitType> ID_SERIALIZER = ComponentSerializer.<UnitType>builder()
+//            .configuration(Configuration.defaultInstance())
+//            .baseSerializer(UnitType::id)
+//            .aliasUndefinedStrategy(AliasUndefinedStrategy.AUTO_COMPOSITE)
+//            .build();
     /**
      * 单位类型组件与对应指数
      */
@@ -40,7 +46,7 @@ public class CompositeUnitType extends UnitType {
     @NonNull
     @Override
     public String id() {
-        return Util.createCompositeIdOrAlias(this.componentToExponents());
+        return Util.createCompositeId(this.componentToExponents());
     }
 
     @NonNull

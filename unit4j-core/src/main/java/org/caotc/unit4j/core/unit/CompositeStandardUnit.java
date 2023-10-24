@@ -94,7 +94,7 @@ public class CompositeStandardUnit extends StandardUnit {
 
   @Override
   public @NonNull String id() {
-    return Util.createCompositeIdOrAlias(componentToExponents());
+    return Util.createCompositeId(componentToExponents());
   }
 
     private void validate() {

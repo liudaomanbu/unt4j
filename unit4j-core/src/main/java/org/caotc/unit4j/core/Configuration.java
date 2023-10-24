@@ -569,6 +569,12 @@ public final class Configuration {
     }
 
     @NonNull
+    public ImmutableSet<Alias> aliases(@NonNull Object element) {
+        //todo
+        return ImmutableSet.of();
+    }
+
+    @NonNull
     public ImmutableSet<Alias> aliases(@NonNull UnitType unitType) {
         return ImmutableSet.copyOf(unitTypeToAliases.get(unitType));
     }

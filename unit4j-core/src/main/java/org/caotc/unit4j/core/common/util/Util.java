@@ -69,11 +69,11 @@ public class Util {
    * @since 1.0.0
    */
   @NonNull
-  public static String createCompositeIdOrAlias(
+  public static String createCompositeId(
           @NonNull Map<? extends Identifiable, Integer> stringSupplierToExponents) {
-      return stringSupplierToExponents.entrySet().stream()
-              .map(entry -> StringConstant.EMPTY_JOINER.join(StringConstant.HALF_WIDTH_LEFT_PARENTHESIS, entry.getKey().id(),
-                      StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS, getSuperscript(entry.getValue())))
-              .collect(Collectors.joining());
+    return stringSupplierToExponents.entrySet().stream()
+            .map(entry -> StringConstant.EMPTY_JOINER.join(StringConstant.HALF_WIDTH_LEFT_PARENTHESIS, entry.getKey().id(),
+                    StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS, getSuperscript(entry.getValue())))
+            .collect(Collectors.joining());
   }
 }
