@@ -8,7 +8,9 @@ import lombok.NonNull;
 import lombok.Singular;
 import lombok.ToString;
 import lombok.Value;
-import org.caotc.unit4j.core.common.util.Util;
+import org.caotc.unit4j.core.serializer.ComponentCompositeSerializer;
+import org.caotc.unit4j.core.serializer.PowerSerializer;
+import org.caotc.unit4j.core.serializer.Serializer;
 
 import java.util.Collection;
 import java.util.Map;
@@ -26,11 +28,11 @@ import java.util.Map.Entry;
 @ToString(callSuper = false)
 public class CompositeUnitType extends UnitType {
     //todo
-//    private static final Serializer<UnitType> ID_SERIALIZER = ComponentSerializer.<UnitType>builder()
-//            .configuration(Configuration.defaultInstance())
-//            .baseSerializer(UnitType::id)
-//            .aliasUndefinedStrategy(AliasUndefinedStrategy.AUTO_COMPOSITE)
-//            .build();
+    private static final Serializer<UnitType> ID_SERIALIZER = ComponentCompositeSerializer.<UnitType>builder()
+            .powerSerializer(PowerSerializer.<UnitType>builder()
+                    .elementSerializer(UnitType::id)
+                    .build())
+            .build();
     /**
      * 单位类型组件与对应指数
      */
@@ -46,7 +48,8 @@ public class CompositeUnitType extends UnitType {
     @NonNull
     @Override
     public String id() {
-        return Util.createCompositeId(this.componentToExponents());
+//        return Util.createCompositeId(this.componentToExponents());
+        return ID_SERIALIZER.serialize(this);
     }
 
     @NonNull

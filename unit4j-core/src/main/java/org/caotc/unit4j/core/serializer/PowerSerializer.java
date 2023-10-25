@@ -15,24 +15,32 @@ import org.caotc.unit4j.core.constant.StringConstant;
 @Value
 @Builder
 public class PowerSerializer<E> implements Serializer<Power<? extends E>> {
+
+
     @NonNull
-    Serializer<E> baseSerializer;
+    Serializer<E> elementSerializer;
     @NonNull
     @Builder.Default
-    String baseLeftDelimiter = StringConstant.HALF_WIDTH_LEFT_PARENTHESIS;
+    String elementPrefix = StringConstant.HALF_WIDTH_LEFT_PARENTHESIS;
     @NonNull
     @Builder.Default
-    String baseRightDelimiter = StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS;
+    String elementSuffix = StringConstant.HALF_WIDTH_RIGHT_PARENTHESIS;
     @NonNull
     @Builder.Default
     String operator = StringConstant.EMPTY;
     @NonNull
     @Builder.Default
     Serializer<Integer> exponentSerializer = Util::getSuperscript;
+    @NonNull
+    @Builder.Default
+    String exponentPrefix = StringConstant.EMPTY;
+    @NonNull
+    @Builder.Default
+    String exponentSuffix = StringConstant.EMPTY;
 
     @Override
     public @NonNull String serialize(@NonNull Power<? extends E> power) {
-        return StringConstant.EMPTY_JOINER.join(baseLeftDelimiter(), baseSerializer().serialize(power.base())
-                , baseRightDelimiter(), operator(), exponentSerializer().serialize(power.exponent()));
+        return StringConstant.EMPTY_JOINER.join(elementPrefix(), elementSerializer().serialize(power.base()), elementSuffix()
+                , operator(), exponentPrefix(), exponentSerializer().serialize(power.exponent()), exponentSuffix());
     }
 }

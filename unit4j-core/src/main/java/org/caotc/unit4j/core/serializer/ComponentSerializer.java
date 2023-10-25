@@ -68,17 +68,17 @@ public class ComponentSerializer<E extends Component<E> & Identifiable> implemen
         PowerSerializer.PowerSerializerBuilder<E> powerSerializerBuilder = PowerSerializer.builder();
 
         public ComponentSerializerBuilder<E> baseSerializer(Serializer<E> baseSerializer) {
-            this.powerSerializerBuilder.baseSerializer(baseSerializer);
+            this.powerSerializerBuilder.elementSerializer(baseSerializer);
             return this;
         }
 
         public ComponentSerializerBuilder<E> powerBaseLeftDelimiter(String baseLeftDelimiter) {
-            this.powerSerializerBuilder.baseLeftDelimiter(baseLeftDelimiter);
+            this.powerSerializerBuilder.elementPrefix(baseLeftDelimiter);
             return this;
         }
 
         public ComponentSerializerBuilder<E> powerBaseRightDelimiter(String baseRightDelimiter) {
-            this.powerSerializerBuilder.baseRightDelimiter(baseRightDelimiter);
+            this.powerSerializerBuilder.elementSuffix(baseRightDelimiter);
             return this;
         }
 

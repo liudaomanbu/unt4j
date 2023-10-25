@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
+import org.caotc.unit4j.core.Identifiable;
 
 /**
  * @author caotc
@@ -13,7 +14,7 @@ import org.caotc.unit4j.core.Configuration;
  */
 @Value
 @Builder
-public class AliasSerializer<E> implements Serializer<E> {
+public class AliasSerializer<E extends Identifiable> implements Serializer<E> {
     @NonNull
     Configuration configuration;
     @NonNull
