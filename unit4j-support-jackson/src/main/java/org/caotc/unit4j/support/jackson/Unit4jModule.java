@@ -23,8 +23,6 @@ public class Unit4jModule extends SimpleModule {
       unit4jModule
               .addSerializer(unit4jContextualSerializer.quantitySerializer().quantityValueSerializer());
       unit4jModule.addSerializer(unit4jContextualSerializer.quantitySerializer().unitSerializer());
-      SerializeCommandsSerializer serializeCommandsSerializer = new SerializeCommandsSerializer();
-      unit4jModule.addSerializer(serializeCommandsSerializer);
       return unit4jModule;
   }
 

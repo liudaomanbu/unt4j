@@ -27,12 +27,11 @@ import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 
 /**
- * 数量序列化配置注解
+ * 数量序列化配置注解,标注在属性和get方法上
  *
  * @author caotc
  * @date 2019-04-23
@@ -40,7 +39,7 @@ import static java.lang.annotation.ElementType.METHOD;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {METHOD, FIELD, ANNOTATION_TYPE})
+@Target(value = {METHOD, FIELD})
 public @interface QuantitySerialize {
 
     /**
@@ -49,30 +48,20 @@ public @interface QuantitySerialize {
     CodecStrategy strategy() default CodecStrategy.VALUE;
 
     /**
-     * @return 数学计算中的舍入模式
+     * @return 配置对象主键
+     * @see Configuration#findExact(String)
      */
-    RoundingMode roundingMode() default RoundingMode.UNNECESSARY;
+    String configId() default Configuration.DEFAULT_ID;
 
-  /**
-   * @return 数学计算精度
-   */
-  int precision() default 0;
+    /**
+     * @return 当前属性名称格式
+     */
+    CaseFormat nameCaseFormat() default CaseFormat.LOWER_CAMEL;
 
-  /**
-   * @return 数值序列化时使用的类
-   */
-  Class<?> valueType() default BigDecimal.class;
-
-  /**
-   * @return 配置对象主键
-   * @see Configuration#id()
-   */
-  String configId() default Configuration.DEFAULT_ID;
-
-  /**
-   * @return 当前属性名称格式
-   */
-  CaseFormat caseFormat() default CaseFormat.LOWER_CAMEL;
+    /**
+     * @return 字段名称
+     */
+    String name() default StringConstant.EMPTY;
 
     /**
      * @return 目标单位id
@@ -80,19 +69,27 @@ public @interface QuantitySerialize {
     String targetUnitId() default StringConstant.EMPTY;
 
     /**
-     * @return 值字段名称
-     */
-    String valueName() default StringConstant.EMPTY;
-
-    /**
      * @return 单位字段名称
      */
     String unitName() default StringConstant.EMPTY;
 
     /**
-     * @return 字段名称
+     * @return 值字段名称
      */
-    String name() default StringConstant.EMPTY;
+    String valueName() default StringConstant.EMPTY;
 
-    //TODO 目标属性名称的格式以外的内容
+    /**
+     * @return 数值序列化时使用的类
+     */
+    Class<?> valueType() default BigDecimal.class;
+
+    /**
+     * @return 数学计算中的舍入模式
+     */
+    RoundingMode valueRoundingMode() default RoundingMode.UNNECESSARY;
+
+    /**
+     * @return 数学计算精度
+     */
+    int valuePrecision() default 0;
 }

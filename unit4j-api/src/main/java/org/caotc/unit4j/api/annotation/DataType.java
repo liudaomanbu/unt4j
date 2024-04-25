@@ -26,6 +26,7 @@ import static java.lang.annotation.ElementType.METHOD;
 
 /**
  * 数据类型,标注在属性和get方法上
+ * //todo 需要确认是否有实际意义
  *
  * @author caotc
  * @date 2019-07-18
@@ -36,8 +37,8 @@ import static java.lang.annotation.ElementType.METHOD;
 @Target(value = {METHOD, FIELD})
 public @interface DataType {
 
-  /**
-   * 数据类型
-   */
-  String value();
+    /**
+     * 数据类型
+     */
+    String value();
 }

@@ -571,6 +571,18 @@ public final class Configuration {
     @NonNull
     public ImmutableSet<Alias> aliases(@NonNull Object element) {
         //todo
+        if (element instanceof UnitType) {
+            return aliases((UnitType) element);
+        }
+        if (element instanceof Prefix) {
+            return aliases((Prefix) element);
+        }
+        if (element instanceof StandardUnit) {
+            return aliases((StandardUnit) element);
+        }
+        if (element instanceof PrefixUnit) {
+            return aliases((PrefixUnit) element);
+        }
         return ImmutableSet.of();
     }
 

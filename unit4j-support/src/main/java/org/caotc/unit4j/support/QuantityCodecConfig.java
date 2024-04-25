@@ -20,7 +20,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
-import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.unit.Unit;
@@ -91,24 +90,4 @@ public class QuantityCodecConfig {
 //  public String outputUnitName() {
 //    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME));
 //  }
-
-    /**
-     * 获取传入数量对象的序列化指令
-     *
-     * @param quantity 要进行序列化的数量对象
-     * @return 序列化指令
-     * @author caotc
-     * @date 2019-05-29
-     * @since 1.0.0
-     */
-    //TODO 待删除
-    @NonNull
-    public <T> SerializeCommands serializeCommandsFromAmount(@NonNull Quantity quantity) {
-//    Function<Class<? extends T>, ? extends Set<FieldWrapper<T, ?>>> kvRemovalListener = type -> ReflectionUtil
-//        .fieldWrappersFromClassWithFieldCheck(type, MethodNameStyle.FLUENT);
-//    return strategy.createSerializeCommands(beforeCodec(amount), fieldNameConverter()
-//        , kvRemovalListener
-//        , CaseFormat.LOWER_CAMEL);
-        return null;
-  }
 }

@@ -19,7 +19,6 @@ package org.caotc.unit4j.support.fastjson;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.BigFractionAdapter;
 import org.caotc.unit4j.core.unit.BasePrefixUnit;
@@ -63,17 +62,11 @@ public class Unit4jModule {
      */
     @NonNull
     QuantitySerializer quantitySerializer;
-    /**
-     * {@link SerializeCommands}序列化器
-     */
-    @NonNull
-    SerializeCommandsSerializer serializeCommandsSerializer;
 
 
   private Unit4jModule(@NonNull Unit4jProperties unit4jProperties) {
       unit4jFilter = new Unit4jFilter(unit4jProperties);
       quantitySerializer = new QuantitySerializer(unit4jProperties.createAmountCodecConfig());
-      serializeCommandsSerializer = new SerializeCommandsSerializer();
   }
 
   /**
@@ -92,7 +85,6 @@ public class Unit4jModule {
       serializeConfig.put(BasePrefixUnit.class, quantitySerializer().unitSerializer());
       serializeConfig.put(CompositeStandardUnit.class, quantitySerializer().unitSerializer());
       serializeConfig.put(CompositePrefixUnit.class, quantitySerializer().unitSerializer());
-      serializeConfig.put(SerializeCommands.class, serializeCommandsSerializer());
       Arrays.stream(classes).forEach(clazz -> serializeConfig.addFilter(clazz, unit4jFilter()));
   }
 }

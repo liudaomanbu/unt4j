@@ -15,8 +15,6 @@ import org.caotc.unit4j.core.constant.StringConstant;
 @Value
 @Builder
 public class PowerSerializer<E> implements Serializer<Power<? extends E>> {
-
-
     @NonNull
     Serializer<E> elementSerializer;
     @NonNull

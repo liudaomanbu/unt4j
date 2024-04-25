@@ -35,7 +35,7 @@ public class QuantityField {
     Quantity noAnnotationQuantity;
     @QuantitySerialize(strategy = CodecStrategy.VALUE, valueType = BigDecimal.class)
     Quantity annotationValueQuantity;
-    @QuantitySerialize(strategy = CodecStrategy.OBJECT, valueType = byte.class, roundingMode = RoundingMode.HALF_UP)
+    @QuantitySerialize(strategy = CodecStrategy.OBJECT, valueType = byte.class, valueRoundingMode = RoundingMode.HALF_UP)
     Quantity annotationObjectQuantity;
     @QuantitySerialize(strategy = CodecStrategy.FLAT, valueType = String.class)
     Quantity annotationFlatQuantity;

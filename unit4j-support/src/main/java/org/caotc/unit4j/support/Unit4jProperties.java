@@ -209,7 +209,7 @@ public class Unit4jProperties {
         QuantitySerialize quantitySerialize = amountReadableProperty.annotation(QuantitySerialize.class).orElse(null);
         Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
                 .apply(valueFieldNameWords,
-                        Optional.ofNullable(quantitySerialize).map(QuantitySerialize::caseFormat)
+                        Optional.ofNullable(quantitySerialize).map(QuantitySerialize::nameCaseFormat)
                                 .map(
                                         caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
                                 .orElseGet(this::getFieldNameSplitter)
@@ -235,7 +235,7 @@ public class Unit4jProperties {
                         Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueType)
                                 .orElseGet(() -> (Class) getValueType()),
                         Optional.ofNullable(quantitySerialize)
-                                .map(a -> new MathContext(a.precision(), a.roundingMode()))
+                                .map(a -> new MathContext(a.valuePrecision(), a.valueRoundingMode()))
                                 .orElseGet(this::getMathContext)))
             .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
                     getUnitAliasUndefinedStrategy())).build();
@@ -248,7 +248,7 @@ public class Unit4jProperties {
         QuantityDeserialize quantityDeserialize = amountWritableProperty.annotation(QuantityDeserialize.class).orElse(null);
         Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
                 .apply(valueFieldNameWords,
-                        Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::caseFormat)
+                        Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::nameCaseFormat)
                                 .map(
                                         caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
                                 .orElseGet(this::getFieldNameSplitter)
@@ -274,7 +274,7 @@ public class Unit4jProperties {
                         Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueType)
                                 .orElseGet(() -> (Class) getValueType()),
                         Optional.ofNullable(quantityDeserialize)
-                                .map(a -> new MathContext(a.precision(), a.roundingMode()))
+                                .map(a -> new MathContext(a.valuePrecision(), a.valueRoundingMode()))
                                 .orElseGet(this::getMathContext)))
                 .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
                         getUnitAliasUndefinedStrategy())).build();

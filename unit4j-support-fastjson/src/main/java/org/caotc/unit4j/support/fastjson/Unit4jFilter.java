@@ -26,8 +26,6 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
-import org.caotc.unit4j.api.annotation.SerializeCommand;
-import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.QuantityCodecConfig;
@@ -61,7 +59,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
               .readableProperty(object.getClass(), name)
               .map(unit4jProperties::createPropertyAmountCodecConfig)
               .orElseGet(unit4jProperties::createAmountCodecConfig);
-      return quantityCodecConfig.serializeCommandsFromAmount((Quantity) value);
+      return null;//todo
   }
 
   @Override
@@ -70,8 +68,7 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
               .readableProperty(object.getClass(), name)
               .map(unit4jProperties::createPropertyAmountCodecConfig)
               .orElseGet(unit4jProperties::createAmountCodecConfig);
-      return quantityCodecConfig.serializeCommandsFromAmount((Quantity) value).commands().stream()
-              .noneMatch(SerializeCommand.REMOVE_ORIGINAL_FIELD::equals);
+      return true;//todo
   }
 
   @SuppressWarnings("unchecked")
@@ -87,16 +84,6 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
                         .map(amountSerialize -> unit4jProperties
                                 .createPropertyAmountCodecConfig(fieldWrapper))
                         .orElseGet(unit4jProperties::createAmountCodecConfig);
-                SerializeCommands serializeCommands = quantityCodecConfig
-                        .serializeCommandsFromAmount(amount);
-                if (serializeCommands.commands().stream()
-                        .anyMatch(SerializeCommand.REMOVE_ORIGINAL_FIELD::equals)) {
-                    serializeCommands.commands().forEach(command -> {
-                        if (command.type() == SerializeCommand.Type.WRITE_FIELD) {
-                            writeKeyValue(command.fieldName(), command.fieldValue());
-                }
-              });
-            }
           });
         });
   }

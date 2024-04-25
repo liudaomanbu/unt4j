@@ -18,11 +18,7 @@ package org.caotc.unit4j.support;
 
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.api.annotation.SerializeCommand;
-import org.caotc.unit4j.api.annotation.SerializeCommand.Type;
-import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.Number;
 
 import java.math.MathContext;
 
@@ -47,20 +43,4 @@ public class NumberCodecConfig {
     @NonNull
   MathContext mathContext;
 
-  /**
-   * 获取数值的序列化指令
-   *
-   * @param number 数值
-   * @return 序列化指令
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  @NonNull
-  public SerializeCommands createSerializeCommands(@NonNull Number number) {
-    return SerializeCommands.builder()
-        .command(SerializeCommand
-            .create(Type.WRITE_VALUE, null, number.value(valueType(), mathContext())))
-        .build();
-  }
 }

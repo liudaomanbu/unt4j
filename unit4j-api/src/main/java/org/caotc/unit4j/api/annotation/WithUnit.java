@@ -21,7 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 
@@ -34,7 +33,7 @@ import static java.lang.annotation.ElementType.METHOD;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {METHOD, FIELD, ANNOTATION_TYPE})
+@Target(value = {METHOD, FIELD})
 public @interface WithUnit {
 
     /**

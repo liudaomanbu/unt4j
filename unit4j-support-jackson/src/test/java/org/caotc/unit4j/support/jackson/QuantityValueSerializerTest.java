@@ -42,8 +42,7 @@ class QuantityValueSerializerTest {
     QuantityValueSerializer quantityValueSerializer = new QuantityValueSerializer(
             new NumberCodecConfig(
                     BigDecimal.class, MathContext.UNLIMITED));
-    SimpleModule module = new SimpleModule("myModule").addSerializer(quantityValueSerializer)
-            .addSerializer(new SerializeCommandsSerializer());
+    SimpleModule module = new SimpleModule("myModule").addSerializer(quantityValueSerializer);
     ObjectMapper mapper = new ObjectMapper().registerModule(module);
 
     @Test

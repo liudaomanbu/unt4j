@@ -21,7 +21,6 @@ import com.alibaba.fastjson.serializer.ObjectSerializer;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 
@@ -29,7 +28,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
- * 单独{@link Quantity}对象在fastjson中的序列化器 //TODO 考虑Spring环境时配置刷新问题
+ * 单独{@link Quantity}对象在fastjson中的序列化器
+ * //TODO 考虑Spring环境时配置刷新问题
  *
  * @author caotc
  * @date 2019-04-24
@@ -64,11 +64,7 @@ public class QuantitySerializer implements ObjectSerializer {
     @Override
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
                       int features) throws IOException {
-        Quantity quantity = (Quantity) object;
-        SerializeCommands serializeCommands = quantityCodecConfig
-                .serializeCommandsFromAmount(quantity);
-        ObjectSerializer objectWriter = serializer.getObjectWriter(SerializeCommands.class);
-        objectWriter.write(serializer, serializeCommands, fieldName, fieldType, features);
+        //todo
     }
 
 }

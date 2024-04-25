@@ -19,7 +19,6 @@ package org.caotc.unit4j.support.fastjson;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.api.annotation.SerializeCommands;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.BigFractionAdapter;
 import org.caotc.unit4j.core.unit.Units;
@@ -45,7 +44,6 @@ class NumberSerializerTest {
     @BeforeEach
     void init() {
         globalInstance.put(BigFractionAdapter.class, numberSerializer);
-        globalInstance.put(SerializeCommands.class, new SerializeCommandsSerializer());
     }
 
     @Test
