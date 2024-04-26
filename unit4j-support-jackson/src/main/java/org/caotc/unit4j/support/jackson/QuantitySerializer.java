@@ -52,7 +52,6 @@ public class QuantitySerializer extends StdSerializer<Quantity> {
         log.debug("value:{}", value);
         log.debug("gen:{}", gen);
         log.debug("provider:{}", provider);
-        gen.writeObject(quantityCodecConfig.serializeCommandsFromAmount(value));
     }
 
 }

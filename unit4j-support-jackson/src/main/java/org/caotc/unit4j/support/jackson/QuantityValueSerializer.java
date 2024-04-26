@@ -51,7 +51,6 @@ public class QuantityValueSerializer extends StdSerializer<Number> {
   @Override
   public void serialize(Number value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
-      gen.writeObject(numberCodecConfig.createSerializeCommands(value));
   }
 
 }

@@ -15,174 +15,162 @@ class QuantityDeserializeTest {
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantityFields")
-    void isAnnotationPresent(Field dataTypeField) {
-        boolean exist = dataTypeField.isAnnotationPresent(DataType.class);
+    void isAnnotationPresent(Field quantityDeserializeField) {
+        boolean exist = quantityDeserializeField.isAnnotationPresent(QuantityDeserialize.class);
         log.info("exist:{}", exist);
         Assertions.assertTrue(exist);
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantitySetMethods")
-    void isAnnotationPresent(Method dataTypeGetMethod) {
-        boolean exist = dataTypeGetMethod.isAnnotationPresent(DataType.class);
+    void isAnnotationPresent(Method quantityDeserializeSetMethod) {
+        boolean exist = quantityDeserializeSetMethod.isAnnotationPresent(QuantityDeserialize.class);
         log.info("exist:{}", exist);
         Assertions.assertTrue(exist);
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantityFields")
-    void getAnnotation(Field dataTypeField, String dataTypeValue) {
-        DataType dataTypeAnnotation = dataTypeField.getAnnotation(DataType.class);
-        log.info("dataTypeAnnotation:{}", dataTypeAnnotation);
-        Assertions.assertNotNull(dataTypeAnnotation);
-        Assertions.assertEquals(dataTypeValue, dataTypeAnnotation.value());
+    void getAnnotation(Field quantityDeserializeField) {
+        QuantityDeserialize quantityDeserializeAnnotation = quantityDeserializeField.getAnnotation(QuantityDeserialize.class);
+        log.info("quantityDeserializeAnnotation:{}", quantityDeserializeAnnotation);
+        Assertions.assertNotNull(quantityDeserializeAnnotation);
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantitySetMethods")
-    void getAnnotation(Method dataTypeGetMethod, String dataTypeValue) {
-        DataType dataTypeAnnotation = dataTypeGetMethod.getAnnotation(DataType.class);
-        log.info("dataTypeAnnotation:{}", dataTypeAnnotation);
-        Assertions.assertNotNull(dataTypeAnnotation);
-        Assertions.assertEquals(dataTypeValue, dataTypeAnnotation.value());
+    void getAnnotation(Method quantityDeserializeSetMethod) {
+        QuantityDeserialize quantityDeserializeAnnotation = quantityDeserializeSetMethod.getAnnotation(QuantityDeserialize.class);
+        log.info("quantityDeserializeAnnotation:{}", quantityDeserializeAnnotation);
+        Assertions.assertNotNull(quantityDeserializeAnnotation);
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantityFields")
-    void getDeclaredAnnotation(Field dataTypeField, String dataTypeValue) {
-        DataType dataTypeAnnotation = dataTypeField.getDeclaredAnnotation(DataType.class);
-        log.info("dataTypeAnnotation:{}", dataTypeAnnotation);
-        Assertions.assertNotNull(dataTypeAnnotation);
-        Assertions.assertEquals(dataTypeValue, dataTypeAnnotation.value());
+    void getDeclaredAnnotation(Field quantityDeserializeField) {
+        QuantityDeserialize quantityDeserializeAnnotation = quantityDeserializeField.getDeclaredAnnotation(QuantityDeserialize.class);
+        log.info("quantityDeserializeAnnotation:{}", quantityDeserializeAnnotation);
+        Assertions.assertNotNull(quantityDeserializeAnnotation);
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantitySetMethods")
-    void getDeclaredAnnotation(Method dataTypeGetMethod, String dataTypeValue) {
-        DataType dataTypeAnnotation = dataTypeGetMethod.getDeclaredAnnotation(DataType.class);
-        log.info("dataTypeAnnotation:{}", dataTypeAnnotation);
-        Assertions.assertNotNull(dataTypeAnnotation);
-        Assertions.assertEquals(dataTypeValue, dataTypeAnnotation.value());
+    void getDeclaredAnnotation(Method quantityDeserializeSetMethod) {
+        QuantityDeserialize quantityDeserializeAnnotation = quantityDeserializeSetMethod.getDeclaredAnnotation(QuantityDeserialize.class);
+        log.info("quantityDeserializeAnnotation:{}", quantityDeserializeAnnotation);
+        Assertions.assertNotNull(quantityDeserializeAnnotation);
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantityFields")
-    void getAnnotations(Field dataTypeField, String dataTypeValue) {
-        Annotation[] annotations = dataTypeField.getAnnotations();
+    void getAnnotations(Field quantityDeserializeField) {
+        Annotation[] annotations = quantityDeserializeField.getAnnotations();
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantitySetMethods")
-    void getAnnotations(Method dataTypeGetMethod, String dataTypeValue) {
-        Annotation[] annotations = dataTypeGetMethod.getAnnotations();
+    void getAnnotations(Method quantityDeserializeSetMethod) {
+        Annotation[] annotations = quantityDeserializeSetMethod.getAnnotations();
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantityFields")
-    void getDeclaredAnnotations(Field dataTypeField, String dataTypeValue) {
-        Annotation[] annotations = dataTypeField.getDeclaredAnnotations();
+    void getDeclaredAnnotations(Field quantityDeserializeField) {
+        Annotation[] annotations = quantityDeserializeField.getDeclaredAnnotations();
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantitySetMethods")
-    void getDeclaredAnnotations(Method dataTypeGetMethod, String dataTypeValue) {
-        Annotation[] annotations = dataTypeGetMethod.getDeclaredAnnotations();
+    void getDeclaredAnnotations(Method quantityDeserializeSetMethod) {
+        Annotation[] annotations = quantityDeserializeSetMethod.getDeclaredAnnotations();
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantityFields")
-    void getAnnotationsByType(Field dataTypeField, String dataTypeValue) {
-        Annotation[] annotations = dataTypeField.getAnnotationsByType(DataType.class);
+    void getAnnotationsByType(Field quantityDeserializeField) {
+        Annotation[] annotations = quantityDeserializeField.getAnnotationsByType(QuantityDeserialize.class);
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantitySetMethods")
-    void getAnnotationsByType(Method dataTypeGetMethod, String dataTypeValue) {
-        Annotation[] annotations = dataTypeGetMethod.getAnnotationsByType(DataType.class);
+    void getAnnotationsByType(Method quantityDeserializeSetMethod) {
+        Annotation[] annotations = quantityDeserializeSetMethod.getAnnotationsByType(QuantityDeserialize.class);
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantityFields")
-    void getDeclaredAnnotationsByType(Field dataTypeField, String dataTypeValue) {
-        Annotation[] annotations = dataTypeField.getDeclaredAnnotationsByType(DataType.class);
+    void getDeclaredAnnotationsByType(Field quantityDeserializeField) {
+        Annotation[] annotations = quantityDeserializeField.getDeclaredAnnotationsByType(QuantityDeserialize.class);
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.api.annotation.provider.QuantityDeserializeProvider#quantitySetMethods")
-    void getDeclaredAnnotationsByType(Method dataTypeGetMethod, String dataTypeValue) {
-        Annotation[] annotations = dataTypeGetMethod.getDeclaredAnnotationsByType(DataType.class);
+    void getDeclaredAnnotationsByType(Method quantityDeserializeSetMethod) {
+        Annotation[] annotations = quantityDeserializeSetMethod.getDeclaredAnnotationsByType(QuantityDeserialize.class);
         log.info("annotations:{}", Arrays.toString(annotations));
         Assertions.assertNotNull(annotations);
         Assertions.assertEquals(1, annotations.length);
         Annotation annotation = annotations[0];
         log.info("annotation:{}", annotation);
         Assertions.assertNotNull(annotation);
-        Assertions.assertInstanceOf(DataType.class, annotation);
-        DataType dataType = (DataType) annotation;
-        Assertions.assertEquals(dataTypeValue, dataType.value());
+        Assertions.assertInstanceOf(QuantityDeserialize.class, annotation);
+        QuantityDeserialize dataType = (QuantityDeserialize) annotation;
     }
 }
 

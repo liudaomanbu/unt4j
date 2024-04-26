@@ -21,7 +21,6 @@ import com.alibaba.fastjson.serializer.ObjectSerializer;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.support.NumberCodecConfig;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class NumberSerializer implements ObjectSerializer {
     @Override
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
                       int features) throws IOException {
-    Number value = (Number) object;
-        serializer.write(numberCodecConfig.createSerializeCommands(value));
-  }
+//    Number value = (Number) object;
+//        serializer.write(numberCodecConfig.createSerializeCommands(value));
+    }
 }

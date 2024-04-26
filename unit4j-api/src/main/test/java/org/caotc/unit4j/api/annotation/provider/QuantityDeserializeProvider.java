@@ -19,21 +19,21 @@ import java.util.stream.Stream;
 public class QuantityDeserializeProvider {
 
     static Stream<Arguments> quantityFields() throws NoSuchFieldException {
-        return Stream.of(Arguments.of(QuantityFieldObject.class.getDeclaredField(QuantityFieldObject.Fields.QUANTITY_FIELD)));
+        return Stream.of(Arguments.of(QuantityDeserializeFieldObject.class.getDeclaredField(QuantityDeserializeFieldObject.Fields.QUANTITY_FIELD)));
     }
 
     static Stream<Arguments> quantitySetMethods() throws NoSuchMethodException {
-        return Stream.of(Arguments.of(QuantitySetMethodObject.class.getDeclaredMethod("setQuantityField", Quantity.class)));
+        return Stream.of(Arguments.of(QuantityDeserializeSetMethodObject.class.getDeclaredMethod("setQuantityField", Quantity.class)));
     }
 }
 
 @FieldNameConstants
-class QuantityFieldObject {
+class QuantityDeserializeFieldObject {
     @QuantityDeserialize
     Quantity quantityField;
 }
 
-class QuantitySetMethodObject {
+class QuantityDeserializeSetMethodObject {
     @QuantityDeserialize
     public void setQuantityField(Quantity quantity) {
 
