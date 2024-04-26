@@ -34,6 +34,7 @@ import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
+import org.caotc.unit4j.core.convert.UnitFinder;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 
 import java.math.BigDecimal;
@@ -60,118 +61,112 @@ import java.util.stream.Stream;
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 @Accessors(fluent = false, chain = true)
 public class Unit4jProperties {
-  private static final String AMOUNT_VALUE_FIELD_NAME = "value";
-  private static final String AMOUNT_UNIT_FIELD_NAME = "unit";
+    /**
+     * 默认的编码解码策略
+     */
+    private static final CodecStrategy DEFAULT_STRATEGY = CodecStrategy.VALUE;
+    /**
+     * 作为其他类属性的{@link Quantity}对象的默认的编码解码策略
+     */
+    private static final CodecStrategy DEFAULT_PROPERTY_STRATEGY = CodecStrategy.VALUE;
+    /**
+     * 默认的单位转换配置
+     */
+    private static final Configuration DEFAULT_CONFIGURATION = Configuration.defaultInstance();
+    /**
+     * 默认的名称拆分器
+     */
+    private static final Function<@NonNull String, @NonNull List<String>> DEFAULT_NAME_SPLITTER = CaseFormat.LOWER_CAMEL::split;
+    /**
+     * 默认的名称拼接器
+     */
+    private static final Function<@NonNull List<String>, @NonNull String> DEFAULT_NAME_JOINER = CaseFormat.LOWER_CAMEL::join;
+    /**
+     * 默认的名称转换器
+     */
+    private static final Function<@NonNull String, @NonNull String> DEFAULT_NAME_CONVERTER = DEFAULT_NAME_SPLITTER
+            .andThen(DEFAULT_NAME_JOINER);
+    /**
+     * 默认的属性名称拼接器
+     */
+    private static final BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> DEFAULT_FIELD_NAME_JOINER = (objectFieldNameWords, valueFieldNameWords) -> CaseFormat.LOWER_CAMEL
+            .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList()));
+    private static final String DEFAULT_QUANTITY_UNIT_FIELD_NAME = "unit";
+    private static final UnitFinder DEFAULT_TARGET_UNIT_FINDER = DEFAULT_CONFIGURATION.targetUnitFinder();
+    private static final String DEFAULT_QUANTITY_VALUE_FIELD_NAME = "value";
+    /**
+     * 默认的值序列化时的类型
+     */
+    private static final Class<BigDecimal> DEFAULT_VALUE_TYPE = BigDecimal.class;
+    /**
+     * 默认的数学运算配置
+     */
+    private static final MathContext DEFAULT_VALUE_MATH_CONTEXT = MathContext.UNLIMITED;
 
-  /**
-   * 默认的数学运算配置
-   */
-  public static final MathContext DEFAULT_MATH_CONTEXT = MathContext.UNLIMITED;
-  /**
-   * 默认的值序列化时的类型
-   */
-  public static final Class<BigDecimal> DEFAULT_VALUE_TYPE = BigDecimal.class;
-  /**
-   * 默认的单位转换配置
-   */
-  public static final Configuration DEFAULT_CONFIGURATION = Configuration.defaultInstance();
-  /**
-   * 默认的编码解码策略
-   */
-  public static final CodecStrategy DEFAULT_STRATEGY = CodecStrategy.VALUE;
-  /**
-   * 默认的名称拆分器
-   */
-  public static final Function<@NonNull String, @NonNull List<String>> DEFAULT_NAME_SPLITTER = CaseFormat.LOWER_CAMEL::split;
-  /**
-   * 默认的名称拼接器
-   */
-  public static final Function<@NonNull List<String>, @NonNull String> DEFAULT_NAME_JOINER = CaseFormat.LOWER_CAMEL::join;
-  /**
-   * 默认的名称转换器
-   */
-  public static final Function<@NonNull String, @NonNull String> DEFAULT_NAME_CONVERTER = DEFAULT_NAME_SPLITTER
-          .andThen(DEFAULT_NAME_JOINER);
-  /**
-   * 默认的属性名称拼接器
-   */
-  public static final BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> DEFAULT_FIELD_NAME_JOINER = (valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_CAMEL
-          .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList()));
 
-  /**
-   * 默认单位的输出别名类型
-   */
-  public static final Type DEFAULT_UNIT_ALIAS_TYPE = Aliases.Types.ENGLISH_NAME;
-  /**
-   * 默认单位别名未定义策略
-   */
-  public static final AliasUndefinedStrategy DEFAULT_UNIT_UNDEFINED_STRATEGY = AliasUndefinedStrategy.THROW_EXCEPTION;
+    /**
+     * 默认单位的输出别名类型
+     */
+    private static final Type DEFAULT_UNIT_ALIAS_TYPE = Aliases.Types.ENGLISH_NAME;
+    /**
+     * 默认单位别名未定义策略
+     */
+    private static final AliasUndefinedStrategy DEFAULT_UNIT_UNDEFINED_STRATEGY = AliasUndefinedStrategy.THROW_EXCEPTION;
 
-  /**
-   * 数学运算的舍入模式
-   */
-  @NonNull
-  RoundingMode roundingMode = DEFAULT_MATH_CONTEXT.getRoundingMode();
-  /**
-   * 数学运算的精度
-   */
-  int precision = DEFAULT_MATH_CONTEXT.getPrecision();
-  /**
-   * 数值转换类
-   */
-  @NonNull
-  Class<?> valueType = DEFAULT_VALUE_TYPE;
-  /**
-   * 配置
-   */
-  //TODO
-  //  TargetUnitChooser targetUnitChooser;
-  @NonNull
-  Configuration configuration = DEFAULT_CONFIGURATION;
-  /**
-   * 数学运算的上下文
-   */
-  @NonNull
-  MathContext mathContext = DEFAULT_MATH_CONTEXT;
     /**
      * 单独的{@link Quantity}对象的序列化反序列化策略
      */
-  @NonNull
-  CodecStrategy strategy = DEFAULT_STRATEGY;
+    @NonNull
+    CodecStrategy defaultStrategy = DEFAULT_STRATEGY;
     /**
      * 作为其他类属性的{@link Quantity}对象的序列化反序列化策略
      */
-  @NonNull
-  CodecStrategy propertyStrategy = DEFAULT_STRATEGY;
+    @NonNull
+    CodecStrategy defaultPropertyStrategy = DEFAULT_STRATEGY;
     /**
-     * 单独的{@link Quantity}对象的名称拼接器
+     * 配置
      */
-  Function<@NonNull List<String>, @NonNull String> nameJoiner = DEFAULT_NAME_JOINER;
+    @NonNull
+    Configuration defaultConfiguration = DEFAULT_CONFIGURATION;
     /**
-     * 作为其他类属性的{@link Quantity}对象的属性名称拆分器
+     * 名称转换器
+     * todo 确认序列化和反序列化时是否使用同一个,使用接口应该定义为NameConverter还是CaseFormat或其他
      */
-  Function<@NonNull String, @NonNull List<String>> fieldNameSplitter = DEFAULT_NAME_SPLITTER;
+    Function<@NonNull String, @NonNull String> defaultNameConverter = DEFAULT_NAME_CONVERTER;
     /**
-     * 作为其他类属性的{@link Quantity}对象的属性名称拼接器
+     * 属性名称拼接器,{@link CodecStrategy#FLAT}时拼接使用
      */
-  BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> fieldNameJoiner = DEFAULT_FIELD_NAME_JOINER;
+    BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> defaultFieldNameJoiner = DEFAULT_FIELD_NAME_JOINER;
 
-  /**
-   * 单位的别名类型
-   */
-  @NonNull
-  Alias.Type unitAliasType = DEFAULT_UNIT_ALIAS_TYPE;
-  /**
-   * 别名未定义策略
-   */
-  @NonNull
-  AliasUndefinedStrategy unitAliasUndefinedStrategy = DEFAULT_UNIT_UNDEFINED_STRATEGY;
+    String defaultQuantityUnitFieldName = DEFAULT_QUANTITY_UNIT_FIELD_NAME;
+    UnitFinder targetUnitFinder = DEFAULT_TARGET_UNIT_FINDER;
+    String defaultQuantityValueFieldName = DEFAULT_QUANTITY_VALUE_FIELD_NAME;
+    /**
+     * 数值转换类
+     */
+    @NonNull
+    Class<?> defaultValueType = DEFAULT_VALUE_TYPE;
+    /**
+     * 数学运算的上下文
+     */
+    @NonNull
+    MathContext defaultValueMathContext = DEFAULT_VALUE_MATH_CONTEXT;
+    /**
+     * 单位的别名类型
+     */
+    @NonNull
+    Alias.Type unitAliasType = DEFAULT_UNIT_ALIAS_TYPE;
+    /**
+     * 别名未定义策略
+     */
+    @NonNull
+    AliasUndefinedStrategy unitAliasUndefinedStrategy = DEFAULT_UNIT_UNDEFINED_STRATEGY;
 
-  /**
-   * 单位转换关系额外注入//TODO
-   */
-  @NonNull
-  Map<String, Map<String, String>> unitConvertConfigs = Maps.newHashMap();
+    /**
+     * 单位转换关系额外注入//TODO
+     */
+    @NonNull
+    Map<String, Map<String, String>> unitConvertConfigs = Maps.newHashMap();
 
     /**
      * 获取单独的{@link Quantity}对象的序列化反序列化配置
@@ -182,21 +177,20 @@ public class Unit4jProperties {
      * @since 1.0.0
      */
     @NonNull
-    public QuantityCodecConfig createAmountCodecConfig() {
-        return QuantityCodecConfig.builder().configuration(getConfiguration()).strategy(getStrategy())
-//        .nameTransformer()
-                .outputName(getNameJoiner().apply(ImmutableList.of()))
-                .outputValueName(getNameJoiner().apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME)))
-                .outputUnitName(getNameJoiner().apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME)))
-                .valueCodecConfig(new NumberCodecConfig(getValueType(), getMathContext()))
-                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
+    public QuantityCodecConfig createQuantityCodecConfig() {
+        return QuantityCodecConfig.builder().configuration(getDefaultConfiguration()).strategy(getDefaultStrategy())
+                .outputName("")
+                .outputValueName(defaultNameConverter.apply(ImmutableList.of(defaultQuantityValueFieldName)))
+                .outputUnitName(defaultNameConverter.apply(ImmutableList.of(defaultQuantityUnitFieldName)))
+                .valueCodecConfig(new NumberCodecConfig(getDefaultValueType(), getDefaultValueMathContext()))
+                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getDefaultConfiguration(),
                         getUnitAliasUndefinedStrategy())).build();
     }
 
     /**
      * 获取作为其他类属性的{@link Quantity}对象的序列化反序列化配置
      *
-     * @param amountReadableProperty 属性名称
+     * @param quantityReadableProperty 属性名称
      * @return 序列化反序列化配置
      * @author caotc
      * @date 2019-11-06
@@ -204,21 +198,21 @@ public class Unit4jProperties {
      */
     @NonNull
     @SuppressWarnings("unchecked")
-    public QuantityCodecConfig createPropertyAmountCodecConfig(
-            @NonNull Property<?, ?> amountReadableProperty) {
-        QuantitySerialize quantitySerialize = amountReadableProperty.annotation(QuantitySerialize.class).orElse(null);
-        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
+    public QuantityCodecConfig createPropertyQuantityCodecConfig(
+            @NonNull Property<?, ?> quantityReadableProperty) {
+        QuantitySerialize quantitySerialize = quantityReadableProperty.annotation(QuantitySerialize.class).orElse(null);
+        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getDefaultFieldNameJoiner()
                 .apply(valueFieldNameWords,
                         Optional.ofNullable(quantitySerialize).map(QuantitySerialize::nameCaseFormat)
                                 .map(
                                         caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
-                                .orElseGet(this::getFieldNameSplitter)
-                                .apply(amountReadableProperty.name()));
+                                .orElseGet(this::getDefaultNameSplitter)
+                                .apply(quantityReadableProperty.name()));
         return QuantityCodecConfig.builder()
                 .configuration(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::configId)
-                        .map(Configuration::findExact).orElseGet(this::getConfiguration))
+                        .map(Configuration::findExact).orElseGet(this::getDefaultConfiguration))
                 .strategy(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::strategy)
-                        .orElseGet(this::getPropertyStrategy))
+                        .orElseGet(this::getDefaultPropertyStrategy))
                 .targetUnit(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::targetUnitId)
                         .filter(targetUnitId -> !targetUnitId.isEmpty())
                         .map(Configuration::findUnitExact).orElse(null))
@@ -227,37 +221,37 @@ public class Unit4jProperties {
                         .orElse(fieldNameConverter.apply(ImmutableList.of())))
                 .outputValueName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueName)
                         .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME))))
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_VALUE_FIELD_NAME))))
                 .outputUnitName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::unitName)
                         .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_UNIT_FIELD_NAME))))
                 .valueCodecConfig(new NumberCodecConfig(
                         Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueType)
-                                .orElseGet(() -> (Class) getValueType()),
+                                .orElseGet(() -> (Class) getDefaultValueType()),
                         Optional.ofNullable(quantitySerialize)
                                 .map(a -> new MathContext(a.valuePrecision(), a.valueRoundingMode()))
-                                .orElseGet(this::getMathContext)))
-            .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
-                    getUnitAliasUndefinedStrategy())).build();
+                                .orElseGet(this::getDefaultValueMathContext)))
+                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getDefaultConfiguration(),
+                        getUnitAliasUndefinedStrategy())).build();
     }
 
     @NonNull
     @SuppressWarnings("unchecked")
-    public QuantityCodecConfig createPropertyAmountCodecConfig(
+    public QuantityCodecConfig createPropertyQuantityCodecConfig(
             @NonNull WritableProperty<?, ?> amountWritableProperty) {
         QuantityDeserialize quantityDeserialize = amountWritableProperty.annotation(QuantityDeserialize.class).orElse(null);
-        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getFieldNameJoiner()
+        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getDefaultFieldNameJoiner()
                 .apply(valueFieldNameWords,
                         Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::nameCaseFormat)
                                 .map(
                                         caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
-                                .orElseGet(this::getFieldNameSplitter)
+                                .orElseGet(this::getDefaultNameSplitter)
                                 .apply(amountWritableProperty.name()));
         return QuantityCodecConfig.builder()
                 .configuration(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::configId)
-                        .map(Configuration::findExact).orElseGet(this::getConfiguration))
+                        .map(Configuration::findExact).orElseGet(this::getDefaultConfiguration))
                 .strategy(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::strategy)
-                        .orElseGet(this::getPropertyStrategy))
+                        .orElseGet(this::getDefaultPropertyStrategy))
 //            .targetUnit(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::targetUnitId)
 //                    .filter(targetUnitId->!targetUnitId.isEmpty())
 //                    .map(Configuration::getUnitByIdExact).orElse(null))
@@ -266,63 +260,59 @@ public class Unit4jProperties {
                         .orElse(fieldNameConverter.apply(ImmutableList.of())))
                 .outputValueName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueName)
                         .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME))))
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_VALUE_FIELD_NAME))))
                 .outputUnitName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::unitName)
                         .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME))))
+                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_UNIT_FIELD_NAME))))
                 .valueCodecConfig(new NumberCodecConfig(
                         Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueType)
-                                .orElseGet(() -> (Class) getValueType()),
+                                .orElseGet(() -> (Class) getDefaultValueType()),
                         Optional.ofNullable(quantityDeserialize)
                                 .map(a -> new MathContext(a.valuePrecision(), a.valueRoundingMode()))
-                                .orElseGet(this::getMathContext)))
-                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getConfiguration(),
+                                .orElseGet(this::getDefaultValueMathContext)))
+                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getDefaultConfiguration(),
                         getUnitAliasUndefinedStrategy())).build();
     }
 
     /**
      * 舍入模式set方法
      *
-     * @param roundingMode 舍入模式
+     * @param valueRoundingMode 舍入模式
      * @return {@code this}
      * @author caotc
      * @date 2019-05-29
      * @since 1.0.0
      */
-  public Unit4jProperties setRoundingMode(@NonNull RoundingMode roundingMode) {
-    this.roundingMode = roundingMode;
-    mathContext = new MathContext(precision, roundingMode);
-    return this;
-  }
+    public Unit4jProperties setValueRoundingMode(@NonNull RoundingMode valueRoundingMode) {
+        setDefaultValueMathContext(new MathContext(getDefaultValueMathContext().getPrecision(), valueRoundingMode));
+        return this;
+    }
 
-  /**
-   * 精度set方法
-   *
-   * @param precision 精度
-   * @return {@code this}
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  public Unit4jProperties setPrecision(int precision) {
-    this.precision = precision;
-    mathContext = new MathContext(precision, roundingMode);
-    return this;
-  }
+    /**
+     * 精度set方法
+     *
+     * @param valuePrecision 精度
+     * @return {@code this}
+     * @author caotc
+     * @date 2019-05-29
+     * @since 1.0.0
+     */
+    public Unit4jProperties setValuePrecision(int valuePrecision) {
+        setDefaultValueMathContext(new MathContext(valuePrecision, getDefaultValueMathContext().getRoundingMode()));
+        return this;
+    }
 
-  /**
-   * 数学上下文set方法
-   *
-   * @param mathContext 数学上下文
-   * @return {@code this}
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  public Unit4jProperties setMathContext(@NonNull MathContext mathContext) {
-    this.mathContext = mathContext;
-    this.roundingMode = mathContext.getRoundingMode();
-    this.precision = mathContext.getPrecision();
-    return this;
-  }
+    /**
+     * 数学上下文set方法
+     *
+     * @param defaultValueMathContext 数学上下文
+     * @return {@code this}
+     * @author caotc
+     * @date 2019-05-29
+     * @since 1.0.0
+     */
+    public Unit4jProperties setDefaultValueMathContext(@NonNull MathContext defaultValueMathContext) {
+        this.defaultValueMathContext = defaultValueMathContext;
+        return this;
+    }
 }

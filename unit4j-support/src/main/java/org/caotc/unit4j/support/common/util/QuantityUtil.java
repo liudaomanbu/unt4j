@@ -50,10 +50,10 @@ import java.util.stream.Stream;
 @UtilityClass
 public class QuantityUtil {
 
-    private static final TypeToken<Quantity> AMOUNT_TYPE_TOKEN = TypeToken.of(Quantity.class);
+    private static final TypeToken<Quantity> QUANTITY_TYPE_TOKEN = TypeToken.of(Quantity.class);
 
-    public static void checkAmountProperty(@NonNull Property<?, ?> amountProperty) {
-        Preconditions.checkArgument(isAmountProperty(amountProperty), "%s is not a AmountProperty",
+    public static void checkQuantityProperty(@NonNull Property<?, ?> amountProperty) {
+        Preconditions.checkArgument(isQuantityProperty(amountProperty), "%s is not a QuantityProperty",
                 amountProperty);
     }
 
@@ -61,23 +61,23 @@ public class QuantityUtil {
      * 从传入的类中获取包括所有超类和接口的可写{@link Quantity}属性{@link WritableProperty}集合
      *
      * @param clazz 需要获取可写{@link Quantity}属性的类
-     * @return 可写{@link org.caotc.unit4j.core.Amount}属性{@link WritableProperty}集合
+     * @return 可写{@link org.caotc.unit4j.core.Quantity}属性{@link WritableProperty}集合
      * @author caotc
      * @date 2019-10-26
      * @since 1.0.0
      */
     @NonNull
-    public static <T> ImmutableSet<WritableProperty<T, Quantity>> writableAmountPropertiesFromClass(
+    public static <T> ImmutableSet<WritableProperty<T, Quantity>> writableQuantityPropertiesFromClass(
             @NonNull Class<T> clazz) {
-        return writableAmountPropertyStreamFromClass(clazz).collect(ImmutableSet.toImmutableSet());
+        return writableQuantityPropertyStream(clazz).collect(ImmutableSet.toImmutableSet());
     }
 
     @NonNull
-    public static <T> ReadableProperty<T, Quantity> readableAmountPropertyFromClassExact(
+    public static <T> ReadableProperty<T, Quantity> readableQuantityPropertyExact(
             @NonNull Class<T> type, @NonNull String fieldName) {
         ReadableProperty<T, ?> readableProperty = ReflectionUtil
                 .readablePropertyExact(type, fieldName);
-        if (!isAmountProperty(readableProperty)) {
+        if (!isQuantityProperty(readableProperty)) {
             throw ReadablePropertyNotFoundException
                     .create(TypeToken.of(type), fieldName);
         }
@@ -85,54 +85,54 @@ public class QuantityUtil {
     }
 
     @NonNull
-    public static <T> Optional<ReadableProperty<T, Quantity>> readableAmountPropertyFromClass(
+    public static <T> Optional<ReadableProperty<T, Quantity>> readableQuantityProperty(
             @NonNull Class<T> type, @NonNull String fieldName) {
         return ReflectionUtil.readableProperty(type, fieldName)
-                .filter(QuantityUtil::isAmountProperty)
+                .filter(QuantityUtil::isQuantityProperty)
                 .map(QuantityUtil::warp);
     }
 
     @NonNull
-    public static <T> Stream<ReadableProperty<T, Quantity>> readableAmountPropertyStreamFromClass(
+    public static <T> Stream<ReadableProperty<T, Quantity>> readableQuantityPropertyStream(
             @NonNull Class<T> type) {
         return ReflectionUtil.readablePropertyStream(type)
-                .filter(QuantityUtil::isAmountProperty)
+                .filter(QuantityUtil::isQuantityProperty)
                 .map(QuantityUtil::warp);
     }
 
     @NonNull
-    public static <T> Stream<WritableProperty<T, Quantity>> writableAmountPropertyStreamFromClass(
+    public static <T> Stream<WritableProperty<T, Quantity>> writableQuantityPropertyStream(
             @NonNull Class<T> type) {
         return ReflectionUtil.writablePropertyStream(type)
-                .filter(QuantityUtil::isAmountProperty)
+                .filter(QuantityUtil::isQuantityProperty)
                 .map(QuantityUtil::warp);
     }
 
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, Quantity>> accessibleAmountPropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, Quantity>> accessibleQuantityPropertyStream(
             @NonNull Class<T> type) {
         return ReflectionUtil.accessiblePropertyStream(type)
-                .filter(QuantityUtil::isAmountProperty)
+                .filter(QuantityUtil::isQuantityProperty)
                 .map(QuantityUtil::warp);
     }
 
     @NonNull
-    public static <T> Stream<AccessibleProperty<T, Quantity>> accessibleAmountPropertyStreamFromClass(
+    public static <T> Stream<AccessibleProperty<T, Quantity>> accessibleQuantityPropertyStream(
             @NonNull T object) {
         return ReflectionUtil.accessiblePropertyStream(object)
-                .filter(QuantityUtil::isAmountProperty)
+                .filter(QuantityUtil::isQuantityProperty)
                 .map(QuantityUtil::warp);
     }
 
-    public static boolean isAmountProperty(@NonNull Property<?, ?> property) {
-        return property.type().equals(AMOUNT_TYPE_TOKEN)
+    public static boolean isQuantityProperty(@NonNull Property<?, ?> property) {
+        return property.type().equals(QUANTITY_TYPE_TOKEN)
                 || property.annotation(WithUnit.class).isPresent();
     }
 
     @SuppressWarnings("unchecked")
     @NonNull
     private static <O, P> ReadableProperty<O, Quantity> warp(@NonNull ReadableProperty<O, P> readableValueProperty) {
-        return readableValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
+        return readableValueProperty.type().equals(QUANTITY_TYPE_TOKEN) ?
                 (ReadableProperty<O, Quantity>) readableValueProperty
                 : new ReadableQuantityProperty<O, P>(readableValueProperty);
     }
@@ -140,7 +140,7 @@ public class QuantityUtil {
     @SuppressWarnings("unchecked")
     @NonNull
     private static <O, P> WritableProperty<O, Quantity> warp(@NonNull WritableProperty<O, P> writableValueProperty) {
-        return writableValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
+        return writableValueProperty.type().equals(QUANTITY_TYPE_TOKEN) ?
                 (WritableProperty<O, Quantity>) writableValueProperty
                 : new WritableQuantityProperty<O, P>(writableValueProperty);
     }
@@ -148,13 +148,13 @@ public class QuantityUtil {
     @SuppressWarnings("unchecked")
     @NonNull
     private static <O, P> AccessibleProperty<O, Quantity> warp(@NonNull AccessibleProperty<O, P> accessibleValueProperty) {
-        return accessibleValueProperty.type().equals(AMOUNT_TYPE_TOKEN) ?
+        return accessibleValueProperty.type().equals(QUANTITY_TYPE_TOKEN) ?
                 (AccessibleProperty<O, Quantity>) accessibleValueProperty
                 : new AccessibleQuantityProperty<O, P>(accessibleValueProperty);
     }
 
     @NonNull
-    public static <T> Optional<Quantity> readAmount(
+    public static <T> Optional<Quantity> readQuantity(
             @NonNull ReadableProperty<T, ?> amountReadableProperty,
             @NonNull T object) {
         Optional<?> optional = amountReadableProperty.read(object);
@@ -190,16 +190,16 @@ public class QuantityUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> void writeAmount(
+    public static <T> void writeQuantity(
             @NonNull WritableProperty<T, ?> amountWritableProperty,
             @NonNull T object, @NonNull Quantity quantity) {
-        checkAmountProperty(amountWritableProperty);
+        checkQuantityProperty(amountWritableProperty);
         Optional<Unit> targetUnit = readDeserializeTargetUnit(amountWritableProperty);
         TypeToken<?> typeToken = amountWritableProperty.type();
-        boolean isAmountType = typeToken.equals(TypeToken.of(Quantity.class));
+        boolean isQuantityType = typeToken.equals(TypeToken.of(Quantity.class));
         //TODO 配置对象指定功能
         Quantity actualQuantity = targetUnit.map(quantity::convertTo).orElse(quantity);
-        if (isAmountType) {
+        if (isQuantityType) {
             WritableProperty<T, Quantity> actual = (WritableProperty<T, Quantity>) amountWritableProperty;
             actual.write(object, actualQuantity);
         } else {
@@ -214,7 +214,7 @@ public class QuantityUtil {
     @NonNull
     public static <T> Optional<Unit> readDeserializeTargetUnit(
             @NonNull Property<T, ?> amountProperty) {
-        checkAmountProperty(amountProperty);
+        checkQuantityProperty(amountProperty);
         return amountProperty.annotation(WithUnit.class)
                 .map(WithUnit::value)
                 //TODO 配置对象定制

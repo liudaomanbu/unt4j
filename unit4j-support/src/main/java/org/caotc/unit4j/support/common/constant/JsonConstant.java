@@ -21,6 +21,7 @@ import org.caotc.unit4j.core.constant.StringConstant;
 
 /**
  * json相关常量
+ * //todo 确认是否保留
  *
  * @author caotc
  * @date 2019-05-09

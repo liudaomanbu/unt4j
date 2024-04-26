@@ -46,7 +46,7 @@ public class AmountPropertyObjectWrapperFactory implements ObjectWrapperFactory 
 
     @Override
     public boolean hasWrapperFor(Object object) {
-        return !QuantityUtil.writableAmountPropertiesFromClass(object.getClass()).isEmpty();
+        return !QuantityUtil.writableQuantityPropertiesFromClass(object.getClass()).isEmpty();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class AmountPropertyObjectWrapperFactory implements ObjectWrapperFactory 
 
         public AmountPropertyObjectWrapper(MetaObject metaObject, Object object) {
             super(metaObject, object);
-            propertyNameToAmountProperties = QuantityUtil.accessibleAmountPropertyStreamFromClass(object)
+            propertyNameToAmountProperties = QuantityUtil.accessibleQuantityPropertyStream(object)
                     .collect(ImmutableMap.toImmutableMap(Property::name, Function.identity()));
         }
 

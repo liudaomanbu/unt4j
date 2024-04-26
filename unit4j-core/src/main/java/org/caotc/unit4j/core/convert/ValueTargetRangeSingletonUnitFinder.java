@@ -28,6 +28,7 @@ import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.core.math.number.Numbers;
+import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.UnitGroup;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,9 +41,9 @@ import java.util.stream.IntStream;
  */
 @Value(staticConstructor = "of")
 @Slf4j
-public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConverter {
+public class ValueTargetRangeSingletonUnitFinder implements SingletonUnitFinder {
     @NonNull
-    public static ValueTargetRangeSingletonAutoConverter of(@NonNull Range<Number> valueTargetRange) {
+    public static ValueTargetRangeSingletonUnitFinder of(@NonNull Range<Number> valueTargetRange) {
         return of(valueTargetRange, true);
     }
 
@@ -57,13 +58,14 @@ public class ValueTargetRangeSingletonAutoConverter implements SingletonAutoConv
     AtomicReference<Range<Number>> valueTargetLowerRange = new AtomicReference<>();
 
     @Override
-    public @NonNull Quantity autoConvert(@NonNull Configuration configuration, @NonNull Quantity quantity) {
+    public @NonNull Unit find(@NonNull Configuration configuration, @NonNull Quantity quantity) {
         if (valueTargetRange().contains(quantity.value())) {
-            return quantity;
+            return quantity.unit();
         }
 
-        return indexedBinarySearch(configuration, quantity);
+        return indexedBinarySearch(configuration, quantity).unit();
     }
+
     private Quantity indexedBinarySearch(Configuration configuration, Quantity quantity) {
         UnitGroup list = configuration.getUnitGroup(quantity.unit());
 

@@ -59,7 +59,7 @@ public class Unit4jContextualSerializer extends StdSerializer<Quantity> implemen
   public Unit4jContextualSerializer(@NonNull Unit4jProperties unit4jProperties) {
       super(Quantity.class);
       this.unit4jProperties = unit4jProperties;
-      quantitySerializer = new QuantitySerializer(unit4jProperties.createAmountCodecConfig());
+      quantitySerializer = new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
   }
 
     @Override
@@ -84,10 +84,10 @@ public class Unit4jContextualSerializer extends StdSerializer<Quantity> implemen
 //        }
             if (quantitySerialize != null) {
                 return new QuantitySerializer(
-                        unit4jProperties.createPropertyAmountCodecConfig(ReflectionUtil
+                        unit4jProperties.createPropertyQuantityCodecConfig(ReflectionUtil
                                 .readablePropertyExact(prov.getActiveView(), property.getName())));
             } else {
-                return new QuantitySerializer(unit4jProperties.createAmountCodecConfig());
+                return new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
             }
         }
       return prov.findValueSerializer(property.getType(), property);

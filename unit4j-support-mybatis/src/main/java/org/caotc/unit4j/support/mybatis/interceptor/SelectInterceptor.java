@@ -68,8 +68,8 @@ public class SelectInterceptor implements Interceptor {
     private static final String MAPPED_STATEMENT_RESULT_MAPS_FIELD_NAME = "resultMaps";
 
     Unit4jProperties unit4jProperties = new Unit4jProperties()
-            .setFieldNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
-            .setFieldNameJoiner((valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_UNDERSCORE
+            .setDefaultNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
+            .setDefaultFieldNameJoiner((valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_UNDERSCORE
                     .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList())));
 
     @Override
@@ -100,13 +100,13 @@ public class SelectInterceptor implements Interceptor {
                         .map(ResultMapping::getProperty)
                         .collect(ImmutableSet.toImmutableSet());
 
-                ImmutableSet<WritableProperty<?, Quantity>> writableAmountProperties = QuantityUtil.writableAmountPropertyStreamFromClass(resultMap.getType())
+                ImmutableSet<WritableProperty<?, Quantity>> writableAmountProperties = QuantityUtil.writableQuantityPropertyStream(resultMap.getType())
                         .filter(writableProperty -> resultMappingPropertyNames.isEmpty() || resultMappingPropertyNames.contains(writableProperty.name()))
                         .collect(ImmutableSet.toImmutableSet());
 
                 ImmutableSet<QuantityCodecConfig> quantityCodecConfigs = writableAmountProperties
                         .stream()
-                        .map(unit4jProperties::createPropertyAmountCodecConfig)
+                        .map(unit4jProperties::createPropertyQuantityCodecConfig)
                         .collect(ImmutableSet.toImmutableSet());
 
                 ImmutableSet<ResultMapping> amountPropertyResultMappings = writableAmountProperties
@@ -163,7 +163,7 @@ public class SelectInterceptor implements Interceptor {
     }
 
     private Stream<ResultMapping> createAmountResultMapping(Configuration configuration, WritableProperty<?, ?> amountWritableProperty) {
-        QuantityCodecConfig quantityCodecConfig = unit4jProperties.createPropertyAmountCodecConfig(amountWritableProperty);
+        QuantityCodecConfig quantityCodecConfig = unit4jProperties.createPropertyQuantityCodecConfig(amountWritableProperty);
         switch (quantityCodecConfig.strategy()) {
             case OBJECT:
                 throw new IllegalArgumentException(

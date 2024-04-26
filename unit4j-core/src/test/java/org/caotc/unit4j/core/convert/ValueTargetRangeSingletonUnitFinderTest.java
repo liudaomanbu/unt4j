@@ -19,20 +19,21 @@ package org.caotc.unit4j.core.convert;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.unit.Unit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
-class ValueTargetRangeSingletonAutoConverterTest {
+class ValueTargetRangeSingletonUnitFinderTest {
 
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.core.convert.Provider#unitAutoConverterAndQuantityAndAutoConverted")
-    void autoConvert(ValueTargetRangeSingletonAutoConverter converter, Quantity quantity, Quantity autoConverted) {
-        Quantity result = converter.autoConvert(Configuration.defaultInstance(), quantity);
+    void autoConvert(ValueTargetRangeSingletonUnitFinder converter, Quantity quantity, Quantity autoConverted) {
+        Unit result = converter.find(Configuration.defaultInstance(), quantity);
         log.debug("converter:{},quantity:{},result:{}", converter, quantity, result);
-        Assertions.assertEquals(autoConverted.unit(), result.unit());
+        Assertions.assertEquals(autoConverted.unit(), result);
         Assertions.assertEquals(autoConverted.bigDecimalValue(), autoConverted.bigDecimalValue());
     }
 }

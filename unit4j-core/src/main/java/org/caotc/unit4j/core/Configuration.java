@@ -36,11 +36,11 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.fraction.BigFraction;
-import org.caotc.unit4j.core.convert.AutoConverter;
-import org.caotc.unit4j.core.convert.DefaultAutoConverter;
+import org.caotc.unit4j.core.convert.DefaultUnitFinder;
 import org.caotc.unit4j.core.convert.QuantityChooser;
 import org.caotc.unit4j.core.convert.UnitConvertConfig;
-import org.caotc.unit4j.core.convert.ValueTargetRangeSingletonAutoConverter;
+import org.caotc.unit4j.core.convert.UnitFinder;
+import org.caotc.unit4j.core.convert.ValueTargetRangeSingletonUnitFinder;
 import org.caotc.unit4j.core.exception.ConfigurationNotFoundException;
 import org.caotc.unit4j.core.exception.UnitNotFoundException;
 import org.caotc.unit4j.core.math.number.Numbers;
@@ -65,6 +65,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -91,9 +92,9 @@ public final class Configuration {
      */
     private static final MathContext DEFAULT_MATH_CONTEXT = MathContext.UNLIMITED;
     /**
-     * 默认的单位自动转换器
+     * 默认的目标单位选择器
      */
-    private static final AutoConverter DEFAULT_AUTO_CONVERTER = DefaultAutoConverter.of(ValueTargetRangeSingletonAutoConverter.of(Range.closedOpen(Numbers.ONE, Numbers.valueOf(1000))), QuantityChooser.minQuantityChooser());
+    private static final UnitFinder DEFAULT_UNIT_FINDER = DefaultUnitFinder.of(ValueTargetRangeSingletonUnitFinder.of(Range.closedOpen(Numbers.ONE, Numbers.valueOf(1000))), QuantityChooser.minQuantityChooser());
     //todo 应该是static还是对象?
     private static final Map<String, Unit> ID_TO_UNITS = Maps.newConcurrentMap();
     /**
@@ -188,13 +189,13 @@ public final class Configuration {
     final Table<String, Alias.Type, Object> aliasToTypeToAliasRegistrableTable = Tables
             .synchronizedTable(HashBasedTable.create());
     @NonNull
-    final Map<Prefix, BigFraction> prefixToValues =Maps.newConcurrentMap();
+    final Map<Prefix, BigFraction> prefixToValues = Maps.newConcurrentMap();
     /**
      * 单位自动转换器
      */
     @NonNull
     @NonFinal
-    AutoConverter autoConverter = DEFAULT_AUTO_CONVERTER;
+    UnitFinder targetUnitFinder = DEFAULT_UNIT_FINDER;
     /**
      * 数学计算时使用的上下文
      */
@@ -846,17 +847,22 @@ public final class Configuration {
 
     @NonNull
     public Quantity autoConvert(@NonNull Quantity quantity) {
-        return autoConverter().autoConvert(this, quantity);
+        Unit targetUnit = targetUnitFinder().find(this, quantity);
+        return convert(quantity, targetUnit);
     }
 
     @NonNull
     public Collection<Quantity> autoConvert(@NonNull Collection<Quantity> quantities, boolean unitConsistency) {
-        return autoConverter().autoConvert(this, quantities, unitConsistency);
+        if (unitConsistency) {
+            Unit targetUnit = targetUnitFinder().find(this, quantities);
+            return quantities.stream().map(quantity -> convert(quantity, targetUnit)).collect(Collectors.toList());
+        }
+        return quantities.stream().map(this::autoConvert).collect(Collectors.toList());
     }
 
     @NonNull
     public Collection<Quantity> autoConvert(@NonNull Collection<Quantity> quantities) {
-        return autoConverter().autoConvert(this, quantities);
+        return autoConvert(quantities, true);
     }
 
     /**

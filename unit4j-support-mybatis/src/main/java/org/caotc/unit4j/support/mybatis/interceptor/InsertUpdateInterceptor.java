@@ -75,8 +75,8 @@ public class InsertUpdateInterceptor implements Interceptor {
     private static final String STATEMENT_HANDLER_MAPPED_STATEMENT_FIELD_NAME = "delegate.mappedStatement";
 
     Unit4jProperties unit4jProperties = new Unit4jProperties()
-            .setFieldNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
-            .setFieldNameJoiner((valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_UNDERSCORE
+            .setDefaultNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
+            .setDefaultFieldNameJoiner((valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_UNDERSCORE
                     .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList())));
 
     @Override
@@ -115,10 +115,10 @@ public class InsertUpdateInterceptor implements Interceptor {
                 sqlParam.readableProperty.read(boundSql.getParameterObject());
                 //noinspection unchecked
                   QuantityUtil
-                                .readAmount((ReadableProperty<? super Object, ?>) sqlParam.readableProperty,
-                                        boundSql.getParameterObject()).ifPresent(amount -> {
+                          .readQuantity((ReadableProperty<? super Object, ?>) sqlParam.readableProperty,
+                                  boundSql.getParameterObject()).ifPresent(amount -> {
                               QuantityCodecConfig quantityCodecConfig = unit4jProperties
-                                      .createPropertyAmountCodecConfig(sqlParam.readableProperty);
+                                      .createPropertyQuantityCodecConfig(sqlParam.readableProperty);
 
                               if (Objects.nonNull(quantityCodecConfig.targetUnit()) && !quantityCodecConfig
                                       .targetUnit().equals(amount.unit())) {

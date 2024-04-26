@@ -46,9 +46,6 @@ public class Quantity {
     public static final Quantity UNKNOWN = create(UnkownNumber.INSTANCE, UnknownUnit.INSTANCE);
 
     @NonNull
-    Number value;
-
-    @NonNull
     public static Quantity create(@NonNull Object value, @NonNull Unit unit) {
         if (value instanceof BigDecimal) {
             return create((BigDecimal) value, unit);
@@ -151,6 +148,9 @@ public class Quantity {
     public static Quantity create(@NonNull String value, @NonNull Unit unit) {
         return create(Numbers.valueOf(new BigDecimal(value)), unit);
     }
+
+    @NonNull
+    Number value;
     @NonNull
     Unit unit;
 

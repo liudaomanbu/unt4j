@@ -64,14 +64,14 @@ public @interface QuantitySerialize {
     String name() default StringConstant.EMPTY;
 
     /**
-     * @return 目标单位id
-     */
-    String targetUnitId() default StringConstant.EMPTY;
-
-    /**
      * @return 单位字段名称
      */
     String unitName() default StringConstant.EMPTY;
+
+    /**
+     * @return 目标单位id
+     */
+    String targetUnitId() default StringConstant.EMPTY;
 
     /**
      * @return 值字段名称

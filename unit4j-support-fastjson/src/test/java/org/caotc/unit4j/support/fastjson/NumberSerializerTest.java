@@ -35,7 +35,7 @@ import java.math.MathContext;
 class NumberSerializerTest {
 
     Unit4jProperties unit4jProperties = new Unit4jProperties();
-    QuantityCodecConfig quantityCodecConfig = unit4jProperties.createAmountCodecConfig();
+    QuantityCodecConfig quantityCodecConfig = unit4jProperties.createQuantityCodecConfig();
     SerializeConfig globalInstance = SerializeConfig.getGlobalInstance();
     Quantity quantity = Quantity.create("123.56", Units.SECOND);
     NumberSerializer numberSerializer = new NumberSerializer(

@@ -30,6 +30,7 @@ import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
+import org.caotc.unit4j.support.common.util.QuantityUtil;
 
 import java.lang.reflect.Type;
 
@@ -57,8 +58,8 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   public Object process(BeanContext context, Object object, String name, Object value) {
       QuantityCodecConfig quantityCodecConfig = ReflectionUtil
               .readableProperty(object.getClass(), name)
-              .map(unit4jProperties::createPropertyAmountCodecConfig)
-              .orElseGet(unit4jProperties::createAmountCodecConfig);
+              .map(unit4jProperties::createPropertyQuantityCodecConfig)
+              .orElseGet(unit4jProperties::createQuantityCodecConfig);
       return null;//todo
   }
 
@@ -66,26 +67,23 @@ public class Unit4jFilter extends BeforeFilter implements ContextValueFilter, Pr
   public boolean apply(Object object, String name, Object value) {
       QuantityCodecConfig quantityCodecConfig = ReflectionUtil
               .readableProperty(object.getClass(), name)
-              .map(unit4jProperties::createPropertyAmountCodecConfig)
-              .orElseGet(unit4jProperties::createAmountCodecConfig);
+              .map(unit4jProperties::createPropertyQuantityCodecConfig)
+              .orElseGet(unit4jProperties::createQuantityCodecConfig);
       return true;//todo
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void writeBefore(Object object) {
-      ReflectionUtil.readableProperties((Class<Object>) object.getClass())
-              .stream()
-              .filter(fieldWrapper -> fieldWrapper.annotation(QuantitySerialize.class).isPresent()
-                      || Quantity.class.equals(fieldWrapper.type().getRawType()))
-        .forEach(fieldWrapper -> {
-            fieldWrapper.read(object).map(Quantity.class::cast).ifPresent(amount -> {
-                QuantityCodecConfig quantityCodecConfig = fieldWrapper.annotation(QuantitySerialize.class)
-                        .map(amountSerialize -> unit4jProperties
-                                .createPropertyAmountCodecConfig(fieldWrapper))
-                        .orElseGet(unit4jProperties::createAmountCodecConfig);
-          });
-        });
+      QuantityUtil.readableQuantityPropertyStream((Class<Object>) object.getClass())
+              .forEach(quantityProperty -> {
+                  quantityProperty.read(object).map(Quantity.class::cast).ifPresent(amount -> {
+                      QuantityCodecConfig quantityCodecConfig = quantityProperty.annotation(QuantitySerialize.class)
+                              .map(amountSerialize -> unit4jProperties
+                                      .createPropertyQuantityCodecConfig(quantityProperty))
+                              .orElseGet(unit4jProperties::createQuantityCodecConfig);
+                  });
+              });
   }
 
   @Override

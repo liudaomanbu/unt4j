@@ -19,6 +19,7 @@ package org.caotc.unit4j.core.convert;
 import lombok.NonNull;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.unit.Unit;
 
 import java.util.Collection;
 
@@ -28,11 +29,7 @@ import java.util.Collection;
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface CollectionAutoConverter {
+public interface CollectionUnitFinder {
     @NonNull
-    Collection<Quantity> autoConvert(@NonNull Configuration configuration, @NonNull Collection<Quantity> quantities, boolean unitConsistency);
-
-    default Collection<Quantity> autoConvert(@NonNull Configuration configuration, @NonNull Collection<Quantity> quantities) {
-        return autoConvert(Configuration.defaultInstance(), quantities, true);
-    }
+    Unit find(@NonNull Configuration configuration, @NonNull Collection<Quantity> quantities);
 }

@@ -44,11 +44,11 @@ public class QuantityCodecConfig {
      * 目标单位//TODO 待处理
      */
     Unit targetUnit;
-  /**
-   * 序列化和反序列化策略
-   */
-  @NonNull
-  CodecStrategy strategy;
+    /**
+     * 序列化和反序列化策略
+     */
+    @NonNull
+    CodecStrategy strategy;
 //  /**
 //   * 属性名称转换器
 //   */
@@ -70,11 +70,11 @@ public class QuantityCodecConfig {
     @NonNull
     UnitCodecConfig unitCodecConfig;
 
-  String outputName;
+    String outputName;
 
-  String outputValueName;
+    String outputValueName;
 
-  String outputUnitName;
+    String outputUnitName;
 
 //  @NonNull
 //  public String outputName() {

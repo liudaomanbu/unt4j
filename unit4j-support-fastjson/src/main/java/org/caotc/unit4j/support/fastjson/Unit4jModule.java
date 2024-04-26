@@ -66,7 +66,7 @@ public class Unit4jModule {
 
   private Unit4jModule(@NonNull Unit4jProperties unit4jProperties) {
       unit4jFilter = new Unit4jFilter(unit4jProperties);
-      quantitySerializer = new QuantitySerializer(unit4jProperties.createAmountCodecConfig());
+      quantitySerializer = new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
   }
 
   /**
