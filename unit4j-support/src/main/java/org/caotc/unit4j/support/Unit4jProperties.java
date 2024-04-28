@@ -34,12 +34,15 @@ import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
+import org.caotc.unit4j.core.convert.FixedUnitFinder;
+import org.caotc.unit4j.core.convert.SingletonUnitFinder;
 import org.caotc.unit4j.core.convert.UnitFinder;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +60,7 @@ import java.util.stream.Stream;
  * @see QuantityCodecConfig
  * @since 1.0.0
  */
+@SuppressWarnings("rawtypes")
 @Data
 @FieldDefaults(makeFinal = false, level = AccessLevel.PRIVATE)
 @Accessors(fluent = false, chain = true)
@@ -73,6 +77,7 @@ public class Unit4jProperties {
      * 默认的单位转换配置
      */
     private static final Configuration DEFAULT_CONFIGURATION = Configuration.defaultInstance();
+    private static final CaseFormat DEFAULT_NAME_CASE_FORMAT = CaseFormat.LOWER_CAMEL;
     /**
      * 默认的名称拆分器
      */
@@ -91,9 +96,9 @@ public class Unit4jProperties {
      */
     private static final BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> DEFAULT_FIELD_NAME_JOINER = (objectFieldNameWords, valueFieldNameWords) -> CaseFormat.LOWER_CAMEL
             .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList()));
-    private static final String DEFAULT_QUANTITY_UNIT_FIELD_NAME = "unit";
+    private static final ImmutableList<String> DEFAULT_QUANTITY_UNIT_FIELD_NAME = ImmutableList.of("unit");
     private static final UnitFinder DEFAULT_TARGET_UNIT_FINDER = DEFAULT_CONFIGURATION.targetUnitFinder();
-    private static final String DEFAULT_QUANTITY_VALUE_FIELD_NAME = "value";
+    private static final ImmutableList<String> DEFAULT_QUANTITY_VALUE_FIELD_NAME = ImmutableList.of("value");
     /**
      * 默认的值序列化时的类型
      */
@@ -128,6 +133,8 @@ public class Unit4jProperties {
      */
     @NonNull
     Configuration defaultConfiguration = DEFAULT_CONFIGURATION;
+    @NonNull
+    CaseFormat defaultNameCaseFormat = DEFAULT_NAME_CASE_FORMAT;
     /**
      * 名称转换器
      * todo 确认序列化和反序列化时是否使用同一个,使用接口应该定义为NameConverter还是CaseFormat或其他
@@ -138,9 +145,9 @@ public class Unit4jProperties {
      */
     BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> defaultFieldNameJoiner = DEFAULT_FIELD_NAME_JOINER;
 
-    String defaultQuantityUnitFieldName = DEFAULT_QUANTITY_UNIT_FIELD_NAME;
-    UnitFinder targetUnitFinder = DEFAULT_TARGET_UNIT_FINDER;
-    String defaultQuantityValueFieldName = DEFAULT_QUANTITY_VALUE_FIELD_NAME;
+    ImmutableList<String> defaultQuantityUnitFieldName = DEFAULT_QUANTITY_UNIT_FIELD_NAME;
+    SingletonUnitFinder targetUnitFinder = DEFAULT_TARGET_UNIT_FINDER;
+    ImmutableList<String> defaultQuantityValueFieldName = DEFAULT_QUANTITY_VALUE_FIELD_NAME;
     /**
      * 数值转换类
      */
@@ -179,9 +186,8 @@ public class Unit4jProperties {
     @NonNull
     public QuantityCodecConfig createQuantityCodecConfig() {
         return QuantityCodecConfig.builder().configuration(getDefaultConfiguration()).strategy(getDefaultStrategy())
-                .outputName("")
-                .outputValueName(defaultNameConverter.apply(ImmutableList.of(defaultQuantityValueFieldName)))
-                .outputUnitName(defaultNameConverter.apply(ImmutableList.of(defaultQuantityUnitFieldName)))
+                .outputValueName(defaultQuantityValueFieldName)
+                .outputUnitName(defaultQuantityUnitFieldName)
                 .valueCodecConfig(new NumberCodecConfig(getDefaultValueType(), getDefaultValueMathContext()))
                 .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getDefaultConfiguration(),
                         getUnitAliasUndefinedStrategy())).build();
@@ -197,81 +203,74 @@ public class Unit4jProperties {
      * @since 1.0.0
      */
     @NonNull
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public QuantityCodecConfig createPropertyQuantityCodecConfig(
             @NonNull Property<?, ?> quantityReadableProperty) {
-        QuantitySerialize quantitySerialize = quantityReadableProperty.annotation(QuantitySerialize.class).orElse(null);
-        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getDefaultFieldNameJoiner()
-                .apply(valueFieldNameWords,
-                        Optional.ofNullable(quantitySerialize).map(QuantitySerialize::nameCaseFormat)
-                                .map(
-                                        caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
-                                .orElseGet(this::getDefaultNameSplitter)
-                                .apply(quantityReadableProperty.name()));
+        Optional<QuantitySerialize> quantitySerialize = quantityReadableProperty.annotation(QuantitySerialize.class);
+        Configuration configuration = quantitySerialize.map(QuantitySerialize::configId).map(Configuration::findExact)
+                .orElseGet(this::getDefaultConfiguration);
         return QuantityCodecConfig.builder()
-                .configuration(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::configId)
-                        .map(Configuration::findExact).orElseGet(this::getDefaultConfiguration))
-                .strategy(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::strategy)
+                .strategy(quantitySerialize.map(QuantitySerialize::strategy)
                         .orElseGet(this::getDefaultPropertyStrategy))
-                .targetUnit(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::targetUnitId)
+                .configuration(configuration)
+                .nameCaseFormat(quantitySerialize.map(QuantitySerialize::nameCaseFormat)
+                        .orElseGet(this::getDefaultNameCaseFormat))
+                .outputUnitName(quantitySerialize.map(QuantitySerialize::unitName)
+                        .filter(name -> name.length != 0)
+                        .map(Arrays::asList)
+                        .orElseGet(this::getDefaultQuantityUnitFieldName))
+                .targetUnitFinder(quantitySerialize.map(QuantitySerialize::targetUnitId)
                         .filter(targetUnitId -> !targetUnitId.isEmpty())
-                        .map(Configuration::findUnitExact).orElse(null))
-                .outputName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::name)
-                        .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of())))
-                .outputValueName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueName)
-                        .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_VALUE_FIELD_NAME))))
-                .outputUnitName(Optional.ofNullable(quantitySerialize).map(QuantitySerialize::unitName)
-                        .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_UNIT_FIELD_NAME))))
-                .valueCodecConfig(new NumberCodecConfig(
-                        Optional.ofNullable(quantitySerialize).map(QuantitySerialize::valueType)
-                                .orElseGet(() -> (Class) getDefaultValueType()),
-                        Optional.ofNullable(quantitySerialize)
-                                .map(a -> new MathContext(a.valuePrecision(), a.valueRoundingMode()))
-                                .orElseGet(this::getDefaultValueMathContext)))
+                        .map(Configuration::findUnitExact)
+                        .map(FixedUnitFinder::of)
+                        .orElseGet(this::getTargetUnitFinder))
                 .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getDefaultConfiguration(),
-                        getUnitAliasUndefinedStrategy())).build();
+                        getUnitAliasUndefinedStrategy()))
+                .outputValueName(quantitySerialize.map(QuantitySerialize::valueName)
+                        .filter(name -> name.length != 0)
+                        .map(Arrays::asList)
+                        .orElseGet(this::getDefaultQuantityValueFieldName))
+                .valueCodecConfig(new NumberCodecConfig(
+                        quantitySerialize.map(QuantitySerialize::valueType).orElseGet(() -> (Class) getDefaultValueType()),
+                        quantitySerialize.map(a -> new MathContext(a.valuePrecision(), a.valueRoundingMode())).
+                                orElseGet(this::getDefaultValueMathContext)))
+                .build();
     }
 
     @NonNull
     @SuppressWarnings("unchecked")
     public QuantityCodecConfig createPropertyQuantityCodecConfig(
             @NonNull WritableProperty<?, ?> amountWritableProperty) {
-        QuantityDeserialize quantityDeserialize = amountWritableProperty.annotation(QuantityDeserialize.class).orElse(null);
-        Function<@NonNull List<String>, @NonNull String> fieldNameConverter = valueFieldNameWords -> getDefaultFieldNameJoiner()
-                .apply(valueFieldNameWords,
-                        Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::nameCaseFormat)
-                                .map(
-                                        caseFormat -> (Function<@NonNull String, @NonNull List<String>>) caseFormat::split)
-                                .orElseGet(this::getDefaultNameSplitter)
-                                .apply(amountWritableProperty.name()));
+        Optional<QuantityDeserialize> quantityDeserialize = amountWritableProperty.annotation(QuantityDeserialize.class);
         return QuantityCodecConfig.builder()
-                .configuration(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::configId)
-                        .map(Configuration::findExact).orElseGet(this::getDefaultConfiguration))
-                .strategy(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::strategy)
+                .strategy(quantityDeserialize.map(QuantityDeserialize::strategy)
                         .orElseGet(this::getDefaultPropertyStrategy))
-//            .targetUnit(Optional.ofNullable(amountDeserialize).map(AmountDeserialize::targetUnitId)
-//                    .filter(targetUnitId->!targetUnitId.isEmpty())
-//                    .map(Configuration::getUnitByIdExact).orElse(null))
-                .outputName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::name)
-                        .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of())))
-                .outputValueName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueName)
-                        .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_VALUE_FIELD_NAME))))
-                .outputUnitName(Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::unitName)
-                        .filter(name -> !name.isEmpty())
-                        .orElse(fieldNameConverter.apply(ImmutableList.of(DEFAULT_QUANTITY_UNIT_FIELD_NAME))))
+                .configuration(quantityDeserialize.map(QuantityDeserialize::configId)
+                        .map(Configuration::findExact).orElseGet(this::getDefaultConfiguration))
+                .nameCaseFormat(quantityDeserialize.map(QuantityDeserialize::nameCaseFormat)
+                        .orElseGet(this::getDefaultNameCaseFormat))
+                .outputUnitName(quantityDeserialize.map(QuantityDeserialize::unitName)
+                        .filter(name -> name.length != 0)
+                        .map(Arrays::asList)
+                        .orElseGet(this::getDefaultQuantityUnitFieldName))
+                .targetUnitFinder(quantityDeserialize.map(QuantityDeserialize::sourceUnitId)
+                        .filter(targetUnitId -> !targetUnitId.isEmpty())
+                        .map(Configuration::findUnitExact)
+                        .map(FixedUnitFinder::of)
+                        .orElseGet(this::getTargetUnitFinder))
+                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getDefaultConfiguration(),
+                        getUnitAliasUndefinedStrategy()))
+                .outputValueName(quantityDeserialize.map(QuantityDeserialize::valueName)
+                        .filter(name -> name.length != 0)
+                        .map(Arrays::asList)
+                        .orElseGet(this::getDefaultQuantityValueFieldName))
                 .valueCodecConfig(new NumberCodecConfig(
-                        Optional.ofNullable(quantityDeserialize).map(QuantityDeserialize::valueType)
+                        quantityDeserialize.map(QuantityDeserialize::valueType)
                                 .orElseGet(() -> (Class) getDefaultValueType()),
-                        Optional.ofNullable(quantityDeserialize)
+                        quantityDeserialize
                                 .map(a -> new MathContext(a.valuePrecision(), a.valueRoundingMode()))
                                 .orElseGet(this::getDefaultValueMathContext)))
-                .unitCodecConfig(new UnitCodecConfig(getUnitAliasType(), getDefaultConfiguration(),
-                        getUnitAliasUndefinedStrategy())).build();
+                .build();
     }
 
     /**

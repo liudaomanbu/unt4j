@@ -59,14 +59,9 @@ public @interface QuantitySerialize {
     CaseFormat nameCaseFormat() default CaseFormat.LOWER_CAMEL;
 
     /**
-     * @return 字段名称
-     */
-    String name() default StringConstant.EMPTY;
-
-    /**
      * @return 单位字段名称
      */
-    String unitName() default StringConstant.EMPTY;
+    String[] unitName() default StringConstant.EMPTY;
 
     /**
      * @return 目标单位id
@@ -76,7 +71,7 @@ public @interface QuantitySerialize {
     /**
      * @return 值字段名称
      */
-    String valueName() default StringConstant.EMPTY;
+    String[] valueName() default StringConstant.EMPTY;
 
     /**
      * @return 数值序列化时使用的类

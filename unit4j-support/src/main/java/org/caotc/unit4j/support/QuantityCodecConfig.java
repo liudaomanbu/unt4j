@@ -22,7 +22,10 @@ import lombok.Value;
 import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.unit.Unit;
+import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.caotc.unit4j.core.convert.SingletonUnitFinder;
+
+import java.util.List;
 
 /**
  * {@link Quantity}对象序列化和反序列化配置
@@ -34,31 +37,27 @@ import org.caotc.unit4j.core.unit.Unit;
 @Value
 @Builder(toBuilder = true)
 public class QuantityCodecConfig {
-
-    /**
-     * 配置
-     */
-    @NonNull
-    Configuration configuration;
-    /**
-     * 目标单位//TODO 待处理
-     */
-    Unit targetUnit;
     /**
      * 序列化和反序列化策略
      */
     @NonNull
     CodecStrategy strategy;
-//  /**
-//   * 属性名称转换器
-//   */
-//  @NonNull
-//  Function<ImmutableList<String>, String> fieldNameConverter;
-//  /**
-//   * 属性名称转换器
-//   */
-//  @NonNull
-//  Function<String, String> nameTransformer;
+    /**
+     * 配置
+     */
+    @NonNull
+    Configuration configuration;
+    @NonNull
+    CaseFormat nameCaseFormat;
+    @NonNull
+    List<String> outputUnitName;
+    /**
+     * 目标单位
+     */
+    @NonNull
+    SingletonUnitFinder targetUnitFinder;
+    @NonNull
+    List<String> outputValueName;
     /**
      * 数值的序列化和反序列化配置
      */
@@ -70,24 +69,7 @@ public class QuantityCodecConfig {
     @NonNull
     UnitCodecConfig unitCodecConfig;
 
-    String outputName;
 
-    String outputValueName;
 
-    String outputUnitName;
 
-//  @NonNull
-//  public String outputName() {
-//    return fieldNameConverter.apply(ImmutableList.of());
-//  }
-
-//  @NonNull
-//  public String outputValueName() {
-//    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_VALUE_FIELD_NAME));
-//  }
-//
-//  @NonNull
-//  public String outputUnitName() {
-//    return fieldNameConverter.apply(ImmutableList.of(AMOUNT_UNIT_FIELD_NAME));
-//  }
 }

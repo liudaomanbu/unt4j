@@ -41,6 +41,6 @@ public class NumberCodecConfig {
      * 数学计算上下文对象
      */
     @NonNull
-  MathContext mathContext;
+    MathContext mathContext;
 
 }

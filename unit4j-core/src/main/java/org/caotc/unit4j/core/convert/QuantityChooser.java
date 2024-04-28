@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 /**
  * {@link Quantity}类的选择器,用于在集合中选取目标对象
+ * todo 确认是否需要把要转换的Quantity转换成所有可能单位的Quantity再选择的逻辑
  *
  * @author caotc
  * @date 2018-04-13

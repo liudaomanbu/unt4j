@@ -59,11 +59,6 @@ public @interface QuantityDeserialize {
     CaseFormat nameCaseFormat() default CaseFormat.LOWER_CAMEL;
 
     /**
-     * @return 字段名称
-     */
-    String name() default StringConstant.EMPTY;
-
-    /**
      * @return 来源单位id
      */
     String sourceUnitId() default StringConstant.EMPTY;
@@ -71,12 +66,12 @@ public @interface QuantityDeserialize {
     /**
      * @return 单位字段名称
      */
-    String unitName() default StringConstant.EMPTY;
+    String[] unitName() default StringConstant.EMPTY;
 
     /**
      * @return 值字段名称
      */
-    String valueName() default StringConstant.EMPTY;
+    String[] valueName() default StringConstant.EMPTY;
 
     /**
      * @return 数值序列化时使用的类
