@@ -2,12 +2,13 @@ package org.caotc.unit4j.support.fastjson;
 
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.UnitCodecConfig;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * {@link org.caotc.unit4j.core.unit.Unit}在fastjson的序列化器
@@ -29,7 +30,7 @@ public class UnitSerializer implements ObjectSerializer {
   public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
       int features) throws IOException {
     Unit unit = (Unit) object;
-    serializer.write(unitCodecConfig.serialize(unit));
+//    serializer.write(unitCodecConfig.serialize(unit));
   }
 
 }

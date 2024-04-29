@@ -19,7 +19,8 @@ package org.caotc.unit4j.support;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.api.annotation.CodecStrategy;
+import lombok.With;
+import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
@@ -36,12 +37,13 @@ import java.util.List;
  */
 @Value
 @Builder(toBuilder = true)
+@With
 public class QuantityCodecConfig {
     /**
      * 序列化和反序列化策略
      */
     @NonNull
-    CodecStrategy strategy;
+    QuantityCodecStrategy strategy;
     /**
      * 配置
      */
@@ -68,8 +70,4 @@ public class QuantityCodecConfig {
      */
     @NonNull
     UnitCodecConfig unitCodecConfig;
-
-
-
-
 }

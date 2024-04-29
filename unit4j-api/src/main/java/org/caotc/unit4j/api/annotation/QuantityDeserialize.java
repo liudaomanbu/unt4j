@@ -19,6 +19,7 @@ package org.caotc.unit4j.api.annotation;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.constant.StringConstant;
+import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -45,7 +46,7 @@ public @interface QuantityDeserialize {
     /**
      * @return 反序列化策略
      */
-    CodecStrategy strategy() default CodecStrategy.VALUE;
+    QuantityCodecStrategy strategy() default QuantityCodecStrategy.VALUE;
 
     /**
      * @return 配置对象主键
@@ -67,6 +68,12 @@ public @interface QuantityDeserialize {
      * @return 单位字段名称
      */
     String[] unitName() default StringConstant.EMPTY;
+
+    UnitCodecStrategy unitStrategy() default UnitCodecStrategy.ALIAS;
+
+    String unitAliasType() default StringConstant.EMPTY;
+
+    AliasUndefinedStrategy unitAliasUndefinedStrategy() default AliasUndefinedStrategy.AUTO_COMPOSITE;
 
     /**
      * @return 值字段名称

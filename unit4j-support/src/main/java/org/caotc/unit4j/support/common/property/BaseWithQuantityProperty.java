@@ -19,19 +19,20 @@ package org.caotc.unit4j.support.common.property;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import org.caotc.unit4j.api.annotation.WithUnit;
+import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.support.common.util.QuantityUtil;
 
 import java.lang.annotation.Annotation;
 import java.util.Optional;
@@ -44,18 +45,23 @@ import java.util.Optional;
 @EqualsAndHashCode
 @ToString
 @AllArgsConstructor
-public abstract class BaseQuantityProperty<O, P, D extends Property<O, P>> implements Property<O, Quantity> {
-    //    @Delegate(types=Property.class)
+@Getter(AccessLevel.PROTECTED)
+public abstract class BaseWithQuantityProperty<O, P, D extends Property<O, P>> implements Property<O, Quantity> {
     @NonNull
-    protected D delegate;
+    D delegate;
+
     @NonNull
     @Getter(lazy = true)
-    WithUnit withUnit = delegate.annotationExact(WithUnit.class);
+    WithUnit withUnit = delegate().annotationExact(WithUnit.class);
+
+    @NonNull
+    @Getter(lazy = true)
+    Unit unit = Configuration.findUnitExact(withUnit().value());
 
     @Override
     @NonNull
     public String name() {
-        return delegate.name();
+        return delegate().name();
     }
 
     @Override
@@ -66,7 +72,7 @@ public abstract class BaseQuantityProperty<O, P, D extends Property<O, P>> imple
 
     @Override
     public @NonNull TypeToken<O> ownerType() {
-        return delegate.ownerType();
+        return delegate().ownerType();
     }
 
     @Override
@@ -86,48 +92,48 @@ public abstract class BaseQuantityProperty<O, P, D extends Property<O, P>> imple
 
     @Override
     public boolean readable() {
-        return delegate.readable();
+        return delegate().readable();
     }
 
     @Override
     public boolean writable() {
-        return delegate.writable();
+        return delegate().writable();
     }
 
     @Override
     public boolean accessible() {
-        return delegate.accessible();
+        return delegate().accessible();
     }
 
     @Override
     public ReadableProperty<O, Quantity> toReadable() {
-        return new ReadableQuantityProperty<>(delegate.toReadable());
+        return new ReadableWithQuantityProperty<>(delegate().toReadable());
     }
 
     @Override
     public WritableProperty<O, Quantity> toWritable() {
-        return new WritableQuantityProperty<>(delegate.toWritable());
+        return new WritableWithQuantityProperty<>(delegate().toWritable());
     }
 
     @Override
     public AccessibleProperty<O, Quantity> toAccessible() {
-        return new AccessibleQuantityProperty<>(delegate.toAccessible());
+        return new AccessibleWithQuantityProperty<>(delegate().toAccessible());
     }
 
     @Override
     @NonNull
     public <X extends Annotation> Optional<X> annotation(@NonNull Class<X> annotationClass) {
-        return delegate.annotation(annotationClass);
+        return delegate().annotation(annotationClass);
     }
 
     @Override
     @NonNull
     public <X extends Annotation> ImmutableList<X> annotations(@NonNull Class<X> annotationClass) {
-        return delegate.annotations(annotationClass);
+        return delegate().annotations(annotationClass);
     }
 
-    @NonNull
-    protected Unit unit() {
-        return QuantityUtil.readUnit(withUnit());
+    @Override
+    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
+        return delegate().checkOwnerType(newOwnerType);
     }
 }

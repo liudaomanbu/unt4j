@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
+import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 
@@ -31,15 +32,21 @@ import java.math.MathContext;
  * @since 1.0.0
  */
 @Value
-public class WritableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Quantity> {
-    public WritableQuantityProperty(@NonNull WritableProperty<O, P> delegate) {
+public class WritableWithQuantityProperty<O, P> extends BaseWithQuantityProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Quantity> {
+    //todo
+    @NonNull
+    Configuration configuration = Configuration.defaultInstance();
+    @NonNull
+    MathContext mathContext = configuration.mathContext();
+
+    public WritableWithQuantityProperty(@NonNull WritableProperty<O, P> delegate) {
         super(delegate);
     }
 
-
     @Override
     public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
-        return delegate.write(target, value.convertTo(unit()).value().value(delegate.type(), MathContext.UNLIMITED));
+        Quantity result = configuration().convert(value, unit());
+        return delegate().write(target, result.value().value(delegate().type(), mathContext()));
     }
 
     @Override
@@ -59,11 +66,6 @@ public class WritableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, W
 
     @Override
     public @NonNull <O1> WritableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return new WritableQuantityProperty<>(delegate.ownerType(ownerType));
-    }
-
-    @Override
-    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
-        return delegate.checkOwnerType(newOwnerType);
+        return new WritableWithQuantityProperty<>(delegate().ownerType(ownerType));
     }
 }

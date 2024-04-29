@@ -41,7 +41,7 @@ import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.caotc.unit4j.api.annotation.CodecStrategy;
+import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
@@ -172,7 +172,7 @@ public class InsertUpdateInterceptor implements Interceptor {
                                     break;
                                 case OBJECT:
                                     throw new IllegalArgumentException(
-                                            "database strategy can't use " + CodecStrategy.OBJECT);
+                                            "database strategy can't use " + QuantityCodecStrategy.OBJECT);
                                 default:
                                     throw new IllegalArgumentException();
                             }

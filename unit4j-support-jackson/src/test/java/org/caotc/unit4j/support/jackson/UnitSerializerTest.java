@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 class UnitSerializerTest {
 
-    UnitSerializer unitSerializer = new UnitSerializer(UnitCodecConfig.builder().type(Aliases.Types.ENGLISH_NAME)
+    UnitSerializer unitSerializer = new UnitSerializer(UnitCodecConfig.builder().alisType(Aliases.Types.ENGLISH_NAME)
             .configuration(Configuration.defaultInstance())
             .aliasUndefinedStrategy(AliasUndefinedStrategy.THROW_EXCEPTION).build());
     SimpleModule module = new SimpleModule("myModule").addSerializer(unitSerializer);

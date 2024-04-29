@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 the original author or authors.
+ * Copyright (C) 2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,37 +14,26 @@
  * limitations under the License.
  */
 
-package org.caotc.unit4j.support;
-
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Value;
-import lombok.With;
-import org.caotc.unit4j.core.Quantity;
-
-import java.math.MathContext;
+package org.caotc.unit4j.api.annotation;
 
 /**
- * {@link Quantity#value()}序列化反序列化配置
+ * 序列化、反序列化时的策略
  *
  * @author caotc
- * @date 2019-04-21
+ * @date 2019-04-24
  * @since 1.0.0
  */
-@Value
-@Builder(toBuilder = true)
-@With
-public class NumberCodecConfig {
-
+public enum QuantityCodecStrategy {
     /**
-     * 数值转换目标类
+     * 像普通对象一样序列化，即输出为一个json对象，里面包含所有属性
      */
-    @NonNull
-    Class<?> valueType;
+    OBJECT,
     /**
-     * 数学计算上下文对象
+     * 只输出值,单位为默认的固定单位
      */
-    @NonNull
-    MathContext mathContext;
-
+    VALUE,
+    /**
+     * 与{@see OBJECT}一样输出所有属性, 但是改为扁平化输出，即自己不是一个对象，而是多个字段
+     */
+    FLAT;
 }

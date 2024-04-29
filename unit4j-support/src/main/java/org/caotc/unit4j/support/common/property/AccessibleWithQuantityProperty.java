@@ -22,7 +22,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
-import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
+import org.caotc.unit4j.core.exception.PropertyValueNotFoundException;
 
 import java.math.MathContext;
 import java.util.Optional;
@@ -33,25 +33,25 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class AccessibleQuantityProperty<O, P> extends BaseQuantityProperty<O, P, AccessibleProperty<O, P>> implements AccessibleProperty<O, Quantity> {
-    public AccessibleQuantityProperty(@NonNull AccessibleProperty<O, P> delegate) {
+public class AccessibleWithQuantityProperty<O, P> extends BaseWithQuantityProperty<O, P, AccessibleProperty<O, P>> implements AccessibleProperty<O, Quantity> {
+    public AccessibleWithQuantityProperty(@NonNull AccessibleProperty<O, P> delegate) {
         super(delegate);
     }
 
     @NonNull
     public Optional<Quantity> read(@NonNull O target) {
-        return delegate.read(target).map(value -> Quantity.create(value, unit()));
+        return delegate().read(target).map(value -> Quantity.create(value, unit()));
     }
 
     @NonNull
     public Quantity readExact(@NonNull O target) {
         return read(target)
-                .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
+                .orElseThrow(() -> PropertyValueNotFoundException.create(this, target));
     }
 
     @Override
     public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
-        return delegate.write(target, value.convertTo(unit()).value().value(delegate.type(), MathContext.UNLIMITED));
+        return delegate().write(target, value.convertTo(unit()).value().value(delegate().type(), MathContext.UNLIMITED));
     }
 
     @Override
@@ -70,12 +70,7 @@ public class AccessibleQuantityProperty<O, P> extends BaseQuantityProperty<O, P,
     }
 
     @Override
-    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
-        return delegate.checkOwnerType(newOwnerType);
-    }
-
-    @Override
     public @NonNull <O1> AccessibleProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return new AccessibleQuantityProperty<>(delegate.ownerType(ownerType));
+        return new AccessibleWithQuantityProperty<>(delegate().ownerType(ownerType));
     }
 }

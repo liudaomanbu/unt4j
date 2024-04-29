@@ -31,9 +31,9 @@ import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.core.exception.ReadablePropertyNotFoundException;
 import org.caotc.unit4j.core.unit.Unit;
-import org.caotc.unit4j.support.common.property.AccessibleQuantityProperty;
-import org.caotc.unit4j.support.common.property.ReadableQuantityProperty;
-import org.caotc.unit4j.support.common.property.WritableQuantityProperty;
+import org.caotc.unit4j.support.common.property.AccessibleWithQuantityProperty;
+import org.caotc.unit4j.support.common.property.ReadableWithQuantityProperty;
+import org.caotc.unit4j.support.common.property.WritableWithQuantityProperty;
 import org.caotc.unit4j.support.exception.NotQuantityPropertyException;
 
 import java.math.BigDecimal;
@@ -52,9 +52,9 @@ public class QuantityUtil {
 
     private static final TypeToken<Quantity> QUANTITY_TYPE_TOKEN = TypeToken.of(Quantity.class);
 
-    public static void checkQuantityProperty(@NonNull Property<?, ?> amountProperty) {
-        Preconditions.checkArgument(isQuantityProperty(amountProperty), "%s is not a QuantityProperty",
-                amountProperty);
+    public static void checkQuantityProperty(@NonNull Property<?, ?> quantityProperty) {
+        Preconditions.checkArgument(isQuantityProperty(quantityProperty), "%s is not a QuantityProperty",
+                quantityProperty);
     }
 
     /**
@@ -134,7 +134,7 @@ public class QuantityUtil {
     private static <O, P> ReadableProperty<O, Quantity> warp(@NonNull ReadableProperty<O, P> readableValueProperty) {
         return readableValueProperty.type().equals(QUANTITY_TYPE_TOKEN) ?
                 (ReadableProperty<O, Quantity>) readableValueProperty
-                : new ReadableQuantityProperty<O, P>(readableValueProperty);
+                : new ReadableWithQuantityProperty<>(readableValueProperty);
     }
 
     @SuppressWarnings("unchecked")
@@ -142,7 +142,7 @@ public class QuantityUtil {
     private static <O, P> WritableProperty<O, Quantity> warp(@NonNull WritableProperty<O, P> writableValueProperty) {
         return writableValueProperty.type().equals(QUANTITY_TYPE_TOKEN) ?
                 (WritableProperty<O, Quantity>) writableValueProperty
-                : new WritableQuantityProperty<O, P>(writableValueProperty);
+                : new WritableWithQuantityProperty<>(writableValueProperty);
     }
 
     @SuppressWarnings("unchecked")
@@ -150,14 +150,14 @@ public class QuantityUtil {
     private static <O, P> AccessibleProperty<O, Quantity> warp(@NonNull AccessibleProperty<O, P> accessibleValueProperty) {
         return accessibleValueProperty.type().equals(QUANTITY_TYPE_TOKEN) ?
                 (AccessibleProperty<O, Quantity>) accessibleValueProperty
-                : new AccessibleQuantityProperty<O, P>(accessibleValueProperty);
+                : new AccessibleWithQuantityProperty<>(accessibleValueProperty);
     }
 
     @NonNull
     public static <T> Optional<Quantity> readQuantity(
-            @NonNull ReadableProperty<T, ?> amountReadableProperty,
+            @NonNull ReadableProperty<T, ?> quantityReadableProperty,
             @NonNull T object) {
-        Optional<?> optional = amountReadableProperty.read(object);
+        Optional<?> optional = quantityReadableProperty.read(object);
         if (!optional.isPresent()) {
             return Optional.empty();
         }
@@ -167,8 +167,8 @@ public class QuantityUtil {
             return Optional.of((Quantity) value);
         }
 
-        WithUnit withUnit = amountReadableProperty.annotation(WithUnit.class).orElseThrow(
-                () -> NotQuantityPropertyException.of(amountReadableProperty));
+        WithUnit withUnit = quantityReadableProperty.annotation(WithUnit.class).orElseThrow(
+                () -> NotQuantityPropertyException.of(quantityReadableProperty));
         Unit unit = readUnit(withUnit);
 
         if (value instanceof BigDecimal) {
@@ -184,45 +184,45 @@ public class QuantityUtil {
         }
 
         if (value instanceof Long) {
-            return Optional.of(Quantity.create((Long) value, unit));
+            return Optional.of(Quantity.create(value, unit));
         }
         throw new IllegalArgumentException();
     }
 
     @SuppressWarnings("unchecked")
     public static <T> void writeQuantity(
-            @NonNull WritableProperty<T, ?> amountWritableProperty,
+            @NonNull WritableProperty<T, ?> quantityWritableProperty,
             @NonNull T object, @NonNull Quantity quantity) {
-        checkQuantityProperty(amountWritableProperty);
-        Optional<Unit> targetUnit = readDeserializeTargetUnit(amountWritableProperty);
-        TypeToken<?> typeToken = amountWritableProperty.type();
+        checkQuantityProperty(quantityWritableProperty);
+        Optional<Unit> targetUnit = readDeserializeTargetUnit(quantityWritableProperty);
+        TypeToken<?> typeToken = quantityWritableProperty.type();
         boolean isQuantityType = typeToken.equals(TypeToken.of(Quantity.class));
         //TODO 配置对象指定功能
         Quantity actualQuantity = targetUnit.map(quantity::convertTo).orElse(quantity);
         if (isQuantityType) {
-            WritableProperty<T, Quantity> actual = (WritableProperty<T, Quantity>) amountWritableProperty;
+            WritableProperty<T, Quantity> actual = (WritableProperty<T, Quantity>) quantityWritableProperty;
             actual.write(object, actualQuantity);
         } else {
-            WritableProperty<T, Object> actual = (WritableProperty<T, Object>) amountWritableProperty;
+            WritableProperty<T, Object> actual = (WritableProperty<T, Object>) quantityWritableProperty;
             //TODO 上下文配置
             Object value = actualQuantity.value(typeToken.getRawType(), MathContext.UNLIMITED);
             actual.write(object, value);
-            Optional<WithUnit> withUnit = amountWritableProperty.annotation(WithUnit.class);
+            Optional<WithUnit> withUnit = quantityWritableProperty.annotation(WithUnit.class);
         }
     }
 
     @NonNull
     public static <T> Optional<Unit> readDeserializeTargetUnit(
-            @NonNull Property<T, ?> amountProperty) {
-        checkQuantityProperty(amountProperty);
-        return amountProperty.annotation(WithUnit.class)
+            @NonNull Property<T, ?> quantityProperty) {
+        checkQuantityProperty(quantityProperty);
+        return quantityProperty.annotation(WithUnit.class)
                 .map(WithUnit::value)
                 //TODO 配置对象定制
                 .map(Configuration::findUnitExact);
     }
 
     @NonNull
-    public static <T> Unit readUnit(
+    public static Unit readUnit(
             @NonNull WithUnit withUnit) {
         String unitId = withUnit.value();
         return Configuration.findUnitExact(unitId);

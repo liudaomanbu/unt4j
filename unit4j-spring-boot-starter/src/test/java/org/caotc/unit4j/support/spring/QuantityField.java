@@ -18,8 +18,8 @@ package org.caotc.unit4j.support.spring;
 
 import lombok.Value;
 import lombok.experimental.Accessors;
-import org.caotc.unit4j.api.annotation.CodecStrategy;
 import org.caotc.unit4j.api.annotation.DataType;
+import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.api.annotation.QuantityDeserialize;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.core.Quantity;
@@ -33,17 +33,17 @@ import java.math.RoundingMode;
 public class QuantityField {
 
     Quantity noAnnotationQuantity;
-    @QuantitySerialize(strategy = CodecStrategy.VALUE, valueType = BigDecimal.class)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.VALUE, valueType = BigDecimal.class)
     Quantity annotationValueQuantity;
-    @QuantitySerialize(strategy = CodecStrategy.OBJECT, valueType = byte.class, valueRoundingMode = RoundingMode.HALF_UP)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.OBJECT, valueType = byte.class, valueRoundingMode = RoundingMode.HALF_UP)
     Quantity annotationObjectQuantity;
-    @QuantitySerialize(strategy = CodecStrategy.FLAT, valueType = String.class)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT, valueType = String.class)
     Quantity annotationFlatQuantity;
-    @QuantitySerialize(strategy = CodecStrategy.VALUE, targetUnitId = "SECOND")
-    @QuantityDeserialize(strategy = CodecStrategy.VALUE)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.VALUE, targetUnitId = "SECOND")
+    @QuantityDeserialize(strategy = QuantityCodecStrategy.VALUE)
     Integer dbValue;
-    @QuantitySerialize(strategy = CodecStrategy.FLAT, targetUnitId = "MINUTE")
-    @QuantityDeserialize(strategy = CodecStrategy.VALUE)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT, targetUnitId = "MINUTE")
+    @QuantityDeserialize(strategy = QuantityCodecStrategy.VALUE)
     Integer jsonValue;
 
     public static QuantityField create(Quantity quantity) {

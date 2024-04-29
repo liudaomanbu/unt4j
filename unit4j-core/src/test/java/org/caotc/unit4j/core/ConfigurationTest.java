@@ -200,8 +200,8 @@ class ConfigurationTest {
     void registerAlias() {
         Configuration configuration = Configuration.of();
         Random random = new Random();
-        Prefix prefix = Prefix.of(random.nextInt()+"");
-        Alias prefixAlias = Alias.create(Alias.Type.create(random.nextInt() + ""), random.nextInt() + "");
+        Prefix prefix = Prefix.of(random.nextInt() + "");
+        Alias prefixAlias = Alias.create(Alias.Type.of(random.nextInt() + ""), random.nextInt() + "");
         StandardUnit standardUnit = Unit.of(random.nextInt() + "", UnitTypes.LENGTH);
         Alias standardUnitAlias = prefixAlias.withValue(random.nextInt() + "");
         PrefixUnit unit = standardUnit.addPrefix(prefix);
@@ -240,7 +240,7 @@ class ConfigurationTest {
         Assertions.assertTrue(unitOptional.isPresent());
         Assertions.assertEquals(unit, unitOptional.get());
 
-        Alias unitAlias = Alias.create(Alias.Type.create(random.nextInt() + ""), random.nextInt() + "");
+        Alias unitAlias = Alias.create(Alias.Type.of(random.nextInt() + ""), random.nextInt() + "");
         configuration.registerAlias(unit, unitAlias);
         unitAliases = configuration.aliases(unit);
         log.debug("unitAliases:{}", unitAliases);

@@ -33,7 +33,7 @@ import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 @RequiredArgsConstructor(staticName = "create")
 @Getter
 @EqualsAndHashCode
-public class ReadablePropertyValueNotFoundException extends IllegalStateException {
+public class PropertyValueNotFoundException extends IllegalStateException {
 
     @NonNull
     ReadableProperty<?, ?> readableProperty;

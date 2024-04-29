@@ -19,7 +19,7 @@ package org.caotc.unit4j.support.mybatis.model;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.caotc.unit4j.api.annotation.CodecStrategy;
+import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.api.annotation.QuantityDeserialize;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.api.annotation.WithUnit;
@@ -37,7 +37,7 @@ public class TestAmountWithUnitAndAmountSerialize {
     Long id;
 
     //TODO AmountSerialize,AmountDeserialize,WithUnit注解之间的关系,属性覆盖处理
-    @QuantitySerialize(targetUnitId = "SECOND", strategy = CodecStrategy.FLAT, valueName = "with_unit_property", unitName = "unit")
+    @QuantitySerialize(targetUnitId = "SECOND", strategy = QuantityCodecStrategy.FLAT, valueName = "with_unit_property", unitName = "unit")
     @QuantityDeserialize()
     @WithUnit("MINUTE")
     BigDecimal dataValue;

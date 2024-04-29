@@ -17,7 +17,7 @@
 package org.caotc.unit4j.support.mybatis.model;
 
 import lombok.Data;
-import org.caotc.unit4j.api.annotation.CodecStrategy;
+import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.api.annotation.QuantityDeserialize;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.core.Quantity;
@@ -37,8 +37,8 @@ public class TestQuantity {
 
     Long id;
 
-    @QuantitySerialize(strategy = CodecStrategy.FLAT)
-    @QuantityDeserialize(strategy = CodecStrategy.FLAT)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT)
+    @QuantityDeserialize(strategy = QuantityCodecStrategy.FLAT)
     Quantity data;
 
     public static void main(String[] args) {

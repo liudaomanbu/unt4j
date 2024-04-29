@@ -115,7 +115,7 @@ public class Provider {
     static Stream<Alias> errorUnitTypeAliases() {
         return aliasAndUnitTypes().map(arguments -> (Alias) arguments.get()[0])
                 .flatMap(alias -> Stream.of(alias.withValue(alias.value() + Math.random()),
-                        alias.withType(Alias.Type.create(alias.type().name() + Math.random()))));
+                        alias.withType(Alias.Type.of(alias.type().name() + Math.random()))));
     }
 
     @SuppressWarnings("unchecked")
@@ -127,7 +127,7 @@ public class Provider {
     static Stream<Alias> errorPrefixAliases() {
         return aliasAndPrefixes().map(arguments -> (Alias) arguments.get()[0])
                 .flatMap(alias -> Stream.of(alias.withValue(alias.value() + Math.random()),
-                        alias.withType(Alias.Type.create(alias.type().name() + Math.random()))));
+                        alias.withType(Alias.Type.of(alias.type().name() + Math.random()))));
     }
 
     @SuppressWarnings("unchecked")
@@ -139,7 +139,7 @@ public class Provider {
     static Stream<Alias> errorUnitAliases() {
         return aliasAndUnits().map(arguments -> (Alias) arguments.get()[0])
                 .flatMap(alias -> Stream.of(alias.withValue(alias.value() + Math.random()),
-                        alias.withType(Alias.Type.create(alias.type().name() + Math.random()))));
+                        alias.withType(Alias.Type.of(alias.type().name() + Math.random()))));
     }
 
     @SuppressWarnings("unchecked")

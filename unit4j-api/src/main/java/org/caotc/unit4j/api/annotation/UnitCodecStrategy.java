@@ -23,15 +23,19 @@ package org.caotc.unit4j.api.annotation;
  * @date 2019-04-24
  * @since 1.0.0
  */
-public enum CodecStrategy {
+public enum UnitCodecStrategy {
     /**
      * 像普通对象一样序列化，即输出为一个json对象，里面包含所有属性
      */
     OBJECT,
     /**
-     * 只输出值,单位为默认的固定单位
+     * 只输出id
      */
-    VALUE,
+    ID,
+    /**
+     * 只输出别名
+     */
+    ALIAS,
     /**
      * 与{@see OBJECT}一样输出所有属性, 但是改为扁平化输出，即自己不是一个对象，而是多个字段
      */

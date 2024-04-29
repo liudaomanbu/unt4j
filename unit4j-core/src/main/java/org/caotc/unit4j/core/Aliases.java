@@ -678,18 +678,18 @@ public class Aliases {
         /**
          * 英文名称
          */
-        public static final Alias.Type ENGLISH_NAME = Alias.Type.create("ENGLISH_NAME");
+        public static final Alias.Type ENGLISH_NAME = Alias.Type.of("ENGLISH_NAME");
         /**
          * 英文名称
          */
-        public static final Alias.Type CHINESE_NAME = Alias.Type.create("CHINESE_NAME");
+        public static final Alias.Type CHINESE_NAME = Alias.Type.of("CHINESE_NAME");
         /**
          * 缩写
          */
-        public static final Alias.Type ABBREVIATION = Alias.Type.create("ABBREVIATION");
+        public static final Alias.Type ABBREVIATION = Alias.Type.of("ABBREVIATION");
         /**
          * 符号
          */
-        public static final Alias.Type SYMBOL = Alias.Type.create("SYMBOL");
+        public static final Alias.Type SYMBOL = Alias.Type.of("SYMBOL");
     }
 }

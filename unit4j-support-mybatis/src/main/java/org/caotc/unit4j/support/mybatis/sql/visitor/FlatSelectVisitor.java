@@ -20,11 +20,11 @@ import com.google.common.base.Preconditions;
 import lombok.NonNull;
 import lombok.Value;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import org.caotc.unit4j.api.annotation.CodecStrategy;
+import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 
 /**
- * {@link CodecStrategy#FLAT}策略的查询语句访问器
+ * {@link QuantityCodecStrategy#FLAT}策略的查询语句访问器
  *
  * @author caotc
  * @date 2019-09-19
@@ -39,7 +39,7 @@ public class FlatSelectVisitor extends AbstractSelectVisitor {
     ColumnAddSelectVisitor columnAddSelectVisitor;
 
     public FlatSelectVisitor(@NonNull QuantityCodecConfig quantityCodecConfig) {
-        Preconditions.checkArgument(CodecStrategy.FLAT == quantityCodecConfig.strategy());
+        Preconditions.checkArgument(QuantityCodecStrategy.FLAT == quantityCodecConfig.strategy());
         this.columnRenameSelectVisitor = new ColumnRenameSelectVisitor(quantityCodecConfig.outputName()
                 , quantityCodecConfig.outputValueName());
         this.columnAddSelectVisitor = new ColumnAddSelectVisitor(quantityCodecConfig.outputUnitName());

@@ -20,6 +20,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
+import org.caotc.unit4j.api.annotation.UnitCodecStrategy;
 import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
@@ -36,37 +37,24 @@ import org.caotc.unit4j.core.unit.Unit;
 @Builder(toBuilder = true)
 @With
 public class UnitCodecConfig {
-
-  /**
-   * 别名类型
-   */
-  @NonNull
-  Alias.Type type;
-  /**
-   * 配置
-   */
-  @NonNull
-  Configuration configuration;
-  /**
-   * 别名未定义
-   */
-  @NonNull
-  AliasUndefinedStrategy aliasUndefinedStrategy;
-
-  /**
-   * 获取单位的序列化指令
-   *
-   * @param unit 单位
-   * @return 序列化指令
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  @NonNull
-  public String serialize(@NonNull Unit unit) {
-    //TODO 增加UnitSerializeStrategy
-//    return configuration().aliases(unit, type()).stream().map(Alias::value).findFirst()
-//            .orElseGet(() -> aliasUndefinedStrategy().execute(unit, configuration(), type()));
-    return "";
-  }
+    /**
+     * 序列化和反序列化策略
+     */
+    @NonNull
+    UnitCodecStrategy strategy;
+    /**
+     * 配置
+     */
+    @NonNull
+    Configuration configuration;
+    /**
+     * 别名类型
+     */
+    @NonNull
+    Alias.Type alisType;
+    /**
+     * 别名未定义策略
+     */
+    @NonNull
+    AliasUndefinedStrategy aliasUndefinedStrategy;
 }

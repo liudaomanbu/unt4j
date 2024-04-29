@@ -15,9 +15,8 @@ import lombok.With;
 @With
 public class Alias {
 
-  @Value(staticConstructor = "create")
+  @Value(staticConstructor = "of")
   public static class Type {
-
     @NonNull
     String name;
   }

@@ -22,7 +22,7 @@ import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
-import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
+import org.caotc.unit4j.core.exception.PropertyValueNotFoundException;
 
 import java.util.Optional;
 
@@ -32,20 +32,20 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class ReadableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, ReadableProperty<O, P>> implements ReadableProperty<O, Quantity> {
-    public ReadableQuantityProperty(@NonNull ReadableProperty<O, P> delegate) {
+public class ReadableWithQuantityProperty<O, P> extends BaseWithQuantityProperty<O, P, ReadableProperty<O, P>> implements ReadableProperty<O, Quantity> {
+    public ReadableWithQuantityProperty(@NonNull ReadableProperty<O, P> delegate) {
         super(delegate);
     }
 
     @NonNull
     public Optional<Quantity> read(@NonNull O target) {
-        return delegate.read(target).map(value -> Quantity.create(value, unit()));
+        return delegate().read(target).map(value -> Quantity.create(value, unit()));
     }
 
     @NonNull
     public Quantity readExact(@NonNull O target) {
         return read(target)
-                .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
+                .orElseThrow(() -> PropertyValueNotFoundException.create(this, target));
     }
 
     @Override
@@ -65,11 +65,6 @@ public class ReadableQuantityProperty<O, P> extends BaseQuantityProperty<O, P, R
 
     @Override
     public @NonNull <O1> ReadableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return new ReadableQuantityProperty<>(delegate.ownerType(ownerType));
-    }
-
-    @Override
-    public boolean checkOwnerType(@NonNull TypeToken<?> newOwnerType) {
-        return delegate.checkOwnerType(newOwnerType);
+        return new ReadableWithQuantityProperty<>(delegate().ownerType(ownerType));
     }
 }

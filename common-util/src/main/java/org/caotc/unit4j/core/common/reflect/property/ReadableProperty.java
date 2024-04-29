@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import org.caotc.unit4j.core.common.reflect.property.accessor.PropertyReader;
-import org.caotc.unit4j.core.exception.ReadablePropertyValueNotFoundException;
+import org.caotc.unit4j.core.exception.PropertyValueNotFoundException;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -79,7 +79,7 @@ public interface ReadableProperty<O, P> extends Property<O, P> {
     @NonNull
     default P readExact(@NonNull O target) {
         return read(target)
-                .orElseThrow(() -> ReadablePropertyValueNotFoundException.create(this, target));
+                .orElseThrow(() -> PropertyValueNotFoundException.create(this, target));
     }
 
     @NonNull

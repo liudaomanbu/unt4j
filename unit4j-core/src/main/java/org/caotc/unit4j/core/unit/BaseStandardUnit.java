@@ -47,11 +47,11 @@ public class BaseStandardUnit extends StandardUnit {
     @NonNull
     String id;
 
-  /**
-   * 单位类型
-   */
-  @NonNull
-  BaseUnitType type;
+    /**
+     * 单位类型
+     */
+    @NonNull
+    BaseUnitType type;
 
     @Override
     public @NonNull Unit simplify(boolean recursive) {
@@ -65,7 +65,7 @@ public class BaseStandardUnit extends StandardUnit {
     }
 
 
-  public @NonNull BasePrefixUnit addPrefix(@NonNull Prefix prefix) {
-      return new BasePrefixUnit(prefix, this);
-  }
+    public @NonNull BasePrefixUnit addPrefix(@NonNull Prefix prefix) {
+        return new BasePrefixUnit(prefix, this);
+    }
 }

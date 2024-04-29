@@ -19,6 +19,7 @@ package org.caotc.unit4j.api.annotation;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.constant.StringConstant;
+import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -45,7 +46,7 @@ public @interface QuantitySerialize {
     /**
      * @return 序列化策略
      */
-    CodecStrategy strategy() default CodecStrategy.VALUE;
+    QuantityCodecStrategy strategy() default QuantityCodecStrategy.VALUE;
 
     /**
      * @return 配置对象主键
@@ -64,9 +65,19 @@ public @interface QuantitySerialize {
     String[] unitName() default StringConstant.EMPTY;
 
     /**
-     * @return 目标单位id
+     * @return 单位序列化策略
      */
-    String targetUnitId() default StringConstant.EMPTY;
+    UnitCodecStrategy unitStrategy() default UnitCodecStrategy.ALIAS;
+
+    /**
+     * @return 单位别名类型.单位序列化中有别名时被使用.
+     */
+    String unitAliasType() default StringConstant.EMPTY;
+
+    /**
+     * @return 单位别名未定义策略.单位序列化中有别名时被使用.
+     */
+    AliasUndefinedStrategy unitAliasUndefinedStrategy() default AliasUndefinedStrategy.AUTO_COMPOSITE;
 
     /**
      * @return 值字段名称
@@ -81,7 +92,7 @@ public @interface QuantitySerialize {
     /**
      * @return 数学计算中的舍入模式
      */
-    RoundingMode valueRoundingMode() default RoundingMode.UNNECESSARY;
+    RoundingMode valueRoundingMode() default RoundingMode.HALF_UP;
 
     /**
      * @return 数学计算精度
