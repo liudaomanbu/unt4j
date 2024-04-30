@@ -39,13 +39,9 @@ import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
-import org.caotc.unit4j.core.math.number.Number;
-import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.common.util.QuantityUtil;
-import org.caotc.unit4j.support.mybatis.constant.AmountPropertyConstant;
-import org.caotc.unit4j.support.mybatis.sql.visitor.FlatSelectVisitor;
 import org.caotc.unit4j.support.mybatis.util.PluginUtil;
 
 import java.sql.Connection;
@@ -68,7 +64,7 @@ public class SelectInterceptor implements Interceptor {
     private static final String MAPPED_STATEMENT_RESULT_MAPS_FIELD_NAME = "resultMaps";
 
     Unit4jProperties unit4jProperties = new Unit4jProperties()
-            .setDefaultNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
+//            .setDefaultNameSplitter(CaseFormat.LOWER_UNDERSCORE::split)
             .setDefaultFieldNameJoiner((valueFieldNameWords, objectFieldNameWords) -> CaseFormat.LOWER_UNDERSCORE
                     .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList())));
 
@@ -127,7 +123,7 @@ public class SelectInterceptor implements Interceptor {
                         case VALUE:
                             break;
                         case FLAT:
-                            select.getSelectBody().accept(new FlatSelectVisitor(amountCodecConfig));
+//                            select.getSelectBody().accept(new FlatSelectVisitor(amountCodecConfig));
                             break;
                         case OBJECT:
                             throw new IllegalArgumentException(
@@ -170,12 +166,12 @@ public class SelectInterceptor implements Interceptor {
                         "database strategy can't use " + QuantityCodecStrategy.OBJECT);
             case VALUE:
                 //TODO outputName
-                ResultMapping amountResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputName(), Number.class).build();
-                return Stream.of(amountResultMapping);
+//                ResultMapping amountResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputName(), Number.class).build();
+//                return Stream.of(amountResultMapping);
             case FLAT:
-                ResultMapping amountValueResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputValueName(), Number.class).build();
-                ResultMapping amountUnitResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.UNIT, quantityCodecConfig.outputUnitName(), Unit.class).build();
-                return Stream.of(amountValueResultMapping, amountUnitResultMapping);
+//                ResultMapping amountValueResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputValueName(), Number.class).build();
+//                ResultMapping amountUnitResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.UNIT, quantityCodecConfig.outputUnitName(), Unit.class).build();
+//                return Stream.of(amountValueResultMapping, amountUnitResultMapping);
             default:
                 throw new IllegalStateException("Unexpected value: " + quantityCodecConfig.strategy());
         }

@@ -57,8 +57,8 @@ public class QuantitySerializer implements ObjectSerializer {
 
     public QuantitySerializer(@NonNull QuantityCodecConfig quantityCodecConfig) {
         this.quantityCodecConfig = quantityCodecConfig;
-        numberSerializer = new NumberSerializer(quantityCodecConfig().valueCodecConfig());
-        unitSerializer = new UnitSerializer(quantityCodecConfig().unitCodecConfig());
+        numberSerializer = NumberSerializer.of(quantityCodecConfig().valueCodecConfig());
+        unitSerializer = UnitSerializer.of(quantityCodecConfig().unitCodecConfig());
     }
 
     @Override

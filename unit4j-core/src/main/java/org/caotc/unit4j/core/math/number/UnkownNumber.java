@@ -46,14 +46,13 @@ public class UnkownNumber implements Number {
 
     @Override
     public @NonNull Number add(@NonNull Number augend) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NonNull Number multiply(@NonNull Number multiplicand) {
-        return null;
+        throw new UnsupportedOperationException();
     }
-
 
     @Override
     public @NonNull Number pow(int exponent) {
@@ -67,23 +66,21 @@ public class UnkownNumber implements Number {
 
     @Override
     public @NonNull Number reciprocal() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int compareTo(@NonNull Number o) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NonNull BigFraction bigFractionValue() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NonNull BigFraction bigFractionValueExact() {
-        return null;
+        throw new UnsupportedOperationException();
     }
-
-
 }

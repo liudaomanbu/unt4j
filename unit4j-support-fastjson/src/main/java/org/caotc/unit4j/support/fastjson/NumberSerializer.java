@@ -20,10 +20,11 @@ import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.support.NumberCodecConfig;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -33,7 +34,8 @@ import java.lang.reflect.Type;
  * @date 2019-04-24
  * @since 1.0.0
  */
-@Value
+@Value(staticConstructor = "of")
+@Slf4j
 public class NumberSerializer implements ObjectSerializer {
 
     /**
@@ -44,8 +46,8 @@ public class NumberSerializer implements ObjectSerializer {
 
     @Override
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
-                      int features) throws IOException {
-//    Number value = (Number) object;
-//        serializer.write(numberCodecConfig.createSerializeCommands(value));
+                      int features) {
+        Number value = (Number) object;
+        serializer.write(value.value(numberCodecConfig().valueType(), numberCodecConfig().mathContext()));
     }
 }

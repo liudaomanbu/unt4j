@@ -18,7 +18,7 @@ package org.caotc.unit4j.support.exception;
 
 import lombok.NonNull;
 import lombok.Value;
-import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.property.Property;
 
 /**
  * @author caotc
@@ -29,6 +29,6 @@ import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 public class NotQuantityPropertyException extends IllegalArgumentException {
 
     @NonNull
-    ReadableProperty<?, ?> property;
+    Property<?, ?> property;
 
 }

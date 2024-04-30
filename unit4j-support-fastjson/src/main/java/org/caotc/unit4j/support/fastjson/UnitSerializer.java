@@ -4,6 +4,7 @@ import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.UnitCodecConfig;
 
@@ -17,7 +18,8 @@ import java.lang.reflect.Type;
  * @date 2019-04-24
  * @since 1.0.0
  */
-@Value
+@Value(staticConstructor = "of")
+@Slf4j
 public class UnitSerializer implements ObjectSerializer {
 
   /**
@@ -29,7 +31,14 @@ public class UnitSerializer implements ObjectSerializer {
   @Override
   public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
       int features) throws IOException {
+    log.error("object:{},fieldName:{},fieldType:{}", object, fieldName, fieldType);
     Unit unit = (Unit) object;
+//    serializer.writeWithFieldName("field1Value","field1Name");
+//    serializer.getWriter().append('{').append('}');
+//    serializer.getWriter()
+//            .append("unit_id:\"METER\"")
+//            .append(",")
+//            .append("unit_type:\"LENGTH\"");
 //    serializer.write(unitCodecConfig.serialize(unit));
   }
 

@@ -24,7 +24,6 @@ import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
-import org.caotc.unit4j.core.convert.SingletonUnitFinder;
 
 import java.util.List;
 
@@ -53,11 +52,6 @@ public class QuantityCodecConfig {
     CaseFormat nameCaseFormat;
     @NonNull
     List<String> outputUnitName;
-    /**
-     * 目标单位
-     */
-    @NonNull
-    SingletonUnitFinder targetUnitFinder;
     @NonNull
     List<String> outputValueName;
     /**

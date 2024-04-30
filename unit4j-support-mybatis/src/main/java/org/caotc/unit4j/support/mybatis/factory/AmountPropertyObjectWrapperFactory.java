@@ -46,7 +46,7 @@ public class AmountPropertyObjectWrapperFactory implements ObjectWrapperFactory 
 
     @Override
     public boolean hasWrapperFor(Object object) {
-        return !QuantityUtil.writableQuantityPropertiesFromClass(object.getClass()).isEmpty();
+        return !QuantityUtil.writableQuantityProperties(object.getClass()).isEmpty();
     }
 
     @Override

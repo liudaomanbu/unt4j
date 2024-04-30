@@ -32,15 +32,10 @@ import java.math.MathContext;
  * @since 1.0.0
  */
 @Value
-public class WritableWithQuantityProperty<O, P> extends BaseWithQuantityProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Quantity> {
-    //todo
-    @NonNull
-    Configuration configuration = Configuration.defaultInstance();
-    @NonNull
-    MathContext mathContext = configuration.mathContext();
+public class WritableWithUnitProperty<O, P> extends BaseWithUnitProperty<O, P, WritableProperty<O, P>> implements WritableProperty<O, Quantity> {
 
-    public WritableWithQuantityProperty(@NonNull WritableProperty<O, P> delegate) {
-        super(delegate);
+    public WritableWithUnitProperty(@NonNull WritableProperty<O, P> delegate, @NonNull Configuration configuration, @NonNull MathContext mathContext) {
+        super(delegate, configuration, mathContext);
     }
 
     @Override
@@ -66,6 +61,6 @@ public class WritableWithQuantityProperty<O, P> extends BaseWithQuantityProperty
 
     @Override
     public @NonNull <O1> WritableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return new WritableWithQuantityProperty<>(delegate().ownerType(ownerType));
+        return new WritableWithUnitProperty<>(delegate().ownerType(ownerType), configuration(), mathContext());
     }
 }

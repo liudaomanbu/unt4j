@@ -40,8 +40,7 @@ class QuantityValueSerializerTest {
     QuantityCodecConfig quantityCodecConfig = unit4jProperties.createQuantityCodecConfig();
     Quantity quantity = Quantity.create("123.56", Units.SECOND);
     QuantityValueSerializer quantityValueSerializer = new QuantityValueSerializer(
-            new NumberCodecConfig(
-                    BigDecimal.class, MathContext.UNLIMITED));
+            NumberCodecConfig.builder().valueType(BigDecimal.class).mathContext(MathContext.UNLIMITED).build());
     SimpleModule module = new SimpleModule("myModule").addSerializer(quantityValueSerializer);
     ObjectMapper mapper = new ObjectMapper().registerModule(module);
 

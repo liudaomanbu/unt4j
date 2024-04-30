@@ -443,9 +443,7 @@ public interface Number extends Comparable<Number> {
   @NonNull
   default java.math.BigDecimal bigDecimalValue(@NonNull MathContext mathContext) {
     BigFraction value = bigFractionValue();
-    int bigIntegerPrecision = new java.math.BigDecimal(value.getNumerator().divide(value.getDenominator())).precision();
-    int scale=mathContext.getPrecision()-bigIntegerPrecision;
-    return value.bigDecimalValue(scale,mathContext.getRoundingMode().ordinal());
+    return new java.math.BigDecimal(value.getNumerator()).divide(new java.math.BigDecimal(value.getDenominator()), mathContext);
   }
 
   /**

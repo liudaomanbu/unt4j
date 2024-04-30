@@ -37,7 +37,7 @@ public class TestAmountWithUnitAndAmountSerialize {
     Long id;
 
     //TODO AmountSerialize,AmountDeserialize,WithUnit注解之间的关系,属性覆盖处理
-    @QuantitySerialize(targetUnitId = "SECOND", strategy = QuantityCodecStrategy.FLAT, valueName = "with_unit_property", unitName = "unit")
+    @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT, valueName = "with_unit_property", unitName = "unit")
     @QuantityDeserialize()
     @WithUnit("MINUTE")
     BigDecimal dataValue;

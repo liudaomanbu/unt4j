@@ -39,10 +39,10 @@ public class QuantityField {
     Quantity annotationObjectQuantity;
     @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT, valueType = String.class)
     Quantity annotationFlatQuantity;
-    @QuantitySerialize(strategy = QuantityCodecStrategy.VALUE, targetUnitId = "SECOND")
+    @QuantitySerialize(strategy = QuantityCodecStrategy.VALUE)
     @QuantityDeserialize(strategy = QuantityCodecStrategy.VALUE)
     Integer dbValue;
-    @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT, targetUnitId = "MINUTE")
+    @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT)
     @QuantityDeserialize(strategy = QuantityCodecStrategy.VALUE)
     Integer jsonValue;
 

@@ -35,6 +35,7 @@ import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.unit.Unit;
 
 import java.lang.annotation.Annotation;
+import java.math.MathContext;
 import java.util.Optional;
 
 /**
@@ -46,9 +47,13 @@ import java.util.Optional;
 @ToString
 @AllArgsConstructor
 @Getter(AccessLevel.PROTECTED)
-public abstract class BaseWithQuantityProperty<O, P, D extends Property<O, P>> implements Property<O, Quantity> {
+public abstract class BaseWithUnitProperty<O, P, D extends Property<O, P>> implements Property<O, Quantity> {
     @NonNull
     D delegate;
+    @NonNull
+    Configuration configuration;
+    @NonNull
+    MathContext mathContext;
 
     @NonNull
     @Getter(lazy = true)
@@ -107,17 +112,17 @@ public abstract class BaseWithQuantityProperty<O, P, D extends Property<O, P>> i
 
     @Override
     public ReadableProperty<O, Quantity> toReadable() {
-        return new ReadableWithQuantityProperty<>(delegate().toReadable());
+        return new ReadableWithUnitProperty<>(delegate().toReadable(), configuration(), mathContext());
     }
 
     @Override
     public WritableProperty<O, Quantity> toWritable() {
-        return new WritableWithQuantityProperty<>(delegate().toWritable());
+        return new WritableWithUnitProperty<>(delegate().toWritable(), configuration(), mathContext());
     }
 
     @Override
     public AccessibleProperty<O, Quantity> toAccessible() {
-        return new AccessibleWithQuantityProperty<>(delegate().toAccessible());
+        return new AccessibleWithUnitProperty<>(delegate().toAccessible(), configuration(), mathContext());
     }
 
     @Override

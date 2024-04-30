@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 the original author or authors.
+ * Copyright (C) 2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.reflect.TypeToken;
 import lombok.NonNull;
 import lombok.Value;
+import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
+import org.caotc.unit4j.core.common.reflect.property.AccessibleProperty;
 import org.caotc.unit4j.core.exception.PropertyValueNotFoundException;
 
+import java.math.MathContext;
 import java.util.Optional;
 
 /**
@@ -32,9 +34,9 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value
-public class ReadableWithQuantityProperty<O, P> extends BaseWithQuantityProperty<O, P, ReadableProperty<O, P>> implements ReadableProperty<O, Quantity> {
-    public ReadableWithQuantityProperty(@NonNull ReadableProperty<O, P> delegate) {
-        super(delegate);
+public class AccessibleWithUnitProperty<O, P> extends BaseWithUnitProperty<O, P, AccessibleProperty<O, P>> implements AccessibleProperty<O, Quantity> {
+    public AccessibleWithUnitProperty(@NonNull AccessibleProperty<O, P> delegate, @NonNull Configuration configuration, @NonNull MathContext mathContext) {
+        super(delegate, configuration, mathContext);
     }
 
     @NonNull
@@ -49,22 +51,28 @@ public class ReadableWithQuantityProperty<O, P> extends BaseWithQuantityProperty
     }
 
     @Override
+    public @NonNull O write(@NonNull O target, @NonNull Quantity value) {
+        Quantity result = configuration().convert(value, unit());
+        return delegate().write(target, result.value().value(delegate().type(), mathContext()));
+    }
+
+    @Override
     @NonNull
-    public <P1 extends Quantity> ReadableProperty<O, P1> type(@NonNull Class<P1> propertyType) {
+    public <P1 extends Quantity> AccessibleProperty<O, P1> type(@NonNull Class<P1> propertyType) {
         return type(TypeToken.of(propertyType));
     }
 
     @Override
     @NonNull
-    public <P1 extends Quantity> ReadableProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
+    public <P1 extends Quantity> AccessibleProperty<O, P1> type(@NonNull TypeToken<P1> propertyType) {
         Preconditions.checkArgument(propertyType.isSupertypeOf(type())
                 , "Property is known type %s,not %s ", type(), propertyType);
         //noinspection unchecked
-        return (ReadableProperty<O, P1>) this;
+        return (AccessibleProperty<O, P1>) this;
     }
 
     @Override
-    public @NonNull <O1> ReadableProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
-        return new ReadableWithQuantityProperty<>(delegate().ownerType(ownerType));
+    public @NonNull <O1> AccessibleProperty<O1, Quantity> ownerType(@NonNull TypeToken<O1> ownerType) {
+        return new AccessibleWithUnitProperty<>(delegate().ownerType(ownerType), configuration(), mathContext());
     }
 }

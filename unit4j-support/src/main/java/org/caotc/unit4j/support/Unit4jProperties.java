@@ -183,6 +183,7 @@ public class Unit4jProperties {
         return QuantityCodecConfig.builder()
                 .strategy(getDefaultStrategy())
                 .configuration(getDefaultConfiguration())
+                .nameCaseFormat(getDefaultNameCaseFormat())
                 .outputUnitName(getDefaultQuantityUnitFieldName())
                 .unitCodecConfig(UnitCodecConfig.builder()
                         .strategy(getDefaultUnitCodecStrategy())

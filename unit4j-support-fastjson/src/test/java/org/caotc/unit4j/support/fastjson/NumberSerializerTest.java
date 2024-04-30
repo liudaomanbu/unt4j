@@ -19,36 +19,51 @@ package org.caotc.unit4j.support.fastjson;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.math.number.BigFractionAdapter;
-import org.caotc.unit4j.core.unit.Units;
+import org.caotc.unit4j.core.math.number.Number;
+import org.caotc.unit4j.core.math.number.Numbers;
 import org.caotc.unit4j.support.NumberCodecConfig;
-import org.caotc.unit4j.support.QuantityCodecConfig;
-import org.caotc.unit4j.support.Unit4jProperties;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Random;
 
 @Slf4j
 class NumberSerializerTest {
 
-    Unit4jProperties unit4jProperties = new Unit4jProperties();
-    QuantityCodecConfig quantityCodecConfig = unit4jProperties.createQuantityCodecConfig();
-    SerializeConfig globalInstance = SerializeConfig.getGlobalInstance();
-    Quantity quantity = Quantity.create("123.56", Units.SECOND);
-    NumberSerializer numberSerializer = new NumberSerializer(
-            new NumberCodecConfig(BigDecimal.class, MathContext.UNLIMITED));
+    private static final SerializeConfig SERIALIZE_CONFIG = new SerializeConfig();
+    private static final NumberSerializer NUMBER_SERIALIZER = NumberSerializer.of(
+            NumberCodecConfig.builder()
+                    .valueType(byte.class)
+                    .mathContext(MathContext.UNLIMITED)
+                    .build());
 
-    @BeforeEach
-    void init() {
-        globalInstance.put(BigFractionAdapter.class, numberSerializer);
+    @BeforeAll
+    static void init() {
+        SERIALIZE_CONFIG.put(Number.class, NUMBER_SERIALIZER);
+        SERIALIZE_CONFIG.put(BigFractionAdapter.class, NUMBER_SERIALIZER);
     }
 
-    @Test
-  void serialize() throws Exception {
-        log.info("value:{}", JSONObject.toJSONString(quantity.value()));
-        log.info("value:{}", JSONObject.toJSONString(quantity));
-  }
+    @RepeatedTest(5000)
+    void serialize() {
+        NumberSerializer numberSerializer = NumberSerializer.of(
+                NumberCodecConfig.builder()
+                        .valueType(BigDecimal.class)
+                        .mathContext(MathContext.UNLIMITED)
+                        .build());
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.put(Number.class, numberSerializer);
+        serializeConfig.put(BigFractionAdapter.class, numberSerializer);
+
+        Random random = new Random();
+        BigDecimal value = BigDecimal.valueOf(random.nextDouble());
+        String jsonString = JSONObject.toJSONString(value, serializeConfig);
+        Number number = Numbers.valueOf(value);
+        String result = JSONObject.toJSONString(number, serializeConfig);
+        log.debug("number:{},jsonString:{},result:{}", number, jsonString, result);
+        Assertions.assertEquals(jsonString, result);
+    }
 }

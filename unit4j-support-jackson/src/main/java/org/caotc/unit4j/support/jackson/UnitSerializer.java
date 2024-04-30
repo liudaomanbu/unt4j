@@ -3,11 +3,12 @@ package org.caotc.unit4j.support.jackson;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import java.io.IOException;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.UnitCodecConfig;
+
+import java.io.IOException;
 
 /**
  * {@link org.caotc.unit4j.core.unit.Unit}在jackson的序列化器
@@ -33,6 +34,6 @@ public class UnitSerializer extends StdSerializer<Unit> {
   @Override
   public void serialize(Unit value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
-    gen.writeString(unitCodecConfig.serialize(value));
+//    gen.writeString(unitCodecConfig.serialize(value));
   }
 }
