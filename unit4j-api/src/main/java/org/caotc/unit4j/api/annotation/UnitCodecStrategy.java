@@ -16,6 +16,8 @@
 
 package org.caotc.unit4j.api.annotation;
 
+import org.caotc.unit4j.core.Alias;
+
 /**
  * 序列化、反序列化时的策略
  *
@@ -25,19 +27,11 @@ package org.caotc.unit4j.api.annotation;
  */
 public enum UnitCodecStrategy {
     /**
-     * 像普通对象一样序列化，即输出为一个json对象，里面包含所有属性
+     * id就是{@link org.caotc.unit4j.core.unit.Unit}
      */
-    OBJECT,
+    AS_ID,
     /**
-     * 只输出id
+     * {@link Alias#value()}就是{@link org.caotc.unit4j.core.unit.Unit}
      */
-    ID,
-    /**
-     * 只输出别名
-     */
-    ALIAS,
-    /**
-     * 与{@see OBJECT}一样输出所有属性, 但是改为扁平化输出，即自己不是一个对象，而是多个字段
-     */
-    FLAT;
+    AS_ALIAS
 }

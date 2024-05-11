@@ -17,7 +17,7 @@ class ComponentCompositeSerializerTest {
         configuration.registerAlias(UnitTypes.FORCE_WEIGHT, Alias.create(Aliases.Types.CHINESE_NAME, "重量"));
 
         AliasSerializer<UnitType> base = AliasSerializer.<UnitType>builder()
-                .aliasFinder(DefaultAliasFinder.of(Aliases.Types.CHINESE_NAME))
+                .aliasFinder(FirstAliasFinder.of(Aliases.Types.CHINESE_NAME))
                 .configuration(configuration)
                 .aliasUndefinedSerializer(UnitType::id)
                 .build();
@@ -28,7 +28,7 @@ class ComponentCompositeSerializerTest {
                 .powerSerializer(powerSerializer)
                 .build();
         Serializer<UnitType> serializer = AliasSerializer.<UnitType>builder()
-                .aliasFinder(DefaultAliasFinder.of(Aliases.Types.CHINESE_NAME))
+                .aliasFinder(FirstAliasFinder.of(Aliases.Types.CHINESE_NAME))
                 .configuration(configuration)
                 .aliasUndefinedSerializer(componentCompositeSerializer)
                 .build();

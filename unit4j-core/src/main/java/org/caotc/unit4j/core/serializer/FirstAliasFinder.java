@@ -6,6 +6,7 @@ import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.exception.AliasUndefinedException;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -14,13 +15,16 @@ import java.util.Optional;
  * @since 1.0.0
  */
 @Value(staticConstructor = "of")
-public class DefaultAliasFinder<E> implements AliasFinder<E> {
+public class FirstAliasFinder<E> implements AliasFinder<E> {
     @NonNull
     Alias.Type aliasType;
 
     @Override
     public @NonNull Optional<Alias> find(@NonNull Configuration configuration, @NonNull E element) {
-        return configuration.aliases(element).stream().findFirst();
+        return configuration.aliases(element)
+                .stream()
+                .filter(alias -> Objects.equals(alias.type(), aliasType()))
+                .findFirst();
     }
 
     @Override

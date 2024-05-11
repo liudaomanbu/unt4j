@@ -69,7 +69,7 @@ public @interface QuantityDeserialize {
      */
     String[] unitName() default StringConstant.EMPTY;
 
-    UnitCodecStrategy unitStrategy() default UnitCodecStrategy.ALIAS;
+    UnitCodecStrategy unitStrategy() default UnitCodecStrategy.AS_ALIAS;
 
     String unitAliasType() default StringConstant.EMPTY;
 

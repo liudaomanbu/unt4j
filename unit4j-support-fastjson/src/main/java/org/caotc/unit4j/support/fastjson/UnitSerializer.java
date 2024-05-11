@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.UnitCodecConfig;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 /**
  * {@link org.caotc.unit4j.core.unit.Unit}在fastjson的序列化器
@@ -22,24 +22,38 @@ import java.lang.reflect.Type;
 @Slf4j
 public class UnitSerializer implements ObjectSerializer {
 
+  @NonNull
+  public static UnitSerializer of(@NonNull UnitCodecConfig unitCodecConfig) {
+    return of(unitCodecConfig, unitCodecConfig);
+  }
+
   /**
    * {@link org.caotc.unit4j.core.unit.Unit}的序列化反序列化配置
    */
   @NonNull
   UnitCodecConfig unitCodecConfig;
+  @NonNull
+  UnitCodecConfig propertyUnitCodecConfig;
 
   @Override
   public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
-      int features) throws IOException {
-    log.error("object:{},fieldName:{},fieldType:{}", object, fieldName, fieldType);
+                    int features) {
+    log.debug("object:{},fieldName:{},fieldType:{},features:{}", object, fieldName, fieldType, features);
     Unit unit = (Unit) object;
-//    serializer.writeWithFieldName("field1Value","field1Name");
-//    serializer.getWriter().append('{').append('}');
-//    serializer.getWriter()
-//            .append("unit_id:\"METER\"")
-//            .append(",")
-//            .append("unit_type:\"LENGTH\"");
-//    serializer.write(unitCodecConfig.serialize(unit));
+
+    //is property
+    UnitCodecConfig unitCodecConfig = Objects.isNull(serializer.getContext()) ? unitCodecConfig() : propertyUnitCodecConfig();
+    String serialize = serialize(unitCodecConfig, unit);
+    serializer.getWriter().write(serialize);
   }
 
+  static String serialize(@NonNull UnitCodecConfig unitCodecConfig, @NonNull Unit unit) {
+    switch (unitCodecConfig.strategy()) {
+      case AS_ALIAS:
+        return unitCodecConfig.aliasSerializer().serialize(unit);
+      case AS_ID:
+      default:
+        return unit.id();
+    }
+  }
 }

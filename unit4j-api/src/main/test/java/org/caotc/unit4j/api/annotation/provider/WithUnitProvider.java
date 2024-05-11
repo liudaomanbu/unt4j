@@ -33,7 +33,7 @@ class WithUnitFieldObject {
 }
 
 class WithUniteGetMethodObject {
-    @WithUnit("METER")
+    @WithUnit(value = "METER")
     public Integer getWithUnitField() {
         return 0;
     }

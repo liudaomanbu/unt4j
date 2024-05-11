@@ -31,9 +31,8 @@ public class ComponentCompositeSerializer<E extends Component<E>> implements Ser
 
     @Override
     public @NonNull String serialize(@NonNull E element) {
-        //todo components()?
-        return element.componentToExponents().entrySet().stream()
-                .map(entry -> new Power<>(entry.getKey(), entry.getValue()))
+        return element.components()
+                .stream()
                 .map(powerSerializer::serialize)
                 .collect(Collectors.joining(delimiter(), prefix(), suffix()));
     }

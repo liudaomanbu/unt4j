@@ -67,7 +67,7 @@ public @interface QuantitySerialize {
     /**
      * @return 单位序列化策略
      */
-    UnitCodecStrategy unitStrategy() default UnitCodecStrategy.ALIAS;
+    UnitCodecStrategy unitStrategy() default UnitCodecStrategy.AS_ALIAS;
 
     /**
      * @return 单位别名类型.单位序列化中有别名时被使用.

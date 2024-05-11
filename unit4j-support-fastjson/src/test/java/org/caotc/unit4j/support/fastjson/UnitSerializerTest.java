@@ -17,15 +17,16 @@
 package org.caotc.unit4j.support.fastjson;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.NameFilter;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializeConfig;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.api.annotation.UnitCodecStrategy;
-import org.caotc.unit4j.core.Aliases;
+import org.caotc.unit4j.core.Alias;
 import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
+import org.caotc.unit4j.core.Identifiable;
+import org.caotc.unit4j.core.serializer.AliasSerializer;
+import org.caotc.unit4j.core.serializer.FirstAliasFinder;
 import org.caotc.unit4j.core.unit.BasePrefixUnit;
 import org.caotc.unit4j.core.unit.BaseStandardUnit;
 import org.caotc.unit4j.core.unit.CompositePrefixUnit;
@@ -33,45 +34,73 @@ import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.support.UnitCodecConfig;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @Slf4j
 class UnitSerializerTest {
 
-    SerializeConfig globalInstance = SerializeConfig.getGlobalInstance();
-    UnitSerializer unitSerializer = UnitSerializer.of(UnitCodecConfig.builder()
-            .strategy(UnitCodecStrategy.ALIAS)
-            .alisType(Aliases.Types.ENGLISH_NAME)
-            .configuration(Configuration.defaultInstance())
-            .aliasUndefinedStrategy(AliasUndefinedStrategy.THROW_EXCEPTION)
-            .build());
-
-    @BeforeEach
-    void init() {
-        globalInstance.put(BaseStandardUnit.class, unitSerializer);
-        globalInstance.put(BasePrefixUnit.class, unitSerializer);
-        globalInstance.put(CompositeStandardUnit.class, unitSerializer);
-        globalInstance.put(CompositePrefixUnit.class, unitSerializer);
-        globalInstance.addFilter(UnitFiledObject.class, (NameFilter) (object, name, value) -> {
-            log.error("object:{},name:{},value:{}", object, name, value);
-            return name.toUpperCase();
-        });
+    SerializeConfig init(UnitSerializer unitSerializer) {
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.put(BaseStandardUnit.class, unitSerializer);
+        serializeConfig.put(BasePrefixUnit.class, unitSerializer);
+        serializeConfig.put(CompositeStandardUnit.class, unitSerializer);
+        serializeConfig.put(CompositePrefixUnit.class, unitSerializer);
+        return serializeConfig;
     }
 
     @Test
-    void write() {
-        String unitJson = JSONObject.toJSONString(Units.NEWTON);
-        log.debug("unit:{}", unitJson);
-//    Assertions.assertEquals("\"NEWTON\"", unitJson);
-        log.info("NEWTON:{}", JSONObject.toJSONString(Units.NEWTON));
-        log.info("METER:{}", JSONObject.toJSONString(Units.METER));
-        log.info("UnitFiledObject:{}", JSONObject.toJSONString(new UnitFiledObject(Units.METER)));
+    void writeNonId() {
+        UnitSerializer unitSerializer = UnitSerializer.of(UnitCodecConfig.builder()
+                .strategy(UnitCodecStrategy.AS_ID)
+                .build());
+        SerializeConfig serializeConfig = init(unitSerializer);
+        String jsonString = JSONObject.toJSONString(Units.NON, serializeConfig);
+        Assertions.assertTrue(jsonString.isEmpty());
+    }
+
+    @Test
+    void writeNonAlias() {
+        Configuration configuration = Configuration.of();
+        Alias.Type type = Alias.Type.of("writeNonAlias");
+        UnitSerializer unitSerializer = UnitSerializer.of(UnitCodecConfig.builder()
+                .strategy(UnitCodecStrategy.AS_ALIAS)
+                .aliasSerializer(AliasSerializer.<Unit>builder()
+                        .configuration(configuration)
+                        .aliasFinder(FirstAliasFinder.of(type))
+                        .aliasUndefinedSerializer(Identifiable::id)
+                        .build())
+                .build());
+        SerializeConfig serializeConfig = init(unitSerializer);
+        String jsonString = JSONObject.toJSONString(Units.NON, serializeConfig);
+        log.info("Non:{}", jsonString);
+        Assertions.assertTrue(jsonString.isEmpty());
+
+        String alias = "Non";
+        configuration.registerAlias(Units.NON, Alias.create(type, alias));
+        jsonString = JSONObject.toJSONString(Units.NON, serializeConfig);
+        log.info("Non:{}", jsonString);
+        Assertions.assertEquals(alias, jsonString);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.caotc.unit4j.support.fastjson.provider.UnitSerializerProvider#units")
+    void writeUnitId(Unit unit) {
+        UnitSerializer unitSerializer = UnitSerializer.of(UnitCodecConfig.builder()
+                .strategy(UnitCodecStrategy.AS_ID)
+                .build());
+        SerializeConfig serializeConfig = init(unitSerializer);
+        String jsonString = JSONObject.toJSONString(unit, serializeConfig);
+        log.info("{}:{}", unit, jsonString);
+        Assertions.assertEquals(unit.id(), jsonString);
     }
 }
 
-@AllArgsConstructor
-@ToString
+@Value
 class UnitFiledObject {
+    @JSONField(unwrapped = true)
     public Unit unit;
 }
+

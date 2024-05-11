@@ -11,7 +11,13 @@ import org.caotc.unit4j.core.Identifiable;
  */
 @Value
 public class IdentifiableSerializer<E extends Identifiable> implements Serializer<E> {
-    public static final IdentifiableSerializer<Identifiable> INSTANCE = new IdentifiableSerializer<>();
+    private static final IdentifiableSerializer<Identifiable> INSTANCE = new IdentifiableSerializer<>();
+
+    @SuppressWarnings("unchecked")
+    public static <E extends Identifiable> IdentifiableSerializer<E> instance() {
+        return (IdentifiableSerializer<E>) INSTANCE;
+    }
+
     @Override
     public @NonNull String serialize(@NonNull E identifiable) {
         return identifiable.id();

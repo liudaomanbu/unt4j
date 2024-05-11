@@ -19,13 +19,14 @@ package org.caotc.unit4j.support.fastjson;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.fraction.BigFraction;
 import org.caotc.unit4j.core.math.number.BigFractionAdapter;
 import org.caotc.unit4j.core.math.number.Number;
 import org.caotc.unit4j.core.math.number.Numbers;
 import org.caotc.unit4j.support.NumberCodecConfig;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -33,20 +34,6 @@ import java.util.Random;
 
 @Slf4j
 class NumberSerializerTest {
-
-    private static final SerializeConfig SERIALIZE_CONFIG = new SerializeConfig();
-    private static final NumberSerializer NUMBER_SERIALIZER = NumberSerializer.of(
-            NumberCodecConfig.builder()
-                    .valueType(byte.class)
-                    .mathContext(MathContext.UNLIMITED)
-                    .build());
-
-    @BeforeAll
-    static void init() {
-        SERIALIZE_CONFIG.put(Number.class, NUMBER_SERIALIZER);
-        SERIALIZE_CONFIG.put(BigFractionAdapter.class, NUMBER_SERIALIZER);
-    }
-
     @RepeatedTest(5000)
     void serialize() {
         NumberSerializer numberSerializer = NumberSerializer.of(
@@ -65,5 +52,20 @@ class NumberSerializerTest {
         String result = JSONObject.toJSONString(number, serializeConfig);
         log.debug("number:{},jsonString:{},result:{}", number, jsonString, result);
         Assertions.assertEquals(jsonString, result);
+    }
+
+    @Test
+    void serializeArithmeticException() {
+        NumberSerializer numberSerializer = NumberSerializer.of(
+                NumberCodecConfig.builder()
+                        .valueType(BigDecimal.class)
+                        .mathContext(MathContext.UNLIMITED)
+                        .build());
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.put(Number.class, numberSerializer);
+        serializeConfig.put(BigFractionAdapter.class, numberSerializer);
+
+        Number number = Numbers.valueOf(BigFraction.ONE_THIRD);
+        Assertions.assertThrows(ArithmeticException.class, () -> JSONObject.toJSONString(number, serializeConfig));
     }
 }

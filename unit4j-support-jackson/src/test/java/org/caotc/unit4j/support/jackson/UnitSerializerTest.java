@@ -19,9 +19,6 @@ package org.caotc.unit4j.support.jackson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
-import org.caotc.unit4j.core.Aliases;
-import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
 import org.caotc.unit4j.core.unit.Units;
 import org.caotc.unit4j.support.UnitCodecConfig;
 import org.junit.jupiter.api.Assertions;
@@ -30,9 +27,7 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 class UnitSerializerTest {
 
-    UnitSerializer unitSerializer = new UnitSerializer(UnitCodecConfig.builder().alisType(Aliases.Types.ENGLISH_NAME)
-            .configuration(Configuration.defaultInstance())
-            .aliasUndefinedStrategy(AliasUndefinedStrategy.THROW_EXCEPTION).build());
+    UnitSerializer unitSerializer = new UnitSerializer(UnitCodecConfig.builder().build());
     SimpleModule module = new SimpleModule("myModule").addSerializer(unitSerializer);
     ObjectMapper mapper = new ObjectMapper().registerModule(module);
 

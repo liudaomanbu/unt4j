@@ -35,7 +35,10 @@ import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.core.common.reflect.property.Property;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
+import org.caotc.unit4j.core.serializer.AliasSerializer;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
+import org.caotc.unit4j.core.serializer.FirstAliasFinder;
+import org.caotc.unit4j.core.unit.Unit;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -94,7 +97,7 @@ public class Unit4jProperties {
     private static final BiFunction<@NonNull List<String>, @NonNull List<String>, @NonNull String> DEFAULT_FIELD_NAME_JOINER = (objectFieldNameWords, valueFieldNameWords) -> CaseFormat.LOWER_CAMEL
             .join(Stream.concat(objectFieldNameWords.stream(), valueFieldNameWords.stream()).collect(Collectors.toList()));
     private static final ImmutableList<String> DEFAULT_QUANTITY_UNIT_FIELD_NAME = ImmutableList.of("unit");
-    private static final UnitCodecStrategy DEFAULT_UNIT_CODEC_STRATEGY = UnitCodecStrategy.ALIAS;
+    private static final UnitCodecStrategy DEFAULT_UNIT_CODEC_STRATEGY = UnitCodecStrategy.AS_ALIAS;
     /**
      * 默认单位的输出别名类型
      */
@@ -180,6 +183,8 @@ public class Unit4jProperties {
      */
     @NonNull
     public QuantityCodecConfig createQuantityCodecConfig() {
+        FirstAliasFinder<Unit> aliasFinder = FirstAliasFinder.of(getDefaultUnitAliasType());
+
         return QuantityCodecConfig.builder()
                 .strategy(getDefaultStrategy())
                 .configuration(getDefaultConfiguration())
@@ -187,9 +192,11 @@ public class Unit4jProperties {
                 .outputUnitName(getDefaultQuantityUnitFieldName())
                 .unitCodecConfig(UnitCodecConfig.builder()
                         .strategy(getDefaultUnitCodecStrategy())
-                        .configuration(getDefaultConfiguration())
-                        .alisType(getDefaultUnitAliasType())
-                        .aliasUndefinedStrategy(getDefaultUnitUndefinedStrategy())
+                        .aliasSerializer(AliasSerializer.<Unit>builder()
+                                .configuration(getDefaultConfiguration())
+                                .aliasFinder(aliasFinder)
+                                .aliasUndefinedSerializer(getDefaultUnitUndefinedStrategy().createSerializer(aliasFinder, getDefaultConfiguration()))
+                                .build())
                         .build())
                 .outputValueName(getDefaultQuantityValueFieldName())
                 .valueCodecConfig(NumberCodecConfig.builder()
@@ -215,6 +222,12 @@ public class Unit4jProperties {
         Optional<QuantitySerialize> quantitySerialize = quantityReadableProperty.annotation(QuantitySerialize.class);
         Configuration configuration = quantitySerialize.map(QuantitySerialize::configId).map(Configuration::findExact)
                 .orElseGet(this::getDefaultConfiguration);
+
+        Type type = quantitySerialize.map(QuantitySerialize::unitAliasType)
+                .map(Type::of)
+                .orElseGet(this::getDefaultUnitAliasType);
+        FirstAliasFinder<Unit> aliasFinder = FirstAliasFinder.of(type);
+        AliasUndefinedStrategy aliasUndefinedStrategy = quantitySerialize.map(QuantitySerialize::unitAliasUndefinedStrategy).orElseGet(this::getDefaultUnitUndefinedStrategy);
         return QuantityCodecConfig.builder()
                 .strategy(quantitySerialize.map(QuantitySerialize::strategy)
                         .orElseGet(this::getDefaultPropertyStrategy))
@@ -227,11 +240,11 @@ public class Unit4jProperties {
                         .orElseGet(this::getDefaultQuantityUnitFieldName))
                 .unitCodecConfig(UnitCodecConfig.builder()
                         .strategy(quantitySerialize.map(QuantitySerialize::unitStrategy).orElseGet(this::getDefaultUnitCodecStrategy))
-                        .configuration(configuration)
-                        .alisType(quantitySerialize.map(QuantitySerialize::unitAliasType)
-                                .map(Alias.Type::of)
-                                .orElseGet(this::getDefaultUnitAliasType))
-                        .aliasUndefinedStrategy(quantitySerialize.map(QuantitySerialize::unitAliasUndefinedStrategy).orElseGet(this::getDefaultUnitUndefinedStrategy))
+                        .aliasSerializer(AliasSerializer.<Unit>builder()
+                                .configuration(configuration)
+                                .aliasFinder(aliasFinder)
+                                .aliasUndefinedSerializer(aliasUndefinedStrategy.createSerializer(aliasFinder, configuration))
+                                .build())
                         .build())
                 .outputValueName(quantitySerialize.map(QuantitySerialize::valueName)
                         .filter(name -> name.length != 0)
@@ -251,6 +264,11 @@ public class Unit4jProperties {
         Optional<QuantityDeserialize> quantityDeserialize = amountWritableProperty.annotation(QuantityDeserialize.class);
         Configuration configuration = quantityDeserialize.map(QuantityDeserialize::configId).map(Configuration::findExact)
                 .orElseGet(this::getDefaultConfiguration);
+        Type type = quantityDeserialize.map(QuantityDeserialize::unitAliasType)
+                .map(Type::of)
+                .orElseGet(this::getDefaultUnitAliasType);
+        FirstAliasFinder<Unit> aliasFinder = FirstAliasFinder.of(type);
+        AliasUndefinedStrategy aliasUndefinedStrategy = quantityDeserialize.map(QuantityDeserialize::unitAliasUndefinedStrategy).orElseGet(this::getDefaultUnitUndefinedStrategy);
         return QuantityCodecConfig.builder()
                 .strategy(quantityDeserialize.map(QuantityDeserialize::strategy)
                         .orElseGet(this::getDefaultPropertyStrategy))
@@ -263,11 +281,11 @@ public class Unit4jProperties {
                         .orElseGet(this::getDefaultQuantityUnitFieldName))
                 .unitCodecConfig(UnitCodecConfig.builder()
                         .strategy(quantityDeserialize.map(QuantityDeserialize::unitStrategy).orElseGet(this::getDefaultUnitCodecStrategy))
-                        .configuration(configuration)
-                        .alisType(quantityDeserialize.map(QuantityDeserialize::unitAliasType)
-                                .map(Alias.Type::of)
-                                .orElseGet(this::getDefaultUnitAliasType))
-                        .aliasUndefinedStrategy(quantityDeserialize.map(QuantityDeserialize::unitAliasUndefinedStrategy).orElseGet(this::getDefaultUnitUndefinedStrategy))
+                        .aliasSerializer(AliasSerializer.<Unit>builder()
+                                .configuration(configuration)
+                                .aliasFinder(aliasFinder)
+                                .aliasUndefinedSerializer(aliasUndefinedStrategy.createSerializer(aliasFinder, configuration))
+                                .build())
                         .build())
                 .outputValueName(quantityDeserialize.map(QuantityDeserialize::valueName)
                         .filter(name -> name.length != 0)

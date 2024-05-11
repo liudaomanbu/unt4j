@@ -21,10 +21,10 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.With;
 import org.caotc.unit4j.api.annotation.UnitCodecStrategy;
-import org.caotc.unit4j.core.Alias;
-import org.caotc.unit4j.core.Configuration;
-import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
+import org.caotc.unit4j.core.serializer.AliasSerializer;
 import org.caotc.unit4j.core.unit.Unit;
+
+import java.util.Objects;
 
 /**
  * {@link Unit}对象序列化和反序列化配置
@@ -42,19 +42,18 @@ public class UnitCodecConfig {
      */
     @NonNull
     UnitCodecStrategy strategy;
-    /**
-     * 配置
-     */
-    @NonNull
-    Configuration configuration;
-    /**
-     * 别名类型
-     */
-    @NonNull
-    Alias.Type alisType;
-    /**
-     * 别名未定义策略
-     */
-    @NonNull
-    AliasUndefinedStrategy aliasUndefinedStrategy;
+    AliasSerializer<Unit> aliasSerializer;
+
+    @Builder
+    private UnitCodecConfig(@NonNull UnitCodecStrategy strategy, AliasSerializer<Unit> aliasSerializer) {
+        this.strategy = strategy;
+        this.aliasSerializer = aliasSerializer;
+        validate();
+    }
+
+    private void validate() {
+        if (UnitCodecStrategy.AS_ALIAS == strategy() && Objects.isNull(aliasSerializer())) {
+            throw new IllegalArgumentException(String.format("strategy is %s,aliasSerializer can't be null", UnitCodecStrategy.AS_ALIAS));
+        }
+    }
 }

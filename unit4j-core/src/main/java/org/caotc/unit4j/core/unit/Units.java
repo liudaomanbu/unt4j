@@ -396,6 +396,7 @@ public class Units {
 
     /**
      * 国际单位制7个基本标准单位不可变集合
+     * todo 改成方法,可以自动范型
      */
     public static final ImmutableSet<BaseStandardUnit> SI_BASE_STANDARD_UNITS = ImmutableSet
             .of(Units.METER, Units.GRAM, Units.SECOND, Units.AMPERE,
