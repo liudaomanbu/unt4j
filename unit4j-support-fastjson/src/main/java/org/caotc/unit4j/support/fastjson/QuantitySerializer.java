@@ -55,9 +55,11 @@ public class QuantitySerializer implements ObjectSerializer {
      * 序列化反序列化配置
      */
     @NonNull
-    QuantityCodecConfig codecConfig;
+    @Getter(lazy = true)
+    QuantityCodecConfig codecConfig = unit4jProperties().createQuantityCodecConfig();
     @NonNull
-    QuantityCodecConfig propertyCodecConfig;
+    @Getter(lazy = true)
+    QuantityCodecConfig propertyCodecConfig = unit4jProperties().;
     /**
      * 数值序列化器
      */
