@@ -246,6 +246,7 @@ public class Units {
 
     /**
      * 弧度 m·m−1 平面角 球面度 m2·m−2 立体角
+     * todo 需要确定id到底应该用空字符串还是用特定字符比如Non,如果是空字符串,增加量词前缀prefix之后id会是【YOCTO_】格式
      */
     public static final CompositeStandardUnit NON = CompositeStandardUnit.builderInternal().build();
 

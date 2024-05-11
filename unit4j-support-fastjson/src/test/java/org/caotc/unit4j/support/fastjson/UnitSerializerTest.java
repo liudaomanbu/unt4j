@@ -18,11 +18,14 @@ package org.caotc.unit4j.support.fastjson;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.NameFilter;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.Value;
+import lombok.experimental.FieldNameConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.api.annotation.UnitCodecStrategy;
 import org.caotc.unit4j.core.Alias;
+import org.caotc.unit4j.core.Aliases;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Identifiable;
 import org.caotc.unit4j.core.serializer.AliasSerializer;
@@ -38,6 +41,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Map;
 
 @Slf4j
 class UnitSerializerTest {
@@ -58,7 +63,7 @@ class UnitSerializerTest {
                 .build());
         SerializeConfig serializeConfig = init(unitSerializer);
         String jsonString = JSONObject.toJSONString(Units.NON, serializeConfig);
-        Assertions.assertTrue(jsonString.isEmpty());
+        Assertions.assertEquals("\"\"", jsonString);
     }
 
     @Test
@@ -76,31 +81,152 @@ class UnitSerializerTest {
         SerializeConfig serializeConfig = init(unitSerializer);
         String jsonString = JSONObject.toJSONString(Units.NON, serializeConfig);
         log.info("Non:{}", jsonString);
-        Assertions.assertTrue(jsonString.isEmpty());
+        Assertions.assertEquals("\"\"", jsonString);
 
         String alias = "Non";
         configuration.registerAlias(Units.NON, Alias.create(type, alias));
         jsonString = JSONObject.toJSONString(Units.NON, serializeConfig);
         log.info("Non:{}", jsonString);
-        Assertions.assertEquals(alias, jsonString);
+        Assertions.assertEquals(String.format("\"%s\"", alias), jsonString);
     }
 
     @ParameterizedTest
     @MethodSource("org.caotc.unit4j.support.fastjson.provider.UnitSerializerProvider#units")
     void writeUnitId(Unit unit) {
-        UnitSerializer unitSerializer = UnitSerializer.of(UnitCodecConfig.builder()
-                .strategy(UnitCodecStrategy.AS_ID)
-                .build());
+        UnitSerializer unitSerializer = UnitSerializer.of(
+                UnitCodecConfig.builder()
+                        .strategy(UnitCodecStrategy.AS_ID)
+                        .build());
         SerializeConfig serializeConfig = init(unitSerializer);
         String jsonString = JSONObject.toJSONString(unit, serializeConfig);
         log.info("{}:{}", unit, jsonString);
-        Assertions.assertEquals(unit.id(), jsonString);
+        Assertions.assertEquals(String.format("\"%s\"", unit.id()), jsonString);
+    }
+
+    @Test
+    void writeUnitAlias() {
+        Alias.Type type = Aliases.Types.CHINESE_NAME;
+        UnitSerializer unitSerializer = UnitSerializer.of(UnitCodecConfig.builder()
+                .strategy(UnitCodecStrategy.AS_ALIAS)
+                .aliasSerializer(AliasSerializer.<Unit>builder()
+                        .configuration(Configuration.defaultInstance())
+                        .aliasFinder(FirstAliasFinder.of(type))
+                        .aliasUndefinedSerializer(Identifiable::id)
+                        .build())
+                .build());
+        SerializeConfig serializeConfig = init(unitSerializer);
+        String jsonString = JSONObject.toJSONString(Units.METER, serializeConfig);
+        log.info("METER:{}", jsonString);
+        Assertions.assertEquals(String.format("\"%s\"", "米"), jsonString);
+    }
+
+    @Test
+    void writeMapUnit() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        String unitKey = "unitKey";
+        Map<String, Object> map = Map.of(unitKey, Units.METER);
+        String jsonString = JSONObject.toJSONString(map, serializeConfig);
+        log.info("{}:{}", map, jsonString);
+        Assertions.assertEquals(String.format("{\"%s\":\"米\"}", unitKey), jsonString);
+    }
+
+    @Test
+    void writeFieldUnit() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        UnitFiledObject object = new UnitFiledObject(Units.METER);
+        String jsonString = JSONObject.toJSONString(object, serializeConfig);
+        log.info("{}:{}", object, jsonString);
+        Assertions.assertEquals(String.format("{\"%s\":\"米\"}", UnitFiledObject.Fields.UNIT), jsonString);
+    }
+
+    @Test
+    void writeFieldUnitUnwrapped() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        UnwrappedUnitFiledObject object = new UnwrappedUnitFiledObject(Units.METER);
+        String jsonString = JSONObject.toJSONString(object, serializeConfig);
+        log.info("{}:{}", object, jsonString);
+        Assertions.assertEquals("{\"米\"}", jsonString);
+    }
+
+    @Test
+    void writeJSONFieldNameFieldUnit() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        JSONFieldNameUnitFiledObject object = new JSONFieldNameUnitFiledObject(Units.METER);
+        String jsonString = JSONObject.toJSONString(object, serializeConfig);
+        log.info("{}:{}", object, jsonString);
+        Assertions.assertEquals(String.format("{\"%s\":\"米\"}", "unitField"), jsonString);
+    }
+
+    @Test
+    void writeNameFilterFieldUnit() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        serializeConfig.addFilter(UnitFiledObject.class, (NameFilter) (object, name, value) -> name.toUpperCase());
+        UnitFiledObject object = new UnitFiledObject(Units.METER);
+        String jsonString = JSONObject.toJSONString(object, serializeConfig);
+        log.info("{}:{}", object, jsonString);
+        Assertions.assertEquals(String.format("{\"%s\":\"米\"}", UnitFiledObject.Fields.UNIT.toUpperCase()), jsonString);
+    }
+
+    @Test
+    void writeNameFilterFieldUnitUnwrapped() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        serializeConfig.addFilter(UnwrappedUnitFiledObject.class, (NameFilter) (object, name, value) -> name.toUpperCase());
+        UnwrappedUnitFiledObject object = new UnwrappedUnitFiledObject(Units.METER);
+        String jsonString = JSONObject.toJSONString(object, serializeConfig);
+        log.info("{}:{}", object, jsonString);
+        //按照正确逻辑,NameFilter与unwrapped同时存在时,应该仍然不输出name.fastjson bug,ignore
+//        Assertions.assertEquals("{\"米\"}", jsonString);
+    }
+
+    @Test
+    void writeNameFilterJSONFieldNameFieldUnit() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        serializeConfig.addFilter(UnwrappedUnitFiledObject.class, (NameFilter) (object, name, value) -> name.toUpperCase());
+        JSONFieldNameUnitFiledObject object = new JSONFieldNameUnitFiledObject(Units.METER);
+        String jsonString = JSONObject.toJSONString(object, serializeConfig);
+        log.info("{}:{}", object, jsonString);
+        //按照正确逻辑,JSONField name优先级高于NameFilter,fastjson逻辑,仅做了解
+//        Assertions.assertEquals(String.format("{\"%s\":\"米\"}","unitField"), jsonString);
+    }
+
+    UnitSerializer propertyChineseNameUnitSerializer() {
+        Alias.Type type = Aliases.Types.CHINESE_NAME;
+        return UnitSerializer.of(UnitCodecConfig.builder()
+                        .strategy(UnitCodecStrategy.AS_ID)
+                        .build(),
+                UnitCodecConfig.builder()
+                        .strategy(UnitCodecStrategy.AS_ALIAS)
+                        .aliasSerializer(AliasSerializer.<Unit>builder()
+                                .configuration(Configuration.defaultInstance())
+                                .aliasFinder(FirstAliasFinder.of(type))
+                                .aliasUndefinedSerializer(Identifiable::id)
+                                .build())
+                        .build());
     }
 }
 
 @Value
+@FieldNameConstants
 class UnitFiledObject {
+    public Unit unit;
+}
+
+@Value
+class UnwrappedUnitFiledObject {
     @JSONField(unwrapped = true)
+    public Unit unit;
+}
+
+@Value
+class JSONFieldNameUnitFiledObject {
+    @JSONField(name = "unitField")
     public Unit unit;
 }
 

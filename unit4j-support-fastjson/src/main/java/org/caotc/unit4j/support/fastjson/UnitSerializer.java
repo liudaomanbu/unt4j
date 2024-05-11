@@ -44,7 +44,7 @@ public class UnitSerializer implements ObjectSerializer {
     //is property
     UnitCodecConfig unitCodecConfig = Objects.isNull(serializer.getContext()) ? unitCodecConfig() : propertyUnitCodecConfig();
     String serialize = serialize(unitCodecConfig, unit);
-    serializer.getWriter().write(serialize);
+    serializer.write(serialize);
   }
 
   static String serialize(@NonNull UnitCodecConfig unitCodecConfig, @NonNull Unit unit) {
