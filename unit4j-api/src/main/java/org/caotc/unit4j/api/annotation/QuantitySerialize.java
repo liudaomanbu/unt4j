@@ -46,7 +46,7 @@ public @interface QuantitySerialize {
     /**
      * @return 序列化策略
      */
-    QuantityCodecStrategy strategy() default QuantityCodecStrategy.VALUE;
+    QuantityCodecStrategy strategy() default QuantityCodecStrategy.AS_VALUE;
 
     /**
      * @return 配置对象主键

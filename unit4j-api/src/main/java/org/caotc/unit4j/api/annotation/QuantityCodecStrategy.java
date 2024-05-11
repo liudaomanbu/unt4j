@@ -31,7 +31,7 @@ public enum QuantityCodecStrategy {
     /**
      * 只输出值,单位为默认的固定单位
      */
-    VALUE,
+    AS_VALUE,
     /**
      * 与{@see OBJECT}一样输出所有属性, 但是改为扁平化输出，即自己不是一个对象，而是多个字段
      */

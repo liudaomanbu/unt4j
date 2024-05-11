@@ -47,15 +47,6 @@ import java.util.Map;
 @Slf4j
 class UnitSerializerTest {
 
-    SerializeConfig init(UnitSerializer unitSerializer) {
-        SerializeConfig serializeConfig = new SerializeConfig();
-        serializeConfig.put(BaseStandardUnit.class, unitSerializer);
-        serializeConfig.put(BasePrefixUnit.class, unitSerializer);
-        serializeConfig.put(CompositeStandardUnit.class, unitSerializer);
-        serializeConfig.put(CompositePrefixUnit.class, unitSerializer);
-        return serializeConfig;
-    }
-
     @Test
     void writeNonId() {
         UnitSerializer unitSerializer = UnitSerializer.of(UnitCodecConfig.builder()
@@ -194,6 +185,15 @@ class UnitSerializerTest {
         log.info("{}:{}", object, jsonString);
         //按照正确逻辑,JSONField name优先级高于NameFilter,fastjson逻辑,仅做了解
 //        Assertions.assertEquals(String.format("{\"%s\":\"米\"}","unitField"), jsonString);
+    }
+
+    SerializeConfig init(UnitSerializer unitSerializer) {
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.put(BaseStandardUnit.class, unitSerializer);
+        serializeConfig.put(BasePrefixUnit.class, unitSerializer);
+        serializeConfig.put(CompositeStandardUnit.class, unitSerializer);
+        serializeConfig.put(CompositePrefixUnit.class, unitSerializer);
+        return serializeConfig;
     }
 
     UnitSerializer propertyChineseNameUnitSerializer() {

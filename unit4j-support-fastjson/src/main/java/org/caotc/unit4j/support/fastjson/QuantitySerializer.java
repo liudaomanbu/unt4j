@@ -18,14 +18,19 @@ package org.caotc.unit4j.support.fastjson;
 
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.alibaba.fastjson.serializer.SerialContext;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.support.QuantityCodecConfig;
+import org.caotc.unit4j.support.Unit4jProperties;
+import org.caotc.unit4j.support.common.util.QuantityUtil;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 单独{@link Quantity}对象在fastjson中的序列化器
@@ -35,36 +40,52 @@ import java.lang.reflect.Type;
  * @date 2019-04-24
  * @since 1.0.0
  */
-@Value
+@Value(staticConstructor = "of")
 @Slf4j
 public class QuantitySerializer implements ObjectSerializer {
 
+    @NonNull
+    public static QuantitySerializer of(@NonNull QuantityCodecConfig codecConfig) {
+        return of(codecConfig, codecConfig);
+    }
+
+    @NonNull
+    Unit4jProperties unit4jProperties;
     /**
      * 序列化反序列化配置
      */
     @NonNull
-    QuantityCodecConfig quantityCodecConfig;
+    QuantityCodecConfig codecConfig;
+    @NonNull
+    QuantityCodecConfig propertyCodecConfig;
     /**
      * 数值序列化器
      */
     @NonNull
-    NumberSerializer numberSerializer;
+    @Getter(lazy = true)
+    NumberSerializer numberSerializer = NumberSerializer.of(codecConfig().valueCodecConfig());
     /**
      * 单位序列化器
      */
     @NonNull
-    UnitSerializer unitSerializer;
-
-    public QuantitySerializer(@NonNull QuantityCodecConfig quantityCodecConfig) {
-        this.quantityCodecConfig = quantityCodecConfig;
-        numberSerializer = NumberSerializer.of(quantityCodecConfig().valueCodecConfig());
-        unitSerializer = UnitSerializer.of(quantityCodecConfig().unitCodecConfig());
-    }
+    @Getter(lazy = true)
+    UnitSerializer unitSerializer = UnitSerializer.of(codecConfig().unitCodecConfig());
 
     @Override
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
-                      int features) throws IOException {
+                      int features) {
+        log.debug("object:{},fieldName:{},fieldType:{},features:{}", object, fieldName, fieldType, features);
+
+        QuantityCodecConfig codecConfig = codecConfig();
+        SerialContext context = serializer.getContext();
         //todo
+        if (Objects.nonNull(context)) {
+            codecConfig = Optional.ofNullable(fieldName)
+                    .flatMap(name -> QuantityUtil.readableQuantityProperty(context.object, (String) fieldName))
+                    .map(unit4jProperties::createPropertyQuantityCodecConfig)
+                    .orElseGet(this::propertyCodecConfig);
+        }
+
 
     }
 

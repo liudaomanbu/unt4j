@@ -33,7 +33,7 @@ import org.caotc.unit4j.core.Aliases;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
-import org.caotc.unit4j.core.common.reflect.property.Property;
+import org.caotc.unit4j.core.common.reflect.property.ReadableProperty;
 import org.caotc.unit4j.core.common.reflect.property.WritableProperty;
 import org.caotc.unit4j.core.serializer.AliasSerializer;
 import org.caotc.unit4j.core.serializer.AliasUndefinedStrategy;
@@ -68,11 +68,11 @@ public class Unit4jProperties {
     /**
      * 默认的编码解码策略
      */
-    private static final QuantityCodecStrategy DEFAULT_STRATEGY = QuantityCodecStrategy.VALUE;
+    private static final QuantityCodecStrategy DEFAULT_STRATEGY = QuantityCodecStrategy.AS_VALUE;
     /**
      * 作为其他类属性的{@link Quantity}对象的默认的编码解码策略
      */
-    private static final QuantityCodecStrategy DEFAULT_PROPERTY_STRATEGY = QuantityCodecStrategy.VALUE;
+    private static final QuantityCodecStrategy DEFAULT_PROPERTY_STRATEGY = QuantityCodecStrategy.AS_VALUE;
     /**
      * 默认的单位转换配置
      */
@@ -218,7 +218,7 @@ public class Unit4jProperties {
     @NonNull
     @SuppressWarnings({"unchecked", "rawtypes"})
     public QuantityCodecConfig createPropertyQuantityCodecConfig(
-            @NonNull Property<?, ?> quantityReadableProperty) {
+            @NonNull ReadableProperty<?, ?> quantityReadableProperty) {
         Optional<QuantitySerialize> quantitySerialize = quantityReadableProperty.annotation(QuantitySerialize.class);
         Configuration configuration = quantitySerialize.map(QuantitySerialize::configId).map(Configuration::findExact)
                 .orElseGet(this::getDefaultConfiguration);

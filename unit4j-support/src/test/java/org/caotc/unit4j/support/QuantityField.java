@@ -30,7 +30,7 @@ import java.math.RoundingMode;
 public class QuantityField {
 
     Quantity noAnnotationQuantity;
-    @QuantitySerialize(strategy = QuantityCodecStrategy.VALUE, valueType = BigDecimal.class)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.AS_VALUE, valueType = BigDecimal.class)
     Quantity annotationValueQuantity;
     @QuantitySerialize(strategy = QuantityCodecStrategy.OBJECT, valueType = byte.class, valueRoundingMode = RoundingMode.HALF_UP)
     Quantity annotationObjectQuantity;

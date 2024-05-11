@@ -33,17 +33,17 @@ import java.math.RoundingMode;
 public class QuantityField {
 
     Quantity noAnnotationQuantity;
-    @QuantitySerialize(strategy = QuantityCodecStrategy.VALUE, valueType = BigDecimal.class)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.AS_VALUE, valueType = BigDecimal.class)
     Quantity annotationValueQuantity;
     @QuantitySerialize(strategy = QuantityCodecStrategy.OBJECT, valueType = byte.class, valueRoundingMode = RoundingMode.HALF_UP)
     Quantity annotationObjectQuantity;
     @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT, valueType = String.class)
     Quantity annotationFlatQuantity;
-    @QuantitySerialize(strategy = QuantityCodecStrategy.VALUE)
-    @QuantityDeserialize(strategy = QuantityCodecStrategy.VALUE)
+    @QuantitySerialize(strategy = QuantityCodecStrategy.AS_VALUE)
+    @QuantityDeserialize(strategy = QuantityCodecStrategy.AS_VALUE)
     Integer dbValue;
     @QuantitySerialize(strategy = QuantityCodecStrategy.FLAT)
-    @QuantityDeserialize(strategy = QuantityCodecStrategy.VALUE)
+    @QuantityDeserialize(strategy = QuantityCodecStrategy.AS_VALUE)
     Integer jsonValue;
 
     public static QuantityField create(Quantity quantity) {

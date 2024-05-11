@@ -120,7 +120,7 @@ public class SelectInterceptor implements Interceptor {
 
                 quantityCodecConfigs.forEach(amountCodecConfig -> {
                     switch (amountCodecConfig.strategy()) {
-                        case VALUE:
+                        case AS_VALUE:
                             break;
                         case FLAT:
 //                            select.getSelectBody().accept(new FlatSelectVisitor(amountCodecConfig));
@@ -164,7 +164,7 @@ public class SelectInterceptor implements Interceptor {
             case OBJECT:
                 throw new IllegalArgumentException(
                         "database strategy can't use " + QuantityCodecStrategy.OBJECT);
-            case VALUE:
+            case AS_VALUE:
                 //TODO outputName
 //                ResultMapping amountResultMapping = new ResultMapping.Builder(configuration, amountWritableProperty.name() + AmountPropertyConstant.DELIMITER + Quantity.Fields.VALUE, quantityCodecConfig.outputName(), Number.class).build();
 //                return Stream.of(amountResultMapping);

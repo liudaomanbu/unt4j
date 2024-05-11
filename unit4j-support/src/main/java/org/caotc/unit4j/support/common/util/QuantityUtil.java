@@ -86,6 +86,14 @@ public class QuantityUtil {
 
     @NonNull
     public static <T> Optional<ReadableProperty<T, Quantity>> readableQuantityProperty(
+            @NonNull T object, @NonNull String fieldName) {
+        return ReflectionUtil.readableProperty(object, fieldName)
+                .filter(QuantityUtil::isQuantityProperty)
+                .map(QuantityUtil::wrap);
+    }
+
+    @NonNull
+    public static <T> Optional<ReadableProperty<T, Quantity>> readableQuantityProperty(
             @NonNull Class<T> type, @NonNull String fieldName) {
         return ReflectionUtil.readableProperty(type, fieldName)
                 .filter(QuantityUtil::isQuantityProperty)

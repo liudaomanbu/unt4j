@@ -23,17 +23,17 @@ import java.util.Objects;
 public class UnitSerializer implements ObjectSerializer {
 
   @NonNull
-  public static UnitSerializer of(@NonNull UnitCodecConfig unitCodecConfig) {
-    return of(unitCodecConfig, unitCodecConfig);
+  public static UnitSerializer of(@NonNull UnitCodecConfig codecConfig) {
+    return of(codecConfig, codecConfig);
   }
 
   /**
    * {@link org.caotc.unit4j.core.unit.Unit}的序列化反序列化配置
    */
   @NonNull
-  UnitCodecConfig unitCodecConfig;
+  UnitCodecConfig codecConfig;
   @NonNull
-  UnitCodecConfig propertyUnitCodecConfig;
+  UnitCodecConfig propertyCodecConfig;
 
   @Override
   public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
@@ -42,7 +42,7 @@ public class UnitSerializer implements ObjectSerializer {
     Unit unit = (Unit) object;
 
     //is property
-    UnitCodecConfig unitCodecConfig = Objects.isNull(serializer.getContext()) ? unitCodecConfig() : propertyUnitCodecConfig();
+    UnitCodecConfig unitCodecConfig = Objects.isNull(serializer.getContext()) ? codecConfig() : propertyCodecConfig();
     String serialize = serialize(unitCodecConfig, unit);
     serializer.write(serialize);
   }

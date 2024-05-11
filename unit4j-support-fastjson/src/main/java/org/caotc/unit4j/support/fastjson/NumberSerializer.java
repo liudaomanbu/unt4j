@@ -42,12 +42,13 @@ public class NumberSerializer implements ObjectSerializer {
      * {@link Quantity#value()}的序列化反序列化配置
      */
     @NonNull
-    NumberCodecConfig numberCodecConfig;
+    NumberCodecConfig codecConfig;
 
     @Override
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
                       int features) {
+        log.debug("object:{},fieldName:{},fieldType:{},features:{}", object, fieldName, fieldType, features);
         Number value = (Number) object;
-        serializer.write(value.value(numberCodecConfig().valueType(), numberCodecConfig().mathContext()));
+        serializer.write(value.value(codecConfig().valueType(), codecConfig().mathContext()));
     }
 }
