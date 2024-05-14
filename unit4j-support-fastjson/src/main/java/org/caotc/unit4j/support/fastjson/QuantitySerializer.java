@@ -29,6 +29,7 @@ import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.common.util.QuantityUtil;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,12 +44,6 @@ import java.util.Optional;
 @Value(staticConstructor = "of")
 @Slf4j
 public class QuantitySerializer implements ObjectSerializer {
-
-    @NonNull
-    public static QuantitySerializer of(@NonNull QuantityCodecConfig codecConfig) {
-        return of(codecConfig, codecConfig);
-    }
-
     @NonNull
     Unit4jProperties unit4jProperties;
     /**
@@ -59,7 +54,7 @@ public class QuantitySerializer implements ObjectSerializer {
     QuantityCodecConfig codecConfig = unit4jProperties().createQuantityCodecConfig();
     @NonNull
     @Getter(lazy = true)
-    QuantityCodecConfig propertyCodecConfig = unit4jProperties().;
+    QuantityCodecConfig propertyCodecConfig = unit4jProperties().createQuantityCodecConfig();
     /**
      * 数值序列化器
      */
@@ -78,17 +73,44 @@ public class QuantitySerializer implements ObjectSerializer {
                       int features) {
         log.debug("object:{},fieldName:{},fieldType:{},features:{}", object, fieldName, fieldType, features);
 
+        Quantity quantity = (Quantity) object;
         QuantityCodecConfig codecConfig = codecConfig();
         SerialContext context = serializer.getContext();
         //todo
         if (Objects.nonNull(context)) {
             codecConfig = Optional.ofNullable(fieldName)
-                    .flatMap(name -> QuantityUtil.readableQuantityProperty(context.object, (String) fieldName))
+                    .flatMap(name -> QuantityUtil.readableQuantityProperty(context.object, (String) name))
                     .map(unit4jProperties::createPropertyQuantityCodecConfig)
                     .orElseGet(this::propertyCodecConfig);
         }
 
+        //todo convert to targetUnit
 
+        NumberSerializer valueSerializer = NumberSerializer.of(codecConfig.valueCodecConfig());
+        switch (codecConfig.strategy()) {
+            case FLAT:
+                serializer.writeNull();
+                serializer.getWriter().write(",");
+                List<String> unitPropertyNameWords = codecConfig.outputUnitName();
+                String unitPropertyName = codecConfig.nameCaseFormat().join();
+                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), "unit", quantity.unit().getClass(), features);
+                serializer.getWriter().write(",");
+                valueSerializer.write(serializer, quantity.value(), "value", quantity.value().getClass(), features);
+                break;
+            case OBJECT:
+                serializer.getWriter().write("{");
+
+                serializer.getWriter().writeFieldName("unit");
+                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), "unit", quantity.unit().getClass(), features);
+                serializer.getWriter().write(",");
+                serializer.getWriter().writeFieldName("value");
+                valueSerializer.write(serializer, quantity.value(), "value", quantity.value().getClass(), features);
+                serializer.getWriter().write("}");
+                break;
+            case AS_VALUE:
+            default:
+                valueSerializer.write(serializer, quantity.value(), null, null, features);
+        }
     }
 
 }
