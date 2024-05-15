@@ -125,7 +125,7 @@ public class Unit4jProperties {
      * 作为其他类属性的{@link Quantity}对象的序列化反序列化策略
      */
     @NonNull
-    QuantityCodecStrategy defaultPropertyStrategy = DEFAULT_STRATEGY;
+    QuantityCodecStrategy defaultPropertyStrategy = DEFAULT_PROPERTY_STRATEGY;
     /**
      * 配置
      */
@@ -189,7 +189,7 @@ public class Unit4jProperties {
                 .strategy(getDefaultStrategy())
                 .configuration(getDefaultConfiguration())
                 .nameCaseFormat(getDefaultNameCaseFormat())
-                .outputUnitName(getDefaultQuantityUnitFieldName())
+                .outputUnitNameWords(getDefaultQuantityUnitFieldName())
                 .unitCodecConfig(UnitCodecConfig.builder()
                         .strategy(getDefaultUnitCodecStrategy())
                         .aliasSerializer(AliasSerializer.<Unit>builder()
@@ -198,7 +198,7 @@ public class Unit4jProperties {
                                 .aliasUndefinedSerializer(getDefaultUnitUndefinedStrategy().createSerializer(aliasFinder, getDefaultConfiguration()))
                                 .build())
                         .build())
-                .outputValueName(getDefaultQuantityValueFieldName())
+                .outputValueNameWords(getDefaultQuantityValueFieldName())
                 .valueCodecConfig(NumberCodecConfig.builder()
                         .valueType(getDefaultValueType())
                         .mathContext(getDefaultValueMathContext())
@@ -234,7 +234,7 @@ public class Unit4jProperties {
                 .configuration(configuration)
                 .nameCaseFormat(quantitySerialize.map(QuantitySerialize::nameCaseFormat)
                         .orElseGet(this::getDefaultNameCaseFormat))
-                .outputUnitName(quantitySerialize.map(QuantitySerialize::unitName)
+                .outputUnitNameWords(quantitySerialize.map(QuantitySerialize::unitName)
                         .filter(name -> name.length != 0)
                         .map(Arrays::asList)
                         .orElseGet(this::getDefaultQuantityUnitFieldName))
@@ -246,7 +246,7 @@ public class Unit4jProperties {
                                 .aliasUndefinedSerializer(aliasUndefinedStrategy.createSerializer(aliasFinder, configuration))
                                 .build())
                         .build())
-                .outputValueName(quantitySerialize.map(QuantitySerialize::valueName)
+                .outputValueNameWords(quantitySerialize.map(QuantitySerialize::valueName)
                         .filter(name -> name.length != 0)
                         .map(Arrays::asList)
                         .orElseGet(this::getDefaultQuantityValueFieldName))
@@ -275,7 +275,7 @@ public class Unit4jProperties {
                 .configuration(configuration)
                 .nameCaseFormat(quantityDeserialize.map(QuantityDeserialize::nameCaseFormat)
                         .orElseGet(this::getDefaultNameCaseFormat))
-                .outputUnitName(quantityDeserialize.map(QuantityDeserialize::unitName)
+                .outputUnitNameWords(quantityDeserialize.map(QuantityDeserialize::unitName)
                         .filter(name -> name.length != 0)
                         .map(Arrays::asList)
                         .orElseGet(this::getDefaultQuantityUnitFieldName))
@@ -287,7 +287,7 @@ public class Unit4jProperties {
                                 .aliasUndefinedSerializer(aliasUndefinedStrategy.createSerializer(aliasFinder, configuration))
                                 .build())
                         .build())
-                .outputValueName(quantityDeserialize.map(QuantityDeserialize::valueName)
+                .outputValueNameWords(quantityDeserialize.map(QuantityDeserialize::valueName)
                         .filter(name -> name.length != 0)
                         .map(Arrays::asList)
                         .orElseGet(this::getDefaultQuantityValueFieldName))

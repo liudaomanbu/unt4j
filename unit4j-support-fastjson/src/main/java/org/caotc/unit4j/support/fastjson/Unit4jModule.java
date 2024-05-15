@@ -20,11 +20,6 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.math.number.BigFractionAdapter;
-import org.caotc.unit4j.core.unit.BasePrefixUnit;
-import org.caotc.unit4j.core.unit.BaseStandardUnit;
-import org.caotc.unit4j.core.unit.CompositePrefixUnit;
-import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.support.Unit4jProperties;
 
 import java.util.Arrays;
@@ -80,12 +75,11 @@ public class Unit4jModule {
    */
   public void registerTo(@NonNull SerializeConfig serializeConfig, @NonNull Class<?>... classes) {
       serializeConfig.put(Quantity.class, quantitySerializer());
-      serializeConfig.put(BigFractionAdapter.class,
-              quantitySerializer().numberSerializer());
-      serializeConfig.put(BaseStandardUnit.class, quantitySerializer().unitSerializer());
-      serializeConfig.put(BasePrefixUnit.class, quantitySerializer().unitSerializer());
-      serializeConfig.put(CompositeStandardUnit.class, quantitySerializer().unitSerializer());
-      serializeConfig.put(CompositePrefixUnit.class, quantitySerializer().unitSerializer());
+//      serializeConfig.put(BigFractionAdapter.class, quantitySerializer().numberSerializer());
+//      serializeConfig.put(BaseStandardUnit.class, quantitySerializer().unitSerializer());
+//      serializeConfig.put(BasePrefixUnit.class, quantitySerializer().unitSerializer());
+//      serializeConfig.put(CompositeStandardUnit.class, quantitySerializer().unitSerializer());
+//      serializeConfig.put(CompositePrefixUnit.class, quantitySerializer().unitSerializer());
       Arrays.stream(classes).forEach(clazz -> serializeConfig.addFilter(clazz, unit4jFilter()));
   }
 }

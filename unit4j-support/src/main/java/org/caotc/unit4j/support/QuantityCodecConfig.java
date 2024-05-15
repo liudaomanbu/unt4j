@@ -24,8 +24,10 @@ import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.core.Configuration;
 import org.caotc.unit4j.core.Quantity;
 import org.caotc.unit4j.core.common.base.CaseFormat;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * {@link Quantity}对象序列化和反序列化配置
@@ -48,12 +50,9 @@ public class QuantityCodecConfig {
      */
     @NonNull
     Configuration configuration;
-    @NonNull
     CaseFormat nameCaseFormat;
-    @NonNull
-    List<String> outputUnitName;
-    @NonNull
-    List<String> outputValueName;
+    List<String> outputUnitNameWords;
+    List<String> outputValueNameWords;
     /**
      * 数值的序列化和反序列化配置
      */
@@ -62,6 +61,34 @@ public class QuantityCodecConfig {
     /**
      * 单位的序列化和反序列化配置
      */
-    @NonNull
     UnitCodecConfig unitCodecConfig;
+
+    @Builder
+    private QuantityCodecConfig(@NonNull QuantityCodecStrategy strategy, @NonNull Configuration configuration, @NonNull CaseFormat nameCaseFormat, List<String> outputUnitNameWords, List<String> outputValueNameWords, @NonNull NumberCodecConfig valueCodecConfig, UnitCodecConfig unitCodecConfig) {
+        this.strategy = strategy;
+        this.configuration = configuration;
+        this.nameCaseFormat = nameCaseFormat;
+        this.outputUnitNameWords = outputUnitNameWords;
+        this.outputValueNameWords = outputValueNameWords;
+        this.valueCodecConfig = valueCodecConfig;
+        this.unitCodecConfig = unitCodecConfig;
+        validate();
+    }
+
+    private void validate() {
+        if (QuantityCodecStrategy.AS_VALUE != strategy()) {
+            if (Objects.isNull(nameCaseFormat())) {
+                throw new IllegalArgumentException(String.format("strategy is %s,nameCaseFormat can't be null", strategy()));
+            }
+            if (CollectionUtils.isEmpty(outputUnitNameWords())) {
+                throw new IllegalArgumentException(String.format("strategy is %s,outputValueNameWords can't be empty", strategy()));
+            }
+            if (CollectionUtils.isEmpty(outputValueNameWords())) {
+                throw new IllegalArgumentException(String.format("strategy is %s,outputValueNameWords can't be empty", strategy()));
+            }
+            if (Objects.isNull(unitCodecConfig())) {
+                throw new IllegalArgumentException(String.format("strategy is %s,unitCodecConfig can't be null", strategy()));
+            }
+        }
+    }
 }

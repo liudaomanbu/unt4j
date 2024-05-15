@@ -36,39 +36,6 @@ import static java.util.Objects.requireNonNull;
 @AllArgsConstructor
 public enum CaseFormat {
     /**
-     * {@link com.google.common.base.CaseFormat#LOWER_HYPHEN}
-     */
-    LOWER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z').or(CharMatcher.is('_'))).negate()) {
-        @Override
-        String normalizeWord(String word) {
-            return Ascii.toLowerCase(word);
-        }
-    },
-    UPPER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z').or(CharMatcher.is('_'))).negate()) {
-        @Override
-        String normalizeWord(String word) {
-            return Ascii.toUpperCase(word);
-        }
-    },
-    /**
-     * {@link com.google.common.base.CaseFormat#LOWER_UNDERSCORE}
-     */
-    LOWER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z').or(CharMatcher.is('-'))).negate()) {
-        @Override
-        String normalizeWord(String word) {
-            return Ascii.toLowerCase(word);
-        }
-    },
-    /**
-     * {@link com.google.common.base.CaseFormat#UPPER_UNDERSCORE}
-     */
-    UPPER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z').or(CharMatcher.is('-'))).negate()) {
-        @Override
-        String normalizeWord(String word) {
-            return Ascii.toUpperCase(word);
-        }
-    },
-    /**
      * {@link com.google.common.base.CaseFormat#LOWER_CAMEL}
      */
     LOWER_CAMEL(CharMatcher.inRange('A', 'Z'), "", CharMatcher.noneOf("-_")) {
@@ -111,6 +78,39 @@ public enum CaseFormat {
                 }
             }
             return super.matches(string) && !string.toUpperCase().equals(string);
+        }
+    },
+    /**
+     * {@link com.google.common.base.CaseFormat#LOWER_UNDERSCORE}
+     */
+    LOWER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z').or(CharMatcher.is('-'))).negate()) {
+        @Override
+        String normalizeWord(String word) {
+            return Ascii.toLowerCase(word);
+        }
+    },
+    /**
+     * {@link com.google.common.base.CaseFormat#UPPER_UNDERSCORE}
+     */
+    UPPER_UNDERSCORE(CharMatcher.is('_'), "_", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z').or(CharMatcher.is('-'))).negate()) {
+        @Override
+        String normalizeWord(String word) {
+            return Ascii.toUpperCase(word);
+        }
+    },
+    /**
+     * {@link com.google.common.base.CaseFormat#LOWER_HYPHEN}
+     */
+    LOWER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('A', 'Z').or(CharMatcher.is('_'))).negate()) {
+        @Override
+        String normalizeWord(String word) {
+            return Ascii.toLowerCase(word);
+        }
+    },
+    UPPER_HYPHEN(CharMatcher.is('-'), "-", CharMatcher.forPredicate(CharMatcher.inRange('a', 'z').or(CharMatcher.is('_'))).negate()) {
+        @Override
+        String normalizeWord(String word) {
+            return Ascii.toUpperCase(word);
         }
     };
 

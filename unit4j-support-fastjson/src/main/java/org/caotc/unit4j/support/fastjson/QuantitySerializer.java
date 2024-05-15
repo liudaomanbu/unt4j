@@ -16,19 +16,27 @@
 
 package org.caotc.unit4j.support.fastjson;
 
+import com.alibaba.fastjson.PropertyNamingStrategy;
+import com.alibaba.fastjson.annotation.JSONType;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
 import com.alibaba.fastjson.serializer.SerialContext;
+import com.alibaba.fastjson.serializer.SerializeWriter;
+import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.caotc.unit4j.api.annotation.QuantityCodecStrategy;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.common.base.CaseFormat;
 import org.caotc.unit4j.support.QuantityCodecConfig;
 import org.caotc.unit4j.support.Unit4jProperties;
 import org.caotc.unit4j.support.common.util.QuantityUtil;
+import org.caotc.unit4j.support.fastjson.util.CodecUtil;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,19 +62,18 @@ public class QuantitySerializer implements ObjectSerializer {
     QuantityCodecConfig codecConfig = unit4jProperties().createQuantityCodecConfig();
     @NonNull
     @Getter(lazy = true)
-    QuantityCodecConfig propertyCodecConfig = unit4jProperties().createQuantityCodecConfig();
-    /**
-     * 数值序列化器
-     */
-    @NonNull
-    @Getter(lazy = true)
-    NumberSerializer numberSerializer = NumberSerializer.of(codecConfig().valueCodecConfig());
-    /**
-     * 单位序列化器
-     */
-    @NonNull
-    @Getter(lazy = true)
-    UnitSerializer unitSerializer = UnitSerializer.of(codecConfig().unitCodecConfig());
+    QuantityCodecConfig propertyCodecConfig = unit4jProperties().createQuantityCodecConfig().withStrategy(unit4jProperties().getDefaultPropertyStrategy());
+
+    private QuantitySerializer(@NonNull Unit4jProperties unit4jProperties) {
+        this.unit4jProperties = unit4jProperties;
+        validate();
+    }
+
+    private void validate() {
+        if (codecConfig().strategy() == QuantityCodecStrategy.FLAT) {
+            throw new IllegalArgumentException(String.format("strategy %s only support property", QuantityCodecStrategy.FLAT));
+        }
+    }
 
     @Override
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
@@ -76,10 +83,11 @@ public class QuantitySerializer implements ObjectSerializer {
         Quantity quantity = (Quantity) object;
         QuantityCodecConfig codecConfig = codecConfig();
         SerialContext context = serializer.getContext();
-        //todo
+
+        //is property
         if (Objects.nonNull(context)) {
             codecConfig = Optional.ofNullable(fieldName)
-                    .flatMap(name -> QuantityUtil.readableQuantityProperty(context.object, (String) name))
+                    .flatMap(propertyName -> QuantityUtil.readableQuantityProperty(context.object, (String) propertyName))
                     .map(unit4jProperties::createPropertyQuantityCodecConfig)
                     .orElseGet(this::propertyCodecConfig);
         }
@@ -87,25 +95,56 @@ public class QuantitySerializer implements ObjectSerializer {
         //todo convert to targetUnit
 
         NumberSerializer valueSerializer = NumberSerializer.of(codecConfig.valueCodecConfig());
+        PropertyNamingStrategy propertyNamingStrategy = Optional.ofNullable(serializer.getContext().object.getClass())
+                .map(clazz -> clazz.getAnnotation(JSONType.class))
+                .map(JSONType::naming)
+                .orElseGet(() -> Optional.ofNullable(serializer.getMapping().propertyNamingStrategy)
+                        .orElse(PropertyNamingStrategy.CamelCase));
+        log.debug("propertyNamingStrategy:{}", propertyNamingStrategy);
+        CaseFormat caseFormat = CodecUtil.mapping(propertyNamingStrategy);
+
+        SerializeWriter writer = serializer.getWriter();
         switch (codecConfig.strategy()) {
             case FLAT:
+                List<String> propertyNameWords;
+                //序列化为FLAT策略时,从逻辑上说一定有属性名称.但是fastjson在某些情况下比如使用了NameFilter时会不传递fieldName
+                if (Objects.isNull(fieldName)) {
+                    String propertyName = getPropertyName(writer);
+                    caseFormat = Arrays.stream(CaseFormat.values())
+                            .filter(format -> format.matches(propertyName))
+                            .findFirst()
+                            .orElse(caseFormat);
+                    propertyNameWords = caseFormat.split(propertyName);
+                } else {
+                    propertyNameWords = caseFormat.split((String) fieldName);
+                }
+
+                /*
+                  fastjson中想要实现直接不输出该属性名,只能使用Filter机制.但是却没提供全局的Filter机制,必须按序列化目标Class注册.
+                  所以在FLAT策略时只能输出null值和逗号来代替不输出属性名.
+                 */
                 serializer.writeNull();
-                serializer.getWriter().write(",");
-                List<String> unitPropertyNameWords = codecConfig.outputUnitName();
-                String unitPropertyName = codecConfig.nameCaseFormat().join();
-                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), "unit", quantity.unit().getClass(), features);
-                serializer.getWriter().write(",");
-                valueSerializer.write(serializer, quantity.value(), "value", quantity.value().getClass(), features);
+                writer.write(",");
+                List<String> unitPropertyNameWords = ImmutableList.<String>builder().addAll(propertyNameWords).addAll(codecConfig.outputUnitNameWords()).build();
+                String unitPropertyName = caseFormat.join(unitPropertyNameWords);
+                writer.writeFieldName(unitPropertyName);
+                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), unitPropertyName, quantity.unit().getClass(), features);
+                writer.write(",");
+                List<String> valuePropertyNameWords = ImmutableList.<String>builder().addAll(propertyNameWords).addAll(codecConfig.outputValueNameWords()).build();
+                String valuePropertyName = caseFormat.join(valuePropertyNameWords);
+                writer.writeFieldName(valuePropertyName);
+                valueSerializer.write(serializer, quantity.value(), valuePropertyName, quantity.value().getClass(), features);
                 break;
             case OBJECT:
-                serializer.getWriter().write("{");
-
-                serializer.getWriter().writeFieldName("unit");
-                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), "unit", quantity.unit().getClass(), features);
-                serializer.getWriter().write(",");
-                serializer.getWriter().writeFieldName("value");
-                valueSerializer.write(serializer, quantity.value(), "value", quantity.value().getClass(), features);
-                serializer.getWriter().write("}");
+                writer.write("{");
+                unitPropertyName = caseFormat.join(codecConfig.outputUnitNameWords());
+                writer.writeFieldName(unitPropertyName);
+                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), unitPropertyName, quantity.unit().getClass(), features);
+                writer.write(",");
+                valuePropertyName = caseFormat.join(codecConfig.outputValueNameWords());
+                writer.writeFieldName(valuePropertyName);
+                valueSerializer.write(serializer, quantity.value(), valuePropertyName, quantity.value().getClass(), features);
+                writer.write("}");
                 break;
             case AS_VALUE:
             default:
@@ -113,4 +152,19 @@ public class QuantitySerializer implements ObjectSerializer {
         }
     }
 
+    private String getPropertyName(@NonNull SerializeWriter writer) {
+        //"[propertyName]":
+        char[] chars = writer.toCharArray();
+        //[propertyNameStartIndex,propertyNameEndIndex)
+        int propertyNameEndIndex = chars.length - 2;
+        int propertyNameStartIndex = 0;
+        for (int i = propertyNameEndIndex - 1; i >= 0; i--) {
+            //属性名称符号可能是双引号或者单引号,以结尾符号对应匹配
+            if (chars[i] == chars[propertyNameEndIndex]) {
+                propertyNameStartIndex = i + 1;
+                break;
+            }
+        }
+        return String.valueOf(chars, propertyNameStartIndex, propertyNameEndIndex - propertyNameStartIndex);
+    }
 }
