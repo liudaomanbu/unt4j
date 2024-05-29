@@ -52,6 +52,7 @@ import java.util.Optional;
 @Value(staticConstructor = "of")
 @Slf4j
 public class QuantitySerializer implements ObjectSerializer {
+    //todo 确认到底Serializer应该依赖Unit4jProperties还是Unit4jProperties产生的CodecConfig
     @NonNull
     Unit4jProperties unit4jProperties;
     /**
