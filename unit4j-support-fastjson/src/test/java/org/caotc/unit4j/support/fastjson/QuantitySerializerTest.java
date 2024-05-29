@@ -16,6 +16,8 @@ import org.caotc.unit4j.support.Unit4jProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 @Slf4j
 class QuantitySerializerTest {
     @Test
@@ -46,7 +48,49 @@ class QuantitySerializerTest {
     }
 
     @Test
-    void writeFlat() {
+    void writeMapQuantityFlat() {
+        Unit4jProperties properties = new Unit4jProperties();
+        properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
+        properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
+
+        QuantitySerializer quantitySerializer = QuantitySerializer.of(properties);
+        SerializeConfig serializeConfig = init(quantitySerializer);
+        Quantity quantity = Quantity.create(999, Units.METER);
+        String jsonString = JSONObject.toJSONString(Map.of("quantity", quantity), serializeConfig);
+        log.info("map:{}", jsonString);
+        Assertions.assertEquals("{\"quantity\":null,\"quantityUnit\":\"METER\",\"quantityValue\":999}", jsonString);
+    }
+
+    @Test
+    void writeMapQuantityLowerUnderscoreFlat() {
+        Unit4jProperties properties = new Unit4jProperties();
+        properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
+        properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
+
+        QuantitySerializer quantitySerializer = QuantitySerializer.of(properties);
+        SerializeConfig serializeConfig = init(quantitySerializer);
+        Quantity quantity = Quantity.create(999, Units.METER);
+        String jsonString = JSONObject.toJSONString(Map.of("quantity_field", quantity), serializeConfig);
+        log.info("map:{}", jsonString);
+        Assertions.assertEquals("{\"quantity_field\":null,\"quantity_field_unit\":\"METER\",\"quantity_field_value\":999}", jsonString);
+    }
+
+    @Test
+    void writeMapQuantityFlatWithNameFilter() {
+        Unit4jProperties properties = new Unit4jProperties();
+        properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
+        properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
+
+        QuantitySerializer quantitySerializer = QuantitySerializer.of(properties);
+        SerializeConfig serializeConfig = init(quantitySerializer);
+        Quantity quantity = Quantity.create(999, Units.METER);
+        String jsonString = JSONObject.toJSONString(Map.of("quantity_field", quantity), serializeConfig, (NameFilter) (object, name, value) -> name.toUpperCase());
+        log.info("map:{}", jsonString);
+        Assertions.assertEquals("{\"QUANTITY_FIELD\":null,\"QUANTITY_FIELD_UNIT\":\"METER\",\"QUANTITY_FIELD_VALUE\":999}", jsonString);
+    }
+
+    @Test
+    void writeFieldQuantityFlat() {
         Unit4jProperties properties = new Unit4jProperties();
         properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
         properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
@@ -60,7 +104,7 @@ class QuantitySerializerTest {
     }
 
     @Test
-    void writeFlatDefaultPropertyNamingStrategy() {
+    void writeFieldQuantityFlatDefaultPropertyNamingStrategy() {
         Unit4jProperties properties = new Unit4jProperties();
         properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
         properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
@@ -74,7 +118,7 @@ class QuantitySerializerTest {
     }
 
     @Test
-    void writeFlatCamelCase() {
+    void writeFieldQuantityFlatCamelCase() {
         Unit4jProperties properties = new Unit4jProperties();
         properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
         properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
@@ -88,7 +132,7 @@ class QuantitySerializerTest {
     }
 
     @Test
-    void writeFlatPascalCase() {
+    void writeFieldQuantityFlatPascalCase() {
         Unit4jProperties properties = new Unit4jProperties();
         properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
         properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
@@ -102,7 +146,7 @@ class QuantitySerializerTest {
     }
 
     @Test
-    void writeFlatSnakeCase() {
+    void writeFieldQuantityFlatSnakeCase() {
         Unit4jProperties properties = new Unit4jProperties();
         properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
         properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
@@ -116,7 +160,7 @@ class QuantitySerializerTest {
     }
 
     @Test
-    void writeFlatKebabCase() {
+    void writeFieldQuantityFlatKebabCase() {
         Unit4jProperties properties = new Unit4jProperties();
         properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
         properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);
@@ -130,7 +174,7 @@ class QuantitySerializerTest {
     }
 
     @Test
-    void writeFlatWithNameFilter() {
+    void writeFieldQuantityFlatWithNameFilter() {
         Unit4jProperties properties = new Unit4jProperties();
         properties.setDefaultPropertyStrategy(QuantityCodecStrategy.FLAT);
         properties.setDefaultUnitCodecStrategy(UnitCodecStrategy.AS_ID);

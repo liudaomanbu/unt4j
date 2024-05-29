@@ -16,7 +16,6 @@
 
 package org.caotc.unit4j.support.fastjson;
 
-import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.annotation.JSONType;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
@@ -38,6 +37,7 @@ import org.caotc.unit4j.support.fastjson.util.CodecUtil;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -83,41 +83,42 @@ public class QuantitySerializer implements ObjectSerializer {
         Quantity quantity = (Quantity) object;
         QuantityCodecConfig codecConfig = codecConfig();
         SerialContext context = serializer.getContext();
+        SerializeWriter writer = serializer.getWriter();
 
+        //有context时,从逻辑上说一定有属性名称.但是fastjson在某些情况下比如bean使用了NameFilter时会不传递fieldName
+        final String propertyName = Objects.nonNull(context) && Objects.isNull(fieldName) ? getPropertyName(writer) : (String) fieldName;
+        CaseFormat caseFormat = null;
         //is property
         if (Objects.nonNull(context)) {
-            codecConfig = Optional.ofNullable(fieldName)
-                    .flatMap(propertyName -> QuantityUtil.readableQuantityProperty(context.object, (String) propertyName))
+            codecConfig = QuantityUtil.readableQuantityProperty(context.object, propertyName)
                     .map(unit4jProperties::createPropertyQuantityCodecConfig)
                     .orElseGet(this::propertyCodecConfig);
+
+
+            if (!(context.object instanceof Map)) {
+                caseFormat = Optional.ofNullable(context.object.getClass())
+                        .map(clazz -> clazz.getAnnotation(JSONType.class))
+                        .map(JSONType::naming)
+                        .or(() -> Optional.ofNullable(serializer.getMapping().propertyNamingStrategy))
+                        .map(CodecUtil::mapping)
+                        .orElse(null);
+            }
+        }
+        if (Objects.isNull(caseFormat)) {
+            caseFormat = Optional.ofNullable(propertyName)
+                    .flatMap(name -> Arrays.stream(CaseFormat.values())
+                            .filter(format -> format.matches(name))
+                            .findFirst())
+                    .orElse(CaseFormat.LOWER_CAMEL);
         }
 
         //todo convert to targetUnit
 
         NumberSerializer valueSerializer = NumberSerializer.of(codecConfig.valueCodecConfig());
-        PropertyNamingStrategy propertyNamingStrategy = Optional.ofNullable(serializer.getContext().object.getClass())
-                .map(clazz -> clazz.getAnnotation(JSONType.class))
-                .map(JSONType::naming)
-                .orElseGet(() -> Optional.ofNullable(serializer.getMapping().propertyNamingStrategy)
-                        .orElse(PropertyNamingStrategy.CamelCase));
-        log.debug("propertyNamingStrategy:{}", propertyNamingStrategy);
-        CaseFormat caseFormat = CodecUtil.mapping(propertyNamingStrategy);
 
-        SerializeWriter writer = serializer.getWriter();
         switch (codecConfig.strategy()) {
             case FLAT:
-                List<String> propertyNameWords;
-                //序列化为FLAT策略时,从逻辑上说一定有属性名称.但是fastjson在某些情况下比如使用了NameFilter时会不传递fieldName
-                if (Objects.isNull(fieldName)) {
-                    String propertyName = getPropertyName(writer);
-                    caseFormat = Arrays.stream(CaseFormat.values())
-                            .filter(format -> format.matches(propertyName))
-                            .findFirst()
-                            .orElse(caseFormat);
-                    propertyNameWords = caseFormat.split(propertyName);
-                } else {
-                    propertyNameWords = caseFormat.split((String) fieldName);
-                }
+                List<String> propertyNameWords = caseFormat.split(propertyName);
 
                 /*
                   fastjson中想要实现直接不输出该属性名,只能使用Filter机制.但是却没提供全局的Filter机制,必须按序列化目标Class注册.
