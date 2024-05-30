@@ -17,12 +17,17 @@
 package org.caotc.unit4j.support.fastjson;
 
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Value;
 import org.caotc.unit4j.core.Quantity;
+import org.caotc.unit4j.core.math.number.BigFractionAdapter;
+import org.caotc.unit4j.core.math.number.Number;
+import org.caotc.unit4j.core.unit.BasePrefixUnit;
+import org.caotc.unit4j.core.unit.BaseStandardUnit;
+import org.caotc.unit4j.core.unit.CompositePrefixUnit;
+import org.caotc.unit4j.core.unit.CompositeStandardUnit;
 import org.caotc.unit4j.support.Unit4jProperties;
-
-import java.util.Arrays;
 
 /**
  * unit4j库的fastjson的序列化与反序列化模块. 所有fastjson的序列化与反序列化需要的对象都包装在该类中使用.
@@ -31,55 +36,39 @@ import java.util.Arrays;
  * @date 2019-05-12
  * @since 1.0.0
  */
-@Value
+@Value(staticConstructor = "of")
 public class Unit4jModule {
 
-  /**
-   * 工厂方法
-   *
-   * @param unit4jProperties 属性
-   * @return unit4j库的fastjson的序列化与反序列化模块
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  public static Unit4jModule create(@NonNull Unit4jProperties unit4jProperties) {
-    return new Unit4jModule(unit4jProperties);
-  }
-
-    /**
-     * 属性过滤器
-     */
     @NonNull
-    Unit4jFilter unit4jFilter;
+    Unit4jProperties unit4jProperties;
     /**
      * 单独{@link Quantity}对象的序列化器
      */
     @NonNull
-    QuantitySerializer quantitySerializer;
+    @Getter(lazy = true)
+    QuantitySerializer quantitySerializer = QuantitySerializer.of(unit4jProperties());
+    @NonNull
+    @Getter(lazy = true)
+    NumberSerializer numberSerializer = NumberSerializer.of(unit4jProperties().createQuantityCodecConfig().valueCodecConfig());
+    @NonNull
+    @Getter(lazy = true)
+    UnitSerializer unitSerializer = UnitSerializer.of(unit4jProperties().createQuantityCodecConfig().unitCodecConfig());
 
-
-  private Unit4jModule(@NonNull Unit4jProperties unit4jProperties) {
-      unit4jFilter = new Unit4jFilter(unit4jProperties);
-//      quantitySerializer = QuantitySerializer.of(unit4jProperties.createQuantityCodecConfig());
-      quantitySerializer = null;
-  }
-
-  /**
-   * 注册到fastjson配置
-   *
-   * @param serializeConfig fastjson序列化配置
-   * @author caotc
-   * @date 2019-05-29
-   * @since 1.0.0
-   */
-  public void registerTo(@NonNull SerializeConfig serializeConfig, @NonNull Class<?>... classes) {
-      serializeConfig.put(Quantity.class, quantitySerializer());
-//      serializeConfig.put(BigFractionAdapter.class, quantitySerializer().numberSerializer());
-//      serializeConfig.put(BaseStandardUnit.class, quantitySerializer().unitSerializer());
-//      serializeConfig.put(BasePrefixUnit.class, quantitySerializer().unitSerializer());
-//      serializeConfig.put(CompositeStandardUnit.class, quantitySerializer().unitSerializer());
-//      serializeConfig.put(CompositePrefixUnit.class, quantitySerializer().unitSerializer());
-      Arrays.stream(classes).forEach(clazz -> serializeConfig.addFilter(clazz, unit4jFilter()));
-  }
+    /**
+     * 注册到fastjson配置
+     *
+     * @param serializeConfig fastjson序列化配置
+     * @author caotc
+     * @date 2019-05-29
+     * @since 1.0.0
+     */
+    public void registerTo(@NonNull SerializeConfig serializeConfig) {
+        serializeConfig.put(Quantity.class, quantitySerializer());
+        serializeConfig.put(Number.class, numberSerializer());
+        serializeConfig.put(BigFractionAdapter.class, numberSerializer());
+        serializeConfig.put(BaseStandardUnit.class, unitSerializer());
+        serializeConfig.put(BasePrefixUnit.class, unitSerializer());
+        serializeConfig.put(CompositeStandardUnit.class, unitSerializer());
+        serializeConfig.put(CompositePrefixUnit.class, unitSerializer());
+    }
 }

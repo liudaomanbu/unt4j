@@ -224,6 +224,7 @@ public class Unit4jProperties {
                 .orElseGet(this::getDefaultConfiguration);
 
         Type type = quantitySerialize.map(QuantitySerialize::unitAliasType)
+                .filter(t -> !t.isEmpty())
                 .map(Type::of)
                 .orElseGet(this::getDefaultUnitAliasType);
         FirstAliasFinder<Unit> aliasFinder = FirstAliasFinder.of(type);
@@ -265,6 +266,7 @@ public class Unit4jProperties {
         Configuration configuration = quantityDeserialize.map(QuantityDeserialize::configId).map(Configuration::findExact)
                 .orElseGet(this::getDefaultConfiguration);
         Type type = quantityDeserialize.map(QuantityDeserialize::unitAliasType)
+                .filter(t -> !t.isEmpty())
                 .map(Type::of)
                 .orElseGet(this::getDefaultUnitAliasType);
         FirstAliasFinder<Unit> aliasFinder = FirstAliasFinder.of(type);

@@ -62,7 +62,7 @@ public @interface QuantitySerialize {
     /**
      * @return 单位字段名称
      */
-    String[] unitName() default StringConstant.EMPTY;
+    String[] unitName() default {};
 
     /**
      * @return 单位序列化策略
@@ -82,7 +82,7 @@ public @interface QuantitySerialize {
     /**
      * @return 值字段名称
      */
-    String[] valueName() default StringConstant.EMPTY;
+    String[] valueName() default {};
 
     /**
      * @return 数值序列化时使用的类

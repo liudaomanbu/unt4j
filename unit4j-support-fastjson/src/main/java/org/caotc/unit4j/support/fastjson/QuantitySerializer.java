@@ -96,6 +96,7 @@ public class QuantitySerializer implements ObjectSerializer {
                     .orElseGet(this::propertyCodecConfig);
 
 
+            //非map时propertyNamingStrategy有效,尝试获取
             if (!(context.object instanceof Map)) {
                 caseFormat = Optional.ofNullable(context.object.getClass())
                         .map(clazz -> clazz.getAnnotation(JSONType.class))
@@ -105,6 +106,7 @@ public class QuantitySerializer implements ObjectSerializer {
                         .orElse(null);
             }
         }
+        //获取不到propertyNamingStrategy,根据当前属性判断名称格式
         if (Objects.isNull(caseFormat)) {
             caseFormat = Optional.ofNullable(propertyName)
                     .flatMap(name -> Arrays.stream(CaseFormat.values())
