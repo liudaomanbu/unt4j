@@ -120,6 +120,19 @@ class UnitSerializerTest {
         Assertions.assertEquals(String.format("{\"%s\":\"米\"}", unitKey), jsonString);
     }
 
+    @SuppressWarnings("rawtypes")
+    @Test
+    void writeMapUnitArray() throws JsonProcessingException {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        ObjectMapper mapper = init(unitSerializer);
+        String unitKey = "unitKey";
+        Map<String, Object> map = Map.of(unitKey, Units.METER);
+        Map[] array = new Map[]{map};
+        String jsonString = mapper.writeValueAsString(array);
+        log.info("{}:{}", array, jsonString);
+        Assertions.assertEquals(String.format("[{\"%s\":\"米\"}]", unitKey), jsonString);
+    }
+
     @Test
     void writeFieldUnit() throws JsonProcessingException {
         UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
@@ -128,6 +141,17 @@ class UnitSerializerTest {
         String jsonString = mapper.writeValueAsString(object);
         log.info("{}:{}", object, jsonString);
         Assertions.assertEquals(String.format("{\"%s\":\"米\"}", UnitFiledObject.Fields.UNIT), jsonString);
+    }
+
+    @Test
+    void writeFieldUnitArray() throws JsonProcessingException {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        ObjectMapper mapper = init(unitSerializer);
+        UnitFiledObject object = new UnitFiledObject(Units.METER);
+        UnitFiledObject[] array = new UnitFiledObject[]{object};
+        String jsonString = mapper.writeValueAsString(array);
+        log.info("{}:{}", array, jsonString);
+        Assertions.assertEquals(String.format("[{\"%s\":\"米\"}]", UnitFiledObject.Fields.UNIT), jsonString);
     }
 
     @Test
