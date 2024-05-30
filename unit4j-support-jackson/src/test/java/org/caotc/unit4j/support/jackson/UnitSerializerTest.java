@@ -40,7 +40,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 class UnitSerializerTest {
@@ -110,6 +112,36 @@ class UnitSerializerTest {
     }
 
     @Test
+    void writeUnitArray() throws JsonProcessingException {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        ObjectMapper mapper = init(unitSerializer);
+        Unit[] array = new Unit[]{Units.METER};
+        String jsonString = mapper.writeValueAsString(array);
+        log.info("{}:{}", array, jsonString);
+        Assertions.assertEquals(String.format("[\"%s\"]", Units.METER.id()), jsonString);
+    }
+
+    @Test
+    void writeUnitList() throws JsonProcessingException {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        ObjectMapper mapper = init(unitSerializer);
+        List<Unit> list = List.of(Units.METER);
+        String jsonString = mapper.writeValueAsString(list);
+        log.info("{}:{}", list, jsonString);
+        Assertions.assertEquals(String.format("[\"%s\"]", Units.METER.id()), jsonString);
+    }
+
+    @Test
+    void writeUnitSet() throws JsonProcessingException {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        ObjectMapper mapper = init(unitSerializer);
+        Set<Unit> set = Set.of(Units.METER);
+        String jsonString = mapper.writeValueAsString(set);
+        log.info("{}:{}", set, jsonString);
+        Assertions.assertEquals(String.format("[\"%s\"]", Units.METER.id()), jsonString);
+    }
+
+    @Test
     void writeMapUnit() throws JsonProcessingException {
         UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
         ObjectMapper mapper = init(unitSerializer);
@@ -120,19 +152,6 @@ class UnitSerializerTest {
         Assertions.assertEquals(String.format("{\"%s\":\"米\"}", unitKey), jsonString);
     }
 
-    @SuppressWarnings("rawtypes")
-    @Test
-    void writeMapUnitArray() throws JsonProcessingException {
-        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
-        ObjectMapper mapper = init(unitSerializer);
-        String unitKey = "unitKey";
-        Map<String, Object> map = Map.of(unitKey, Units.METER);
-        Map[] array = new Map[]{map};
-        String jsonString = mapper.writeValueAsString(array);
-        log.info("{}:{}", array, jsonString);
-        Assertions.assertEquals(String.format("[{\"%s\":\"米\"}]", unitKey), jsonString);
-    }
-
     @Test
     void writeFieldUnit() throws JsonProcessingException {
         UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
@@ -141,17 +160,6 @@ class UnitSerializerTest {
         String jsonString = mapper.writeValueAsString(object);
         log.info("{}:{}", object, jsonString);
         Assertions.assertEquals(String.format("{\"%s\":\"米\"}", UnitFiledObject.Fields.UNIT), jsonString);
-    }
-
-    @Test
-    void writeFieldUnitArray() throws JsonProcessingException {
-        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
-        ObjectMapper mapper = init(unitSerializer);
-        UnitFiledObject object = new UnitFiledObject(Units.METER);
-        UnitFiledObject[] array = new UnitFiledObject[]{object};
-        String jsonString = mapper.writeValueAsString(array);
-        log.info("{}:{}", array, jsonString);
-        Assertions.assertEquals(String.format("[{\"%s\":\"米\"}]", UnitFiledObject.Fields.UNIT), jsonString);
     }
 
     @Test

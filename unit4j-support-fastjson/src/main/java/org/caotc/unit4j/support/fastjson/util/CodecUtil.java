@@ -1,11 +1,15 @@
 package org.caotc.unit4j.support.fastjson.util;
 
 import com.alibaba.fastjson.PropertyNamingStrategy;
+import com.alibaba.fastjson.serializer.SerialContext;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.caotc.unit4j.core.common.base.CaseFormat;
+
+import java.util.Collection;
+import java.util.Objects;
 
 /**
  * @author caotc
@@ -24,5 +28,9 @@ public class CodecUtil {
     @NonNull
     public static CaseFormat mapping(@NonNull PropertyNamingStrategy propertyNamingStrategy) {
         return CASE_FORMAT_MAP.get(propertyNamingStrategy);
+    }
+
+    public static boolean isProperty(SerialContext context) {
+        return Objects.isNull(context) || context.object.getClass().isArray() || context.object instanceof Collection;
     }
 }

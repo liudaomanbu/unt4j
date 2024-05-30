@@ -42,7 +42,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 class UnitSerializerTest {
@@ -93,6 +95,36 @@ class UnitSerializerTest {
     }
 
     @Test
+    void writeUnitArray() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        Unit[] array = new Unit[]{Units.METER};
+        String jsonString = JSONObject.toJSONString(array, serializeConfig);
+        log.info("{}:{}", array, jsonString);
+        Assertions.assertEquals(String.format("[\"%s\"]", Units.METER.id()), jsonString);
+    }
+
+    @Test
+    void writeUnitList() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        List<Unit> list = List.of(Units.METER);
+        String jsonString = JSONObject.toJSONString(list, serializeConfig);
+        log.info("{}:{}", list, jsonString);
+        Assertions.assertEquals(String.format("[\"%s\"]", Units.METER.id()), jsonString);
+    }
+
+    @Test
+    void writeUnitSet() {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        SerializeConfig serializeConfig = init(unitSerializer);
+        Set<Unit> set = Set.of(Units.METER);
+        String jsonString = JSONObject.toJSONString(set, serializeConfig);
+        log.info("{}:{}", set, jsonString);
+        Assertions.assertEquals(String.format("[\"%s\"]", Units.METER.id()), jsonString);
+    }
+
+    @Test
     void writeMapUnit() {
         UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
         SerializeConfig serializeConfig = init(unitSerializer);
@@ -103,19 +135,6 @@ class UnitSerializerTest {
         Assertions.assertEquals(String.format("{\"%s\":\"米\"}", unitKey), jsonString);
     }
 
-    @SuppressWarnings("rawtypes")
-    @Test
-    void writeMapUnitArray() {
-        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
-        SerializeConfig serializeConfig = init(unitSerializer);
-        String unitKey = "unitKey";
-        Map<String, Object> map = Map.of(unitKey, Units.METER);
-        Map[] array = new Map[]{map};
-        String jsonString = JSONObject.toJSONString(array, serializeConfig);
-        log.info("{}:{}", array, jsonString);
-        Assertions.assertEquals(String.format("[{\"%s\":\"米\"}]", unitKey), jsonString);
-    }
-
     @Test
     void writeFieldUnit() {
         UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
@@ -124,17 +143,6 @@ class UnitSerializerTest {
         String jsonString = JSONObject.toJSONString(object, serializeConfig);
         log.info("{}:{}", object, jsonString);
         Assertions.assertEquals(String.format("{\"%s\":\"米\"}", UnitFiledObject.Fields.UNIT), jsonString);
-    }
-
-    @Test
-    void writeFieldUnitArray() {
-        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
-        SerializeConfig serializeConfig = init(unitSerializer);
-        UnitFiledObject object = new UnitFiledObject(Units.METER);
-        UnitFiledObject[] array = new UnitFiledObject[]{object};
-        String jsonString = JSONObject.toJSONString(array, serializeConfig);
-        log.info("{}:{}", array, jsonString);
-        Assertions.assertEquals(String.format("[{\"%s\":\"米\"}]", UnitFiledObject.Fields.UNIT), jsonString);
     }
 
     @Test

@@ -7,9 +7,9 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.core.unit.Unit;
 import org.caotc.unit4j.support.UnitCodecConfig;
+import org.caotc.unit4j.support.fastjson.util.CodecUtil;
 
 import java.lang.reflect.Type;
-import java.util.Objects;
 
 /**
  * {@link org.caotc.unit4j.core.unit.Unit}在fastjson的序列化器
@@ -42,7 +42,7 @@ public class UnitSerializer implements ObjectSerializer {
     Unit unit = (Unit) object;
 
     //是否作为属性
-    UnitCodecConfig unitCodecConfig = Objects.isNull(serializer.getContext()) ? codecConfig() : propertyCodecConfig();
+    UnitCodecConfig unitCodecConfig = CodecUtil.isProperty(serializer.getContext()) ? codecConfig() : propertyCodecConfig();
     String serialize = serialize(unitCodecConfig, unit);
     serializer.write(serialize);
   }
