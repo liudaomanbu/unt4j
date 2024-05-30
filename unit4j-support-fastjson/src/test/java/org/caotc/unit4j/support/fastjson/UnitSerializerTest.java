@@ -157,6 +157,10 @@ class UnitSerializerTest {
         UnwrappedUnitFiledObject object = new UnwrappedUnitFiledObject(Units.METER);
         String jsonString = JSONObject.toJSONString(object, serializeConfig);
         log.info("{}:{}", object, jsonString);
+        /*
+        对于序列化结果为非object的情况,unwrapped不应该生效
+        因为如果UnwrappedUnitFiledObject存在其他属性会产生类似于{"Name":"test","米"}之类的非法输出
+         */
         Assertions.assertEquals("{\"UNIT\":\"米\"}", jsonString);
     }
 
