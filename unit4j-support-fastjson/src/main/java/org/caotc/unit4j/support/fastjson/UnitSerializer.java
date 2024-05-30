@@ -41,7 +41,7 @@ public class UnitSerializer implements ObjectSerializer {
     log.debug("object:{},fieldName:{},fieldType:{},features:{}", object, fieldName, fieldType, features);
     Unit unit = (Unit) object;
 
-    //is property
+    //是否作为属性
     UnitCodecConfig unitCodecConfig = Objects.isNull(serializer.getContext()) ? codecConfig() : propertyCodecConfig();
     String serialize = serialize(unitCodecConfig, unit);
     serializer.write(serialize);

@@ -48,7 +48,8 @@ public class NumberSerializer implements ObjectSerializer {
     public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType,
                       int features) {
         log.debug("object:{},fieldName:{},fieldType:{},features:{}", object, fieldName, fieldType, features);
-        Number value = (Number) object;
-        serializer.write(value.value(codecConfig().valueType(), codecConfig().mathContext()));
+        Number number = (Number) object;
+        Object value = number.value(codecConfig().valueType(), codecConfig().mathContext());
+        serializer.write(value);
     }
 }

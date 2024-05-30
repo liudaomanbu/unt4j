@@ -31,7 +31,7 @@ public class QuantitySerializer extends StdSerializer<Quantity> {
      * 数值序列化器
      */
     @NonNull
-    QuantityValueSerializer quantityValueSerializer;
+    NumberSerializer numberSerializer;
     /**
      * 单位序列化器
      */
@@ -41,8 +41,8 @@ public class QuantitySerializer extends StdSerializer<Quantity> {
     public QuantitySerializer(@NonNull QuantityCodecConfig quantityCodecConfig) {
         super(Quantity.class);
         this.quantityCodecConfig = quantityCodecConfig;
-        this.quantityValueSerializer = new QuantityValueSerializer(quantityCodecConfig.valueCodecConfig());
-        unitSerializer = new UnitSerializer(quantityCodecConfig.unitCodecConfig());
+        this.numberSerializer = NumberSerializer.of(quantityCodecConfig.valueCodecConfig());
+        unitSerializer = UnitSerializer.of(quantityCodecConfig.unitCodecConfig());
     }
 
     @Override

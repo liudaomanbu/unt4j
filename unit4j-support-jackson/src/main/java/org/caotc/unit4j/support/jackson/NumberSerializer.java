@@ -35,22 +35,27 @@ import java.io.IOException;
  * @since 1.0.0
  */
 @Value
-public class QuantityValueSerializer extends StdSerializer<Number> {
+public class NumberSerializer extends StdSerializer<Number> {
+
+    @NonNull
+    public static NumberSerializer of(@NonNull NumberCodecConfig codecConfig) {
+        return new NumberSerializer(codecConfig);
+    }
 
     /**
      * {@link Quantity#value()}的序列化反序列化配置
      */
     @NonNull
-    NumberCodecConfig numberCodecConfig;
+    NumberCodecConfig codecConfig;
 
-    public QuantityValueSerializer(@NonNull NumberCodecConfig numberCodecConfig) {
+    public NumberSerializer(@NonNull NumberCodecConfig codecConfig) {
         super(Number.class);
-        this.numberCodecConfig = numberCodecConfig;
+        this.codecConfig = codecConfig;
     }
 
   @Override
   public void serialize(Number value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
+      gen.writeObject(value.value(codecConfig().valueType(), codecConfig().mathContext()));
   }
-
 }
