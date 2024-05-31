@@ -52,7 +52,7 @@ public class UnitSerializer extends StdSerializer<Unit> {
 
     UnitCodecConfig unitCodecConfig;
     //是否作为属性
-    if (sc.inRoot() || (sc.inArray() && sc.getParent().inRoot())) {
+    if (sc.inRoot() || sc.inArray()) {
       unitCodecConfig = codecConfig();
     } else {
       unitCodecConfig = propertyCodecConfig();

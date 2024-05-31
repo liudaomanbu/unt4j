@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -153,6 +154,17 @@ class UnitSerializerTest {
     }
 
     @Test
+    void writeMapUnitCollection() throws JsonProcessingException {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        ObjectMapper mapper = init(unitSerializer);
+        String unitKey = "unitKey";
+        Map<String, Object> map = Map.of(unitKey, List.of(Units.METER));
+        String jsonString = mapper.writeValueAsString(map);
+        log.info("{}:{}", map, jsonString);
+        Assertions.assertEquals(String.format("{\"%s\":[\"%s\"]}", unitKey, Units.METER.id()), jsonString);
+    }
+
+    @Test
     void writeFieldUnit() throws JsonProcessingException {
         UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
         ObjectMapper mapper = init(unitSerializer);
@@ -160,6 +172,16 @@ class UnitSerializerTest {
         String jsonString = mapper.writeValueAsString(object);
         log.info("{}:{}", object, jsonString);
         Assertions.assertEquals(String.format("{\"%s\":\"米\"}", UnitFiledObject.Fields.UNIT), jsonString);
+    }
+
+    @Test
+    void writeFieldUnitCollection() throws JsonProcessingException {
+        UnitSerializer unitSerializer = propertyChineseNameUnitSerializer();
+        ObjectMapper mapper = init(unitSerializer);
+        UnitCollectionFiledObject object = new UnitCollectionFiledObject(List.of(Units.METER));
+        String jsonString = mapper.writeValueAsString(object);
+        log.info("{}:{}", object, jsonString);
+        Assertions.assertEquals(String.format("{\"%s\":[\"%s\"]}", UnitCollectionFiledObject.Fields.UNITS, Units.METER.id()), jsonString);
     }
 
     @Test
@@ -264,6 +286,12 @@ class UnitSerializerTest {
 @FieldNameConstants
 class UnitFiledObject {
     public Unit unit;
+}
+
+@Value
+@FieldNameConstants
+class UnitCollectionFiledObject {
+    public Collection<Unit> units;
 }
 
 @Value
