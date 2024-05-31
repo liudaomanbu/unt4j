@@ -28,7 +28,6 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.caotc.unit4j.api.annotation.QuantitySerialize;
 import org.caotc.unit4j.core.Quantity;
-import org.caotc.unit4j.core.common.util.ReflectionUtil;
 import org.caotc.unit4j.support.Unit4jProperties;
 
 import java.io.IOException;
@@ -59,7 +58,8 @@ public class Unit4jContextualSerializer extends StdSerializer<Quantity> implemen
   public Unit4jContextualSerializer(@NonNull Unit4jProperties unit4jProperties) {
       super(Quantity.class);
       this.unit4jProperties = unit4jProperties;
-      quantitySerializer = new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
+//      quantitySerializer = new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
+      this.quantitySerializer = QuantitySerializer.of(unit4jProperties.createQuantityCodecConfig(), unit4jProperties.createQuantityCodecConfig());
   }
 
     @Override
@@ -83,11 +83,13 @@ public class Unit4jContextualSerializer extends StdSerializer<Quantity> implemen
 //          amountSerialize = property.getContextAnnotation(AmountSerialize.class);
 //        }
             if (quantitySerialize != null) {
-                return new QuantitySerializer(
-                        unit4jProperties.createPropertyQuantityCodecConfig(ReflectionUtil
-                                .readablePropertyExact(prov.getActiveView(), property.getName())));
+//                return  QuantitySerializer.of(
+//                        unit4jProperties.createPropertyQuantityCodecConfig(ReflectionUtil
+//                                .readablePropertyExact(prov.getActiveView(), property.getName())));
+                return null;
             } else {
-                return new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
+//                return new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
+                return null;
             }
         }
       return prov.findValueSerializer(property.getType(), property);

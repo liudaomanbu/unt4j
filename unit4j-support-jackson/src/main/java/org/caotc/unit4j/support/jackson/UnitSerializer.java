@@ -18,17 +18,12 @@ import java.io.IOException;
  * @date 2019-04-24
  * @since 1.0.0
  */
-@Value
+@Value(staticConstructor = "of")
 public class UnitSerializer extends StdSerializer<Unit> {
 
   @NonNull
   public static UnitSerializer of(@NonNull UnitCodecConfig codecConfig) {
     return new UnitSerializer(codecConfig, codecConfig);
-  }
-
-  @NonNull
-  public static UnitSerializer of(@NonNull UnitCodecConfig codecConfig, @NonNull UnitCodecConfig propertyCodecConfig) {
-    return new UnitSerializer(codecConfig, propertyCodecConfig);
   }
 
   /**
