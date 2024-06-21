@@ -53,13 +53,13 @@ public class Unit4jContextualSerializer extends StdSerializer<Quantity> implemen
     @NonNull
     Unit4jProperties unit4jProperties;
     @NonNull
-    QuantitySerializer quantitySerializer;
+    QuantitySerializer quantitySerializer = null;
 
   public Unit4jContextualSerializer(@NonNull Unit4jProperties unit4jProperties) {
       super(Quantity.class);
       this.unit4jProperties = unit4jProperties;
 //      quantitySerializer = new QuantitySerializer(unit4jProperties.createQuantityCodecConfig());
-      this.quantitySerializer = QuantitySerializer.of(unit4jProperties.createQuantityCodecConfig(), unit4jProperties.createQuantityCodecConfig());
+//      this.quantitySerializer = QuantitySerializer.of(unit4jProperties.createQuantityCodecConfig(), unit4jProperties.createQuantityCodecConfig());
   }
 
     @Override

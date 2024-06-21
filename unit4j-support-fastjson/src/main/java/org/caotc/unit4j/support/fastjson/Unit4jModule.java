@@ -63,6 +63,7 @@ public class Unit4jModule {
      * @since 1.0.0
      */
     public void registerTo(@NonNull SerializeConfig serializeConfig) {
+        //todo @WithUnit问题没有解决
         serializeConfig.put(Quantity.class, quantitySerializer());
         serializeConfig.put(Number.class, numberSerializer());
         serializeConfig.put(BigFractionAdapter.class, numberSerializer());

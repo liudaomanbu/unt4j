@@ -216,10 +216,18 @@ public class Unit4jProperties {
      * @since 1.0.0
      */
     @NonNull
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public QuantityCodecConfig createPropertyQuantityCodecConfig(
             @NonNull ReadableProperty<?, ?> quantityReadableProperty) {
-        Optional<QuantitySerialize> quantitySerialize = quantityReadableProperty.annotation(QuantitySerialize.class);
+        return quantityReadableProperty.annotation(QuantitySerialize.class)
+                .map(this::createPropertyQuantityCodecConfig)
+                .orElseGet(this::createQuantityCodecConfig);
+    }
+
+    @NonNull
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public QuantityCodecConfig createPropertyQuantityCodecConfig(
+            QuantitySerialize annotation) {
+        Optional<QuantitySerialize> quantitySerialize = Optional.ofNullable(annotation);
         Configuration configuration = quantitySerialize.map(QuantitySerialize::configId).map(Configuration::findExact)
                 .orElseGet(this::getDefaultConfiguration);
 

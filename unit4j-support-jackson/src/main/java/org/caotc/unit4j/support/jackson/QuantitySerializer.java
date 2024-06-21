@@ -34,6 +34,11 @@ import java.util.Objects;
 public class QuantitySerializer extends StdSerializer<Quantity> implements
         ContextualSerializer {
     @NonNull
+    public static QuantitySerializer of(@NonNull QuantityCodecConfig codecConfig) {
+        return of(codecConfig, NameTransformer.NOP);
+    }
+
+    @NonNull
     Unit4jProperties unit4jProperties = new Unit4jProperties();
     /**
      * 序列化反序列化配置
@@ -41,101 +46,73 @@ public class QuantitySerializer extends StdSerializer<Quantity> implements
     @NonNull
     QuantityCodecConfig codecConfig;
     @NonNull
-    QuantityCodecConfig propertyCodecConfig;
+    NameTransformer nameTransformer;
 
 
-    public QuantitySerializer(@NonNull QuantityCodecConfig codecConfig, @NonNull QuantityCodecConfig propertyCodecConfig) {
+    QuantitySerializer(@NonNull QuantityCodecConfig codecConfig, @NonNull NameTransformer nameTransformer) {
         super(Quantity.class);
         this.codecConfig = codecConfig;
-        this.propertyCodecConfig = propertyCodecConfig;
-        validate();
-    }
-
-    private void validate() {
-        if (codecConfig().strategy() == QuantityCodecStrategy.FLAT) {
-            throw new IllegalArgumentException(String.format("strategy %s only support property", QuantityCodecStrategy.FLAT));
-        }
+        this.nameTransformer = nameTransformer;
     }
 
     @Override
     public JsonSerializer<Quantity> unwrappingSerializer(NameTransformer unwrapper) {
-        return this;
+        return QuantitySerializer.of(codecConfig(), unwrapper);
     }
 
     @Override
     public boolean isUnwrappingSerializer() {
-//        return super.isUnwrappingSerializer();
-        return true;
+        return codecConfig().strategy() == QuantityCodecStrategy.FLAT;
     }
 
     @Override
     public void serialize(Quantity value, JsonGenerator gen, SerializerProvider provider)
             throws IOException {
-        log.error("serialize");
-        gen.writeObjectField("unit", value.unit());
-        gen.writeObjectField("value", value.value());
+        log.debug("serialize value:{},gen:{},provider:{}", value, gen, provider);
 
         JsonStreamContext sc = gen.getOutputContext();
+        log.error("serialize currentName:{}", sc.getCurrentName());
 
-        QuantityCodecConfig codecConfig;
-        //是否作为属性
-        if (sc.inRoot() || sc.inArray()) {
-            codecConfig = codecConfig();
-        } else {
-            codecConfig = propertyCodecConfig();
+        QuantityCodecConfig codecConfig = codecConfig();
+
+        UnitSerializer unitSerializer = UnitSerializer.of(codecConfig.unitCodecConfig());
+        NumberSerializer numberSerializer = NumberSerializer.of(codecConfig.valueCodecConfig());
+        switch (codecConfig.strategy()) {
+            case OBJECT:
+                gen.writeStartObject(value);
+                gen.writeFieldName(nameTransformer().transform("unit"));
+                unitSerializer.serialize(value.unit(), gen, provider);
+                gen.writeFieldName(nameTransformer().transform("value"));
+                numberSerializer.serialize(value.value(), gen, provider);
+//                gen.writeObjectField(nameTransformer().transform("unit"), value.unit());
+//                gen.writeObjectField(nameTransformer().transform("value"), value.value());
+                gen.writeEndObject();
+                break;
+            case FLAT:
+                gen.writeFieldName(nameTransformer().transform("unit"));
+                unitSerializer.serialize(value.unit(), gen, provider);
+                gen.writeFieldName(nameTransformer().transform("value"));
+                numberSerializer.serialize(value.value(), gen, provider);
+//                gen.writeObjectField(nameTransformer().transform("unit"), value.unit());
+//                gen.writeObjectField(nameTransformer().transform("value"), value.value());
+                break;
+            case AS_VALUE:
+            default:
+                gen.writeObject(value.value());
         }
-
-//        switch (codecConfig.strategy()) {
-//            case FLAT:
-//                List<String> propertyNameWords = caseFormat.split(propertyName);
-//
-//                /*
-//                  fastjson中想要实现直接不输出该属性名,只能使用Filter机制.但是却没提供全局的Filter机制,必须按序列化目标Class注册.
-//                  所以在FLAT策略时只能输出null值和逗号来代替不输出属性名.
-//                 */
-//                serializer.writeNull();
-//                writer.write(",");
-//                List<String> unitPropertyNameWords = ImmutableList.<String>builder().addAll(propertyNameWords).addAll(codecConfig.outputUnitNameWords()).build();
-//                String unitPropertyName = caseFormat.join(unitPropertyNameWords);
-//                writer.writeFieldName(unitPropertyName);
-//                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), unitPropertyName, quantity.unit().getClass(), features);
-//                writer.write(",");
-//                List<String> valuePropertyNameWords = ImmutableList.<String>builder().addAll(propertyNameWords).addAll(codecConfig.outputValueNameWords()).build();
-//                String valuePropertyName = caseFormat.join(valuePropertyNameWords);
-//                writer.writeFieldName(valuePropertyName);
-//                valueSerializer.write(serializer, quantity.value(), valuePropertyName, quantity.value().getClass(), features);
-//                break;
-//            case OBJECT:
-//                writer.write("{");
-//                unitPropertyName = caseFormat.join(codecConfig.outputUnitNameWords());
-//                writer.writeFieldName(unitPropertyName);
-//                UnitSerializer.of(codecConfig.unitCodecConfig()).write(serializer, quantity.unit(), unitPropertyName, quantity.unit().getClass(), features);
-//                writer.write(",");
-//                valuePropertyName = caseFormat.join(codecConfig.outputValueNameWords());
-//                writer.writeFieldName(valuePropertyName);
-//                valueSerializer.write(serializer, quantity.value(), valuePropertyName, quantity.value().getClass(), features);
-//                writer.write("}");
-//                break;
-//            case AS_VALUE:
-//            default:
-//                valueSerializer.write(serializer, quantity.value(), null, null, features);
-//        }
     }
 
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property)
             throws JsonMappingException {
         log.error("ContextualSerializer");
-        log.error("prov.getActiveView():{}", prov.getActiveView());
+
         log.error("property:{}", property);
         //TODO 待确认
         if (property != null) {
+            log.error("property name:{},fullName:{},wrapperName:{}", property.getName(), property.getFullName(), property.getWrapperName());
             if (Objects.equals(property.getType().getRawClass(), Quantity.class)) {
                 QuantitySerialize quantitySerialize = property.getAnnotation(QuantitySerialize.class);
-                //TODO 整个类生效
-//        if (amountSerialize == null) {
-//          amountSerialize = property.getContextAnnotation(AmountSerialize.class);
-//        }
                 if (quantitySerialize != null) {
 //                return  QuantitySerializer.of(
 //                        unit4jProperties.createPropertyQuantityCodecConfig(ReflectionUtil
